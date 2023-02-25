@@ -501,7 +501,7 @@ func foodFormButton(
     }
     
     return Group {
-        if let action {
+        if action != nil {
             button
         } else {
             label
