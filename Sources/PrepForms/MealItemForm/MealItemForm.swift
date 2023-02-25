@@ -253,10 +253,18 @@ public struct MealItemForm: View {
         )
     }
     
+    func delete() {
+        Haptics.successFeedback()
+        DataManager.shared.deleteMealItem(
+            viewModel.mealFoodItem,
+            in: viewModel.dayMeal
+        )
+    }
+    
     var content: some View {
         var deleteConfirmationActions: some View {
             Button("Delete Entry", role: .destructive) {
-                actionHandler(.delete)
+                delete()
                 actionHandler(.dismiss)
             }
         }
@@ -491,7 +499,8 @@ public struct MealItemForm: View {
         if viewModel.isEditing {
             FormStyledSection {
                 Button(role: .destructive) {
-                    actionHandler(.delete)
+//                    actionHandler(.delete)
+                    delete()
                     actionHandler(.dismiss)
                 } label: {
                     HStack {
