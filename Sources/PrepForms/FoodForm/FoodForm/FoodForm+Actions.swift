@@ -10,31 +10,28 @@ extension FoodForm {
 
     func appeared() {
         
-        if sources.startWithCamera {
-            showExtractorViewWithCamera()
+        guard !viewModel.didAppear else {
+            return
         }
         
-        sources.didScanAllPickedImages = didScanAllPickedImages
-        //MARK: ☣️
-//        sources.autoFillHandler = autoFillColumn
-        
-//        sources.autoFillHandler = { selectedColumn, scanResult in
-//            extract(column: selectedColumn,
-//                    from: columnSelectionInfo.candidates,
-//                    shouldOverwrite: false
-//            )
+//        if viewModel.startWithCamera {
+//            showExtractorViewWithCamera()
 //        }
         
-        if shouldShowWizard {
+        sources.didScanAllPickedImages = didScanAllPickedImages
+        
+        /// This used to ensure that the (conditional) display of the wizard is restricted
+        /// to only the first invocation of this, as moving to the background and returning causes
+        if viewModel.shouldShowWizard {
             withAnimation(WizardAnimation) {
-                formDisabled = true
-                showingWizard = true
-                shouldShowWizard = false
+                viewModel.formDisabled = true
+                viewModel.showingWizard = true
+                viewModel.shouldShowWizard = false
             }
         } else {
-            showingWizard = false
-            showingWizardOverlay = false
-            formDisabled = false
+            viewModel.showingWizard = false
+            viewModel.showingWizardOverlay = false
+            viewModel.formDisabled = false
         }
         
         if let initialScanImage, let initialScanResult {
@@ -48,6 +45,8 @@ extension FoodForm {
                 prefillExistingFood(existingFood)
             }
         }
+        
+        viewModel.didAppear = true
     }
     
     func autoFillColumn(_ selectedColumn: Int, from scanResult: ScanResult?) {
@@ -191,12 +190,12 @@ extension FoodForm {
     
     func dismissWizard() {
         withAnimation(WizardAnimation) {
-            showingWizard = false
+            viewModel.showingWizard = false
         }
         withAnimation(.easeOut(duration: 0.1)) {
-            showingWizardOverlay = false
+            viewModel.showingWizardOverlay = false
         }
-        formDisabled = false
+        viewModel.formDisabled = false
     }
 }
 

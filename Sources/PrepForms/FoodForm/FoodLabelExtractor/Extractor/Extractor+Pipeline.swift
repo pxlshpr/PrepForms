@@ -465,9 +465,16 @@ extension Extractor {
 
         guard !Task.isCancelled else { return }
         guard let extractorOutput else {
-            didDismiss?(nil)
+            NotificationCenter.default.post(name: .didDismissExtractor, object: nil)
+//            didDismiss?(nil)
             return
         }
-        didDismiss?(extractorOutput)
+        NotificationCenter.default.post(
+            name: .didExtractFoodLabel,
+            object: nil,
+            userInfo: [
+                Notification.Keys.extractorOutput: extractorOutput
+            ]
+        )
     }
 }

@@ -10,7 +10,8 @@ import SwiftHaptics
 public struct FoodForm: View {
     
     @Environment(\.dismiss) var dismiss
-    
+    @Environment(\.scenePhase) var scenePhase
+
     let didSave: (FoodFormOutput) -> ()
     
     @State var showingCancelConfirmation = false
@@ -22,8 +23,9 @@ public struct FoodForm: View {
 
     @StateObject var fields: Fields = Fields.shared
     @StateObject var sources: Sources = Sources.shared
-    @StateObject var extractor: Extractor = Extractor()
-
+    @StateObject var extractor: Extractor = Extractor.shared
+    @StateObject var viewModel: ViewModel = ViewModel.shared
+    
     //MARK: ☣️
     //    @ObservedObject var scanner: LabelScannerViewModel
     //    @ObservedObject var interactiveScanner: ScannerViewModel
@@ -43,27 +45,19 @@ public struct FoodForm: View {
     @State var showingSaveSheet = false
     @State var showingBottomButtonsSaved = false /// Used when presenting keyboard and alerts
     
-    @State var showingExtractorView: Bool
-    
-    @State var showingLabelScanner: Bool
-    @State var animateLabelScannerUp: Bool
-    
+//    @State var showingSaveButton: Bool
+//    @State var showingExtractorView: Bool
+//    @State var showingLabelScanner: Bool
+//    @State var animateLabelScannerUp: Bool
+
     @State var selectedPhoto: UIImage? = nil
     
     /// Menus
     @State var showingFoodLabel = false
     
-    /// Wizard
-    @State var shouldShowWizard: Bool
-    @State var showingWizardOverlay: Bool
-    @State var showingWizard: Bool
-    @State var formDisabled = false
-    
     /// Barcode
     @State var showingAddBarcodeAlert = false
     @State var barcodePayload: String = ""
-    
-    let didScanFoodLabel = NotificationCenter.default.publisher(for: .didScanFoodLabel)
     
     @State var initialScanResult: ScanResult?
     @State var initialScanImage: UIImage?
@@ -71,11 +65,13 @@ public struct FoodForm: View {
     @State var mockScanResult: ScanResult?
     @State var mockScanImage: UIImage?
     
-    @State var showingSaveButton: Bool
     
     @State var showingDismissConfirmationDialog = false
     let keyboardDidShow = NotificationCenter.default.publisher(for: UITextField.textDidBeginEditingNotification)
     let keyboardDidHide = NotificationCenter.default.publisher(for: UITextField.textDidEndEditingNotification)
+    let didDismissExtractor = NotificationCenter.default.publisher(for: .didDismissExtractor)
+    let didExtractFoodLabel = NotificationCenter.default.publisher(for: .didExtractFoodLabel)
+    let shouldDismissFoodForm = NotificationCenter.default.publisher(for: .shouldDismissFoodForm)
 
     @State var refreshBool = false
     
@@ -86,50 +82,62 @@ public struct FoodForm: View {
     @Binding var isPresented: Bool
     
     public init(
-//        fields: FoodForm.Fields,
-//        sources: FoodForm.Sources,
-//        extractor: Extractor,
         existingFood: Food? = nil,
         isPresented: Binding<Bool> = .constant(true),
         didSave: @escaping (FoodFormOutput) -> ()
     ) {
         _isPresented = isPresented
-//        Fields.shared = fields
-//        Sources.shared = sources
-//        self.fields = fields
-//        self.sources = sources
-//        self.extractor = extractor
         
         self.didSave = didSave
         _initialScanResult = State(initialValue: nil)
         _initialScanImage = State(initialValue: nil)
         _mockScanResult = State(initialValue: nil)
         _mockScanImage = State(initialValue: nil)
-        _showingExtractorView = State(initialValue: false)
         
-        if let existingFood {
-            self.existingFood = existingFood
-            _showingLabelScanner = State(initialValue: false)
-            _animateLabelScannerUp = State(initialValue: false)
-            _showingSaveButton = State(initialValue: false)
-            _shouldShowWizard = State(initialValue: false)
-            _showingWizardOverlay = State(initialValue: false)
-            _showingWizard = State(initialValue: false)
-        } else {
-            self.existingFood = nil
-//            let startWithCamera = sources.startWithCamera
-            let startWithCamera = false
-            _showingLabelScanner = State(initialValue: startWithCamera)
-            _animateLabelScannerUp = State(initialValue: startWithCamera)
-            _showingSaveButton = State(initialValue: startWithCamera)
-            _shouldShowWizard = State(initialValue: !startWithCamera)
-            _showingWizardOverlay = State(initialValue: true)
-            _showingWizard = State(initialValue: true)
+        self.existingFood = existingFood
+    }
+    
+    class ViewModel: ObservableObject {
+        static let shared = ViewModel()
+
+        @Published var shouldShowWizard: Bool = true
+        @Published var showingWizardOverlay: Bool  = true
+        @Published var showingWizard: Bool  = true
+        @Published var formDisabled = false
+
+        @Published var showingSaveButton: Bool = false
+        @Published var showingExtractorView: Bool = false
+//        @Published var showingLabelScanner: Bool = false
+//        @Published var animateLabelScannerUp: Bool = false
+
+        var didAppear = false
+        var startWithCamera = false
+
+        func reset(startWithCamera: Bool = false) {
+            shouldShowWizard = !startWithCamera
+            showingWizardOverlay = true
+            showingWizard = true
+            formDisabled = false
+            didAppear = false
+            
+            self.startWithCamera = startWithCamera
+            showingSaveButton = startWithCamera
+            showingExtractorView = startWithCamera
+
+            if startWithCamera {
+                Task {
+                    await Extractor.shared.setup(forCamera: true)
+                }
+            }
         }
     }
     
     public var body: some View {
         content
+            .onChange(of: scenePhase, perform: scenePhaseChanged)
+            .onReceive(didDismissExtractor, perform: didDismissExtractor)
+            .onReceive(didExtractFoodLabel, perform: didExtractFoodLabel)
+            .onReceive(shouldDismissFoodForm, perform: shouldDismissFoodForm)
     }
     
     var content: some View {
@@ -142,7 +150,7 @@ public struct FoodForm: View {
                 .zIndex(3)
         }
     }
-        
+
     var navigationView: some View {
         var formContent: some View {
             ZStack {
@@ -163,12 +171,11 @@ public struct FoodForm: View {
                 .onAppear(perform: appeared)
                 .onChange(of: sources.selectedPhotos, perform: selectedPhotosChanged)
             //                .onChange(of: sources.selectedPhotos, perform: sources.selectedPhotosChanged)
-                .onChange(of: showingWizard, perform: showingWizardChanged)
+                .onChange(of: viewModel.showingWizard, perform: showingWizardChanged)
                 .onChange(of: showingAddLinkAlert, perform: showingAddLinkAlertChanged)
                 .onChange(of: showingAddBarcodeAlert, perform: showingAddBarcodeAlertChanged)
                 .onReceive(keyboardDidShow, perform: keyboardDidShow)
                 .onReceive(keyboardDidHide, perform: keyboardDidHide)
-                .onReceive(didScanFoodLabel, perform: didScanFoodLabel)
             
                 .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
                 .sheet(isPresented: $showingDetailsForm) { detailsForm }
@@ -199,6 +206,31 @@ public struct FoodForm: View {
         }
     }
     
+    func shouldDismissFoodForm(_ notification: Notification) {
+        dismissWithHaptics()
+    }
+    
+    func didDismissExtractor(_ notification: Notification) {
+        extractorDidDismiss(nil)
+    }
+    
+    func didExtractFoodLabel(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let extractorOutput = userInfo[Notification.Keys.extractorOutput] as? ExtractorOutput else {
+            return
+        }
+        extractorDidDismiss(extractorOutput)
+    }
+
+    func scenePhaseChanged(_ newPhase: ScenePhase) {
+        switch newPhase {
+//        case .background:
+//            viewModel.movedToBackground = true
+        default:
+            break
+        }
+    }
+    
     func keyboardDidShow(_ notification: Notification) {
 //        showingBottomButtonsSaved = showingBottomButtons
 //        withAnimation {
@@ -225,7 +257,7 @@ public struct FoodForm: View {
     
     func setShowingSaveButton() {
         /// Animating this doesn't work with the custom interactiveDismissal, so we're using a `.animation` modifier on the save button itself
-        self.showingSaveButton = !(showingWizard || showingAddLinkAlert || showingAddBarcodeAlert)
+        self.viewModel.showingSaveButton = !(viewModel.showingWizard || showingAddLinkAlert || showingAddBarcodeAlert)
     }
         
     var saveSheet: some View {
@@ -246,8 +278,8 @@ public struct FoodForm: View {
     
     @ViewBuilder
     var extractorViewLayer: some View {
-        if showingExtractorView {
-            ExtractorView(extractor: extractor)
+        if viewModel.showingExtractorView {
+            ExtractorView(extractor: extractor, startedWithCamera: viewModel.startWithCamera)
                 .onDisappear {
                     NotificationCenter.default.post(name: .homeButtonsShouldRefresh, object: nil)
                 }
@@ -268,12 +300,12 @@ public struct FoodForm: View {
     }
     
     func dismissHandler() {
-        withAnimation {
-            animateLabelScannerUp = false
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            showingLabelScanner = false
-        }
+//        withAnimation {
+//            viewModel.animateLabelScannerUp = false
+//        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//            viewModel.showingLabelScanner = false
+//        }
     }
     
     func imageHandler(_ image: UIImage, scanResult: ScanResult) {
@@ -305,8 +337,8 @@ public struct FoodForm: View {
         }
         .id(refreshBool)
         .overlay(overlay)
-        .blur(radius: showingWizardOverlay ? 5 : 0)
-        .disabled(formDisabled)
+        .blur(radius: viewModel.showingWizardOverlay ? 5 : 0)
+        .disabled(viewModel.formDisabled)
         .safeAreaInset(edge: .bottom) { safeAreaInset }
     }
     
@@ -351,16 +383,16 @@ public struct FoodForm: View {
     
     @ViewBuilder
     var overlay: some View {
-        if showingWizardOverlay {
+        if viewModel.showingWizardOverlay {
             Color(.quaternarySystemFill)
-                .opacity(showingWizardOverlay ? 0.3 : 0)
+                .opacity(viewModel.showingWizardOverlay ? 0.3 : 0)
         }
     }
     
     @ViewBuilder
     var wizardLayer: some View {
         Wizard(
-            isPresented: $showingWizard,
+            isPresented: $viewModel.showingWizard,
             tapHandler: tappedWizardButton
         )
     }
@@ -542,8 +574,8 @@ public struct FoodForm: View {
                 }
                 .padding(.horizontal, padding)
                 .padding(.bottom, 0)
-                .offset(x: showingSaveButton ? 0 : padding + size)
-                .animation(.interactiveSpring(), value: showingSaveButton)
+                .offset(x: viewModel.showingSaveButton ? 0 : padding + size)
+                .animation(.interactiveSpring(), value: viewModel.showingSaveButton)
             }
         }
         
@@ -572,7 +604,7 @@ public struct FoodForm: View {
     var buttonsLayer_legacy: some View {
         VStack {
             Spacer()
-            if !showingWizard {
+            if !viewModel.showingWizard {
                 dismissButtonRow
                     .transition(.move(edge: .bottom))
             }
@@ -629,7 +661,7 @@ public struct FoodForm: View {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
 //            if showingWizardOverlay {
                 dismissButton
-                    .blur(radius: showingWizardOverlay ? 5 : 0)
+                .blur(radius: viewModel.showingWizardOverlay ? 5 : 0)
 //            }
         }
     }
@@ -672,7 +704,7 @@ public struct FoodForm: View {
 
 extension FoodForm {
     var statusMessage: String? {
-        guard !(showingWizard || fields.isInEmptyState) else {
+        guard !(viewModel.showingWizard || fields.isInEmptyState) else {
             return nil
         }
         if let missingField = fields.missingRequiredField {
@@ -708,7 +740,7 @@ extension FoodForm {
     }
     
     var formSaveInfo: FormSaveInfo? {
-        guard !(showingWizard || fields.isInEmptyState) else {
+        guard !(viewModel.showingWizard || fields.isInEmptyState) else {
             return nil
         }
         

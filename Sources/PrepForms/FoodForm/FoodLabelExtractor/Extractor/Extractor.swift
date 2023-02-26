@@ -7,6 +7,8 @@ import SwiftHaptics
 @MainActor
 public class Extractor: ObservableObject {
 
+    static let shared = Extractor()
+    
     var isUsingCamera: Bool
     var attributesToIgnore: [Attribute] = []
 
@@ -81,7 +83,7 @@ public class Extractor: ObservableObject {
     }
     @Published var internalTextfieldString: String = ""
 
-    var didDismiss: ((ExtractorOutput?) -> Void)? = nil
+//    var didDismiss: ((ExtractorOutput?) -> Void)? = nil
     
     /// This flag is used to keep the association with the value's `RecognizedText` when its changed
     /// by tapping a suggestion.
@@ -103,15 +105,15 @@ public class Extractor: ObservableObject {
             selector: #selector(imageViewerViewportChanged),
             name: .zoomScrollViewViewportChanged,
             object: nil
-        )        
+        )
     }
 }
 
 extension Extractor {
     public func setup(
         forCamera: Bool = false,
-        attributesToIgnore: [Attribute] = [],
-        didDismiss: @escaping ((ExtractorOutput?) -> Void)
+        attributesToIgnore: [Attribute] = []
+//        didDismiss: @escaping ((ExtractorOutput?) -> Void)
     ) {
         isUsingCamera = forCamera
         self.attributesToIgnore = attributesToIgnore
@@ -148,7 +150,7 @@ extension Extractor {
         internalTextfieldDouble = nil
         internalTextfieldString = ""
         
-        self.didDismiss = didDismiss
+//        self.didDismiss = didDismiss
 
         ignoreNextValueChange = false
         

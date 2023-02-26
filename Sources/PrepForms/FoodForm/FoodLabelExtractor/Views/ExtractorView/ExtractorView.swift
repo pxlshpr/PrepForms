@@ -4,9 +4,11 @@ public struct ExtractorView: View {
     
     @ObservedObject var extractor: Extractor
     @StateObject var imageViewerViewModel = ImageViewer.ViewModel()
+    let startedWithCamera: Bool
     
-    public init(extractor: Extractor) {
+    public init(extractor: Extractor, startedWithCamera: Bool) {
         self.extractor = extractor
+        self.startedWithCamera = startedWithCamera
     }
     
     public var body: some View {
@@ -21,7 +23,7 @@ public struct ExtractorView: View {
     }
     
     func appeared() {
-        withAnimation {
+        withAnimation(startedWithCamera ? .none : .default) {
             extractor.presentationState = .onScreen
         }
     }
@@ -108,7 +110,11 @@ public struct ExtractorView: View {
     
     var foodLabelCamera: some View {
         LabelCamera(imageHandler: handleCapturedImage, didTapDismiss: {
-            extractor.dismiss()
+            if startedWithCamera {
+                NotificationCenter.default.post(name: .shouldDismissFoodForm, object: nil)
+            } else {
+                extractor.dismiss()
+            }
         })
     }
 

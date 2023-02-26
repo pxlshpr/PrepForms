@@ -405,10 +405,6 @@ extension FoodForm.SourcesSummaryCell {
 //    }
 }
 
-extension Notification.Name {
-    public static var didScanFoodLabel: Notification.Name { return .init("didScanFoodLabel") }
-}
-
 //MARK: - Add Link Alert (Duplicated in FoodForm.SourcesForm)
 
 extension FoodForm.SourcesSummaryCell {

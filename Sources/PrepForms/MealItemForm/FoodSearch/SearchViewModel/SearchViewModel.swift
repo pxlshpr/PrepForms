@@ -28,6 +28,16 @@ public class SearchViewModel: ObservableObject {
     public init(recents: [Food] = [], allMyFoods: [Food] = []) {
         self.recents = recents
         self.allMyFoods = allMyFoods
+        NotificationCenter.default.addObserver(self, selector: #selector(didAddFood), name: .didAddFood, object: nil)
+    }
+    
+    @objc func didAddFood(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let food = userInfo[Notification.Keys.food] as? Food
+        else { return }
+        withAnimation {
+            self.recents.insert(food, at: 0)
+        }
     }
     
     //TODO: Rename to setInitialLoadingState

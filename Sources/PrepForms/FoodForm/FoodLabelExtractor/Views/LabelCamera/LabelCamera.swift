@@ -37,17 +37,7 @@ public struct LabelCamera: View {
     }
     
     public var body: some View {
-        ZStack {
-            Color.black
-                .edgesIgnoringSafeArea(.all)
-            cameraLayer
-                .opacity(hasAppeared ? 1 : 0)
-            if !viewModel.started {
-                Instructions(tappedStart: tappedStart)
-                    .zIndex(10)
-                    .transition(.opacity)
-            }
-        }
+        content
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 withAnimation {
@@ -63,6 +53,20 @@ public struct LabelCamera: View {
         .onChange(of: cameraViewModel.shouldDismiss) { newValue in
             if newValue {
                 didTapDismiss()
+            }
+        }
+    }
+    
+    var content: some View {
+        ZStack {
+            Color.black
+                .edgesIgnoringSafeArea(.all)
+            cameraLayer
+                .opacity(hasAppeared ? 1 : 0)
+            if !viewModel.started {
+                Instructions(tappedStart: tappedStart)
+                    .zIndex(10)
+                    .transition(.opacity)
             }
         }
     }

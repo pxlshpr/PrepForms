@@ -91,9 +91,12 @@ extension FoodSearch {
         }
         
         return Menu {
-            addHeroButton
-            addRecipeButton
-            addPlateButton
+            Section("Create New") {
+                addFoodButton
+                addRecipeButton
+                addPlateButton
+            }
+            scanFoodLabelButton
         } label: {
             label
         }

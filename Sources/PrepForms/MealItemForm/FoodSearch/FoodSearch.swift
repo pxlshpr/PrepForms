@@ -6,6 +6,7 @@ import ActivityIndicatorView
 import Camera
 import SwiftSugar
 import PrepViews
+import PrepCoreDataStack
 
 public struct FoodSearch: View {
     
@@ -51,6 +52,8 @@ public struct FoodSearch: View {
     
     let focusOnAppear: Bool
     let isRootInNavigationStack: Bool
+    
+    let didAddFood = NotificationCenter.default.publisher(for: .didAddFood)
     
     public init(
         dataProvider: SearchDataProvider,
@@ -114,6 +117,7 @@ public struct FoodSearch: View {
         .onChange(of: searchIsFocused, perform: searchIsFocusedChanged)
         .sheet(isPresented: $showingAddPlate) { plateFormSheet }
         .sheet(isPresented: $showingAddRecipe) { recipeFormSheet }
+        .onReceive(didAddFood, perform: didAddFood)
     }
     
     @ViewBuilder
@@ -138,7 +142,7 @@ public struct FoodSearch: View {
         
         func didSaveFood(_ formOutput: FoodFormOutput) {
             Haptics.successFeedback()
-//            addNewFood(formOutput)
+            FoodFormManager.shared.save(formOutput)
         }
         
         return FoodForm(isPresented: $showingAddFood, didSave: didSaveFood)
@@ -166,6 +170,16 @@ public struct FoodSearch: View {
             if showingAddHeroButton {
 //                showingAddHeroButton = false
             }
+        }
+    }
+    
+    func didAddFood(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let food = userInfo[Notification.Keys.food] as? Food
+        else { return }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            didTapFood(food)
         }
     }
     
@@ -249,10 +263,11 @@ public struct FoodSearch: View {
         .padding(.bottom, bottomPadding)
     }
     
-    var addHeroButton: some View {
+    var addFoodButton: some View {
         Button {
             FoodForm.Fields.shared.reset()
             FoodForm.Sources.shared.reset()
+            FoodForm.ViewModel.shared.reset()
             
             /// Actually shows the `View` for the `FoodForm` that we were passed in
             showingAddFood = true
@@ -263,6 +278,24 @@ public struct FoodSearch: View {
             
         } label: {
             Label("Food", systemImage: FoodType.food.systemImage)
+        }
+    }
+
+    var scanFoodLabelButton: some View {
+        Button {
+            FoodForm.Fields.shared.reset()
+            FoodForm.Sources.shared.reset()
+            FoodForm.ViewModel.shared.reset(startWithCamera: true)
+            
+            /// Actually shows the `View` for the `FoodForm` that we were passed in
+            showingAddFood = true
+
+            /// Resigns focus on search and hides the hero button
+            searchIsFocused = false
+            showingAddHeroButton = false
+            
+        } label: {
+            Label("Scan Food Label", systemImage: "text.viewfinder")
         }
     }
     
@@ -301,9 +334,12 @@ public struct FoodSearch: View {
         
         var menu: some View {
             Menu {
-                addHeroButton
-                addRecipeButton
-                addPlateButton
+                Section("Create New") {
+                    addFoodButton
+                    addRecipeButton
+                    addPlateButton
+                }
+                scanFoodLabelButton
             } label: {
                 label
             }

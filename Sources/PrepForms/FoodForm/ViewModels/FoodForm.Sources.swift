@@ -29,8 +29,6 @@ extension FoodForm {
         //MARK: ☣️
 //        var autoFillHandler: ColumnSelectionHandler? = nil
         
-        public var startWithCamera: Bool = false
-        
         let id = UUID()
         
         public init() {
@@ -54,8 +52,6 @@ extension FoodForm {
             
             didScanAllPickedImages = nil
             
-            startWithCamera = false
-            //MARK: ☣️
 //            autoFillHandler = nil
         }
     }

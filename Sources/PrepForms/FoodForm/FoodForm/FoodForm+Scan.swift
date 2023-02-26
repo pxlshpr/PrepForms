@@ -8,10 +8,6 @@ extension FoodForm {
         extractFieldsOrShowColumnSelectionInfo()
     }
     
-    func didScanFoodLabel(notification: Notification) {
-        extractFieldsOrShowColumnSelectionInfo()
-    }
-    
     func didScanAllPickedImages() {
         extractFieldsOrShowColumnSelectionInfo()
     }

@@ -24,13 +24,10 @@ extension FoodForm {
         if let output {
             processExtractorOutput(output)
         }
-        showingExtractorView = false
+        viewModel.showingExtractorView = false
         extractor.cancelAllTasks()
         /// Do this now so that the cropped images are cleared out of memeory
-        extractor.setup(
-            attributesToIgnore: filledInAttributes,
-            didDismiss: extractorDidDismiss
-        )
+        extractor.setup(attributesToIgnore: filledInAttributes)
         
         /// Allow the animation of food label appearing to complete before refreshing it (mitigating the sources view sometimes sliding into view only as we scroll past it)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -45,11 +42,8 @@ extension FoodForm {
     }
     
     func showExtractor(with item: PhotosPickerItem) {
-        extractor.setup(
-            attributesToIgnore: filledInAttributes,
-            didDismiss: extractorDidDismiss
-        )
-        showingExtractorView = true
+        extractor.setup(attributesToIgnore: filledInAttributes)
+        viewModel.showingExtractorView = true
         
         Task(priority: .low) {
             guard let image = try await loadImage(pickerItem: item) else { return }
@@ -61,9 +55,9 @@ extension FoodForm {
     }
     
     func showExtractorViewWithCamera() {
-        extractor.setup(forCamera: true, didDismiss: extractorDidDismiss)
+        extractor.setup(forCamera: true)
         withAnimation {
-            showingExtractorView = true
+            viewModel.showingExtractorView = true
         }
     }
     
