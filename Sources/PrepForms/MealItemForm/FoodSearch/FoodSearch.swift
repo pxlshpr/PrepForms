@@ -135,6 +135,7 @@ public struct FoodSearch: View {
             .sheet(isPresented: $showingFilters) { filtersSheet }
             .onChange(of: isComparing, perform: isComparingChanged)
             .background(background)
+            .fullScreenCover(isPresented: $showingAddFood) { foodForm }
 //        }
     }
     

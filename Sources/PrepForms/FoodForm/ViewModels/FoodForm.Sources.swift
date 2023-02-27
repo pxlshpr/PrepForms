@@ -162,6 +162,9 @@ extension FoodForm.Sources {
     }
     
     func removeImage(at index: Int) {
+        guard index < imageViewModels.count else {
+            return
+        }
         imageViewModels.remove(at: index)
         withAnimation {
             updateCanBePublished()

@@ -10,7 +10,7 @@ import SwiftHaptics
 public struct FoodForm: View {
     
     @Environment(\.dismiss) var dismiss
-    @Environment(\.scenePhase) var scenePhase
+//    @Environment(\.scenePhase) var scenePhase
 
     let didSave: (FoodFormOutput) -> ()
     
@@ -86,6 +86,7 @@ public struct FoodForm: View {
         isPresented: Binding<Bool> = .constant(true),
         didSave: @escaping (FoodFormOutput) -> ()
     ) {
+        print("💭 FoodForm.init()")
         _isPresented = isPresented
         
         self.didSave = didSave
@@ -134,7 +135,7 @@ public struct FoodForm: View {
     
     public var body: some View {
         content
-            .onChange(of: scenePhase, perform: scenePhaseChanged)
+//            .onChange(of: scenePhase, perform: scenePhaseChanged)
             .onReceive(didDismissExtractor, perform: didDismissExtractor)
             .onReceive(didExtractFoodLabel, perform: didExtractFoodLabel)
             .onReceive(shouldDismissFoodForm, perform: shouldDismissFoodForm)
@@ -222,15 +223,15 @@ public struct FoodForm: View {
         extractorDidDismiss(extractorOutput)
     }
 
-    func scenePhaseChanged(_ newPhase: ScenePhase) {
-        switch newPhase {
-//        case .background:
-//            viewModel.movedToBackground = true
-        default:
-            break
-        }
-    }
-    
+//    func scenePhaseChanged(_ newPhase: ScenePhase) {
+//        switch newPhase {
+////        case .background:
+////            viewModel.movedToBackground = true
+//        default:
+//            break
+//        }
+//    }
+//
     func keyboardDidShow(_ notification: Notification) {
 //        showingBottomButtonsSaved = showingBottomButtons
 //        withAnimation {

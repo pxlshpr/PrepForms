@@ -80,7 +80,6 @@ extension FoodSearch {
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             addMenu
-                .fullScreenCover(isPresented: $showingAddFood) { foodForm }
         }
     }
     
