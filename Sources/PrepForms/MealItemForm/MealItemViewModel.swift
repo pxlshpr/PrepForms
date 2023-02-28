@@ -66,6 +66,7 @@ public class MealItemViewModel: ObservableObject {
             food: food ?? Food.placeholder,
             amount: .init(0, .g),
             isSoftDeleted: false,
+            energyInKcal: 0,
             mealId: dayMealToSet.id
         )
 
@@ -162,6 +163,7 @@ public class MealItemViewModel: ObservableObject {
             markedAsEatenAt: existingMealFoodItem?.markedAsEatenAt ?? nil,
             sortPosition: existingMealFoodItem?.sortPosition ?? 1,
             isSoftDeleted: existingMealFoodItem?.isSoftDeleted ?? false,
+            energyInKcal: existingMealFoodItem?.energyInKcal ?? 0,
             mealId: dayMeal.id
         )
     }
