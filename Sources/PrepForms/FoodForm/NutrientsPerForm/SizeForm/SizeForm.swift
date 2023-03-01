@@ -37,7 +37,7 @@ public struct SizeForm: View {
     public var body: some View {
         NavigationStack {
             QuickForm(
-                title: "New Size",
+                title: viewModel.title,
                 info: saveInfoBinding,
                 saveAction: saveActionBinding,
                 deleteAction: deleteActionBinding
@@ -77,13 +77,6 @@ public struct SizeForm: View {
         )
     }
     
-    var title: some View {
-        Text("New Size")
-            .font(.title2)
-            .fontWeight(.bold)
-            .frame(maxHeight: .infinity, alignment: .center)
-    }
-    
     func isFocusedChanged(_ newValue: Bool) {
         if !isFocused {
             dismiss()
@@ -109,10 +102,10 @@ extension SizeForm {
         Binding<FormConfirmableAction?>(
             get: {
                 .init(
-                    confirmationButtonTitle: "Add",
+                    confirmationButtonTitle: viewModel.saveButtonTitle,
                     isDisabled: viewModel.shouldDisableDone,
                     handler: {
-                        
+                        viewModel.save()
                     }
                 )
             },
@@ -123,13 +116,17 @@ extension SizeForm {
     var deleteActionBinding: Binding<FormConfirmableAction?> {
         Binding<FormConfirmableAction?>(
             get: {
-                .init(
+                guard viewModel.isEditing else { return nil }
+                return .init(
                     shouldConfirm: true,
                     confirmationMessage: nil,
                     isDisabled: false,
                     buttonImage: "trash.fill",
                     handler: {
-                        
+                        guard let initialSize = viewModel.initialField?.size else { return }
+                        withAnimation {
+                            fields.removeSize(initialSize)
+                        }
                     }
                 )
             },

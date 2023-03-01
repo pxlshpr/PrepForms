@@ -135,6 +135,41 @@ extension FieldValue {
             }
         }
     }
+    
+    var foodDensity: FoodDensity? {
+        get {
+            switch self {
+            case .density(let densityValue):
+                return densityValue.foodDensity
+            default:
+                return nil
+            }
+        }
+        set {
+            guard let newValue else {
+                return
+            }
+            switch self {
+            case .density(let densityValue):
+                self = .density(.init(
+                    weight: newValue.weightDoubleValue,
+                    volume: newValue.volumeDoubleValue,
+                    fill: densityValue.fill
+                ))
+            default:
+                break
+            }
+        }
+    }
+}
+
+extension FoodDensity {
+    var weightDoubleValue: FieldValue.DoubleValue {
+        FieldValue.DoubleValue(double: weightAmount, unit: .weight(weightUnit))
+    }
+    var volumeDoubleValue: FieldValue.DoubleValue {
+        FieldValue.DoubleValue(double: volumeAmount, unit: .volume(volumeExplicitUnit.volumeUnit))
+    }
 }
 
 extension FoodLabelUnit {
@@ -461,6 +496,10 @@ extension VNBarcodeSymbology {
 extension Field {
     var size: FormSize? {
         value.size
+    }
+    
+    var foodDensity: FoodDensity? {
+        value.foodDensity
     }
 
     var fill: Fill {

@@ -23,7 +23,8 @@ struct NutrientsPerForm: View {
     @State var showingAmountForm = false
     @State var showingServingForm = false
     @State var showingSizeForm = false
-    
+    @State var showingDensityForm = false
+
     @State var showingImages: Bool = true
     
     init(fields: FoodForm.Fields) {
@@ -40,6 +41,7 @@ struct NutrientsPerForm: View {
         .sheet(isPresented: $showingAmountForm) { amountForm }
         .sheet(isPresented: $showingServingForm) { servingForm }
         .sheet(isPresented: $showingSizeForm) { sizeForm }
+        .sheet(isPresented: $showingDensityForm) { densityForm }
     }
     
     var scrollView: some View {
@@ -77,8 +79,8 @@ struct NutrientsPerForm: View {
         
         return Group {
             titleCell("Sizes")
-            ForEach(fields.allSizeFields, id: \.self) {
-                sizeCell(for: $0)
+            ForEach(fields.allSizeFields.indices, id: \.self) {
+                sizeCell(for: fields.allSizeFields[$0])
             }
             addSizeButton
             footerCell(footerString)
@@ -200,6 +202,7 @@ struct NutrientsPerForm: View {
         
         return Group {
             Button {
+                showingDensityForm = true
             } label: {
                 FieldCell(field: fields.density, showImage: $showingImages)
                     .environmentObject(fields)
@@ -210,7 +213,8 @@ struct NutrientsPerForm: View {
 
     func sizeCell(for sizeField: Field) -> some View {
         Button {
-            
+            viewModel.sizeFieldBeingEdited = sizeField
+            showingSizeForm = true
         } label: {
             FieldCell(field: sizeField, showImage: $showingImages)
                 .environmentObject(fields)
@@ -277,14 +281,40 @@ extension NutrientsPerForm {
 
 extension NutrientsPerForm {
     
+    var densityForm: some View {
+        DensityForm(initialField: fields.density) { density in
+            
+        }
+        .environmentObject(fields)
+    }
+    
     var sizeForm: some View {
         sizeForm(for: viewModel.sizeFieldBeingEdited)
     }
     
     func sizeForm(for sizeField: Field?) -> some View {
-        SizeForm(initialField: sizeField) { newSize in
-            
+        SizeForm(initialField: sizeField) { size in
+            saveSize(size)
         }
         .environmentObject(fields)
+    }
+    
+    func saveSize(_ size: FormSize) {
+        let field = Field.sizeField(with: size)
+        withAnimation {
+            if let oldSizeField = viewModel.sizeFieldBeingEdited {
+                fields.edit(oldSizeField, with: field)
+                viewModel.sizeFieldBeingEdited = nil
+            } else {
+                let _ =  fields.add(sizeField: field)
+            }
+            fields.updateFormState()
+        }
+    }
+}
+
+extension Field {
+    static func sizeField(with size: FormSize) -> Field {
+        Field(fieldValue: .size(.init(size: size, fill: .userInput)))
     }
 }

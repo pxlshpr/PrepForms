@@ -17,13 +17,20 @@ extension FoodForm {
         var didAppear = false
         var startWithCamera = false
 
-        public func reset(startWithCamera: Bool = false) {
-            shouldShowWizard = !startWithCamera
-            showingWizardOverlay = true
-            showingWizard = true
-            formDisabled = false
+        public func reset(startWithCamera: Bool = false, isEditing: Bool = false) {
             didAppear = false
             
+            if isEditing {
+                shouldShowWizard = false
+                showingWizardOverlay = false
+                showingWizard = false
+            } else {
+                shouldShowWizard = !startWithCamera
+                showingWizardOverlay = true
+                showingWizard = true
+            }
+            formDisabled = false
+
             self.startWithCamera = startWithCamera
             showingSaveButton = startWithCamera
             showingExtractorView = startWithCamera

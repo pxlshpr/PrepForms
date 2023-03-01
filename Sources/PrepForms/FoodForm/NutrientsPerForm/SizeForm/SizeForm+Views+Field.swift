@@ -8,9 +8,9 @@ extension SizeForm {
         @ViewBuilder
         var footer: some View {
             if viewModel.showingVolumePrefix {
-                Text("e.g. 2 x cup, shredded = 125 g")
+                Text("e.g. 2 × cup, shredded = 125 g")
             } else {
-                Text("e.g. 5 x cookies = 58 g")
+                Text("e.g. 5 × cookies = 58 g")
             }
         }
         
@@ -50,7 +50,11 @@ extension SizeForm {
     var fieldContents: some View {
 
         var quantityButton: some View {
-            button(viewModel.quantity.cleanAmount) {
+            button(
+                viewModel.quantity.cleanAmount,
+                colorScheme: colorScheme,
+                isCompact: viewModel.showingVolumePrefix
+            ) {
                 Haptics.feedback(style: .soft)
                 showingQuantityForm = true
             }
@@ -62,7 +66,11 @@ extension SizeForm {
         }
         
         var volumePrefixButton: some View {
-            button(viewModel.volumePrefixUnit.shortDescription) {
+            button(
+                viewModel.volumePrefixUnit.shortDescription,
+                colorScheme: colorScheme,
+                isCompact: viewModel.showingVolumePrefix
+            ) {
                 Haptics.feedback(style: .soft)
                 showingVolumePrefixUnitPicker = true
             }
@@ -77,7 +85,12 @@ extension SizeForm {
         }
         
         var nameButton: some View {
-            button(viewModel.name, placeholder: "name") {
+            button(
+                viewModel.name,
+                placeholder: "name",
+                colorScheme: colorScheme,
+                isCompact: viewModel.showingVolumePrefix
+            ) {
                 Haptics.feedback(style: .soft)
                 showingNameForm = true
             }
@@ -90,7 +103,12 @@ extension SizeForm {
         }
         
         var amountButton: some View {
-            button(viewModel.amountDescription, placeholder: "amount") {
+            button(
+                viewModel.amountDescription,
+                placeholder: "amount",
+                colorScheme: colorScheme,
+                isCompact: viewModel.showingVolumePrefix
+            ) {
                 Haptics.feedback(style: .soft)
                 showingAmountForm = true
             }

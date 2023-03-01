@@ -35,6 +35,33 @@ class SizeFormViewModel: ObservableObject {
             self.amountUnit = initialSize.unit
         }
     }
+    
+    func save() {
+        handleNewSize(size)
+    }
+    
+    var size: FormSize {
+        let volumePrefixUnit = showingVolumePrefix ? volumePrefixUnit.formUnit : nil
+        return FormSize(
+            quantity: quantity,
+            volumePrefixUnit: volumePrefixUnit,
+            name: name,
+            amount: amount,
+            unit: amountUnit
+        )
+    }
+    
+    var isEditing: Bool {
+        initialField != nil
+    }
+    
+    var title: String {
+        isEditing ? "Edit Size" : "New Size"
+    }
+    
+    var saveButtonTitle: String {
+        isEditing ? "Save" : "Add"
+    }
 
     var amountDescription: String {
         guard let amount else { return "" }

@@ -44,4 +44,20 @@ extension FoodForm.Fields {
         standardSizes.compactMap({ $0.value.size })
         + volumePrefixedSizes.compactMap({ $0.value.size })
     }
+    
+    func removeSize(_ size: FormSize) {
+        if size.isVolumePrefixed {
+            volumePrefixedSizes.removeAll(where: { $0.value.size?.id == size.id })
+        } else {
+            standardSizes.removeAll(where: { $0.value.size?.id == size.id })
+        }
+        
+        /// if this size was used for either amount or serving—update it with the new size
+        if amount.value.doubleValue.unit.size == size {
+            amount.value = .amount(.init(double: 1, unit: .serving))
+        }
+        if serving.value.doubleValue.unit.size == size {
+            serving.value = .serving(.init(double: nil, unit: .weight(.g)))
+        }
+    }
 }

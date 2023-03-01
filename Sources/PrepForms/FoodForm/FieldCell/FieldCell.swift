@@ -38,17 +38,91 @@ struct FieldCell: View {
         }
     }
     
+    var title: String {
+        switch field.value {
+        case .size(let size):
+            return size.size.name.lowercased()
+        default:
+            return field.value.description.capitalized
+        }
+    }
+    
+    var prefixLabel: String? {
+        switch field.value {
+        case .size(let size):
+            return size.size.volumePrefixString
+        default:
+            return nil
+        }
+    }
+    
+    var quantityLabel: String? {
+        switch field.value {
+        case .size(let size):
+            if let quantity = size.size.quantity, quantity != 1 {
+                return quantity.cleanAmount
+            } else {
+                return nil
+            }
+        default:
+            return nil
+        }
+    }
+    
+    @ViewBuilder
+    var optionalPrefixLabel: some View {
+        if let prefixLabel {
+            Text(prefixLabel)
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundColor(.secondary)
+                .padding(.vertical, 5)
+                .padding(.horizontal, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .foregroundColor(Color(.secondarySystemFill))
+                )
+        }
+    }
+    
+    @ViewBuilder
+    var optionalIcon: some View {
+        if !field.value.iconImageName.isEmpty {
+            Image(systemName: field.value.iconImageName)
+                .font(.system(size: 14))
+        }
+    }
+    
+    @ViewBuilder
+    var optionalQuantityLabel: some View {
+        if let quantityLabel {
+            HStack(spacing: 2) {
+                Text(quantityLabel)
+                    .foregroundColor(.secondary)
+                Text("×")
+                    .foregroundColor(Color(.tertiaryLabel))
+            }
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
+            .font(.system(size: 14, weight: .semibold, design: .rounded))
+            .padding(.vertical, 5)
+            .padding(.horizontal, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .foregroundColor(Color(.tertiarySystemFill))
+            )
+
+        }
+    }
     //MARK: - Components
     
     var topRow: some View {
         HStack {
             Spacer().frame(width: 2)
             HStack(spacing: 4) {
-                if !field.value.iconImageName.isEmpty {
-                    Image(systemName: field.value.iconImageName)
-                        .font(.system(size: 14))
-                }
-                Text(field.value.description.capitalized)
+                optionalIcon
+                optionalQuantityLabel
+                optionalPrefixLabel
+                Text(title)
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
             }
             .frame(maxHeight: .infinity, alignment: .top)

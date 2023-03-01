@@ -636,6 +636,9 @@ public struct FoodForm: View {
             fields.protein.value = .macro(.init(macro: .protein, double: 20))
             fields.carb.value = .macro(.init(macro: .carb, double: 20))
             fields.fat.value = .macro(.init(macro: .fat, double: 20))
+            withAnimation {
+                fields.updateFormState()
+            }
             Haptics.feedback(style: .rigid)
         }
         
