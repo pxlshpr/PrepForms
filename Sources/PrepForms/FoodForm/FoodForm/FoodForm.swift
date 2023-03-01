@@ -619,12 +619,39 @@ public struct FoodForm: View {
     
     //MARK: - Toolbars
     
+    var debugFillButton: some View {
+        
+        func debugFill() {
+            let wordLengths = [4, 5, 6, 7, 8]
+            let firstWordLength = wordLengths.randomElement()!
+            let secondWordLength = wordLengths.randomElement()!
+
+            let firstWord = String((0..<firstWordLength).map { _ in "abcdefghijklmnopqrstuvwxyz".randomElement()! })
+            let secondWord = String((0..<secondWordLength).map { _ in "abcdefghijklmnopqrstuvwxyz".randomElement()! })
+
+            let randomString = "\(firstWord) \(secondWord)"
+            
+            fields.name = randomString
+            fields.energy.value = .energy(.init(double: 100, unit: .kcal))
+            fields.protein.value = .macro(.init(macro: .protein, double: 20))
+            fields.carb.value = .macro(.init(macro: .carb, double: 20))
+            fields.fat.value = .macro(.init(macro: .fat, double: 20))
+            Haptics.feedback(style: .rigid)
+        }
+        
+        return Button {
+            debugFill()
+        } label: {
+            Image(systemName: "rectangle.and.pencil.and.ellipsis")
+        }
+    }
     var navigationTrailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-//            if showingWizardOverlay {
+            Group {
+                debugFillButton
                 dismissButton
-                .blur(radius: viewModel.showingWizardOverlay ? 5 : 0)
-//            }
+            }
+            .blur(radius: viewModel.showingWizardOverlay ? 5 : 0)
         }
     }
     
