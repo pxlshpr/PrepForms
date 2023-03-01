@@ -37,7 +37,19 @@ struct RecipeForm: View {
     }
     
     var foodSearch: some View {
-        func didTapFood(_ food: Food) {
+        NavigationStack {
+            FoodSearch(
+                dataProvider: DataManager.shared,
+                isRootInNavigationStack: true,
+                shouldDelayContents: true,
+                focusOnAppear: true,
+                searchIsFocused: $searchIsFocused,
+                actionHandler: handleFoodSearchAction
+            )
+        }
+    }
+    
+    func didTapFood(_ food: Food) {
 //            Haptics.feedback(style: .soft)
 //            viewModel.setFood(food)
 //
@@ -46,42 +58,39 @@ struct RecipeForm: View {
 //            } else {
 //                dismiss()
 //            }
-        }
-        
-        func didTapMacrosIndicatorForFood(_ food: Food) {
+    }
+    
+    func didTapFoodBadge(_ food: Food) {
 //            Haptics.feedback(style: .soft)
 //            foodToShowMacrosFor = food
-        }
-        
-        func didTapClose() {
+    }
+    
+    func didTapClose() {
 //            Haptics.feedback(style: .soft)
 //            actionHandler(.dismiss)
+    }
+    
+    func didTapAdd(_ foodType: FoodType) {
+        switch foodType {
+        case .food:
+            break
+        case .recipe:
+            showingAddRecipe = true
+        case .plate:
+            break
         }
-        
-        func didTapAdd(_ foodType: FoodType) {
-            switch foodType {
-            case .food:
-                break
-            case .recipe:
-                showingAddRecipe = true
-            case .plate:
-                break
-            }
-        }
-
-        return NavigationStack {
-            FoodSearch(
-                dataProvider: DataManager.shared,
-                isRootInNavigationStack: true,
-                shouldDelayContents: true,
-                focusOnAppear: true,
-                searchIsFocused: $searchIsFocused,
-//                didTapAdd: didTapAdd,
-                didTapClose: didTapClose,
-                didTapFood: didTapFood,
-                didTapMacrosIndicatorForFood: didTapMacrosIndicatorForFood,
-                didTapAddFood: {}
-            )
+    }
+    
+    func handleFoodSearchAction(_ action: FoodSearch.Action) {
+        switch action {
+        case .dismiss:
+            didTapClose()
+        case .tappedFood(let food):
+            didTapFood(food)
+        case .tappedFoodBadge(let food):
+            didTapFoodBadge(food)
+        case .tappedAddFood:
+            break
         }
     }
 }

@@ -5,7 +5,7 @@ import PrepViews
 import PrepDataTypes
 import SwiftUISugar
 
-extension MealItemFormNew {
+extension ItemForm {
     
     struct QuantityForm: View {
         
@@ -82,7 +82,7 @@ extension MealItemFormNew {
     }
 }
 
-extension MealItemFormNew.QuantityForm {
+extension ItemForm.QuantityForm {
     
     var body: some View {
         NavigationStack {

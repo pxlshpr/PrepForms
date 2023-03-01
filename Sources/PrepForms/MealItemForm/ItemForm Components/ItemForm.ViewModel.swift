@@ -3,93 +3,91 @@ import PrepDataTypes
 import PrepCoreDataStack
 import PrepViews
 
-public enum MealItemFormRoute {
-    case mealItemForm
-    case food
-    case meal
-    case quantity
+extension ItemForm {
+    public class ViewModel: ObservableObject {
+        
+        let date: Date
+        
+        @Published var path: [ItemFormRoute]
+        
+        @Published var food: Food?
+        @Published var dayMeals: [DayMeal]
+        
+        @Published var unit: FoodQuantity.Unit = .serving
+        
+        @Published var internalAmountDouble: Double? = 1
+        @Published var internalAmountString: String = "1"
+        
+        @Published var dayMeal: DayMeal
+        
+        @Published var day: Day? = nil
+        
+        @Published var mealFoodItem: MealFoodItem
+        
+        @Published var isAnimatingAmountChange = false
+        var startedAnimatingAmountChangeAt: Date = Date()
+        
+        let existingMealFoodItem: MealFoodItem?
+        let initialDayMeal: DayMeal?
+        
+        let isRootInNavigationStack: Bool
+        
+        public init(
+            existingMealFoodItem: MealFoodItem?,
+            date: Date,
+            dayMeal: DayMeal? = nil,
+            food: Food? = nil,
+            amount: FoodValue? = nil,
+            initialPath: [ItemFormRoute] = []
+        ) {
+            self.path = initialPath
+            self.date = date
+            
+            let day = DataManager.shared.day(for: date)
+            self.day = day
+            self.dayMeals = day?.meals ?? []
+            
+            self.food = food
+            
+            let dayMealToSet = dayMeal ?? DayMeal(name: "New Meal", time: Date().timeIntervalSince1970)
+            self.dayMeal = dayMealToSet
+            self.initialDayMeal = dayMeal
+            
+            //TODO: Handle this in a better way
+            /// [ ] Try making `mealFoodItem` nil and set it as that if we don't get a food here
+            /// [ ] Try and get this fed in with an existing `FoodItem`, from which we create this when editing!
+            self.mealFoodItem = MealFoodItem(
+                food: food ?? Food.placeholder,
+                amount: .init(0, .g),
+                isSoftDeleted: false,
+                energyInKcal: 0,
+                mealId: dayMealToSet.id
+            )
+            
+            self.existingMealFoodItem = existingMealFoodItem
+            
+            self.isRootInNavigationStack = existingMealFoodItem != nil || food != nil
+            
+            if let amount, let food,
+               let unit = FoodQuantity.Unit(foodValue: amount, in: food)
+            {
+                self.amount = amount.value
+                self.unit = unit
+            } else {
+                setDefaultUnit()
+            }
+            setFoodItem()
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(didPickDayMeal),
+                name: .didPickDayMeal,
+                object: nil
+            )
+        }
+    }
 }
 
-public class MealItemViewModel: ObservableObject {
-    
-    let date: Date
-    
-    @Published var path: [MealItemFormRoute]
-
-    @Published var food: Food?
-    @Published var dayMeals: [DayMeal]
-    
-    @Published var unit: FoodQuantity.Unit = .serving
-
-    @Published var internalAmountDouble: Double? = 1
-    @Published var internalAmountString: String = "1"
-
-    @Published var dayMeal: DayMeal
-
-    @Published var day: Day? = nil
-
-    @Published var mealFoodItem: MealFoodItem
-    
-    @Published var isAnimatingAmountChange = false
-    var startedAnimatingAmountChangeAt: Date = Date()
-
-    let existingMealFoodItem: MealFoodItem?
-    let initialDayMeal: DayMeal?
-
-    let isRootInNavigationStack: Bool
-
-    public init(
-        existingMealFoodItem: MealFoodItem?,
-        date: Date,
-        dayMeal: DayMeal? = nil,
-        food: Food? = nil,
-        amount: FoodValue? = nil,
-        initialPath: [MealItemFormRoute] = []
-    ) {
-        self.path = initialPath
-        self.date = date
-        
-        let day = DataManager.shared.day(for: date)
-        self.day = day
-        self.dayMeals = day?.meals ?? []
-
-        self.food = food
-        
-        let dayMealToSet = dayMeal ?? DayMeal(name: "New Meal", time: Date().timeIntervalSince1970)
-        self.dayMeal = dayMealToSet
-        self.initialDayMeal = dayMeal
-        
-        //TODO: Handle this in a better way
-        /// [ ] Try making `mealFoodItem` nil and set it as that if we don't get a food here
-        /// [ ] Try and get this fed in with an existing `FoodItem`, from which we create this when editing!
-        self.mealFoodItem = MealFoodItem(
-            food: food ?? Food.placeholder,
-            amount: .init(0, .g),
-            isSoftDeleted: false,
-            energyInKcal: 0,
-            mealId: dayMealToSet.id
-        )
-
-        self.existingMealFoodItem = existingMealFoodItem
-        
-        self.isRootInNavigationStack = existingMealFoodItem != nil || food != nil
-
-        if let amount, let food,
-           let unit = FoodQuantity.Unit(foodValue: amount, in: food)
-        {
-            self.amount = amount.value
-            self.unit = unit
-        } else {
-            setDefaultUnit()
-        }
-        setFoodItem()
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(didPickDayMeal),
-            name: .didPickDayMeal,
-            object: nil
-        )
-    }
+extension ItemForm.ViewModel {
     
     @objc func didPickDayMeal(notification: Notification) {
         guard let userInfo = notification.userInfo,
@@ -356,7 +354,7 @@ extension FoodValue {
     }
 }
 
-extension MealItemViewModel {
+extension ItemForm.ViewModel {
     var equivalentQuantities: [FoodQuantity] {
         guard let currentQuantity else { return [] }
         let quantities = currentQuantity.equivalentQuantities(using: DataManager.shared.userVolumeUnits)
@@ -377,7 +375,7 @@ extension MealItemViewModel {
     }    
 }
 
-extension MealItemViewModel: NutritionSummaryProvider {
+extension ItemForm.ViewModel: NutritionSummaryProvider {
     public var energyAmount: Double {
         mealFoodItem.scaledValue(for: .energy)
     }
