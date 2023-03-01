@@ -18,7 +18,7 @@ let package = Package(
         .package(url: "https://github.com/pxlshpr/PrepCoreDataStack", from: "0.0.30"),
         .package(url: "https://github.com/pxlshpr/EmojiPicker", from: "0.0.22"),
         .package(url: "https://github.com/pxlshpr/FoodLabel", from: "0.0.59"),
-        .package(url: "https://github.com/pxlshpr/FoodLabelScanner", from: "0.0.150"),
+        .package(url: "https://github.com/pxlshpr/FoodLabelScanner", from: "0.0.156"),
         .package(url: "https://github.com/pxlshpr/MFPScraper", from: "0.0.62"),
         .package(url: "https://github.com/pxlshpr/NamePicker", from: "0.0.20"),
         .package(url: "https://github.com/pxlshpr/PrepDataTypes", from: "0.0.279"),

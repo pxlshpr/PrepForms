@@ -148,6 +148,7 @@ struct DetailsNameForm: View {
             .multilineTextAlignment(.leading)
             .font(binding.wrappedValue.isEmpty ? .body : .largeTitle)
             .keyboardType(.asciiCapable)
+            .textInputAutocapitalization(.words)
 //            .autocorrectionDisabled()
             .frame(minHeight: 50)
             .scrollDismissesKeyboard(.never)

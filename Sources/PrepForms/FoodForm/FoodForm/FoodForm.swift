@@ -86,7 +86,7 @@ public struct FoodForm: View {
         isPresented: Binding<Bool> = .constant(true),
         didSave: @escaping (FoodFormOutput) -> ()
     ) {
-        print("💭 FoodForm.init()")
+        cprint("💭 FoodForm.init()")
         _isPresented = isPresented
         
         self.didSave = didSave
