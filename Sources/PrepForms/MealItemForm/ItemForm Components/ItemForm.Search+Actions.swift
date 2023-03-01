@@ -45,23 +45,18 @@ extension ItemForm.FoodSearch {
         FoodForm.Sources.shared.reset()
         FoodForm.ViewModel.shared.reset()
         
-        /// Actually shows the `View` for the `FoodForm` that we were passed in
         showingAddFood = true
     }
     
     func didTapScanFoodLabel() {
-        //TODO: Bring this back
         FoodForm.Fields.shared.reset()
         FoodForm.Sources.shared.reset()
         FoodForm.ViewModel.shared.reset(startWithCamera: true)
 
-        /// Actually shows the `View` for the `FoodForm` that we were passed in
         showingAddFood = true
 
-        /// Resigns focus on search and hides the hero button
 //        searchIsFocused = false
 //        showingAddHeroButton = false
-
     }
 
 }
