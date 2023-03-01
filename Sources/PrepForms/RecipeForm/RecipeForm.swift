@@ -79,7 +79,8 @@ struct RecipeForm: View {
 //                didTapAdd: didTapAdd,
                 didTapClose: didTapClose,
                 didTapFood: didTapFood,
-                didTapMacrosIndicatorForFood: didTapMacrosIndicatorForFood
+                didTapMacrosIndicatorForFood: didTapMacrosIndicatorForFood,
+                didTapAddFood: {}
             )
         }
     }

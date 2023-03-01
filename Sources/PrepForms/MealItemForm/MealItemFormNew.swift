@@ -14,7 +14,8 @@ struct MealItemFormNew: View {
     @State var bottomHeight: CGFloat = 0.0
     
     let tappedSave: () -> ()
-    
+    let tappedQuantityForm: () -> ()
+
     var body: some View {
         content
             .sheet(isPresented: $showingQuantityForm) { quantityForm }
@@ -137,7 +138,8 @@ struct MealItemFormNew: View {
     var amountButton: some View {
         Button {
             Haptics.feedback(style: .soft)
-            showingQuantityForm = true
+            tappedQuantityForm()
+//            showingQuantityForm = true
         } label: {
 //            amountCell
             amountField

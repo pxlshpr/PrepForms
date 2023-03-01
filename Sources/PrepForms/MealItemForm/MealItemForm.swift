@@ -30,6 +30,8 @@ public struct MealItemForm: View {
     @State var showingDietsPicker = false
     @State var showingEquivalentQuantities: Bool = false
 
+    @State var showingQuantityForm = false
+    
     public init(
         viewModel: MealItemViewModel,
         isEditing: Bool = false,
@@ -272,17 +274,23 @@ public struct MealItemForm: View {
         var deleteConfirmationMessage: some View {
             Text("Are you sure you want to delete this entry?")
         }
+        
+        func tappedQuantityForm() {
+            showingQuantityForm = true
+        }
 
         var formLayer: some View {
             MealItemFormNew(
                 viewModel: viewModel,
-                tappedSave: tappedSave
+                tappedSave: tappedSave,
+                tappedQuantityForm: tappedQuantityForm
             )
             .safeAreaInset(edge: .bottom) { bottomSafeAreaInset }
             .navigationTitle(viewModel.navigationTitle)
             .scrollDismissesKeyboard(.interactively)
             .sheet(isPresented: $showingUnitPicker) { unitPicker }
             .sheet(isPresented: $showingEquivalentQuantities) { equivalentSizesSheet }
+            .sheet(isPresented: $showingQuantityForm) { quantityForm }
             .confirmationDialog(
                 "",
                 isPresented: $showingDeleteConfirmation,
@@ -296,6 +304,20 @@ public struct MealItemForm: View {
 //            saveLayer
         }
         .toolbar { trailingContent }
+    }
+    
+    @ViewBuilder
+    var quantityForm: some View {
+        if let food = viewModel.food {
+            MealItemFormNew.QuantityForm(
+                food: food,
+                double: viewModel.amountValue.value,
+                unit: viewModel.unit.formUnit
+            ) { double, unit in
+                viewModel.amount = double
+                viewModel.didPickUnit(unit)
+            }
+        }
     }
     
     //MARK: - Details

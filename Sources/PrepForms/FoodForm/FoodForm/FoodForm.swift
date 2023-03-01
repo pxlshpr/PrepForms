@@ -79,15 +79,11 @@ public struct FoodForm: View {
     @State var didPrefillFoodFields = false
     @State var didPrefillFoodSources = false
 
-    @Binding var isPresented: Bool
-    
     public init(
         existingFood: Food? = nil,
-        isPresented: Binding<Bool> = .constant(true),
         didSave: @escaping (FoodFormOutput) -> ()
     ) {
         cprint("💭 FoodForm.init()")
-        _isPresented = isPresented
         
         self.didSave = didSave
         _initialScanResult = State(initialValue: nil)

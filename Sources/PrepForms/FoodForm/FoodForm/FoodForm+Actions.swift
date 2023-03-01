@@ -159,10 +159,7 @@ extension FoodForm {
 
     func dismissWithHaptics() {
         Haptics.feedback(style: .soft)
-//        withAnimation {
-            isPresented = false
-//        }
-//        dismiss()
+        dismiss()
     }
 
     //MARK: - Wizard Actions
@@ -171,6 +168,7 @@ extension FoodForm {
         switch button {
         case .dismiss:
             dismiss()
+            return
         case .background, .startWithEmptyFood:
             break
         case .camera:

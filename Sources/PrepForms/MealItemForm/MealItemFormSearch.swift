@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftHaptics
 import PrepCoreDataStack
 import PrepDataTypes
+import SwiftUISugar
 
 public struct MealItemFormSearch: View {
     
@@ -9,7 +10,8 @@ public struct MealItemFormSearch: View {
     
     @ObservedObject var viewModel: MealItemViewModel
     @State var foodToShowMacrosFor: Food? = nil
-    @State var searchIsFocused: Bool = false
+    @State var searchIsFocused = false
+    @State var showingAddFood = false
     let isInitialFoodSearch: Bool
     let actionHandler: (MealItemFormAction) -> ()
     
@@ -18,15 +20,12 @@ public struct MealItemFormSearch: View {
         isInitialFoodSearch: Bool = false,
         actionHandler: @escaping (MealItemFormAction) -> ()
     ) {
+        print("💭 MealItemFormSearch.init()")
         self.viewModel = viewModel
         self.isInitialFoodSearch = isInitialFoodSearch
         self.actionHandler = actionHandler
     }
-}
-
-extension MealItemFormSearch {
     
-    @ViewBuilder
     public var body: some View {
         Group {
             if isInitialFoodSearch {
@@ -104,6 +103,15 @@ extension MealItemFormSearch {
             Haptics.feedback(style: .soft)
             actionHandler(.dismiss)
         }
+        
+        func didTapAddFood() {
+            FoodForm.Fields.shared.reset()
+            FoodForm.Sources.shared.reset()
+            FoodForm.ViewModel.shared.reset()
+            
+            /// Actually shows the `View` for the `FoodForm` that we were passed in
+            showingAddFood = true
+        }
 
         return FoodSearch(
             dataProvider: DataManager.shared,
@@ -114,11 +122,41 @@ extension MealItemFormSearch {
 //            didTapAdd: didTapAdd,
             didTapClose: didTapClose,
             didTapFood: didTapFood,
-            didTapMacrosIndicatorForFood: didTapMacrosIndicatorForFood
+            didTapMacrosIndicatorForFood: didTapMacrosIndicatorForFood,
+            didTapAddFood: didTapAddFood
         )
         .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
+        .sheet(isPresented: $showingAddFood) { foodForm }
         .navigationBarBackButtonHidden(viewModel.food == nil)
     }
+    
+    var foodForm: some View {
+        func didSaveFood(_ formOutput: FoodFormOutput) {
+            Haptics.successFeedback()
+            FoodFormManager.shared.save(formOutput)
+        }
+        
+        return FoodForm(didSave: didSaveFood)
+    }
+    
+    var plateFormSheet: some View {
+        NavigationStack {
+            FormStyledScrollView {
+                FormStyledSection {
+                    Button("Add Food") {
+                        
+                    }
+                }
+            }
+            .navigationTitle("New Plate")
+        }
+    }
+
+    var recipeFormSheet: some View {
+        RecipeForm()
+    }
+
+
     
 //    func didTapAdd(_ foodType: FoodType) {
 //        actionHandler(.add(foodType))

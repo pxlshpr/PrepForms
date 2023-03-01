@@ -35,9 +35,9 @@ public struct FoodSearch: View {
     @State var shouldShowRecents: Bool = true
     @State var shouldShowSearchPrompt: Bool = false
     
-    @State var showingAddFood = false
-    @State var showingAddPlate = false
-    @State var showingAddRecipe = false
+//    @State var showingAddFood = false
+//    @State var showingAddPlate = false
+//    @State var showingAddRecipe = false
 
     @State var showingAddHeroButton: Bool
     @State var heroButtonOffsetOverride: Bool = false
@@ -49,7 +49,8 @@ public struct FoodSearch: View {
     let didTapClose: (() -> ())?
     let didTapFood: (Food) -> ()
     let didTapMacrosIndicatorForFood: (Food) -> ()
-    
+    let didTapAddFood: () -> ()
+
     let focusOnAppear: Bool
     let isRootInNavigationStack: Bool
     
@@ -63,8 +64,11 @@ public struct FoodSearch: View {
         searchIsFocused: Binding<Bool>,
         didTapClose: (() -> ())? = nil,
         didTapFood: @escaping ((Food) -> ()),
-        didTapMacrosIndicatorForFood: @escaping ((Food) -> ())
+        didTapMacrosIndicatorForFood: @escaping ((Food) -> ()),
+        didTapAddFood: @escaping () -> ()
     ) {
+        print("💭 FoodSearch.init()")
+
         self.isRootInNavigationStack = isRootInNavigationStack
         
         let searchViewModel = SearchViewModel(recents: dataProvider.recentFoods)
@@ -82,6 +86,7 @@ public struct FoodSearch: View {
         self.didTapClose = didTapClose
         self.didTapFood = didTapFood
         self.didTapMacrosIndicatorForFood = didTapMacrosIndicatorForFood
+        self.didTapAddFood = didTapAddFood
         
         _showingAddHeroButton = State(initialValue: focusOnAppear)
         _hasAppeared = State(initialValue: shouldDelayContents ? false : true)
@@ -113,11 +118,12 @@ public struct FoodSearch: View {
         .toolbar { principalContent }
         .toolbar { leadingContent }
         .onChange(of: searchViewModel.searchText, perform: searchTextChanged)
-        .onChange(of: scenePhase, perform: scenePhaseChanged)
         .onChange(of: searchIsFocused, perform: searchIsFocusedChanged)
-        .sheet(isPresented: $showingAddPlate) { plateFormSheet }
-        .sheet(isPresented: $showingAddRecipe) { recipeFormSheet }
         .onReceive(didAddFood, perform: didAddFood)
+//        .fullScreenCover(isPresented: $showingAddFood) { foodForm }
+//        .sheet(isPresented: $showingAddPlate) { plateFormSheet }
+//        .sheet(isPresented: $showingAddRecipe) { recipeFormSheet }
+//        .onChange(of: scenePhase, perform: scenePhaseChanged)
     }
     
     @ViewBuilder
@@ -129,43 +135,15 @@ public struct FoodSearch: View {
 //                list
                 searchableView
 //                addHeroLayer
-                fakeTextField
             }
             .sheet(isPresented: $showingBarcodeScanner) { barcodeScanner }
             .sheet(isPresented: $showingFilters) { filtersSheet }
             .onChange(of: isComparing, perform: isComparingChanged)
             .background(background)
-            .fullScreenCover(isPresented: $showingAddFood) { foodForm }
+//            .fullScreenCover(isPresented: $showingAddFood) { foodForm }
 //        }
     }
     
-    var foodForm: some View {
-        
-        func didSaveFood(_ formOutput: FoodFormOutput) {
-            Haptics.successFeedback()
-            FoodFormManager.shared.save(formOutput)
-        }
-        
-        return FoodForm(isPresented: $showingAddFood, didSave: didSaveFood)
-    }
-    
-    var plateFormSheet: some View {
-        NavigationStack {
-            FormStyledScrollView {
-                FormStyledSection {
-                    Button("Add Food") {
-                        
-                    }
-                }
-            }
-            .navigationTitle("New Plate")
-        }
-    }
-
-    var recipeFormSheet: some View {
-        RecipeForm()
-    }
-
     func hideHeroAddButton() {
         withAnimation {
             if showingAddHeroButton {
@@ -189,50 +167,6 @@ public struct FoodSearch: View {
             hideHeroAddButton()
         } else {
             initialSearchIsFocusedChangeIgnored = true
-        }
-    }
-
-    func scenePhaseChanged(to newPhase: ScenePhase) {
-        switch newPhase {
-        case .background:
-            wasInBackground = true
-//            searchIsFocused = false
-        case .active:
-            if wasInBackground, showingAddFood {
-                focusFakeKeyboardWhenVisible = true
-                wasInBackground = false
-            }
-        default:
-            break
-        }
-    }
-    
-    var fakeTextField: some View {
-        TextField("", text: .constant(""))
-            .focused($fakeKeyboardFocused)
-            .opacity(0)
-    }
-
-    func showingAddFoodChanged(_ showing: Bool) {
-        guard !showing else { return }
-        guard focusFakeKeyboardWhenVisible else { return }
-        focusFakeKeyboardWhenVisible = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            fakeKeyboardFocused = true
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                fakeKeyboardFocused = false
-            }
-            /// failsafe in case it wasn't unfocused
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
-                fakeKeyboardFocused = false
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                fakeKeyboardFocused = false
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                fakeKeyboardFocused = false
-            }
         }
     }
 
@@ -266,16 +200,12 @@ public struct FoodSearch: View {
     
     var addFoodButton: some View {
         Button {
-            FoodForm.Fields.shared.reset()
-            FoodForm.Sources.shared.reset()
-            FoodForm.ViewModel.shared.reset()
-            
-            /// Actually shows the `View` for the `FoodForm` that we were passed in
-            showingAddFood = true
-
+            //TODO: Bring this back
             /// Resigns focus on search and hides the hero button
-            searchIsFocused = false
-            showingAddHeroButton = false
+//            searchIsFocused = false
+//            showingAddHeroButton = false
+            
+            didTapAddFood()
             
         } label: {
             Label("Food", systemImage: FoodType.food.systemImage)
@@ -284,16 +214,17 @@ public struct FoodSearch: View {
 
     var scanFoodLabelButton: some View {
         Button {
-            FoodForm.Fields.shared.reset()
-            FoodForm.Sources.shared.reset()
-            FoodForm.ViewModel.shared.reset(startWithCamera: true)
-            
-            /// Actually shows the `View` for the `FoodForm` that we were passed in
-            showingAddFood = true
-
-            /// Resigns focus on search and hides the hero button
-            searchIsFocused = false
-            showingAddHeroButton = false
+            //TODO: Bring this back
+//            FoodForm.Fields.shared.reset()
+//            FoodForm.Sources.shared.reset()
+//            FoodForm.ViewModel.shared.reset(startWithCamera: true)
+//
+//            /// Actually shows the `View` for the `FoodForm` that we were passed in
+//            showingAddFood = true
+//
+//            /// Resigns focus on search and hides the hero button
+//            searchIsFocused = false
+//            showingAddHeroButton = false
             
         } label: {
             Label("Scan Food Label", systemImage: "text.viewfinder")
@@ -442,7 +373,8 @@ public struct FoodSearch: View {
                 Button {
                     searchIsFocused = false
 //                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        showingAddFood = true
+                    didTapAddFood()
+//                        showingAddFood = true
 //                    }
 //                    didTapAddFood()
                 } label: {
@@ -606,5 +538,15 @@ public struct FoodSearch: View {
 extension FoodSearch {
     var title: String {
         return isComparing ? "Select \(searchViewModel.foodType.description)s to Compare" : "Search"
+    }
+}
+
+struct DummyFoodForm: View {
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        Button("Dismiss") {
+            dismiss()
+        }
     }
 }
