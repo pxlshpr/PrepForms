@@ -45,6 +45,8 @@ extension ItemForm.FoodSearch {
         FoodForm.Sources.shared.reset()
         FoodForm.ViewModel.shared.reset()
         
+        Haptics.feedback(style: .soft)
+        
         showingAddFood = true
     }
     
@@ -53,6 +55,7 @@ extension ItemForm.FoodSearch {
         FoodForm.Sources.shared.reset()
         FoodForm.ViewModel.shared.reset(startWithCamera: true)
 
+        Haptics.feedback(style: .heavy)
         showingAddFood = true
 
 //        searchIsFocused = false

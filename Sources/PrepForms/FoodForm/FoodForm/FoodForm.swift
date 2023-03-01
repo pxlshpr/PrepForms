@@ -651,7 +651,7 @@ public struct FoodForm: View {
     var navigationTrailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             Group {
-                debugFillButton
+//                debugFillButton
                 dismissButton
             }
             .blur(radius: viewModel.showingWizardOverlay ? 5 : 0)
