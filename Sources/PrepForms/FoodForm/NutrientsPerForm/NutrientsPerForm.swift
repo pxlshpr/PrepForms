@@ -190,7 +190,7 @@ struct NutrientsPerForm: View {
         var footerString: String {
             var prefix: String {
                 return fields.density.isValid
-                ? "You can also"
+                ? "You can now also"
                 : "Enter this to also be able to"
             }
             if fields.isWeightBased {
