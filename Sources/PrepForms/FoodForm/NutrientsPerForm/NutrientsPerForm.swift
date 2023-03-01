@@ -190,13 +190,13 @@ struct NutrientsPerForm: View {
         var footerString: String {
             var prefix: String {
                 return fields.density.isValid
-                ? "You can"
-                : "Enter this to"
+                ? "You can also"
+                : "Enter this to also be able to"
             }
             if fields.isWeightBased {
-                return "\(prefix) also log this food using volume units, like cups."
+                return "\(prefix) log this food using volume units, like cups."
             } else {
-                return "\(prefix) also log this food using using its weight."
+                return "\(prefix) log this food using using its weight."
             }
         }
         
@@ -283,7 +283,13 @@ extension NutrientsPerForm {
     
     var densityForm: some View {
         DensityForm(initialField: fields.density) { density in
-            
+            guard let density else {
+                fields.density = Field(fieldValue: .density(.init()))
+                return
+            }
+            withAnimation {
+                fields.density = Field(fieldValue: .density(.init(foodDensity: density)))
+            }
         }
         .environmentObject(fields)
     }

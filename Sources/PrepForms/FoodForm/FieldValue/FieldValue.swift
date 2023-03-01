@@ -382,6 +382,20 @@ extension FieldValue {
             self.fill = fill
         }
         
+        init(foodDensity: FoodDensity, fill: Fill = .discardable) {
+            self.weight = .init(
+                double: foodDensity.weightAmount,
+                unit: .weight(foodDensity.weightUnit),
+                fill: fill
+            )
+            self.volume = .init(
+                double: foodDensity.volumeAmount,
+                unit: .volume(foodDensity.volumeExplicitUnit.volumeUnit),
+                fill: fill
+            )
+            self.fill = fill
+        }
+        
         static let DefaultWeight = DoubleValue(unit: .weight(.g))
         static let DefaultVolume = DoubleValue(unit: .volume(.cup))
         

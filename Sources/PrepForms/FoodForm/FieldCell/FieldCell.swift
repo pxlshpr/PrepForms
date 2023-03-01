@@ -205,19 +205,19 @@ struct FieldCell: View {
 
         return Group {
             if densityValue.isValid {
-                if fields.isWeightBased {
-                    weightStack
-                } else {
+//                if fields.isWeightBased {
+//                    weightStack
+//                } else {
                     volumeStack
-                }
+//                }
                 Text("↔")
                     .font(.system(size: 17, weight: .semibold, design: .rounded))
                     .foregroundColor(Color(.tertiaryLabel))
-                if fields.isWeightBased {
-                    volumeStack
-                } else {
+//                if fields.isWeightBased {
+//                    volumeStack
+//                } else {
                     weightStack
-                }
+//                }
             } else {
                 amountText
                     .multilineTextAlignment(.leading)

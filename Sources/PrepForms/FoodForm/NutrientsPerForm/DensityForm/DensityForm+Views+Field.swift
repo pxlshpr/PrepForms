@@ -27,7 +27,7 @@ extension DensityForm {
     var fieldContents: some View {
 
         var equalsSymbol: some View {
-            symbol("=")
+            symbol("↔")
                 .layoutPriority(3)
         }
 
@@ -54,33 +54,15 @@ extension DensityForm {
             }
             .layoutPriority(1)
         }
-        
-        @ViewBuilder
-        var firstButton: some View {
-            if fields.isWeightBased {
-                weightButton
-            } else {
-                volumeButton
-            }
-        }
-
-        @ViewBuilder
-        var secondButton: some View {
-            if fields.isWeightBased {
-                volumeButton
-            } else {
-                weightButton
-            }
-        }
 
         return HStack {
             Group {
                 Spacer()
-                firstButton
+                volumeButton
                 Spacer()
                 equalsSymbol
                 Spacer()
-                secondButton
+                weightButton
                 Spacer()
             }
         }

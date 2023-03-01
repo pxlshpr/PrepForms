@@ -83,7 +83,7 @@ extension DensityForm {
                     buttonImage: "trash.fill",
                     handler: {
                         withAnimation {
-//                            fields.removeDensity()
+                            fields.density = .init(fieldValue: .density(.init()))
                         }
                     }
                 )
