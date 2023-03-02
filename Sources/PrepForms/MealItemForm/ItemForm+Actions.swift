@@ -14,7 +14,13 @@ extension ItemForm {
     
     func tappedSave() {
         Haptics.feedback(style: .soft)
-        actionHandler(.save(viewModel.mealFoodItem, viewModel.dayMeal))
+        if viewModel.forIngredient {
+            //TODO: IngredientItem
+        } else {
+            if let mealFoodItem = viewModel.mealaFoodItem {
+                actionHandler(.save(mealFoodItem, viewModel.dayMeal))
+            }
+        }
         actionHandler(.dismiss)
     }
     
@@ -30,10 +36,14 @@ extension ItemForm {
 
     func delete() {
         Haptics.successFeedback()
-        DataManager.shared.deleteMealItem(
-            viewModel.mealFoodItem,
-            in: viewModel.dayMeal
-        )
+        
+        if viewModel.forIngredient {
+            //TODO: IngredientItem
+        } else {
+            if let mealFoodItem = viewModel.mealaFoodItem {
+                DataManager.shared.deleteMealItem(mealFoodItem, in: viewModel.dayMeal)
+            }
+        }
     }
 
     func didTapGoalSetButton(forMeal: Bool) {

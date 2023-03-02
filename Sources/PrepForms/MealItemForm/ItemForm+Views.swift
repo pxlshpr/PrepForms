@@ -191,16 +191,29 @@ extension ItemForm {
             },
             set: { _ in }
         )
-        return PortionAwareness(
-            foodItem: $viewModel.mealFoodItem,
-            meal: $viewModel.dayMeal,
-            day: $viewModel.day,
-            lastUsedGoalSet: lastUsedGoalSetBinding,
-            userUnits: DataManager.shared.user?.units ?? .standard,
-//            bodyProfile: viewModel.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
-            bodyProfile: DataManager.shared.user?.bodyProfile,
-            didTapGoalSetButton: didTapGoalSetButton
-        )
+        
+        func portionAwarenessForMeal(mealFoodItem: Binding<MealFoodItem>) -> some View {
+            PortionAwareness(
+                foodItem: mealFoodItem,
+                meal: $viewModel.dayMeal,
+                day: $viewModel.day,
+                lastUsedGoalSet: lastUsedGoalSetBinding,
+                userUnits: DataManager.shared.user?.units ?? .standard,
+//                bodyProfile: viewModel.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
+                bodyProfile: DataManager.shared.user?.bodyProfile,
+                didTapGoalSetButton: didTapGoalSetButton
+            )
+        }
+        
+        return Group {
+            //TODO: Bring this back after making PortionAwarnes support optional values in the bindings for `MealItem` and `IngredientItem`
+            Color.clear
+//            if viewModel.forIngredient {
+//
+//            } else {
+//                if let mealFoodItem = viewModel.mealaFoodItem
+//            }
+        }
         .padding(.top, 15)
     }
     

@@ -16,12 +16,16 @@ extension ItemForm {
         @Published var isAnimatingAmountChange = false
         var startedAnimatingAmountChangeAt: Date = Date()
         let isRootInNavigationStack: Bool
+        let forIngredient: Bool
         
+        /// `IngredientFoodItem` specific
+        @Published var ingredientFoodItem: IngredientFoodItem? = nil
+
         /// `MealFoodItem` specific
+        @Published var mealaFoodItem: MealFoodItem?
         @Published var dayMeals: [DayMeal]
         @Published var dayMeal: DayMeal
         @Published var day: Day? = nil
-        @Published var mealFoodItem: MealFoodItem
         let existingMealFoodItem: MealFoodItem?
         let initialDayMeal: DayMeal?
 
@@ -33,6 +37,7 @@ extension ItemForm {
             amount: FoodValue? = nil,
             initialPath: [ItemFormRoute] = []
         ) {
+            self.forIngredient = false
             self.path = initialPath
             self.date = date
             
@@ -49,13 +54,14 @@ extension ItemForm {
             //TODO: Handle this in a better way
             /// [ ] Try making `mealFoodItem` nil and set it as that if we don't get a food here
             /// [ ] Try and get this fed in with an existing `FoodItem`, from which we create this when editing!
-            self.mealFoodItem = MealFoodItem(
-                food: food ?? Food.placeholder,
-                amount: .init(0, .g),
-                isSoftDeleted: false,
-                energyInKcal: 0,
-                mealId: dayMealToSet.id
-            )
+            self.mealaFoodItem = nil
+//            self.mealFoodItem = MealFoodItem(
+//                food: food ?? Food.placeholder,
+//                amount: .init(0, .g),
+//                isSoftDeleted: false,
+//                energyInKcal: 0,
+//                mealId: dayMealToSet.id
+//            )
             
             self.existingMealFoodItem = existingMealFoodItem
             
@@ -147,7 +153,7 @@ extension ItemForm.ViewModel {
 
     func setFoodItem() {
         guard let food else { return }
-        self.mealFoodItem = MealFoodItem(
+        self.mealaFoodItem = MealFoodItem(
             id: existingMealFoodItem?.id ?? UUID(),
             food: food,
             amount: amountValue,
@@ -370,19 +376,27 @@ extension ItemForm.ViewModel {
 
 extension ItemForm.ViewModel: NutritionSummaryProvider {
     public var energyAmount: Double {
-        mealFoodItem.scaledValue(for: .energy)
+        amount(for: .energy)
+    }
+    
+    public func amount(for component: NutrientMeterComponent) -> Double {
+        if forIngredient {
+            return ingredientFoodItem?.scaledValue(for: component) ?? 0
+        } else {
+            return mealaFoodItem?.scaledValue(for: component) ?? 0
+        }
     }
     
     public var carbAmount: Double {
-        mealFoodItem.scaledValue(for: .carb)
+        amount(for: .carb)
     }
     
     public var fatAmount: Double {
-        mealFoodItem.scaledValue(for: .fat)
+        amount(for: .fat)
     }
     
     public var proteinAmount: Double {
-        mealFoodItem.scaledValue(for: .protein)
+        amount(for: .protein)
     }
 }
 
