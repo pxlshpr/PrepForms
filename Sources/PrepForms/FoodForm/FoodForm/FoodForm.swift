@@ -10,6 +10,7 @@ import SwiftHaptics
 public struct FoodForm: View {
     
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
 
     let didSave: (FoodFormOutput) -> ()
     
@@ -20,37 +21,26 @@ public struct FoodForm: View {
     @StateObject var extractor: Extractor = Extractor.shared
     @StateObject var viewModel: ViewModel = ViewModel.shared
     
-    /// Sheets
     @State var showingEmojiPicker = false
     @State var showingDetailsForm = false
-    
-    @State var showingFoodLabelCamera = false
     @State var showingPhotosPicker = false
     @State var showingBarcodeScanner = false
-    
-    @State var showingAddLinkAlert = false
     @State var showingSaveSheet = false
-    @State var showingBottomButtonsSaved = false /// Used when presenting keyboard and alerts
-    
-    @State var selectedPhoto: UIImage? = nil
-    
-    /// Menus
-    @State var showingFoodLabel = false
-    
-    /// Barcode
+    @State var showingSaveButtons = false
+    @State var showingAddLinkAlert = false
     @State var showingAddBarcodeAlert = false
-    @State var barcodePayload: String = ""
-    
     @State var showingDismissConfirmationDialog = false
-    let didDismissExtractor = NotificationCenter.default.publisher(for: .didDismissExtractor)
-    let didExtractFoodLabel = NotificationCenter.default.publisher(for: .didExtractFoodLabel)
-    let shouldDismissFoodForm = NotificationCenter.default.publisher(for: .shouldDismissFoodForm)
 
-    @State var refreshBool = false
-    
     let existingFood: Food?
     @State var didPrefillFoodFields = false
     @State var didPrefillFoodSources = false
+    @State var selectedPhoto: UIImage? = nil
+    @State var barcodePayload: String = ""
+    @State var refreshBool = false
+    
+    let didDismissExtractor = NotificationCenter.default.publisher(for: .didDismissExtractor)
+    let didExtractFoodLabel = NotificationCenter.default.publisher(for: .didExtractFoodLabel)
+    let shouldDismissFoodForm = NotificationCenter.default.publisher(for: .shouldDismissFoodForm)
 
     public init(
         existingFood: Food? = nil,
@@ -92,22 +82,18 @@ public struct FoodForm: View {
         
         return NavigationStack {
             formContent
-//                .edgesIgnoringSafeArea(.bottom)
                 .navigationTitle("\(existingFood == nil ? "New" : "Edit") Food")
                 .toolbar { navigationLeadingContent }
                 .toolbar { navigationTrailingContent }
                 .onAppear(perform: appeared)
                 .onChange(of: sources.selectedPhotos, perform: selectedPhotosChanged)
-//                .onChange(of: sources.selectedPhotos, perform: sources.selectedPhotosChanged)
                 .onChange(of: viewModel.showingWizard, perform: showingWizardChanged)
                 .onChange(of: showingAddLinkAlert, perform: showingAddLinkAlertChanged)
                 .onChange(of: showingAddBarcodeAlert, perform: showingAddBarcodeAlertChanged)
             
                 .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
                 .sheet(isPresented: $showingDetailsForm) { detailsForm }
-//                .sheet(isPresented: $showingSaveSheet) { saveSheet }
                 .fullScreenCover(isPresented: $showingBarcodeScanner) { barcodeScanner }
-//                .sheet(isPresented: $showingBarcodeScanner) { barcodeScanner }
                 .alert(addBarcodeTitle,
                        isPresented: $showingAddBarcodeAlert,
                        actions: { addBarcodeActions },
@@ -217,10 +203,6 @@ public struct FoodForm: View {
     }
     
     //MARK: - Layers
-    
-    @State var showingSaveButtons = false
-    @Environment(\.colorScheme) var colorScheme
-    
     @ViewBuilder
     var formLayer: some View {
         FormStyledScrollView(showsIndicators: false, isLazy: false) {
@@ -272,8 +254,7 @@ public struct FoodForm: View {
     }
     
     var safeAreaInset: some View {
-        Spacer()
-            .frame(height: 60)
+        Spacer().frame(height: 60)
     }
     
     @ViewBuilder
@@ -478,21 +459,6 @@ public struct FoodForm: View {
     }
     
     var saveSheetLayer: some View {
-//        ZStack {
-//            if showingSaveSheet {
-//                Color.black.opacity(colorScheme == .light ? 0.2 : 0.5)
-//                    .transition(.opacity)
-//                    .edgesIgnoringSafeArea(.all)
-//            }
-//            if showingSaveSheet {
-//                VStack {
-//                    Spacer()
-//                    saveSheet
-//                }
-//                .edgesIgnoringSafeArea(.all)
-//                .transition(.move(edge: .bottom))
-//            }
-//        }
         saveSheet
     }
 

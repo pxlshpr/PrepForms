@@ -31,7 +31,7 @@ extension FoodForm {
         
         /// Allow the animation of food label appearing to complete before refreshing it (mitigating the sources view sometimes sliding into view only as we scroll past it)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            /// Only refresh the bool for the first image, since
+            /// Only refresh the bool for the first image, because of the following:
             /// - there would already be the food label, so we wouldn't need to refresh it
             /// - the user has most likely scrolled down the list at this point, so refreshing would cause the
             /// scroll offset to reset

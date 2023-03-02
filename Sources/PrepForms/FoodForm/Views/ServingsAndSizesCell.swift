@@ -5,6 +5,12 @@ public struct ServingsAndSizesCell: View {
     
     @EnvironmentObject var fields: FoodForm.Fields
     
+    let forIngredients: Bool
+    
+    init(forIngredients: Bool = false) {
+        self.forIngredients = forIngredients
+    }
+    
     public var body: some View {
         VStack(alignment: .leading) {
             nutrientsPerContents
@@ -36,7 +42,7 @@ public struct ServingsAndSizesCell: View {
 //            }
 //        }
         return VStack(alignment: .leading, spacing: 3) {
-            Text("Nutrients Per")
+            Text("\(forIngredients ? "Ingredients" : "Nutrients") Per")
                 .font(.system(.headline, design: .rounded, weight: .bold))
                 .foregroundColor(Color(.secondaryLabel))
             HStack(alignment: .firstTextBaseline, spacing: 5) {

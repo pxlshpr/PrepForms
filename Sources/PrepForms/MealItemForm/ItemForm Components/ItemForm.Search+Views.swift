@@ -28,6 +28,15 @@ extension ItemForm.FoodSearch {
         return FoodForm(didSave: didSaveFood)
     }
     
+    var recipeForm: some View {
+        func didSaveFood(_ formOutput: FoodFormOutput) {
+//            Haptics.successFeedback()
+//            FoodFormManager.shared.save(formOutput)
+        }
+        
+        return RecipeForm()
+    }
+    
     func macrosView(for food: Food) -> some View {
         Text("Macros for: \(food.name)")
             .presentationDetents([.medium, .large])
@@ -70,9 +79,7 @@ extension ItemForm.FoodSearch {
         
         var addRecipeButton: some View {
             Button {
-    //            showingAddRecipe = true
-    //            searchIsFocused = false
-    //            showingAddHeroButton = false
+                didTapAddRecipe()
             } label: {
                 Label("Recipe", systemImage: FoodType.recipe.systemImage)
             }

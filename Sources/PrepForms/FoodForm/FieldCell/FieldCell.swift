@@ -8,6 +8,13 @@ struct FieldCell: View {
     @EnvironmentObject var fields: FoodForm.Fields
     @ObservedObject var field: Field
     @Binding var showImage: Bool
+    let customTitle: String?
+    
+    init(field: Field, showImage: Binding<Bool>, customTitle: String? = nil) {
+        self.field = field
+        self.customTitle = customTitle
+        _showImage = showImage
+    }
     
     var body: some View {
         ZStack {
@@ -39,6 +46,10 @@ struct FieldCell: View {
     }
     
     var title: String {
+        if let customTitle {
+            return customTitle
+        }
+        
         switch field.value {
         case .size(let size):
             return size.size.name.lowercased()

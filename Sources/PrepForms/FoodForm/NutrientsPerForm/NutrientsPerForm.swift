@@ -12,7 +12,6 @@ extension NutrientsPerForm {
 
 struct NutrientsPerForm: View {
 
-    @EnvironmentObject var sources: FoodForm.Sources
     @ObservedObject var fields: FoodForm.Fields
 
     @StateObject var viewModel = ViewModel()
@@ -27,8 +26,11 @@ struct NutrientsPerForm: View {
 
     @State var showingImages: Bool = true
     
-    init(fields: FoodForm.Fields) {
+    let forIngredients: Bool
+    
+    init(fields: FoodForm.Fields, forIngredients: Bool = false) {
         self.fields = fields
+        self.forIngredients = forIngredients
         self.shouldShowServing = fields.shouldShowServing
         self.shouldShowDensity = fields.shouldShowDensity
     }
@@ -74,7 +76,10 @@ struct NutrientsPerForm: View {
     
     var sizesGroup: some View {
         var footerString: String {
-            "Sizes give you additional portions to log this food in; like biscuit, bottle, container, etc."
+            let examples = forIngredients
+            ? "bowl, small tupperware, shaker bottle, etc."
+            : "biscuit, bottle, container, etc."
+            return "Sizes give you additional portions to log this \(foodType) in; like \(examples)"
         }
         
         return Group {
@@ -137,9 +142,15 @@ struct NutrientsPerForm: View {
                 .frame(height: 12)
         }
     }
+    
+    var foodType: String {
+        forIngredients ? "recipe" : "food"
+    }
+    
     var amountCell: some View {
         var footerString: String {
-            "This is how much of this food the nutrition facts are for."
+            let object = forIngredients ? "ingredients" : "nutrition facts"
+            return "This is how much of this \(foodType) the \(object) are for."
         }
         
         return Group {
@@ -147,8 +158,12 @@ struct NutrientsPerForm: View {
                 Haptics.feedback(style: .soft)
                 showingAmountForm = true
             } label: {
-                FieldCell(field: fields.amount, showImage: $showingImages)
-                    .environmentObject(fields)
+                FieldCell(
+                    field: fields.amount,
+                    showImage: $showingImages,
+                    customTitle: forIngredients ? "Ingredients Per" : nil
+                )
+                .environmentObject(fields)
             }
             footerCell(footerString)
         }
@@ -194,9 +209,9 @@ struct NutrientsPerForm: View {
                 : "Enter this to also be able to"
             }
             if fields.isWeightBased {
-                return "\(prefix) log this food using volume units, like cups."
+                return "\(prefix) log this \(foodType) using volume units, like cups."
             } else {
-                return "\(prefix) log this food using using its weight."
+                return "\(prefix) log this \(foodType) using using its weight."
             }
         }
         

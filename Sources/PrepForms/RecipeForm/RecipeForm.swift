@@ -8,89 +8,121 @@ import Camera
 import SwiftSugar
 import PrepViews
 
-struct RecipeForm: View {
+public struct RecipeForm: View {
     
+    @StateObject var fields = FoodForm.Fields()
+    @StateObject var ingredients = Ingredients()
+    
+    @State var showingDetailsForm = false
+    @State var showingEmojiPicker = false
     @State var showingFoodSearch = false
-    @State var showingAddRecipe = false
-    @State var searchIsFocused: Bool = false
-    
-    init() {
+
+    public init() {
+        
     }
 
-    var body: some View {
-        NavigationStack {
-            FormStyledScrollView {
-                FormStyledSection {
-                    Button("Add Food") {
-                        showingFoodSearch = true
-                    }
+    public var body: some View {
+        content
+            .sheet(isPresented: $showingDetailsForm) { detailsForm }
+            .sheet(isPresented: $showingFoodSearch) { foodSearchForm }
+    }
+    
+    var content: some View {
+        ZStack {
+            navigationView
+            saveSheet
+                .zIndex(3)
+        }
+    }
+    
+    var navigationView: some View {
+        var formContent: some View {
+            ZStack {
+                formLayer
+//                saveButtonLayer
+//                    .zIndex(3)
+//                loadingLayer
+//                    .zIndex(4)
+            }
+        }
+        
+        return NavigationStack {
+            formContent
+                .navigationTitle("New Recipe")
+        }
+    }
+    
+    var foodSearchForm: some View {
+        Color.clear
+//        ItemForm.FoodSearch(
+//            viewModel: ItemForm.ViewModel(existingMealFoodItem: nil, date: Date()),
+//            isInitialFoodSearch: true,
+//            actionHandler: { _ in
+////                handleMealItemAction($0, forEdit: false)
+//            }
+//        )
+    }
+    
+    var formLayer: some View {
+        FormStyledScrollView(showsIndicators: false, isLazy: false) {
+            detailsSection
+            servingSection
+            ingredientsSection
+        }
+        .safeAreaInset(edge: .bottom) { Spacer().frame(height: 60) }
+    }
+    
+    var ingredientsSection: some View {
+        var header: some View {
+            Text("Ingredients")
+        }
+        
+        return FormStyledSection(header: header) {
+            IngredientsCell(actionHandler: handleIngredientsAction)
+                .environmentObject(ingredients)
+        }
+    }
+    
+    func handleIngredientsAction(_ action: IngredientsCell.Action) {
+        switch action {
+        case .add:
+            showingFoodSearch = true
+        }
+    }
+    
+    var detailsSection: some View {
+        FormStyledSection(header: Text("Details")) {
+            FoodDetailsCell(
+                didTapEmoji: { showingEmojiPicker = true },
+                didTapDetails: { showingDetailsForm = true }
+            )
+            .environmentObject(fields)
+        }
+    }
+    
+    var servingSection: some View {
+        FormStyledSection(header: Text("Servings and Sizes")) {
+            NavigationLink {
+                NutrientsPerForm(fields: fields, forIngredients: true)
+            } label: {
+                if fields.hasAmount {
+                    ServingsAndSizesCell(forIngredients: true)
+                        .environmentObject(fields)
+                } else {
+                    Text("Required")
+                        .foregroundColor(Color(.tertiaryLabel))
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .sheet(isPresented: $showingFoodSearch) { foodSearch }
-            .sheet(isPresented: $showingAddRecipe) { recipeForm }
-            .navigationTitle("New Recipe")
         }
     }
     
-    var recipeForm: some View {
-        RecipeForm()
+    var detailsForm: some View {
+        DetailsQuickForm(brandLabel: "Source")
+            .environmentObject(fields)
     }
-    
-    var foodSearch: some View {
-        NavigationStack {
-            FoodSearch(
-                dataProvider: DataManager.shared,
-                isRootInNavigationStack: true,
-                shouldDelayContents: true,
-                focusOnAppear: true,
-                searchIsFocused: $searchIsFocused,
-                actionHandler: handleFoodSearchAction
-            )
-        }
-    }
-    
-    func didTapFood(_ food: Food) {
-//            Haptics.feedback(style: .soft)
-//            viewModel.setFood(food)
-//
-//            if isInitialFoodSearch {
-//                viewModel.path = [.mealItemForm]
-//            } else {
-//                dismiss()
-//            }
-    }
-    
-    func didTapFoodBadge(_ food: Food) {
-//            Haptics.feedback(style: .soft)
-//            foodToShowMacrosFor = food
-    }
-    
-    func didTapClose() {
-//            Haptics.feedback(style: .soft)
-//            actionHandler(.dismiss)
-    }
-    
-    func didTapAdd(_ foodType: FoodType) {
-        switch foodType {
-        case .food:
-            break
-        case .recipe:
-            showingAddRecipe = true
-        case .plate:
-            break
-        }
-    }
-    
-    func handleFoodSearchAction(_ action: FoodSearch.Action) {
-        switch action {
-        case .dismiss:
-            didTapClose()
-        case .tappedFood(let food):
-            didTapFood(food)
-        case .tappedFoodBadge(let food):
-            didTapFoodBadge(food)
-        case .tappedAddFood:
-            break
-        }
+
+    var saveSheet: some View {
+        EmptyView()
     }
 }

@@ -5,86 +5,97 @@ import PrepDataTypes
 import PrepViews
 import SwiftHaptics
 
-extension FoodForm {
-    var detailsSection: some View {
-        
-        FormStyledSection(header: Text("Details")) {
-            detailsCell
-        }
-    }
+struct FoodDetailsCell: View {
     
-    public var detailsCell: some View {
-        var emojiButton: some View {
-            Button {
-                Haptics.feedback(style: .soft)
-                showingEmojiPicker = true
-            } label: {
-                Text(fields.emoji)
-                    .font(.system(size: 50))
-                    .padding(10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(Color(.secondarySystemFill).gradient)
-                    )
-                    .padding(.trailing, 10)
-            }
-        }
-        
-        var detailsButton: some View {
-            @ViewBuilder
-            var nameText: some View {
-                if !fields.name.isEmpty {
-                    Text(fields.name)
-                        .bold()
-                        .multilineTextAlignment(.leading)
-                } else {
-                    Text("Required")
-                        .foregroundColor(Color(.tertiaryLabel))
-                }
-            }
-            
-            @ViewBuilder
-            var detailText: some View {
-                if !fields.detail.isEmpty {
-                    Text(fields.detail)
-                        .multilineTextAlignment(.leading)
-                }
-            }
+    @EnvironmentObject var fields: FoodForm.Fields
 
-            @ViewBuilder
-            var brandText: some View {
-                if !fields.brand.isEmpty {
-                    Text(fields.brand)
-                        .multilineTextAlignment(.leading)
-                }
-            }
-            
-            return Button {
-                Haptics.feedback(style: .soft)
-                showingDetailsForm = true
-            } label: {
-                HStack {
-                    VStack(alignment: .leading) {
-                        nameText
-                        detailText
-                            .foregroundColor(.secondary)
-                        brandText
-                            .foregroundColor(Color(.tertiaryLabel))
-                    }
-                    Spacer()
-                }
-                .frame(maxHeight: .infinity)
-            }
-            .contentShape(Rectangle())
-        }
-        
-        return HStack {
+    let didTapEmoji: () -> ()
+    let didTapDetails: () -> ()
+    
+    var body: some View {
+        HStack {
             emojiButton
             detailsButton
         }
         .foregroundColor(.primary)
     }
     
+    var emojiButton: some View {
+        Button {
+            Haptics.feedback(style: .soft)
+            didTapEmoji()
+        } label: {
+            Text(fields.emoji)
+                .font(.system(size: 50))
+                .padding(10)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color(.secondarySystemFill).gradient)
+                )
+                .padding(.trailing, 10)
+        }
+    }
+    
+    var detailsButton: some View {
+        @ViewBuilder
+        var nameText: some View {
+            if !fields.name.isEmpty {
+                Text(fields.name)
+                    .bold()
+                    .multilineTextAlignment(.leading)
+            } else {
+                Text("Required")
+                    .foregroundColor(Color(.tertiaryLabel))
+            }
+        }
+        
+        @ViewBuilder
+        var detailText: some View {
+            if !fields.detail.isEmpty {
+                Text(fields.detail)
+                    .multilineTextAlignment(.leading)
+            }
+        }
+
+        @ViewBuilder
+        var brandText: some View {
+            if !fields.brand.isEmpty {
+                Text(fields.brand)
+                    .multilineTextAlignment(.leading)
+            }
+        }
+        
+        return Button {
+            Haptics.feedback(style: .soft)
+            didTapDetails()
+        } label: {
+            HStack {
+                VStack(alignment: .leading) {
+                    nameText
+                    detailText
+                        .foregroundColor(.secondary)
+                    brandText
+                        .foregroundColor(Color(.tertiaryLabel))
+                }
+                Spacer()
+            }
+            .frame(maxHeight: .infinity)
+        }
+        .contentShape(Rectangle())
+    }
+}
+
+extension FoodForm {
+    var detailsSection: some View {
+        FormStyledSection(header: Text("Details")) {
+            FoodDetailsCell(
+                didTapEmoji: { showingEmojiPicker = true },
+                didTapDetails: { showingDetailsForm = true }
+            )
+            .environmentObject(fields)
+        }
+    }
+
     var sourcesSection: some View {
         SourcesSummaryCell(
             sources: sources,
@@ -133,13 +144,10 @@ extension FoodForm {
     var servingSection: some View {
         FormStyledSection(header: Text("Servings and Sizes")) {
             NavigationLink {
-//                AmountPerForm()
                 NutrientsPerForm(fields: fields)
-                    .environmentObject(sources)
             } label: {
                 if fields.hasAmount {
                     servingsAndSizesCell
-//                    foodAmountPerView
                 } else {
                     Text("Required")
                         .foregroundColor(Color(.tertiaryLabel))
@@ -166,6 +174,12 @@ struct DetailsQuickForm: View {
     @State var showingBrandForm = false
     @State var showingNameForm = false
     @State var showingDetailForm = false
+    
+    let brandLabel: String
+    
+    init(brandLabel: String = "Brand") {
+        self.brandLabel = brandLabel
+    }
 
     var body: some View {
         NavigationStack {
@@ -180,7 +194,7 @@ struct DetailsQuickForm: View {
             DetailsNameForm(title: "Detail", isRequired: false, name: $fields.detail)
         }
         .sheet(isPresented: $showingBrandForm) {
-            DetailsNameForm(title: "Brand", isRequired: false, name: $fields.brand)
+            DetailsNameForm(title: brandLabel, isRequired: false, name: $fields.brand)
         }
     }
     

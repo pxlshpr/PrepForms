@@ -12,7 +12,10 @@ extension ItemForm {
         @ObservedObject var viewModel: ViewModel
         @State var foodToShowMacrosFor: Food? = nil
         @State var searchIsFocused = false
-        @State var showingAddFood = false
+        
+        @State var showingFoodForm = false
+        @State var showingRecipeForm = false
+
         let isInitialFoodSearch: Bool
         let actionHandler: (ItemFormAction) -> ()
         
@@ -63,7 +66,8 @@ extension ItemForm.FoodSearch {
             actionHandler: handleFoodSearchAction
         )
         .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
-        .fullScreenCover(isPresented: $showingAddFood) { foodForm }
+        .fullScreenCover(isPresented: $showingFoodForm) { foodForm }
+        .fullScreenCover(isPresented: $showingRecipeForm) { recipeForm }
         .navigationBarBackButtonHidden(viewModel.food == nil)
         .toolbar { trailingContent }
     }

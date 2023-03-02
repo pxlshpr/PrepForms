@@ -46,8 +46,12 @@ extension ItemForm.FoodSearch {
         FoodForm.ViewModel.shared.reset()
         
         Haptics.feedback(style: .soft)
-        
-        showingAddFood = true
+        showingFoodForm = true
+    }
+    
+    func didTapAddRecipe() {
+        Haptics.feedback(style: .soft)
+        showingRecipeForm = true
     }
     
     func didTapScanFoodLabel() {
@@ -56,7 +60,7 @@ extension ItemForm.FoodSearch {
         FoodForm.ViewModel.shared.reset(startWithCamera: true)
 
         Haptics.feedback(style: .heavy)
-        showingAddFood = true
+        showingFoodForm = true
 
 //        searchIsFocused = false
 //        showingAddHeroButton = false
