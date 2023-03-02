@@ -9,10 +9,14 @@ import SwiftSugar
 import PrepViews
 
 public struct RecipeForm: View {
+
+    @Environment(\.dismiss) var dismiss
     
     @StateObject var fields = FoodForm.Fields()
     @StateObject var ingredients = Ingredients()
     
+    @State var showingCancelConfirmation = false
+
     @State var showingDetailsForm = false
     @State var showingEmojiPicker = false
     @State var showingFoodSearch = false
@@ -49,12 +53,13 @@ public struct RecipeForm: View {
         return NavigationStack {
             formContent
                 .navigationTitle("New Recipe")
+                .toolbar { navigationTrailingContent }
         }
     }
     
     var foodSearchForm: some View {
         ItemForm.FoodSearch(
-            viewModel: ItemForm.ViewModel(existingMealItem: nil, date: Date()),
+            viewModel: ItemForm.ViewModel(existingIngredientItem: nil),
             isInitialFoodSearch: true,
             actionHandler: { handleItemAction($0, forEdit: false) }
         )
@@ -132,5 +137,46 @@ public struct RecipeForm: View {
 
     var saveSheet: some View {
         EmptyView()
+    }
+    
+    var navigationTrailingContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            Group {
+//                debugFillButton
+                dismissButton
+            }
+        }
+    }
+    
+    var dismissButton: some View {
+        var dismissConfirmationActions: some View {
+            Button("Close without saving", role: .destructive) {
+                Haptics.feedback(style: .soft)
+                dismiss()
+            }
+        }
+        
+        var dismissConfirmationMessage: some View {
+            Text("You have unsaved data. Are you sure?")
+        }
+        
+        return Button {
+            if fields.isDirty {
+                Haptics.warningFeedback()
+//                showingCancelConfirmation = true
+            } else {
+                Haptics.feedback(style: .soft)
+                dismiss()
+//                dismissWithHaptics()
+            }
+        } label: {
+            CloseButtonLabel(forNavigationBar: true)
+        }
+        .confirmationDialog(
+            "",
+            isPresented: $showingCancelConfirmation,
+            actions: { dismissConfirmationActions },
+            message: { dismissConfirmationMessage }
+        )
     }
 }

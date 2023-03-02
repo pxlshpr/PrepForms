@@ -6,8 +6,6 @@ import PrepViews
 extension ItemForm {
     public class ViewModel: ObservableObject {
         
-        let date: Date
-        
         @Published var path: [ItemFormRoute]
         @Published var food: Food?
         @Published var unit: FoodQuantity.Unit = .serving
@@ -18,13 +16,14 @@ extension ItemForm {
         let isRootInNavigationStack: Bool
         let forIngredient: Bool
         
-        /// `IngredientFoodItem` specific
-        @Published var ingredientFoodItem: IngredientFoodItem? = nil
+        /// `IngredientItem` specific
+        @Published var ingredientItem: IngredientItem? = nil
+        @Published var parentFood: Food?
 
         /// `MealItem` specific
-        @Published var mealaFoodItem: MealItem?
-        @Published var dayMeals: [DayMeal]
-        @Published var dayMeal: DayMeal
+        @Published var mealItem: MealItem?
+        @Published var dayMeal: DayMeal?
+        @Published var dayMeals: [DayMeal]?
         @Published var day: Day? = nil
         let existingMealItem: MealItem?
         let initialDayMeal: DayMeal?
@@ -37,9 +36,9 @@ extension ItemForm {
             amount: FoodValue? = nil,
             initialPath: [ItemFormRoute] = []
         ) {
-            self.forIngredient = false
             self.path = initialPath
-            self.date = date
+            self.forIngredient = false
+            self.parentFood = nil
             
             let day = DataManager.shared.day(for: date)
             self.day = day
@@ -54,7 +53,7 @@ extension ItemForm {
             //TODO: Handle this in a better way
             /// [ ] Try making `mealItem` nil and set it as that if we don't get a food here
             /// [ ] Try and get this fed in with an existing `FoodItem`, from which we create this when editing!
-            self.mealaFoodItem = nil
+            self.mealItem = nil
 //            self.mealItem = MealItem(
 //                food: food ?? Food.placeholder,
 //                amount: .init(0, .g),
@@ -82,6 +81,37 @@ extension ItemForm {
                 name: .didPickDayMeal,
                 object: nil
             )
+        }
+        
+        public init(
+            existingIngredientItem: IngredientItem?,
+            parentFood: Food? = nil,
+            food: Food? = nil,
+            amount: FoodValue? = nil,
+            initialPath: [ItemFormRoute] = []
+        ) {
+            self.path = initialPath
+            self.forIngredient = true
+            self.parentFood = parentFood
+            self.food = food
+            self.isRootInNavigationStack = existingIngredientItem != nil || food != nil
+            
+            self.day = nil
+            self.dayMeals = nil
+            self.dayMeal = nil
+            self.initialDayMeal = nil
+            self.mealItem = nil
+            self.existingMealItem = nil
+            
+            if let amount, let food,
+               let unit = FoodQuantity.Unit(foodValue: amount, in: food)
+            {
+                self.amount = amount.value
+                self.unit = unit
+            } else {
+                setDefaultUnit()
+            }
+            setFoodItem()
         }
     }
 }
@@ -122,9 +152,15 @@ extension ItemForm.ViewModel {
             return amountIsValid
         }
         
-        return existing.food.id != food?.id
-        || (existing.amount != amountValue && amountIsValid)
-        || initialDayMeal?.id != dayMeal.id
+        if forIngredient {
+            return existing.food.id != food?.id
+            || (existing.amount != amountValue && amountIsValid)
+        } else {
+            guard let dayMeal else { return false }
+            return existing.food.id != food?.id
+            || (existing.amount != amountValue && amountIsValid)
+            || initialDayMeal?.id != dayMeal.id
+        }
     }
 
     var amount: Double? {
@@ -153,16 +189,32 @@ extension ItemForm.ViewModel {
 
     func setFoodItem() {
         guard let food else { return }
-        self.mealaFoodItem = MealItem(
-            id: existingMealItem?.id ?? UUID(),
-            food: food,
-            amount: amountValue,
-            markedAsEatenAt: existingMealItem?.markedAsEatenAt ?? nil,
-            sortPosition: existingMealItem?.sortPosition ?? 1,
-            isSoftDeleted: existingMealItem?.isSoftDeleted ?? false,
-            energyInKcal: existingMealItem?.energyInKcal ?? 0,
-            mealId: dayMeal.id
-        )
+        if forIngredient {
+            self.ingredientItem = IngredientItem(
+                id: existingMealItem?.id ?? UUID(),
+                food: food,
+                amount: amountValue,
+                sortPosition: existingMealItem?.sortPosition ?? 1,
+                isSoftDeleted: existingMealItem?.isSoftDeleted ?? false,
+                energyInKcal: existingMealItem?.energyInKcal ?? 0,
+                parentFoodId: parentFood?.id
+            )
+        } else {
+            guard let dayMeal else {
+                print("No DayMeal in ItemForm.ViewModel used for Meal")
+                return
+            }
+            self.mealItem = MealItem(
+                id: existingMealItem?.id ?? UUID(),
+                food: food,
+                amount: amountValue,
+                markedAsEatenAt: existingMealItem?.markedAsEatenAt ?? nil,
+                sortPosition: existingMealItem?.sortPosition ?? 1,
+                isSoftDeleted: existingMealItem?.isSoftDeleted ?? false,
+                energyInKcal: existingMealItem?.energyInKcal ?? 0,
+                mealId: dayMeal.id
+            )
+        }
     }
     
     var amountString: String {
@@ -184,7 +236,8 @@ extension ItemForm.ViewModel {
     }
     
     var timelineItems: [TimelineItem] {
-        dayMeals.map { TimelineItem(dayMeal: $0) }
+        guard let dayMeals else { return [] }
+        return dayMeals.map { TimelineItem(dayMeal: $0) }
     }
     
     var amountTitle: String? {
@@ -204,7 +257,11 @@ extension ItemForm.ViewModel {
     }
     
     var savePrefix: String {
-        dayMeal.time < Date().timeIntervalSince1970 ? "Log" : "Prep"
+        if let dayMeal {
+            return dayMeal.time < Date().timeIntervalSince1970 ? "Log" : "Prep"
+        } else {
+            return "Add"
+        }
     }
     
     var navigationTitle: String {
@@ -381,9 +438,9 @@ extension ItemForm.ViewModel: NutritionSummaryProvider {
     
     public func amount(for component: NutrientMeterComponent) -> Double {
         if forIngredient {
-            return ingredientFoodItem?.scaledValue(for: component) ?? 0
+            return ingredientItem?.scaledValue(for: component) ?? 0
         } else {
-            return mealaFoodItem?.scaledValue(for: component) ?? 0
+            return mealItem?.scaledValue(for: component) ?? 0
         }
     }
     

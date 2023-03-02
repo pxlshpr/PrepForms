@@ -3,31 +3,11 @@ import PrepCoreDataStack
 import PrepDataTypes
 import PrepViews
 
-public struct IngredientFoodItem: Identifiable, Hashable, Codable, Equatable {
-    public var id: UUID
-    public var food: Food
-    public var amount: FoodValue
-    public var sortPosition: Int
-    public var badgeWidth: CGFloat
-    public var energyInKcal: Double
-    public var parentFoodId: UUID?
-    
-    var nutrientScaleFactor: Double {
-        guard let foodQuantity = food.quantity(for: amount) else { return 0 }
-        return food.nutrientScaleFactor(for: foodQuantity) ?? 0
-    }
-    
-    public func scaledValue(for component: NutrientMeterComponent) -> Double {
-        guard let value = food.info.nutrients.value(for: component) else { return 0 }
-        return value * nutrientScaleFactor
-    }
-}
-
 struct IngredientsForm: View {
     
     struct Cell: View {
         
-        let item: IngredientFoodItem
+        let item: IngredientItem
         
         var body: some View {
             Text("Food")
@@ -37,7 +17,7 @@ struct IngredientsForm: View {
     @ObservedObject var ingredients: Ingredients
     
     @State var showingFoodSearch = false
-    @State var showingAddRecipe = false
+    @State var showingRecipeForm = false
 
     @State var searchIsFocused: Bool = false
     
@@ -49,7 +29,7 @@ struct IngredientsForm: View {
     var body: some View {
         content
             .sheet(isPresented: $showingFoodSearch) { foodSearch }
-            .sheet(isPresented: $showingAddRecipe) { recipeForm }
+            .sheet(isPresented: $showingRecipeForm) { recipeForm }
     }
     
     var content: some View {
@@ -109,7 +89,7 @@ struct IngredientsForm: View {
         case .food:
             break
         case .recipe:
-            showingAddRecipe = true
+            showingRecipeForm = true
         case .plate:
             break
         }

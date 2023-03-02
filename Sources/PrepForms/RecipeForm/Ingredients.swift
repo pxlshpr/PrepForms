@@ -1,8 +1,9 @@
 import SwiftUI
+import PrepDataTypes
 
 class Ingredients: ObservableObject {
     
-    @Published var foodItems: [IngredientFoodItem] = []
+    @Published var foodItems: [IngredientItem] = []
     
     init() {
     }

@@ -17,9 +17,13 @@ extension ItemForm {
         if viewModel.forIngredient {
             //TODO: IngredientItem
         } else {
-            if let mealItem = viewModel.mealaFoodItem {
-                actionHandler(.save(mealItem, viewModel.dayMeal))
+            guard let mealItem = viewModel.mealItem,
+                  let dayMeal = viewModel.dayMeal
+            else {
+                print("Error: Saving ItemForm for meal item without MealItem or DayMeal")
+                return
             }
+            actionHandler(.save(mealItem, dayMeal))
         }
         actionHandler(.dismiss)
     }
@@ -40,9 +44,13 @@ extension ItemForm {
         if viewModel.forIngredient {
             //TODO: IngredientItem
         } else {
-            if let mealItem = viewModel.mealaFoodItem {
-                DataManager.shared.deleteMealItem(mealItem, in: viewModel.dayMeal)
+            guard let mealItem = viewModel.mealItem,
+                  let dayMeal = viewModel.dayMeal
+            else {
+                print("Deleting ItemForm for MealItem without MealItem or DayMeal")
+                return
             }
+            DataManager.shared.deleteMealItem(mealItem, in: dayMeal)
         }
     }
 

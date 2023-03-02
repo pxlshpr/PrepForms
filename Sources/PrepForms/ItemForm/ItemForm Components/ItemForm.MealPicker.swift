@@ -42,7 +42,9 @@ public extension ItemForm.MealPicker {
     
     func didTapItem(_ item: TimelineItem) {
         Haptics.feedback(style: .rigid)
-        if let meal = viewModel.dayMeals.first(where: { $0.id.uuidString == item.id }) {
+        if let dayMeals = viewModel.dayMeals,
+           let meal = dayMeals.first(where: { $0.id.uuidString == item.id })
+        {
             didTapMeal(meal)
         }
         dismiss()

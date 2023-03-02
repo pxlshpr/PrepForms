@@ -12,7 +12,9 @@ extension ItemForm {
             LazyVStack(spacing: 0) {
                 Group {
                     foodButton
-                    mealButton
+                    if let dayMeal = viewModel.dayMeal {
+                        mealButton(dayMeal: dayMeal)
+                    }
                 }
                 .padding(.horizontal, 20)
                 if hasAppeared {
@@ -146,7 +148,7 @@ extension ItemForm {
         .padding(.bottom, 10)
     }
     
-    var mealCell: some View {
+    func mealCell(dayMeal: DayMeal) -> some View {
         ZStack {
             HStack {
                 VStack(alignment: .leading, spacing: 20) {
@@ -158,14 +160,14 @@ extension ItemForm {
                                 .foregroundColor(Color(.tertiaryLabel))
                         }
                         Spacer()
-                        Text(viewModel.dayMeal.timeString)
+                        Text(dayMeal.timeString)
                             .font(.system(size: 15, weight: .semibold, design: .rounded))
                             .bold()
                             .foregroundColor(Color(.secondaryLabel))
 //                        disclosureArrow
                     }
                     HStack(alignment: .firstTextBaseline, spacing: 3) {
-                        Text(viewModel.dayMeal.name)
+                        Text(dayMeal.name)
                             .font(.system(size: 28, weight: .medium, design: .rounded))
                             .foregroundColor(.primary)
                         Spacer()
@@ -192,10 +194,18 @@ extension ItemForm {
             set: { _ in }
         )
         
-        func portionAwarenessForMeal(mealItem: Binding<MealItem>) -> some View {
-            PortionAwareness(
-                foodItem: mealItem,
-                meal: $viewModel.dayMeal,
+        var itemPortion: some View {
+            let itemBinding = Binding<MealItem>(
+                get: { viewModel.mealItem! },
+                set: { _ in }
+            )
+            let dayMealBinding = Binding<DayMeal>(
+                get: { viewModel.dayMeal! },
+                set: { _ in }
+            )
+            return ItemPortion(
+                foodItem: itemBinding,
+                meal: dayMealBinding,
                 day: $viewModel.day,
                 lastUsedGoalSet: lastUsedGoalSetBinding,
                 userUnits: DataManager.shared.user?.units ?? .standard,
@@ -205,14 +215,28 @@ extension ItemForm {
             )
         }
         
+        var ingredientPortion: some View {
+            let itemBinding = Binding<IngredientItem>(
+                get: { viewModel.ingredientItem! },
+                set: { _ in }
+            )
+            return IngredientPortion(
+                ingredientItem: itemBinding,
+                lastUsedGoalSet: lastUsedGoalSetBinding,
+                userUnits: DataManager.shared.user?.units ?? .standard,
+                bodyProfile: DataManager.shared.user?.bodyProfile,
+                didTapGoalSetButton: didTapGoalSetButton
+            )
+        }
+        
         return Group {
-            //TODO: Bring this back after making PortionAwarnes support optional values in the bindings for `MealItem` and `IngredientItem`
-            Color.clear
-//            if viewModel.forIngredient {
-//
-//            } else {
-//                if let mealItem = viewModel.mealaFoodItem
-//            }
+            if !viewModel.forIngredient, viewModel.mealItem != nil {
+                itemPortion
+            } else if viewModel.ingredientItem != nil {
+                ingredientPortion
+            } else {
+                EmptyView()
+            }
         }
         .padding(.top, 15)
     }
@@ -392,12 +416,12 @@ extension ItemForm {
         }
     }
     
-    var mealButton: some View {
+    func mealButton(dayMeal: DayMeal) -> some View {
         Button {
             Haptics.feedback(style: .soft)
             viewModel.path.append(.meal)
         } label: {
-            mealCell
+            mealCell(dayMeal: dayMeal)
         }
     }
     

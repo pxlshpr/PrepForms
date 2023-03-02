@@ -67,7 +67,7 @@ extension ItemForm.FoodSearch {
         )
         .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
         .fullScreenCover(isPresented: $showingFoodForm) { foodForm }
-        .fullScreenCover(isPresented: $showingRecipeForm) { recipeForm }
+        .sheet(isPresented: $showingRecipeForm) { recipeForm }
         .navigationBarBackButtonHidden(viewModel.food == nil)
         .toolbar { trailingContent }
     }

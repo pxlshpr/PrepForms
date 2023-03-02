@@ -330,7 +330,7 @@ extension FoodSearch {
 //
 //        var addRecipeButton: some View {
 //            Button {
-//    //            showingAddRecipe = true
+//    //            showingRecipeForm = true
 //    //            searchIsFocused = false
 //    //            showingAddHeroButton = false
 //            } label: {
