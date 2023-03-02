@@ -9,29 +9,22 @@ extension ItemForm {
         let date: Date
         
         @Published var path: [ItemFormRoute]
-        
         @Published var food: Food?
-        @Published var dayMeals: [DayMeal]
-        
         @Published var unit: FoodQuantity.Unit = .serving
-        
         @Published var internalAmountDouble: Double? = 1
         @Published var internalAmountString: String = "1"
-        
-        @Published var dayMeal: DayMeal
-        
-        @Published var day: Day? = nil
-        
-        @Published var mealFoodItem: MealFoodItem
-        
         @Published var isAnimatingAmountChange = false
         var startedAnimatingAmountChangeAt: Date = Date()
-        
-        let existingMealFoodItem: MealFoodItem?
-        let initialDayMeal: DayMeal?
-        
         let isRootInNavigationStack: Bool
         
+        /// `MealFoodItem` specific
+        @Published var dayMeals: [DayMeal]
+        @Published var dayMeal: DayMeal
+        @Published var day: Day? = nil
+        @Published var mealFoodItem: MealFoodItem
+        let existingMealFoodItem: MealFoodItem?
+        let initialDayMeal: DayMeal?
+
         public init(
             existingMealFoodItem: MealFoodItem?,
             date: Date,

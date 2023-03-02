@@ -53,14 +53,22 @@ public struct RecipeForm: View {
     }
     
     var foodSearchForm: some View {
-        Color.clear
-//        ItemForm.FoodSearch(
-//            viewModel: ItemForm.ViewModel(existingMealFoodItem: nil, date: Date()),
-//            isInitialFoodSearch: true,
-//            actionHandler: { _ in
-////                handleMealItemAction($0, forEdit: false)
-//            }
-//        )
+        ItemForm.FoodSearch(
+            viewModel: ItemForm.ViewModel(existingMealFoodItem: nil, date: Date()),
+            isInitialFoodSearch: true,
+            actionHandler: { handleItemAction($0, forEdit: false) }
+        )
+    }
+    
+    func handleItemAction(_ action: ItemFormAction, forEdit: Bool) {
+        switch action {
+        case .save(let mealFoodItem, let dayMeal):
+            break
+        case .delete:
+            break
+        case .dismiss:
+            showingFoodSearch = false
+        }
     }
     
     var formLayer: some View {
