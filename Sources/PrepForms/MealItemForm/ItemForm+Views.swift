@@ -192,9 +192,9 @@ extension ItemForm {
             set: { _ in }
         )
         
-        func portionAwarenessForMeal(mealFoodItem: Binding<MealFoodItem>) -> some View {
+        func portionAwarenessForMeal(mealItem: Binding<MealItem>) -> some View {
             PortionAwareness(
-                foodItem: mealFoodItem,
+                foodItem: mealItem,
                 meal: $viewModel.dayMeal,
                 day: $viewModel.day,
                 lastUsedGoalSet: lastUsedGoalSetBinding,
@@ -211,7 +211,7 @@ extension ItemForm {
 //            if viewModel.forIngredient {
 //
 //            } else {
-//                if let mealFoodItem = viewModel.mealaFoodItem
+//                if let mealItem = viewModel.mealaFoodItem
 //            }
         }
         .padding(.top, 15)

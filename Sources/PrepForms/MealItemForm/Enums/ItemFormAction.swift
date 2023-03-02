@@ -2,7 +2,7 @@ import Foundation
 import PrepDataTypes
 
 public enum ItemFormAction {
-    case save(MealFoodItem, DayMeal)
+    case save(MealItem, DayMeal)
     case delete
     case dismiss
 }

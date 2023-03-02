@@ -68,7 +68,7 @@
 //    
 //    var metersSection: some View {
 //        MealItemMeters(
-//            foodItem: $viewModel.mealFoodItem,
+//            foodItem: $viewModel.mealItem,
 //            meal: $viewModel.dayMeal,
 //            day: viewModel.day, //TODO: Get
 //            userUnits: DataManager.shared.user?.units ?? .standard,

@@ -21,16 +21,16 @@ extension ItemForm {
         /// `IngredientFoodItem` specific
         @Published var ingredientFoodItem: IngredientFoodItem? = nil
 
-        /// `MealFoodItem` specific
-        @Published var mealaFoodItem: MealFoodItem?
+        /// `MealItem` specific
+        @Published var mealaFoodItem: MealItem?
         @Published var dayMeals: [DayMeal]
         @Published var dayMeal: DayMeal
         @Published var day: Day? = nil
-        let existingMealFoodItem: MealFoodItem?
+        let existingMealItem: MealItem?
         let initialDayMeal: DayMeal?
 
         public init(
-            existingMealFoodItem: MealFoodItem?,
+            existingMealItem: MealItem?,
             date: Date,
             dayMeal: DayMeal? = nil,
             food: Food? = nil,
@@ -52,10 +52,10 @@ extension ItemForm {
             self.initialDayMeal = dayMeal
             
             //TODO: Handle this in a better way
-            /// [ ] Try making `mealFoodItem` nil and set it as that if we don't get a food here
+            /// [ ] Try making `mealItem` nil and set it as that if we don't get a food here
             /// [ ] Try and get this fed in with an existing `FoodItem`, from which we create this when editing!
             self.mealaFoodItem = nil
-//            self.mealFoodItem = MealFoodItem(
+//            self.mealItem = MealItem(
 //                food: food ?? Food.placeholder,
 //                amount: .init(0, .g),
 //                isSoftDeleted: false,
@@ -63,9 +63,9 @@ extension ItemForm {
 //                mealId: dayMealToSet.id
 //            )
             
-            self.existingMealFoodItem = existingMealFoodItem
+            self.existingMealItem = existingMealItem
             
-            self.isRootInNavigationStack = existingMealFoodItem != nil || food != nil
+            self.isRootInNavigationStack = existingMealItem != nil || food != nil
             
             if let amount, let food,
                let unit = FoodQuantity.Unit(foodValue: amount, in: food)
@@ -118,7 +118,7 @@ extension ItemForm.ViewModel {
     }
     
     var isDirty: Bool {        
-        guard let existing = existingMealFoodItem else {
+        guard let existing = existingMealItem else {
             return amountIsValid
         }
         
@@ -153,14 +153,14 @@ extension ItemForm.ViewModel {
 
     func setFoodItem() {
         guard let food else { return }
-        self.mealaFoodItem = MealFoodItem(
-            id: existingMealFoodItem?.id ?? UUID(),
+        self.mealaFoodItem = MealItem(
+            id: existingMealItem?.id ?? UUID(),
             food: food,
             amount: amountValue,
-            markedAsEatenAt: existingMealFoodItem?.markedAsEatenAt ?? nil,
-            sortPosition: existingMealFoodItem?.sortPosition ?? 1,
-            isSoftDeleted: existingMealFoodItem?.isSoftDeleted ?? false,
-            energyInKcal: existingMealFoodItem?.energyInKcal ?? 0,
+            markedAsEatenAt: existingMealItem?.markedAsEatenAt ?? nil,
+            sortPosition: existingMealItem?.sortPosition ?? 1,
+            isSoftDeleted: existingMealItem?.isSoftDeleted ?? false,
+            energyInKcal: existingMealItem?.energyInKcal ?? 0,
             mealId: dayMeal.id
         )
     }
@@ -200,7 +200,7 @@ extension ItemForm.ViewModel {
     }
     
     var isEditing: Bool {
-        existingMealFoodItem != nil
+        existingMealItem != nil
     }
     
     var savePrefix: String {
@@ -302,11 +302,11 @@ extension ItemForm.ViewModel {
         )
     }
     
-//    var foodItemBinding: Binding<MealFoodItem> {
-//        Binding<MealFoodItem>(
+//    var foodItemBinding: Binding<MealItem> {
+//        Binding<MealItem>(
 //            get: {
-//                cprint("Getting MealFoodItem")
-//                return MealFoodItem(
+//                cprint("Getting MealItem")
+//                return MealItem(
 //                    food: self.food,
 //                    amount: self.amountValue
 //                )

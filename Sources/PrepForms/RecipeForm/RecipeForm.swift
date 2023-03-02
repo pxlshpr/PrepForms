@@ -54,7 +54,7 @@ public struct RecipeForm: View {
     
     var foodSearchForm: some View {
         ItemForm.FoodSearch(
-            viewModel: ItemForm.ViewModel(existingMealFoodItem: nil, date: Date()),
+            viewModel: ItemForm.ViewModel(existingMealItem: nil, date: Date()),
             isInitialFoodSearch: true,
             actionHandler: { handleItemAction($0, forEdit: false) }
         )
@@ -62,7 +62,7 @@ public struct RecipeForm: View {
     
     func handleItemAction(_ action: ItemFormAction, forEdit: Bool) {
         switch action {
-        case .save(let mealFoodItem, let dayMeal):
+        case .save(let mealItem, let dayMeal):
             break
         case .delete:
             break

@@ -17,8 +17,8 @@ extension ItemForm {
         if viewModel.forIngredient {
             //TODO: IngredientItem
         } else {
-            if let mealFoodItem = viewModel.mealaFoodItem {
-                actionHandler(.save(mealFoodItem, viewModel.dayMeal))
+            if let mealItem = viewModel.mealaFoodItem {
+                actionHandler(.save(mealItem, viewModel.dayMeal))
             }
         }
         actionHandler(.dismiss)
@@ -40,8 +40,8 @@ extension ItemForm {
         if viewModel.forIngredient {
             //TODO: IngredientItem
         } else {
-            if let mealFoodItem = viewModel.mealaFoodItem {
-                DataManager.shared.deleteMealItem(mealFoodItem, in: viewModel.dayMeal)
+            if let mealItem = viewModel.mealaFoodItem {
+                DataManager.shared.deleteMealItem(mealItem, in: viewModel.dayMeal)
             }
         }
     }
