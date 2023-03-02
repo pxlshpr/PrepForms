@@ -15,7 +15,11 @@ extension ItemForm {
     func tappedSave() {
         Haptics.feedback(style: .soft)
         if viewModel.forIngredient {
-            //TODO: IngredientItem
+            guard let ingredientItem = viewModel.ingredientItem else {
+                print("Error: Saving ItemForm for ingredient item without IngredientItem")
+                return
+            }
+            actionHandler(.saveIngredientItem(ingredientItem))
         } else {
             guard let mealItem = viewModel.mealItem,
                   let dayMeal = viewModel.dayMeal
@@ -23,7 +27,7 @@ extension ItemForm {
                 print("Error: Saving ItemForm for meal item without MealItem or DayMeal")
                 return
             }
-            actionHandler(.save(mealItem, dayMeal))
+            actionHandler(.saveMealItem(mealItem, dayMeal))
         }
         actionHandler(.dismiss)
     }
@@ -35,14 +39,19 @@ extension ItemForm {
     
     func tappedDelete() {
         Haptics.selectionFeedback()
-        showingDeleteConfirmation = true
+        if viewModel.forIngredient {
+            /// No confirmation if this is an ingredient
+            delete()
+        } else {
+            showingDeleteConfirmation = true
+        }
     }
 
     func delete() {
         Haptics.successFeedback()
         
         if viewModel.forIngredient {
-            //TODO: IngredientItem
+            actionHandler(.delete)
         } else {
             guard let mealItem = viewModel.mealItem,
                   let dayMeal = viewModel.dayMeal

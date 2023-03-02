@@ -54,6 +54,11 @@ extension ItemForm.FoodSearch {
         showingRecipeForm = true
     }
     
+    func didTapAddPlate() {
+        Haptics.feedback(style: .soft)
+        showingPlateForm = true
+    }
+    
     func didTapScanFoodLabel() {
         FoodForm.Fields.shared.reset()
         FoodForm.Sources.shared.reset()

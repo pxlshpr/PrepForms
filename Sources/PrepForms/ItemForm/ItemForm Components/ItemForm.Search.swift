@@ -15,6 +15,7 @@ extension ItemForm {
         
         @State var showingFoodForm = false
         @State var showingRecipeForm = false
+        @State var showingPlateForm = false
 
         let isInitialFoodSearch: Bool
         let forIngredient: Bool
@@ -70,10 +71,11 @@ extension ItemForm.FoodSearch {
             actionHandler: handleFoodSearchAction
         )
         .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
-        .fullScreenCover(isPresented: $showingFoodForm) { foodForm }
-        .sheet(isPresented: $showingRecipeForm) { recipeForm }
         .navigationBarBackButtonHidden(viewModel.food == nil)
         .toolbar { trailingContent }
+        .fullScreenCover(isPresented: $showingFoodForm) { foodForm }
+        .sheet(isPresented: $showingRecipeForm) { recipeForm }
+        .sheet(isPresented: $showingPlateForm) { plateForm }
     }
     
     @ViewBuilder

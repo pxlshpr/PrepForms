@@ -97,7 +97,7 @@ struct NutrientsPerForm: View {
             viewModel.sizeFieldBeingEdited = nil
             showingSizeForm = true
         } label: {
-            Text("Add a size")
+            Text("Add a Size")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .foregroundColor(.accentColor)
                 .padding(.horizontal, 16)

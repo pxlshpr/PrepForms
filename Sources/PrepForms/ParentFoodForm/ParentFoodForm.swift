@@ -8,21 +8,22 @@ import Camera
 import SwiftSugar
 import PrepViews
 
-public struct RecipeForm: View {
+public struct ParentFoodForm: View {
 
     @Environment(\.dismiss) var dismiss
     
+    @StateObject var viewModel: ViewModel
     @StateObject var fields = FoodForm.Fields()
-    @StateObject var ingredients = Ingredients()
     
     @State var showingCancelConfirmation = false
 
     @State var showingDetailsForm = false
     @State var showingEmojiPicker = false
     @State var showingFoodSearch = false
-
-    public init() {
-        
+    
+    public init(forRecipe: Bool) {
+        let viewModel = ViewModel(forRecipe: forRecipe)
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {
@@ -52,7 +53,7 @@ public struct RecipeForm: View {
         
         return NavigationStack {
             formContent
-                .navigationTitle("New Recipe")
+                .navigationTitle(viewModel.title)
                 .toolbar { navigationTrailingContent }
         }
     }
@@ -68,19 +69,34 @@ public struct RecipeForm: View {
     
     func handleItemAction(_ action: ItemFormAction, forEdit: Bool) {
         switch action {
-        case .save(let mealItem, let dayMeal):
-            break
+        case .saveIngredientItem(let item):
+            Haptics.successFeedback()
+            if forEdit {
+                //TODO: Update ingredient
+            } else {
+                withAnimation {
+                    viewModel.add(item)
+                }
+            }
+            viewModel.recalculateBadgeWdiths()
+            
         case .delete:
             break
+            
         case .dismiss:
             showingFoodSearch = false
+            
+        default:
+            break
         }
     }
     
     var formLayer: some View {
         FormStyledScrollView(showsIndicators: false, isLazy: false) {
             detailsSection
-            servingSection
+            if viewModel.forRecipe {
+                servingSection
+            }
             ingredientsSection
         }
         .safeAreaInset(edge: .bottom) { Spacer().frame(height: 60) }
@@ -88,16 +104,18 @@ public struct RecipeForm: View {
     
     var ingredientsSection: some View {
         var header: some View {
-            Text("Ingredients")
+            Text(viewModel.ingredientsTitle)
         }
         
         return FormStyledSection(header: header) {
-            IngredientsCell(actionHandler: handleIngredientsAction)
-                .environmentObject(ingredients)
+            IngredientsView(
+                actionHandler: handleIngredientsAction
+            )
+            .environmentObject(viewModel)
         }
     }
     
-    func handleIngredientsAction(_ action: IngredientsCell.Action) {
+    func handleIngredientsAction(_ action: IngredientsView.Action) {
         switch action {
         case .add:
             showingFoodSearch = true

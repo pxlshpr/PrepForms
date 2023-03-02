@@ -34,9 +34,18 @@ extension ItemForm.FoodSearch {
 //            FoodFormManager.shared.save(formOutput)
         }
         
-        return RecipeForm()
+        return ParentFoodForm(forRecipe: true)
     }
-    
+
+    var plateForm: some View {
+        func didSaveFood(_ formOutput: FoodFormOutput) {
+//            Haptics.successFeedback()
+//            FoodFormManager.shared.save(formOutput)
+        }
+        
+        return ParentFoodForm(forRecipe: false)
+    }
+
     func macrosView(for food: Food) -> some View {
         Text("Macros for: \(food.name)")
             .presentationDetents([.medium, .large])
@@ -72,6 +81,7 @@ extension ItemForm.FoodSearch {
         
         var addPlateButton: some View {
             Button {
+                didTapAddPlate()
             } label: {
                 Label("Plate", systemImage: FoodType.plate.systemImage)
             }
