@@ -22,9 +22,15 @@ public struct ParentFoodForm: View {
     @State var showingEmojiPicker = false
     @State var showingFoodSearch = false
     
-    public init(forRecipe: Bool) {
-        let viewModel = ViewModel(forRecipe: forRecipe)
+    @State var showingFoodLabel: Bool = false
+    
+    public init(forRecipe: Bool, existingFood: Food? = nil) {
+        let viewModel = ViewModel(forRecipe: forRecipe, existingFood: existingFood)
         _viewModel = StateObject(wrappedValue: viewModel)
+        
+//        if let existingFood, let childrenFoods = existingFood.childrenFoods {
+//            _showingFoodLabel = State(initialValue: existingFood.childrenFoods?.count > 1)
+//        }
     }
 
     public var body: some View {
@@ -106,9 +112,9 @@ public struct ParentFoodForm: View {
                 servingSection
             }
             ingredientsSection
-//            foodLabel
+            foodLabel
+            Spacer().frame(height: 60) /// to account for save button
         }
-        .safeAreaInset(edge: .bottom) { Spacer().frame(height: 60) }
     }
     
     var foodLabel: some View {
@@ -127,8 +133,13 @@ public struct ParentFoodForm: View {
             set: { _ in }
         )
 
-        return FoodLabel(data: dataBinding)
-            .padding(.horizontal, 20)
+        return Group {
+            if showingFoodLabel {
+                FoodLabel(data: dataBinding)
+                    .padding(.horizontal, 20)
+                    .transition(.move(edge: .bottom))
+            }
+        }
     }
     
     var ingredientsSection: some View {
@@ -288,9 +299,59 @@ public struct ParentFoodForm: View {
     var navigationTrailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             Group {
-//                debugFillButton
+                debugFillButton
                 dismissButton
             }
+        }
+    }
+    
+    var debugFillButton: some View {
+        
+        func debugFill() {
+            let wordLengths = [4, 5, 6, 7, 8]
+            let firstWordLength = wordLengths.randomElement()!
+            let secondWordLength = wordLengths.randomElement()!
+
+            let firstWord = String((0..<firstWordLength).map { _ in "abcdefghijklmnopqrstuvwxyz".randomElement()! })
+            let secondWord = String((0..<secondWordLength).map { _ in "abcdefghijklmnopqrstuvwxyz".randomElement()! })
+
+            let randomString = "\(firstWord) \(secondWord)"
+            
+            fields.name = randomString
+            fields.energy.value = .energy(.init(double: 100, unit: .kcal))
+            fields.protein.value = .macro(.init(macro: .protein, double: 20))
+            fields.carb.value = .macro(.init(macro: .carb, double: 20))
+            fields.fat.value = .macro(.init(macro: .fat, double: 20))
+            withAnimation {
+                fields.updateFormState()
+            }
+            
+            if let uuid = UUID(uuidString: "013c751f-dcdd-4aa9-a285-718dca159a75"),
+               let food = DataManager.shared.food(with: uuid)
+            {
+                for _ in 0...20 {
+                    let item = IngredientItem(
+                        id: UUID(),
+                        food: food,
+                        amount: .init(WeightQuantity(100, .g)),
+                        sortPosition: 1,
+                        isSoftDeleted: false,
+                        badgeWidth: 0,
+                        energyInKcal: 0,
+                        parentFoodId: nil
+                    )
+                    viewModel.add(item)
+                }
+                viewModel.recalculateBadgeWdiths()
+            }
+            
+            Haptics.feedback(style: .rigid)
+        }
+        
+        return Button {
+            debugFill()
+        } label: {
+            Image(systemName: "rectangle.and.pencil.and.ellipsis")
         }
     }
     
@@ -309,11 +370,10 @@ public struct ParentFoodForm: View {
         return Button {
             if fields.isDirty {
                 Haptics.warningFeedback()
-//                showingCancelConfirmation = true
+                showingCancelConfirmation = true
             } else {
                 Haptics.feedback(style: .soft)
                 dismiss()
-//                dismissWithHaptics()
             }
         } label: {
             CloseButtonLabel(forNavigationBar: true)

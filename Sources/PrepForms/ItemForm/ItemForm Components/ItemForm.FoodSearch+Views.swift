@@ -22,7 +22,7 @@ extension ItemForm.FoodSearch {
     var foodForm: some View {
         func didSaveFood(_ formOutput: FoodFormOutput) {
             Haptics.successFeedback()
-            FoodFormManager.shared.save(formOutput)
+            FoodFormManager.shared.save(formOutput, sourceId: self.id)
         }
         
         return FoodForm(didSave: didSaveFood)

@@ -211,12 +211,12 @@ public struct FoodForm: View {
             foodLabelSection
             sourcesSection
             barcodesSection
+            Spacer().frame(height: 60) /// to account for save button
         }
         .id(refreshBool)
         .overlay(overlay)
         .blur(radius: viewModel.showingWizardOverlay ? 5 : 0)
         .disabled(viewModel.formDisabled)
-        .safeAreaInset(edge: .bottom) { safeAreaInset }
     }
     
     @ViewBuilder

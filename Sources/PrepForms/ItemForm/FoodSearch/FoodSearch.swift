@@ -59,7 +59,11 @@ public struct FoodSearch: View {
     let didAddFood = NotificationCenter.default.publisher(for: .didAddFood)
     
     let shouldShowPlatesInFilter: Bool
+    
+    let id: UUID
+    
     public init(
+        id: UUID,
         dataProvider: SearchDataProvider,
         isRootInNavigationStack: Bool,
         shouldShowPlatesInFilter: Bool = true,
@@ -68,6 +72,7 @@ public struct FoodSearch: View {
         searchIsFocused: Binding<Bool>,
         actionHandler: @escaping (Action) -> ()
     ) {
+        self.id = id
         print("💭 FoodSearch.init()")
 
         self.isRootInNavigationStack = isRootInNavigationStack

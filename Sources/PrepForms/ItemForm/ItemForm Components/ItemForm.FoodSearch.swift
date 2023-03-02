@@ -13,13 +13,13 @@ extension ItemForm {
         @State var foodToShowMacrosFor: Food? = nil
         @State var searchIsFocused = false
         
-        @State var showingFoodForm = false
-        @State var showingRecipeForm = false
-        @State var showingPlateForm = false
+        @State var presentedFullScreenSheet: Sheet? = nil
 
         let isInitialFoodSearch: Bool
         let forIngredient: Bool
         let actionHandler: (ItemFormAction) -> ()
+        
+        let id = UUID()
         
         public init(
             viewModel: ViewModel,
@@ -62,6 +62,7 @@ extension ItemForm.FoodSearch {
     
     var foodSearch: some View {
         FoodSearch(
+            id: id,
             dataProvider: DataManager.shared,
             isRootInNavigationStack: isInitialFoodSearch,
             shouldShowPlatesInFilter: !forIngredient,
@@ -70,12 +71,58 @@ extension ItemForm.FoodSearch {
             searchIsFocused: $searchIsFocused,
             actionHandler: handleFoodSearchAction
         )
-        .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
+//        .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
         .navigationBarBackButtonHidden(viewModel.food == nil)
         .toolbar { trailingContent }
-        .fullScreenCover(isPresented: $showingFoodForm) { foodForm }
-        .sheet(isPresented: $showingRecipeForm) { recipeForm }
-        .sheet(isPresented: $showingPlateForm) { plateForm }
+        .fullScreenCover(item: $presentedFullScreenSheet) {
+            sheet(for: $0)
+        }
+    }
+
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        switch sheet {
+        case .foodForm: foodForm
+        case .recipeForm: recipeForm
+        case .plateForm: plateForm
+        }
+    }
+
+    enum Sheet: String, Identifiable  {
+        case foodForm
+        case recipeForm
+        case plateForm
+        
+        public var id: String { rawValue }
+    }
+    
+    func presentFullScreen(_ sheet: Sheet, delayIfPresented: Bool = true) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedFullScreenSheet = sheet
+        }
+        
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+        
+        guard delayIfPresented else {
+            present()
+            return
+        }
+        
+        if presentedFullScreenSheet != nil {
+            presentedFullScreenSheet = nil
+            delayedPresent()
+//        } else if presentedSheet != nil {
+//            presentedSheet = nil
+//            delayedPresent()
+        } else {
+            present()
+        }
     }
     
     @ViewBuilder

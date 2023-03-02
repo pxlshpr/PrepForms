@@ -39,8 +39,12 @@ extension FoodSearch {
     
     func didAddFood(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let food = userInfo[Notification.Keys.food] as? Food
+              let food = userInfo[Notification.Keys.food] as? Food,
+              let sourceId = userInfo[Notification.Keys.sourceId] as? UUID,
+              sourceId == self.id
         else { return }
+        
+        print("🧿 Received didAddFood")
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             actionHandler(.tappedFood(food))

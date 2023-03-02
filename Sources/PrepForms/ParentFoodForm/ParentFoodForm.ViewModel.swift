@@ -27,7 +27,7 @@ extension ParentFoodForm.ViewModel {
     }
     
     var isEditing: Bool {
-        existingFood == nil
+        existingFood != nil
     }
     
     var ingredientsTitle: String {

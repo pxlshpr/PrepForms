@@ -46,17 +46,17 @@ extension ItemForm.FoodSearch {
         FoodForm.ViewModel.shared.reset()
         
         Haptics.feedback(style: .soft)
-        showingFoodForm = true
+        presentFullScreen(.foodForm)
     }
     
     func didTapAddRecipe() {
         Haptics.feedback(style: .soft)
-        showingRecipeForm = true
+        presentFullScreen(.recipeForm)
     }
     
     func didTapAddPlate() {
         Haptics.feedback(style: .soft)
-        showingPlateForm = true
+        presentFullScreen(.plateForm)
     }
     
     func didTapScanFoodLabel() {
@@ -65,7 +65,7 @@ extension ItemForm.FoodSearch {
         FoodForm.ViewModel.shared.reset(startWithCamera: true)
 
         Haptics.feedback(style: .heavy)
-        showingFoodForm = true
+        presentFullScreen(.foodForm)
 
 //        searchIsFocused = false
 //        showingAddHeroButton = false
