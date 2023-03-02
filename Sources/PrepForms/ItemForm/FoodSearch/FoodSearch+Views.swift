@@ -354,6 +354,14 @@ extension FoodSearch {
 //        })
 //    }
     
+    var foodTypes: [FoodType] {
+        if shouldShowPlatesInFilter {
+            return FoodType.allCases
+        } else {
+            return FoodType.allCases.filter({ $0 != .plate })
+        }
+    }
+    
     var principalContent: some ToolbarContent {
         ToolbarItemGroup(placement: .principal) {
             Group {
@@ -363,7 +371,7 @@ extension FoodSearch {
                 } else {
                     Menu {
                         Picker(selection: $searchViewModel.foodType, label: EmptyView()) {
-                            ForEach(FoodType.allCases, id: \.self) {
+                            ForEach(foodTypes, id: \.self) {
                                 Label("\($0.description)s", systemImage: $0.systemImage).tag($0)
                                     .labelStyle(.titleAndIcon)
                             }

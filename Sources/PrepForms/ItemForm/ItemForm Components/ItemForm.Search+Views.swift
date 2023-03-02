@@ -89,7 +89,9 @@ extension ItemForm.FoodSearch {
             Section("Create New") {
                 addFoodButton
                 addRecipeButton
-                addPlateButton
+                if !forIngredient {
+                    addPlateButton
+                }
             }
             scanFoodLabelButton
         } label: {

@@ -17,16 +17,19 @@ extension ItemForm {
         @State var showingRecipeForm = false
 
         let isInitialFoodSearch: Bool
+        let forIngredient: Bool
         let actionHandler: (ItemFormAction) -> ()
         
         public init(
             viewModel: ViewModel,
             isInitialFoodSearch: Bool = false,
+            forIngredient: Bool = false,
             actionHandler: @escaping (ItemFormAction) -> ()
         ) {
             print("💭 ItemForm.FoodSearch.init()")
             self.viewModel = viewModel
             self.isInitialFoodSearch = isInitialFoodSearch
+            self.forIngredient = forIngredient
             self.actionHandler = actionHandler
         }
     }
@@ -60,6 +63,7 @@ extension ItemForm.FoodSearch {
         FoodSearch(
             dataProvider: DataManager.shared,
             isRootInNavigationStack: isInitialFoodSearch,
+            shouldShowPlatesInFilter: !forIngredient,
             shouldDelayContents: isInitialFoodSearch,
             focusOnAppear: isInitialFoodSearch,
             searchIsFocused: $searchIsFocused,
@@ -84,6 +88,7 @@ extension ItemForm.FoodSearch {
         case .food:
             ItemForm.FoodSearch(
                 viewModel: viewModel,
+                forIngredient: forIngredient,
                 actionHandler: actionHandler
             )
         case .meal:

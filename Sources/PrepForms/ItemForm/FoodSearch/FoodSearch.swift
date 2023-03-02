@@ -58,9 +58,11 @@ public struct FoodSearch: View {
     
     let didAddFood = NotificationCenter.default.publisher(for: .didAddFood)
     
+    let shouldShowPlatesInFilter: Bool
     public init(
         dataProvider: SearchDataProvider,
         isRootInNavigationStack: Bool,
+        shouldShowPlatesInFilter: Bool = true,
         shouldDelayContents: Bool = true,
         focusOnAppear: Bool = false,
         searchIsFocused: Binding<Bool>,
@@ -69,6 +71,7 @@ public struct FoodSearch: View {
         print("💭 FoodSearch.init()")
 
         self.isRootInNavigationStack = isRootInNavigationStack
+        self.shouldShowPlatesInFilter = shouldShowPlatesInFilter
         
         let searchViewModel = SearchViewModel(recents: dataProvider.recentFoods)
         _searchViewModel = StateObject(wrappedValue: searchViewModel)
