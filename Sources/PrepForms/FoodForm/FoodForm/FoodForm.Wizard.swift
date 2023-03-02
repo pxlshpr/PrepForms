@@ -7,8 +7,6 @@ extension FoodForm {
         case startWithEmptyFood
         case camera
         case choosePhotos
-        case prefill
-        case prefillInfo
         case dismiss
     }
     
@@ -35,7 +33,7 @@ extension FoodForm.Wizard {
         ZStack {
             VStack {
                 clearLayer
-                newFormLayer
+                formLayer
                 clearLayer
             }
             VStack {
@@ -73,7 +71,7 @@ extension FoodForm.Wizard {
         }
     }
     
-    var newFormLayer: some View {
+    var formLayer: some View {
         
         var manualSection: some View {
             FormStyledSection(header: HStack {
@@ -185,114 +183,11 @@ extension FoodForm.Wizard {
             .offset(y: 40)
     }
     
-    var learnMoreFooter: some View {
-        Button {
-            tapHandler(.prefillInfo)
-        } label: {
-            Label("Learn more", systemImage: "info.circle")
-                .font(.footnote)
-        }
-    }
-    
-    var formLayer: some View {
-        Form {
-            manualEntrySection
-            imageSection
-            thirdPartyFoodSection
-        }
-        .cornerRadius(20)
-        .frame(height: 420)
-        .frame(maxWidth: 350)
-        .padding(.horizontal, 30)
-        .shadow(color: colorScheme == .dark ? .black : .gray, radius: 30, x: 0, y: 0)
-        //        .opacity(viewModel.showingWizard ? 1 : 0)
-    }
-    
     var clearLayer: some View {
         Color.clear
             .contentShape(Rectangle())
             .onTapGesture {
                 tapHandler(.background)
             }
-    }
-    
-    //MARK: - Components
-    
-    var manualEntrySection: some View {
-        Section("Start with an empty food") {
-            Button {
-                tapHandler(.startWithEmptyFood)
-            } label: {
-                Label("Empty Food", systemImage: "square.and.pencil")
-                    .foregroundColor(.primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(.borderless)
-        }
-    }
-    
-    var imageSection: some View {
-        var header: some View {
-            Text("Scan food labels")
-        }
-        var footer: some View {
-            Text("Provide images of nutrition fact labels or screenshots of other apps. These will be processed to extract any data from them. They will also be used to verify this food.")
-        }
-        
-        return Section(header: header) {
-            cameraButton
-            photosPickerButton
-        }
-    }
-    
-    var cameraButton: some View {
-        Button {
-            tapHandler(.camera)
-        } label: {
-            Label("Take Photos", systemImage: "camera")
-                .foregroundColor(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .buttonStyle(.borderless)
-    }
-    
-    var photosPickerButton: some View {
-        Button {
-            tapHandler(.choosePhotos)
-        } label: {
-            Label("Choose Photos", systemImage: "photo.on.rectangle")
-                .foregroundColor(.primary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-    
-    var thirdPartyFoodSection: some View {
-        var header: some View {
-            Text("Prefill a MyFitnessPal Food")
-        }
-        var footer: some View {
-            Button {
-                tapHandler(.prefillInfo)
-            } label: {
-                Label("Learn more", systemImage: "info.circle")
-                    .font(.footnote)
-            }
-            //            .sheet(isPresented: $showingThirdPartyInfo) {
-            //                MFPInfoSheet()
-            //                    .presentationDetents([.medium, .large])
-            //                    .presentationDragIndicator(.hidden)
-            //            }
-        }
-        
-        return Section(header: header, footer: footer) {
-            Button {
-                tapHandler(.prefill)
-            } label: {
-                Label("Search", systemImage: "magnifyingglass")
-                    .foregroundColor(.primary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(.borderless)
-        }
     }
 }

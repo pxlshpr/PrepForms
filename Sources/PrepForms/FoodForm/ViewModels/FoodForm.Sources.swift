@@ -16,18 +16,11 @@ extension FoodForm {
         @Published var imageSetStatus: ImageSetStatus = .loading()
         @Published var linkInfo: LinkInfo? = nil
 
-        //MARK: ☣️
-//        @Published var columnSelectionInfo: ColumnSelectionInfo? = nil
-//        @Published var selectedScanResultsColumn = 1
-        
         @Published var selectedPhotos: [PhotosPickerItem] = []
 
         var presentingImageIndex: Int = 0
         
         var didScanAllPickedImages: (() -> ())? = nil
-        
-        //MARK: ☣️
-//        var autoFillHandler: ColumnSelectionHandler? = nil
         
         let id = UUID()
         
@@ -42,10 +35,6 @@ extension FoodForm {
             imageSetStatus = .loading()
             linkInfo = nil
 
-            //MARK: ☣️
-//            columnSelectionInfo = nil
-//            selectedScanResultsColumn = 1
-            
             selectedPhotos = []
 
             presentingImageIndex = 0
@@ -89,36 +78,6 @@ extension FoodForm.Sources {
             counts: DataPointsCount(total: 0, autoFilled: 0, selected: 0, barcodes: 0) /// do this
         )
     }
-    
-    //MARK: ☣️
-//    func extractFieldsOrSetColumnSelectionInfo() async -> [FieldValue]? {
-//
-//        await MainActor.run {
-//            imageSetStatus = .extracting(numberOfImages: imageViewModels.count)
-//        }
-//
-//        guard let output = await FieldsExtractor.shared.extractFieldsOrGetColumnSelectionInfo(for: allScanResults)
-//        else {
-//            return nil
-//        }
-//        switch output {
-//        case .needsColumnSelection(let columnSelectionInfo):
-//            await MainActor.run {
-//                self.columnSelectionInfo = columnSelectionInfo
-//            }
-//            return nil
-//        case .fieldValues(let fieldValues):
-//            return fieldValues
-//        }
-//    }
-//
-//    func extractFieldsFrom(_ results: [ScanResult], at column: Int) async -> [FieldValue] {
-//        let output = await FieldsExtractor.shared.extractFieldsFrom(results, at: column)
-//        guard case .fieldValues(let fieldValues) = output else {
-//            return []
-//        }
-//        return fieldValues
-//    }
     
     /**
      This is used to know which `ImageViewModel`s should be discarded when the user dismisses the column picker—by setting a flag in the `ImageViewModel` that marks it as completed.
@@ -189,11 +148,6 @@ extension FoodForm.Sources {
         }
         return imageViewModels[index].id
     }
-    
-    //MARK: ☣️
-//    func imageViewModels(for columnSelectionInfo: ColumnSelectionInfo) -> [ImageViewModel] {
-//        imageViewModels.containingTexts(in: columnSelectionInfo)
-//    }
     
     var allScanResults: [ScanResult] {
         imageViewModels.compactMap { $0.scanResult }

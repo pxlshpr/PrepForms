@@ -150,45 +150,40 @@ public struct ServingsAndSizesCell: View {
         }
     }
     
-    @ViewBuilder
     var sizesContents: some View {
-        if !fields.allSizeFields.isEmpty {
-            Divider()
-//            VStack(alignment: .leading) {
-//                Text("Sizes")
-//                    .font(.subheadline)
-//                    .fontWeight(.semibold)
-//                    .foregroundColor(Color(.tertiaryLabel))
-//                ForEach(fields.allSizeFields, id: \.self) { sizeField in
-//                    Text("\(sizeField.sizeNameString.capitalized) • \(Text("\(sizeField.sizeAmountDescription)").foregroundColor(.secondary))")
-//                        .foregroundColor(.primary)
-//                }
-//            }
-            VStack(alignment: .leading, spacing: 3) {
-                Text("Sizes")
-                    .font(.system(.subheadline, design: .rounded, weight: .bold))
-                    .foregroundColor(Color(.tertiaryLabel))
+        
+        func cellForSizeField(_ sizeField: Field) -> some View {
+            HStack(alignment: .firstTextBaseline, spacing: 5) {
+                Text(sizeField.sizeNameString)
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    .foregroundColor(.secondary)
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text(sizeField.sizeAmountString)
+                        .font(.system(.footnote, design: .rounded, weight: .semibold))
+                        .foregroundColor(.secondary)
+                    Text(sizeField.sizeAmountUnitString)
+                        .font(.system(.caption, design: .rounded, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 1)
+                .padding(.horizontal, 5)
+                .background(
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                        .foregroundColor(Color(.tertiarySystemFill))
+                )
+            }
+        }
+        
+        return Group {
+            if !fields.allSizeFields.isEmpty {
+                Divider()
                 VStack(alignment: .leading, spacing: 3) {
-                    ForEach(fields.allSizeFields, id: \.self) { sizeField in
-                        HStack(alignment: .firstTextBaseline, spacing: 5) {
-                            Text(sizeField.sizeNameString.capitalized)
-                                .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                                .foregroundColor(.secondary)
-                            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                                Text(sizeField.sizeAmountString)
-                                    .font(.system(.footnote, design: .rounded, weight: .semibold))
-                                    .foregroundColor(.secondary)
-                                Text(sizeField.sizeAmountUnitString)
-                                    .font(.system(.caption, design: .rounded, weight: .medium))
-                                    .foregroundColor(.secondary)
-//                                    .foregroundColor(Color(.tertiaryLabel))
-                            }
-                            .padding(.vertical, 1)
-                            .padding(.horizontal, 5)
-                            .background(
-                                RoundedRectangle(cornerRadius: 4, style: .continuous)
-                                    .foregroundColor(Color(.tertiarySystemFill))
-                            )
+                    Text("Sizes")
+                        .font(.system(.subheadline, design: .rounded, weight: .bold))
+                        .foregroundColor(Color(.tertiaryLabel))
+                    VStack(alignment: .leading, spacing: 3) {
+                        ForEach(fields.allSizeFields.indices, id: \.self) { index in
+                            cellForSizeField(fields.allSizeFields[index])
                         }
                     }
                 }

@@ -119,9 +119,8 @@ public class Field: ObservableObject, Identifiable {
                 image = fieldViewModel.image
                 isCropping = false
             }
-
-        } else if value.fill.isPrefill {
-//            prefillUrl = FoodFormViewModel.shared.prefilledFood?.sourceUrl
+        } else {
+            self.image = nil
         }
     }
     

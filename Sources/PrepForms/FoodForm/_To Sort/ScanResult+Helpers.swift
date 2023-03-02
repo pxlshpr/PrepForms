@@ -183,13 +183,8 @@ extension ScanResult {
         headers?.serving?.equivalentSize
     }
     var servingFormUnit: FormUnit {
-        if let servingUnitNameText {
-            let size = FormSize(
-                name: servingUnitNameText.string,
-                amount: servingUnitAmount,
-                unit: servingUnitSizeUnit
-            )
-            return .size(size, nil)
+        if let servingSize = servingUnitFieldValue?.size {
+            return .size(servingSize, nil)
         } else {
             return servingUnit?.formUnit ?? .weight(.g)
         }
@@ -211,7 +206,7 @@ extension ScanResult {
         if let equivalentSizeUnitSize {
             return .size(equivalentSizeUnitSize, nil)
         } else {
-            return equivalentSize?.unit?.formUnit ?? .weight(.g)
+            return equivalentSize?.unit?.formUnit
         }
     }
     

@@ -119,9 +119,11 @@ extension FoodForm.Fields {
         /// if this size was used for either amount or serving—update it with the new size
         if amount.value.doubleValue.unit.size == oldSize {
             amount.value.doubleValue.unit.size = newSize
+            amount.registerUserInput()
         }
         if serving.value.doubleValue.unit.size == oldSize {
             serving.value.doubleValue.unit.size = newSize
+            serving.registerUserInput()
         }
     }
     

@@ -34,12 +34,6 @@ extension FoodForm {
             viewModel.formDisabled = false
         }
         
-        if let initialScanImage, let initialScanResult {
-            didReceiveScanFromFoodLabelCamera(initialScanResult, image: initialScanImage)
-            self.initialScanImage = nil
-            self.initialScanResult = nil
-        }
-        
         if let existingFood {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
                 prefillExistingFood(existingFood)
@@ -114,13 +108,6 @@ extension FoodForm {
     }
     
     func extract(column: Int, from results: [ScanResult], shouldOverwrite: Bool) {
-        //MARK: ☣️
-//        Task {
-//            let fieldValues = await sources.extractFieldsFrom(results, at: column)
-//            withAnimation {
-//                handleExtractedFieldValues(fieldValues, shouldOverwrite: shouldOverwrite)
-//            }
-//        }
     }
     
 //    func handleSourcesAction(_ action: SourcesAction) {
@@ -175,15 +162,9 @@ extension FoodForm {
             showExtractorViewWithCamera()
         case .choosePhotos:
             showingPhotosPicker = true
-        case .prefill:
-            showingPrefill = true
-        case .prefillInfo:
-            showingPrefillInfo = true
         }
         
-        if button != .prefillInfo {
-            dismissWizard()
-        }
+        dismissWizard()
     }
     
     func dismissWizard() {

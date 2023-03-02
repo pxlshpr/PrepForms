@@ -3,26 +3,11 @@ import FoodLabelScanner
 
 extension FoodForm {
 
-    func didReceiveScanFromFoodLabelCamera(_ scanResult: ScanResult, image: UIImage) {
-        sources.add(image, with: scanResult)
-        extractFieldsOrShowColumnSelectionInfo()
-    }
-    
     func didScanAllPickedImages() {
         extractFieldsOrShowColumnSelectionInfo()
     }
     
     func extractFieldsOrShowColumnSelectionInfo() {
-        //MARK: ☣️
-//        Task {
-//            guard let fieldValues = await sources.extractFieldsOrSetColumnSelectionInfo() else {
-//                /// Either `sources.columnSelectionInfo` is set, causing us to present the `TextPicker`—or there were no results
-//                return
-//            }
-//            withAnimation {
-//                handleExtractedFieldValues(fieldValues, shouldOverwrite: false)
-//            }
-//        }
     }
     
     func handleExtractedFieldValues(_ fieldValues: [FieldValue], shouldOverwrite: Bool) {

@@ -157,26 +157,6 @@ class ImageViewModel: ObservableObject, Identifiable {
         }
     }
 
-    //MARK: ☣️
-//    func texts(for filter: TextPickerFilter) -> [RecognizedText] {
-//        switch filter {
-//        case .allTextsAndBarcodes, .allTexts:
-//            return texts
-//        case .textsWithDensities:
-//            return textsWithDensities
-//        case .textsWithFoodLabelValues:
-//            return textsWithFoodLabelValues
-//        case .textsWithoutFoodLabelValues:
-//            return textsWithoutFoodLabelValues
-//        case .textsInColumn1:
-//            //TODO: Extract column 1
-//            return texts
-//        case .textsInColumn2:
-//            //TODO: Extract column 2
-//            return texts
-//        }
-//    }
-    
     func startUploadTask() {
         Task { [weak self] in
             self?.uploadStatus = .uploading
@@ -326,12 +306,3 @@ extension ImageViewModel: Equatable {
         lhs.hashValue == rhs.hashValue
     }
 }
-
-//MARK: ☣️
-//extension Array where Element == ImageViewModel {
-//    func containingTexts(in output: ColumnSelectionInfo) -> [ImageViewModel] {
-//        filter {
-//            output.column1.containsTexts(from: $0) || output.column2.containsTexts(from: $0)
-//        }
-//    }
-//}

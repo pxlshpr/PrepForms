@@ -24,8 +24,6 @@ extension FoodForm {
         @State var showingAddLinkAlert = false
         @State var linkIsInvalid = false
         @State var link: String = ""
-        
-        //        var actionHandler: ((SourcesAction) -> Void)
     }
 }
 extension FoodForm.SourcesForm {
@@ -34,13 +32,10 @@ extension FoodForm.SourcesForm {
         form
             .navigationTitle("Sources")
             .navigationBarTitleDisplayMode(.large)
-        //MARK: ☣️
-//            .fullScreenCover(isPresented: $showingTextPicker) { textPicker }
             .alert(addLinkTitle, isPresented: $showingAddLinkAlert, actions: { addLinkActions }, message: { addLinkMessage })
             .photosPicker(
                 isPresented: $showingPhotosPicker,
                 selection: $sources.selectedPhotos,
-//                maxSelectionCount: sources.availableImagesCount,
                 maxSelectionCount: 1,
                 matching: .images
             )
@@ -136,23 +131,7 @@ extension FoodForm.SourcesForm {
             }
         }
     }
-    
-    //MARK: ☣️
-//    var textPicker: some View {
-//        TextPicker(
-//            imageViewModels: sources.imageViewModels,
-//            mode: .imageViewer(
-//                initialImageIndex: sources.presentingImageIndex,
-//                deleteHandler: { deletedImageIndex in
-//                    removeImage(at: deletedImageIndex)
-//                },
-//                columnSelectionHandler: { selectedColumn, scanResult in
-//                    sources.autoFillHandler?(selectedColumn, scanResult)
-//                }
-//            )
-//        )
-//    }
-    
+
     var imagesCarousel: some View {
         SourceImagesCarousel(imageViewModels: $sources.imageViewModels) { index in
             sources.presentingImageIndex = index

@@ -46,8 +46,6 @@ extension FoodForm.AmountPerForm.DensityForm {
         form
         .navigationTitle("Unit Conversion")
         .onAppear(perform: appeared)
-        //MARK: ☣️
-//        .fullScreenCover(isPresented: $showingTextPicker) { textPicker }
     }
     
     var form: some View {

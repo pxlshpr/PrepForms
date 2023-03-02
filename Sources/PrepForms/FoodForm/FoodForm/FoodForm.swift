@@ -10,25 +10,15 @@ import SwiftHaptics
 public struct FoodForm: View {
     
     @Environment(\.dismiss) var dismiss
-//    @Environment(\.scenePhase) var scenePhase
 
     let didSave: (FoodFormOutput) -> ()
     
     @State var showingCancelConfirmation = false
     
-    /// ViewModels
-//    @ObservedObject var fields: Fields
-//    @ObservedObject var sources: Sources
-//    @ObservedObject var extractor: Extractor
-
     @StateObject var fields: Fields = Fields.shared
     @StateObject var sources: Sources = Sources.shared
     @StateObject var extractor: Extractor = Extractor.shared
     @StateObject var viewModel: ViewModel = ViewModel.shared
-    
-    //MARK: ☣️
-    //    @ObservedObject var scanner: LabelScannerViewModel
-    //    @ObservedObject var interactiveScanner: ScannerViewModel
     
     /// Sheets
     @State var showingEmojiPicker = false
@@ -36,20 +26,12 @@ public struct FoodForm: View {
     
     @State var showingFoodLabelCamera = false
     @State var showingPhotosPicker = false
-    @State var showingPrefill = false
-    @State var showingPrefillInfo = false
-    @State var showingTextPicker = false
     @State var showingBarcodeScanner = false
     
     @State var showingAddLinkAlert = false
     @State var showingSaveSheet = false
     @State var showingBottomButtonsSaved = false /// Used when presenting keyboard and alerts
     
-//    @State var showingSaveButton: Bool
-//    @State var showingExtractorView: Bool
-//    @State var showingLabelScanner: Bool
-//    @State var animateLabelScannerUp: Bool
-
     @State var selectedPhoto: UIImage? = nil
     
     /// Menus
@@ -59,16 +41,7 @@ public struct FoodForm: View {
     @State var showingAddBarcodeAlert = false
     @State var barcodePayload: String = ""
     
-    @State var initialScanResult: ScanResult?
-    @State var initialScanImage: UIImage?
-    
-    @State var mockScanResult: ScanResult?
-    @State var mockScanImage: UIImage?
-    
-    
     @State var showingDismissConfirmationDialog = false
-    let keyboardDidShow = NotificationCenter.default.publisher(for: UITextField.textDidBeginEditingNotification)
-    let keyboardDidHide = NotificationCenter.default.publisher(for: UITextField.textDidEndEditingNotification)
     let didDismissExtractor = NotificationCenter.default.publisher(for: .didDismissExtractor)
     let didExtractFoodLabel = NotificationCenter.default.publisher(for: .didExtractFoodLabel)
     let shouldDismissFoodForm = NotificationCenter.default.publisher(for: .shouldDismissFoodForm)
@@ -84,19 +57,12 @@ public struct FoodForm: View {
         didSave: @escaping (FoodFormOutput) -> ()
     ) {
         cprint("💭 FoodForm.init()")
-        
         self.didSave = didSave
-        _initialScanResult = State(initialValue: nil)
-        _initialScanImage = State(initialValue: nil)
-        _mockScanResult = State(initialValue: nil)
-        _mockScanImage = State(initialValue: nil)
-        
         self.existingFood = existingFood
     }
     
     public var body: some View {
         content
-//            .onChange(of: scenePhase, perform: scenePhaseChanged)
             .onReceive(didDismissExtractor, perform: didDismissExtractor)
             .onReceive(didExtractFoodLabel, perform: didExtractFoodLabel)
             .onReceive(shouldDismissFoodForm, perform: shouldDismissFoodForm)
@@ -126,32 +92,26 @@ public struct FoodForm: View {
         
         return NavigationStack {
             formContent
-            //                .edgesIgnoringSafeArea(.bottom)
+//                .edgesIgnoringSafeArea(.bottom)
                 .navigationTitle("\(existingFood == nil ? "New" : "Edit") Food")
                 .toolbar { navigationLeadingContent }
                 .toolbar { navigationTrailingContent }
                 .onAppear(perform: appeared)
                 .onChange(of: sources.selectedPhotos, perform: selectedPhotosChanged)
-            //                .onChange(of: sources.selectedPhotos, perform: sources.selectedPhotosChanged)
+//                .onChange(of: sources.selectedPhotos, perform: sources.selectedPhotosChanged)
                 .onChange(of: viewModel.showingWizard, perform: showingWizardChanged)
                 .onChange(of: showingAddLinkAlert, perform: showingAddLinkAlertChanged)
                 .onChange(of: showingAddBarcodeAlert, perform: showingAddBarcodeAlertChanged)
-                .onReceive(keyboardDidShow, perform: keyboardDidShow)
-                .onReceive(keyboardDidHide, perform: keyboardDidHide)
             
                 .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
                 .sheet(isPresented: $showingDetailsForm) { detailsForm }
-//                .sheet(isPresented: $showingPrefill) { mfpSearch }
 //                .sheet(isPresented: $showingSaveSheet) { saveSheet }
                 .fullScreenCover(isPresented: $showingBarcodeScanner) { barcodeScanner }
-            //                .sheet(isPresented: $showingBarcodeScanner) { barcodeScanner }
-//                .sheet(isPresented: $showingPrefillInfo) { prefillInfo }
+//                .sheet(isPresented: $showingBarcodeScanner) { barcodeScanner }
                 .alert(addBarcodeTitle,
                        isPresented: $showingAddBarcodeAlert,
                        actions: { addBarcodeActions },
                        message: { addBarcodeMessage })
-            //MARK: ☣️
-            //                .fullScreenCover(isPresented: $showingTextPicker) { textPicker }
                 .photosPicker(
                     isPresented: $showingPhotosPicker,
                     selection: $sources.selectedPhotos,
@@ -159,12 +119,6 @@ public struct FoodForm: View {
                     maxSelectionCount: 1,
                     matching: .images
                 )
-            //MARK: ☣️
-            //                .onChange(of: sources.columnSelectionInfo) { columnSelectionInfo in
-            //                    if columnSelectionInfo != nil {
-            //                        self.showingTextPicker = true
-            //                    }
-            //                }
         }
     }
     
@@ -182,27 +136,6 @@ public struct FoodForm: View {
             return
         }
         extractorDidDismiss(extractorOutput)
-    }
-
-//    func scenePhaseChanged(_ newPhase: ScenePhase) {
-//        switch newPhase {
-////        case .background:
-////            viewModel.movedToBackground = true
-//        default:
-//            break
-//        }
-//    }
-//
-    func keyboardDidShow(_ notification: Notification) {
-//        showingBottomButtonsSaved = showingBottomButtons
-//        withAnimation {
-//            showingBottomButtons = false
-//        }
-    }
-    func keyboardDidHide(_ notification: Notification) {
-//        withAnimation {
-//            showingBottomButtons = showingBottomButtonsSaved
-//        }
     }
     
     func showingWizardChanged(_ showingWizard: Bool) {
