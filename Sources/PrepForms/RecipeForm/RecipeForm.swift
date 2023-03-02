@@ -61,6 +61,7 @@ public struct RecipeForm: View {
         ItemForm.FoodSearch(
             viewModel: ItemForm.ViewModel(existingIngredientItem: nil),
             isInitialFoodSearch: true,
+            forIngredient: true,
             actionHandler: { handleItemAction($0, forEdit: false) }
         )
     }
