@@ -485,6 +485,7 @@ extension Food {
             publishStatus: .hidden,
             jsonSyncStatus: .synced,
             childrenFoods: [],
+            ingredientItems: [],
             dataset: nil,
             barcodes: nil,
             syncStatus: .synced,

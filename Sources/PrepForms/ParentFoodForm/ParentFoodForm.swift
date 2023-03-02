@@ -28,9 +28,11 @@ public struct ParentFoodForm: View {
         let viewModel = ViewModel(forRecipe: forRecipe, existingFood: existingFood)
         _viewModel = StateObject(wrappedValue: viewModel)
         
-//        if let existingFood, let childrenFoods = existingFood.childrenFoods {
-//            _showingFoodLabel = State(initialValue: existingFood.childrenFoods?.count > 1)
-//        }
+        if let existingFood, let ingredientItems = existingFood.ingredientItems {
+            _showingFoodLabel = State(initialValue: !ingredientItems.isEmpty)
+        } else {
+            _showingFoodLabel = State(initialValue: false)
+        }
     }
 
     public var body: some View {
@@ -38,6 +40,13 @@ public struct ParentFoodForm: View {
             .sheet(isPresented: $showingDetailsForm) { detailsForm }
             .sheet(isPresented: $showingFoodSearch) { foodSearchForm }
             .onChange(of: viewModel.sortOrder, perform: sortOrderChanged)
+            .onChange(of: viewModel.items, perform: itemsChanged)
+    }
+    
+    func itemsChanged(_ items: [IngredientItem]) {
+        withAnimation {
+            showingFoodLabel = !items.isEmpty
+        }
     }
     
     func sortOrderChanged(_ newSortOrder: IngredientSortOrder) {

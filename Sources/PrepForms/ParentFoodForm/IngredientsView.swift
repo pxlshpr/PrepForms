@@ -4,6 +4,7 @@ import SwiftHaptics
 
 struct IngredientsView: View {
     
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var viewModel: ParentFoodForm.ViewModel
     
     let actionHandler: (Action) -> ()
@@ -23,11 +24,33 @@ struct IngredientsView: View {
     }
     
     var addMenu: some View {
-        Button {
+        var legacyLabel: some View {
+            Text(viewModel.addTitle)
+        }
+        
+        var label: some View {
+            HStack {
+                Image(systemName: "plus.circle.fill")
+                Text(viewModel.addTitle)
+                    .fontWeight(.bold)
+            }
+            .foregroundColor(.accentColor)
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+            
+            .background(
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .fill(Color.accentColor.opacity(
+                        colorScheme == .dark ? 0.1 : 0.15
+                    ))
+            )
+        }
+        
+        return Button {
             Haptics.feedback(style: .soft)
             actionHandler(.add)
         } label: {
-            Text(viewModel.addTitle)
+            label
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
                 .padding(.top, viewModel.isEmpty ? 0 : 12)
