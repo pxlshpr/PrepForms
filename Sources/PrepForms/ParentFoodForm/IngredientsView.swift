@@ -13,7 +13,7 @@ struct IngredientsView: View {
     }
     
     var content: some View {
-        VStack(spacing: 0) {
+        LazyVStack(spacing: 0) {
             ForEach(viewModel.items) { item in
                 Cell(item: item)
                     .environmentObject(viewModel)
@@ -45,8 +45,9 @@ extension IngredientsView {
     struct Cell: View {
         @Environment(\.colorScheme) var colorScheme
         
-        @AppStorage(UserDefaultsKeys.showingFoodEmojis) var showingFoodEmojis = PrepConstants.DefaultPreferences.showingFoodEmojis
-        @AppStorage(UserDefaultsKeys.showingFoodDetails) var showingFoodDetails = PrepConstants.DefaultPreferences.showingFoodDetails
+        @AppStorage(UserDefaultsKeys.showingIngredientEmojis) var showingIngredientEmojis = PrepConstants.DefaultPreferences.showingIngredientEmojis
+        @AppStorage(UserDefaultsKeys.showingIngredientDetails) var showingIngredientDetails = PrepConstants.DefaultPreferences.showingIngredientDetails
+        @AppStorage(UserDefaultsKeys.showingIngredientBadges) var showingIngredientBadges = PrepConstants.DefaultPreferences.showingIngredientBadges
 
         @EnvironmentObject var viewModel: ParentFoodForm.ViewModel
         
@@ -81,20 +82,22 @@ extension IngredientsView.Cell {
             optionalEmojiText
 //                .padding(.leading, 10)
             nameTexts
-                .padding(.leading, showingFoodEmojis ? 8 : 10)
-                .padding(.top, viewModel.items.first?.id == item.id ? 0 : 12)
-                .padding(.bottom, 12)
+                .padding(.leading, showingIngredientEmojis ? 8 : 10)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer()
-            foodBadge
-                .transition(.scale)
-//                .padding(.trailing, 10)
+            if showingIngredientBadges {
+                foodBadge
+                    .transition(.scale)
+//                    .padding(.trailing, 10)
+            }
         }
+        .padding(.top, viewModel.items.first?.id == item.id ? 0 : 12)
+        .padding(.bottom, 12)
     }
     
     @ViewBuilder
     var optionalEmojiText: some View {
-        if showingFoodEmojis {
+        if showingIngredientEmojis {
             Text(item.food.emoji)
                 .font(.body)
         }
@@ -105,8 +108,7 @@ extension IngredientsView.Cell {
             .font(.body)
             .fontWeight(.medium)
             .foregroundColor(.primary)
-//        if showingFoodDetails {
-        if true {
+        if showingIngredientDetails {
             if let detail = item.food.detail, !detail.isEmpty {
                 view = view
                 + Text(", ")
@@ -149,6 +151,7 @@ extension IngredientsView.Cell {
             p: item.food.info.nutrients.protein,
             width: widthBinding
         )
+        .opacity(item.energyInKcal == 0 ? 0 : 1)
     }
     
     

@@ -1,5 +1,6 @@
 import SwiftUI
 import PrepDataTypes
+import SwiftHaptics
 
 extension ParentFoodForm {
     class ViewModel: ObservableObject {
@@ -8,7 +9,8 @@ extension ParentFoodForm {
         let existingFood: Food?
         
         @Published var items: [IngredientItem] = []
-        
+        @Published var sortOrder: IngredientSortOrder = .none
+
         init(
             forRecipe: Bool,
             existingFood: Food? = nil
@@ -47,6 +49,42 @@ extension ParentFoodForm.ViewModel {
         var item = item
         item.energyInKcal = item.scaledValueForEnergyInKcal
         self.items.append(item)
+        resortItems()
+    }
+    
+    var sortBinding: Binding<IngredientSortOrder> {
+        Binding<IngredientSortOrder>(
+            get: { self.sortOrder },
+            set: { newValue in
+                Haptics.feedback(style: .soft)
+                self.sortOrder = newValue
+            }
+        )
+    }
+    
+    var sortOrderTitle: String {
+        if sortOrder != .none {
+            return "Sort: \(sortOrder.description)"
+        } else {
+            return "Sort"
+        }
+    }
+
+    func resortItems() {
+        switch sortOrder {
+        case .name:
+            items.sort(by: { $0.food.name < $1.food.name })
+        case .energy:
+            items.sort(by: { $0.energyInKcal > $1.energyInKcal })
+        case .carbPortion:
+            items.sort(by: { $0.food.carbPortion > $1.food.carbPortion })
+        case .fatPortion:
+            items.sort(by: { $0.food.fatPortion > $1.food.fatPortion })
+        case .proteinPortion:
+            items.sort(by: { $0.food.proteinPortion > $1.food.proteinPortion })
+        default:
+            break
+        }
     }
     
     func recalculateBadgeWdiths() {
@@ -57,12 +95,9 @@ extension ParentFoodForm.ViewModel {
             
             let energyValues = copy.energyValuesInKcalDecreasing
             for i in copy.indices {
-                let largest = energyValues.first ?? 0
-                let smallest = energyValues.last ?? 0
                 copy[i].badgeWidth = calculateMacrosIndicatorWidth(
                     for: copy[i].energyInKcal,
-                    largest: largest,
-                    smallest: smallest
+                    within: energyValues
                 )
             }
             
@@ -72,6 +107,13 @@ extension ParentFoodForm.ViewModel {
                 self.items = copy
             }
         }
+    }
+}
+
+extension ParentFoodForm.ViewModel {
+    var energyValue: FoodLabelValue {
+        let energy = items.reduce(0) { $0 + $1.energyInKcal }
+        return FoodLabelValue(amount: energy, unit: .kcal)
     }
 }
 
