@@ -308,8 +308,11 @@ public struct ParentFoodForm: View {
     
     var detailsSection: some View {
         FormStyledSection(header: Text("Details"), largeHeading: false) {
-            FoodDetailsCell(actionHandler: handleDetailAction)
-                .environmentObject(fields)
+            FoodDetailsCell(
+                foodType: viewModel.forRecipe ? .recipe : .plate,
+                actionHandler: handleDetailAction
+            )
+            .environmentObject(fields)
         }
     }
     

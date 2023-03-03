@@ -3,7 +3,12 @@ import SwiftUI
 public extension ImageViewer {
     class ViewModel: ObservableObject {
         
-        let id: UUID
+        static let shared = ViewModel()
+        
+//        var lastContentOffset: CGPoint? = nil
+//        var lastZoomScale: CGFloat? = nil
+
+        @Published var id: UUID
         @Published public var image: UIImage?
         
         /// Text boxes meant to be highlighted are placed here. Ideally with no tap handlers so that changes are animated (they'll move to the new positions)
@@ -29,6 +34,20 @@ public extension ImageViewer {
 }
 
 extension ImageViewer.ViewModel {
+    
+    func reset() {
+        self.id = UUID()
+        self.image = nil
+        self.textBoxes = []
+        self.selectableTextBoxes = []
+        self.zoomBox = nil
+        self.cutoutTextBoxes = []
+        self.showingBoxes = false
+        self.showingCutouts = false
+        self.isShimmering = false
+        self.isFocused = true
+        self.textPickerHasAppeared = true
+    }
     
     var imageOverlayOpacity: CGFloat {
         (showingBoxes && isFocused) ? 0.7 : 1

@@ -47,6 +47,26 @@ extension Extractor {
         }
     }
     
+    /// This is done upon returning back to `.active`
+    func resetZoomToLastViewPortData() {
+        ZoomScrollViewData.shared.lastContentOffset = nil
+        ZoomScrollViewData.shared.lastZoomScale = nil
+    }
+    
+    /// This is done upon moving to `.inactive`. We set these so that the `ZoomScrollView` is able
+    /// to restore its viewport in case it gets re-instantiated.
+    func setLastViewport() {
+        guard ZoomScrollViewData.shared.lastZoomScale == nil else {
+            /// This ensures we don't rewrite with incorrect values if this called a second time after
+            /// setting it for the first change to `inactive`. It waits till the `resetZoomTiLastViewPortDate()`
+            /// is called and the values are set back to `nil` (upon moving back to `.active` before allowing these
+            /// to be set again.
+            return
+        }
+        ZoomScrollViewData.shared.lastContentOffset = lastContentOffset
+        ZoomScrollViewData.shared.lastZoomScale = lastZoomScale
+    }
+    
     func zoomToNutrients() async {
         guard let imageSize = image?.size,
               let boundingBox = scanResult?.nutrientsBoundingBox(includeAttributes: true)

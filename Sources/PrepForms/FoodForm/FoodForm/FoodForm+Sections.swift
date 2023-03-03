@@ -15,8 +15,12 @@ struct FoodDetailsCell: View {
     }
     
     @EnvironmentObject var fields: FoodForm.Fields
-
+    let foodType: FoodType
     let actionHandler: (Action) -> ()
+    
+    var namePlaceholder: String {
+        "Name"
+    }
     
     var body: some View {
         HStack {
@@ -45,6 +49,31 @@ struct FoodDetailsCell: View {
         }
     }
     
+    var detailPlaceholder: String {
+        switch foodType {
+        case .food:
+            return "Flavor, Variety etc."
+        case .recipe:
+            return "Date Cooked, etc."
+//            return "Description"
+        case .plate:
+            return "Description"
+//            return "Description or Size"
+        }
+    }
+
+    var brandPlaceholder: String {
+        switch foodType {
+        case .food:
+            return "Brand, Supplier etc."
+        case .recipe:
+//            return "Website or Cookbook name"
+            return "Source, Author etc."
+        case .plate:
+            return "More Details"
+        }
+    }
+
     var detailsButtons: some View {
         var nameButton: some View {
             var label: some View {
@@ -83,7 +112,7 @@ struct FoodDetailsCell: View {
                             .foregroundColor(Color(.label))
                             .bold()
                     } else {
-                        Text("Detail")
+                        Text(detailPlaceholder)
                             .foregroundColor(Color(.tertiaryLabel))
                     }
                 }
@@ -112,7 +141,7 @@ struct FoodDetailsCell: View {
                             .foregroundColor(Color(.label))
                             .bold()
                     } else {
-                        Text("Brand")
+                        Text(brandPlaceholder)
                             .foregroundColor(Color(.tertiaryLabel))
                     }
                 }
@@ -150,8 +179,11 @@ extension FoodForm {
     
     var detailsSection: some View {
         FormStyledSection(header: Text("Details")) {
-            FoodDetailsCell(actionHandler: handleDetailAction)
-                .environmentObject(fields)
+            FoodDetailsCell(
+                foodType: .food,
+                actionHandler: handleDetailAction
+            )
+            .environmentObject(fields)
         }
     }
     

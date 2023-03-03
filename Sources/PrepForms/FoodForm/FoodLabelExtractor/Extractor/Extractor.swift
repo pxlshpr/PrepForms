@@ -20,6 +20,8 @@ public class Extractor: ObservableObject {
 
     var lastContentOffset: CGPoint? = nil
     var lastContentSize: CGSize? = nil
+    var lastZoomScale: CGFloat? = nil
+
     var allCroppedImages: [RecognizedText : UIImage] = [:]
     @Published var croppedImages: [(UIImage, CGRect, UUID, Angle, (Angle, Angle, Angle, Angle))] = []
 
@@ -126,6 +128,8 @@ extension Extractor {
         
         lastContentOffset = nil
         lastContentSize = nil
+        lastZoomScale = nil
+        
         allCroppedImages = [:]
         croppedImages = []
 
@@ -184,11 +188,13 @@ extension Extractor {
     @objc func imageViewerViewportChanged(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
               let contentOffset = userInfo[Notification.ZoomableScrollViewKeys.contentOffset] as? CGPoint,
-              let contentSize = userInfo[Notification.ZoomableScrollViewKeys.contentSize] as? CGSize
+              let contentSize = userInfo[Notification.ZoomableScrollViewKeys.contentSize] as? CGSize,
+              let zoomScale = userInfo[Notification.ZoomableScrollViewKeys.zoomScale] as? CGFloat
         else { return }
         
         lastContentOffset = contentOffset
         lastContentSize = contentSize
+        lastZoomScale = zoomScale
     }
 
     func setSuggestedValue(_ value: FoodLabelValue) {

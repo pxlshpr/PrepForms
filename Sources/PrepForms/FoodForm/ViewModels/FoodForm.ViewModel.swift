@@ -34,6 +34,7 @@ extension FoodForm {
             self.startWithCamera = startWithCamera
             showingSaveButton = startWithCamera
             showingExtractorView = startWithCamera
+            ImageViewer.ViewModel.shared.reset()
 
             if startWithCamera {
                 Task {

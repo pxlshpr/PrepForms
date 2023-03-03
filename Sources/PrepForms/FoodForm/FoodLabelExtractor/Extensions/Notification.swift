@@ -11,12 +11,16 @@ extension Notification.Name {
     public static var scannerDidChangeAttribute: Notification.Name { return .init("scannerDidChangeAttribute" )}
     
     public static var didEnterForeground: Notification.Name { return .init("didEnterForeground") }
+    
+    public static var homeViewDidBecomeInactive: Notification.Name { return .init("homeViewDidBecomeInactive") }
+
 }
 
 extension Notification {
     public struct ZoomableScrollViewKeys {
         public static let contentOffset = "contentOffset"
         public static let contentSize = "contentSize"
+        public static let zoomScale = "zoomScale"
         public static let zoomBox = "zoomBox"
         public static let imageSize = "imageSize"
     }

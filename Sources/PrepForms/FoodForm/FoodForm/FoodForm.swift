@@ -11,6 +11,7 @@ public struct FoodForm: View {
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.scenePhase) var scenePhase
 
     let didSave: (FoodFormOutput) -> ()
     

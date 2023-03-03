@@ -21,6 +21,13 @@ class CenteringScrollView: UIScrollView {
     }
 }
 
+public class ZoomScrollViewData {
+    public static let shared = ZoomScrollViewData()
+    public var lastContentOffset: CGPoint? = nil
+    public var lastZoomScale: CGFloat? = nil
+}
+
+
 struct ZoomScrollView<Content: View>: View {
     let content: Content
     init(@ViewBuilder content: () -> Content) {
@@ -124,7 +131,16 @@ fileprivate struct ZoomScrollViewRepresentable<Content: View>: UIViewControllerR
         //MARK: - View Lifecycle
         
         override func viewDidAppear(_ animated: Bool) {
-            scrollView.zoom(to: hostedView.bounds, animated: false)
+            if let contentOffset = ZoomScrollViewData.shared.lastContentOffset,
+               let zoomScale = ZoomScrollViewData.shared.lastZoomScale
+            {
+                /// This is done to mitigate cases where this gets re-instantiated when moving to the background.
+                /// We're storing the last known viewport in `ImageViewer.ViewModel.shared`, which we'll be restoring.
+                self.scrollView.setZoomScale(zoomScale, animated: false)
+                self.scrollView.setContentOffset(contentOffset, animated: false)
+            } else {
+                scrollView.zoom(to: hostedView.bounds, animated: false)
+            }
         }
         
         override func viewDidLayoutSubviews() {
@@ -161,7 +177,8 @@ fileprivate struct ZoomScrollViewRepresentable<Content: View>: UIViewControllerR
         func sendNotificationAnimation() {
             NotificationCenter.default.post(name: .zoomScrollViewViewportChanged, object: nil, userInfo: [
                 Notification.ZoomableScrollViewKeys.contentSize: scrollView.contentSize,
-                Notification.ZoomableScrollViewKeys.contentOffset: scrollView.contentOffset
+                Notification.ZoomableScrollViewKeys.contentOffset: scrollView.contentOffset,
+                Notification.ZoomableScrollViewKeys.zoomScale: scrollView.zoomScale
             ])
         }
         
@@ -186,7 +203,7 @@ fileprivate struct ZoomScrollViewRepresentable<Content: View>: UIViewControllerR
             scrollView.setNeedsUpdateConstraints()
             doubleTapCancellable = doubleTap.sink { [unowned self] in handleDoubleTap() }
         }
-
+        
         @objc func zoomZoomableScrollView(notification: Notification) {
             guard let zoomBox = notification.userInfo?[Notification.ZoomableScrollViewKeys.zoomBox] as? ZoomBox
             else { return }

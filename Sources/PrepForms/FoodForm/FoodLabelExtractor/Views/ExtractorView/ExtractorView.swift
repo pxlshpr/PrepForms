@@ -2,9 +2,14 @@ import SwiftUI
 
 public struct ExtractorView: View {
     
+    @Environment(\.scenePhase) var scenePhase
+
     @ObservedObject var extractor: Extractor
-    @StateObject var imageViewerViewModel = ImageViewer.ViewModel()
+//    @StateObject var imageViewerViewModel = ImageViewer.ViewModel()
+    @StateObject var imageViewerViewModel = ImageViewer.ViewModel.shared
     let startedWithCamera: Bool
+    
+    let homeViewDidBecomeInactive = NotificationCenter.default.publisher(for: .homeViewDidBecomeInactive)
     
     public init(extractor: Extractor, startedWithCamera: Bool) {
         self.extractor = extractor
@@ -19,7 +24,22 @@ public struct ExtractorView: View {
             .onChange(of: extractor.cutoutTextBoxes, perform: cutoutTextBoxesChanged)
             .onChange(of: extractor.state, perform: stateChanged)
             .onChange(of: extractor.transitionState, perform: transitionStateChanged)
+            .onChange(of: scenePhase, perform: scenePhaseChanged)
+            .onReceive(homeViewDidBecomeInactive, perform: homeViewDidBecomeInactive)
             .onAppear(perform: appeared)
+    }
+    
+    func homeViewDidBecomeInactive(_ notification: Notification) {
+        extractor.setLastViewport()
+    }
+    
+    func scenePhaseChanged(_ newPhase: ScenePhase) {
+        switch newPhase {
+        case .active:
+            extractor.resetZoomToLastViewPortData()
+        default:
+            break
+        }
     }
     
     func appeared() {
