@@ -7,15 +7,24 @@ import SwiftHaptics
 
 struct FoodDetailsCell: View {
     
+    enum Action {
+        case emoji
+        case name
+        case detail
+        case brand
+    }
+    
     @EnvironmentObject var fields: FoodForm.Fields
 
-    let didTapEmoji: () -> ()
-    let didTapDetails: () -> ()
+    let actionHandler: (Action) -> ()
     
     var body: some View {
         HStack {
-            emojiButton
-            detailsButton
+            VStack {
+                emojiButton
+                Spacer()
+            }
+            detailsButtons
         }
         .foregroundColor(.primary)
     }
@@ -23,10 +32,10 @@ struct FoodDetailsCell: View {
     var emojiButton: some View {
         Button {
             Haptics.feedback(style: .soft)
-            didTapEmoji()
+            actionHandler(.emoji)
         } label: {
             Text(fields.emoji)
-                .font(.system(size: 50))
+                .font(.system(size: 65))
                 .padding(10)
                 .background(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -36,63 +45,127 @@ struct FoodDetailsCell: View {
         }
     }
     
-    var detailsButton: some View {
-        @ViewBuilder
-        var nameText: some View {
-            if !fields.name.isEmpty {
-                Text(fields.name)
-                    .bold()
-                    .multilineTextAlignment(.leading)
-            } else {
-                Text("Required")
-                    .foregroundColor(Color(.tertiaryLabel))
+    var detailsButtons: some View {
+        var nameButton: some View {
+            var label: some View {
+                Group {
+                    if !fields.name.isEmpty {
+                        Text(fields.name)
+                            .foregroundColor(Color(.label))
+                            .bold()
+                    } else {
+                        Text("Name")
+                            .foregroundColor(Color(.secondaryLabel))
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .multilineTextAlignment(.leading)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(.secondarySystemFill).gradient)
+                )
+            }
+            
+            return Button {
+                actionHandler(.name)
+            } label: {
+                label
             }
         }
         
-        @ViewBuilder
-        var detailText: some View {
-            if !fields.detail.isEmpty {
-                Text(fields.detail)
-                    .multilineTextAlignment(.leading)
+        var detailButton: some View {
+            var label: some View {
+                Group {
+                    if !fields.detail.isEmpty {
+                        Text(fields.detail)
+                            .foregroundColor(Color(.label))
+                            .bold()
+                    } else {
+                        Text("Detail")
+                            .foregroundColor(Color(.tertiaryLabel))
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .multilineTextAlignment(.leading)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(.secondarySystemFill).gradient)
+                )
+            }
+            
+            return Button {
+                actionHandler(.detail)
+            } label: {
+                label
             }
         }
 
-        @ViewBuilder
-        var brandText: some View {
-            if !fields.brand.isEmpty {
-                Text(fields.brand)
-                    .multilineTextAlignment(.leading)
+        var brandButton: some View {
+            var label: some View {
+                Group {
+                    if !fields.brand.isEmpty {
+                        Text(fields.brand)
+                            .foregroundColor(Color(.label))
+                            .bold()
+                    } else {
+                        Text("Brand")
+                            .foregroundColor(Color(.tertiaryLabel))
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .multilineTextAlignment(.leading)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 3)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(.secondarySystemFill).gradient)
+                )
+            }
+            
+            return Button {
+                actionHandler(.brand)
+            } label: {
+                label
             }
         }
         
-        return Button {
-            Haptics.feedback(style: .soft)
-            didTapDetails()
-        } label: {
-            HStack {
-                VStack(alignment: .leading) {
-                    nameText
-                    detailText
-                        .foregroundColor(.secondary)
-                    brandText
-                        .foregroundColor(Color(.tertiaryLabel))
-                }
+        return HStack {
+            VStack(alignment: .leading) {
+                nameButton
+                detailButton
+                brandButton
                 Spacer()
             }
-            .frame(maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
         }
-        .contentShape(Rectangle())
+        .frame(maxHeight: .infinity)
     }
 }
 
 extension FoodForm {
+    
     var detailsSection: some View {
         FormStyledSection(header: Text("Details")) {
-            FoodDetailsCell(
-                didTapEmoji: { showingEmojiPicker = true },
-                didTapDetails: { showingDetailsForm = true }
-            )
-            .environmentObject(fields)
+            FoodDetailsCell(actionHandler: handleDetailAction)
+                .environmentObject(fields)
+        }
+    }
+    
+    func handleDetailAction(_ action: FoodDetailsCell.Action) {
+        Haptics.feedback(style: .soft)
+        switch action {
+        case .emoji:
+            showingEmojiPicker = true
+        case .name:
+            showingNameForm = true
+        case .detail:
+            showingDetailForm = true
+        case .brand:
+            showingBrandForm = true
         }
     }
 

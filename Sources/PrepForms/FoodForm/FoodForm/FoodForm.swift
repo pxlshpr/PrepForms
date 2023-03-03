@@ -22,7 +22,11 @@ public struct FoodForm: View {
     @StateObject var viewModel: ViewModel = ViewModel.shared
     
     @State var showingEmojiPicker = false
-    @State var showingDetailsForm = false
+//    @State var showingDetailsForm = false
+    @State var showingBrandForm = false
+    @State var showingNameForm = false
+    @State var showingDetailForm = false
+
     @State var showingPhotosPicker = false
     @State var showingBarcodeScanner = false
     @State var showingSaveSheet = false
@@ -91,8 +95,18 @@ public struct FoodForm: View {
                 .onChange(of: showingAddLinkAlert, perform: showingAddLinkAlertChanged)
                 .onChange(of: showingAddBarcodeAlert, perform: showingAddBarcodeAlertChanged)
             
+                .sheet(isPresented: $showingNameForm) {
+                    DetailsNameForm(title: "Name", isRequired: true, name: $fields.name)
+                }
+                .sheet(isPresented: $showingDetailForm) {
+                    DetailsNameForm(title: "Detail", isRequired: false, name: $fields.detail)
+                }
+                .sheet(isPresented: $showingBrandForm) {
+                    DetailsNameForm(title: "Brand", isRequired: false, name: $fields.brand)
+                }
+
                 .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
-                .sheet(isPresented: $showingDetailsForm) { detailsForm }
+//                .sheet(isPresented: $showingDetailsForm) { detailsForm }
                 .fullScreenCover(isPresented: $showingBarcodeScanner) { barcodeScanner }
                 .alert(addBarcodeTitle,
                        isPresented: $showingAddBarcodeAlert,
@@ -203,6 +217,7 @@ public struct FoodForm: View {
     }
     
     //MARK: - Layers
+    
     @ViewBuilder
     var formLayer: some View {
         FormStyledScrollView(showsIndicators: false, isLazy: false) {

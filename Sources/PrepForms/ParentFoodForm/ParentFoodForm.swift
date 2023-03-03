@@ -8,6 +8,7 @@ import Camera
 import SwiftSugar
 import PrepViews
 import FoodLabel
+import EmojiPicker
 
 public struct ParentFoodForm: View {
 
@@ -21,6 +22,10 @@ public struct ParentFoodForm: View {
     @State var showingDetailsForm = false
     @State var showingEmojiPicker = false
     @State var showingFoodSearch = false
+    
+    @State var showingBrandForm = false
+    @State var showingNameForm = false
+    @State var showingDetailForm = false
     
     @State var showingFoodLabel: Bool = false
     
@@ -52,10 +57,32 @@ public struct ParentFoodForm: View {
     public var body: some View {
         let _ = Self._printChanges()
         return content
-            .sheet(isPresented: $showingDetailsForm) { detailsForm }
+//            .sheet(isPresented: $showingDetailsForm) { detailsForm }
+            .sheet(isPresented: $showingNameForm) {
+                DetailsNameForm(title: "Name", isRequired: true, name: $fields.name)
+            }
+            .sheet(isPresented: $showingDetailForm) {
+                DetailsNameForm(title: "Detail", isRequired: false, name: $fields.detail)
+            }
+            .sheet(isPresented: $showingBrandForm) {
+                DetailsNameForm(title: "Brand", isRequired: false, name: $fields.brand)
+            }
+            .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
             .sheet(isPresented: $showingFoodSearch) { foodSearchForm }
             .onChange(of: viewModel.sortOrder, perform: sortOrderChanged)
             .onChange(of: viewModel.items, perform: itemsChanged)
+    }
+    
+    var emojiPicker: some View {
+        EmojiPicker(
+            categories: [.foodAndDrink, .animalsAndNature],
+            focusOnAppear: true,
+            includeCancelButton: true
+        ) { emoji in
+            Haptics.successFeedback()
+            fields.emoji = emoji
+            showingEmojiPicker = false
+        }
     }
     
     func itemsChanged(_ items: [IngredientItem]) {
@@ -281,13 +308,25 @@ public struct ParentFoodForm: View {
     
     var detailsSection: some View {
         FormStyledSection(header: Text("Details"), largeHeading: false) {
-            FoodDetailsCell(
-                didTapEmoji: { showingEmojiPicker = true },
-                didTapDetails: { showingDetailsForm = true }
-            )
-            .environmentObject(fields)
+            FoodDetailsCell(actionHandler: handleDetailAction)
+                .environmentObject(fields)
         }
     }
+    
+    func handleDetailAction(_ action: FoodDetailsCell.Action) {
+        Haptics.feedback(style: .soft)
+        switch action {
+        case .emoji:
+            showingEmojiPicker = true
+        case .name:
+            showingNameForm = true
+        case .detail:
+            showingDetailForm = true
+        case .brand:
+            showingBrandForm = true
+        }
+    }
+
     
     var servingSection: some View {
         FormStyledSection(header: Text("Servings"), largeHeading: false) {
