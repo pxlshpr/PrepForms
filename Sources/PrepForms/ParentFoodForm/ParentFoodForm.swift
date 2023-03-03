@@ -29,6 +29,7 @@ public struct ParentFoodForm: View {
     let shouldDismiss: () -> ()
     
     let id = UUID()
+    
     public init(forRecipe: Bool, existingFood: Food? = nil, shouldDismiss: @escaping () -> ()) {
         
         print("💭 ParentFoodForm.init() \(id)")
@@ -129,7 +130,7 @@ public struct ParentFoodForm: View {
     }
     
     var formLayer: some View {
-        FormStyledScrollView(showsIndicators: false, isLazy: true) {
+        FormStyledScrollView(showsIndicators: false, isLazy: false) {
             detailsSection
             if viewModel.forRecipe {
                 servingSection
@@ -142,25 +143,16 @@ public struct ParentFoodForm: View {
     
     var foodLabel: some View {
         let dataBinding = Binding<FoodLabelData>(
-            get: {
-                FoodLabelData(
-                    energyValue: fields.energy.value.value ?? .init(amount: 0, unit: .kcal),
-                    carb: fields.carb.value.double ?? 0,
-                    fat: fields.fat.value.double ?? 0,
-                    protein: fields.protein.value.double ?? 0,
-                    nutrients: fields.microsDict,
-                    quantityValue: fields.amount.value.double ?? 0,
-                    quantityUnit: fields.amount.value.doubleValue.unitDescription
-                )
-            },
+            get: { foodLabelData },
             set: { _ in }
         )
 
         return Group {
             if showingFoodLabel {
-                FoodLabel(data: dataBinding)
-                    .padding(.horizontal, 20)
-                    .transition(.move(edge: .bottom))
+                FormStyledSection {
+                    FoodLabel(data: dataBinding)
+                        .transition(.move(edge: .bottom))
+                }
             }
         }
     }
@@ -174,7 +166,7 @@ public struct ParentFoodForm: View {
             }
         }
         
-        return FormStyledSection(header: header, largeHeading: false) {
+        return FormStyledSection(header: header, largeHeading: true) {
             IngredientsView(
                 actionHandler: handleIngredientsAction
             )
@@ -261,11 +253,11 @@ public struct ParentFoodForm: View {
                 }
             }
         } label: {
-            Image(systemName: "ellipsis.circle")
+            Image(systemName: "ellipsis")
                 .imageScale(.medium)
-//                .fontWeight(.regular)
+                .fontWeight(.regular)
                 .font(.title2)
-                .bold()
+//                .bold()
 
                 .foregroundColor(.accentColor)
                 .frame(maxHeight: .infinity)
@@ -353,7 +345,7 @@ public struct ParentFoodForm: View {
                 fields.updateFormState()
             }
             
-            if let uuid = UUID(uuidString: "013c751f-dcdd-4aa9-a285-718dca159a75"),
+            if let uuid = UUID(uuidString: "fc9721cb-97c3-4dcb-8350-719e9b1c8c54"),
                let food = DataManager.shared.food(with: uuid)
             {
                 for _ in 0...20 {

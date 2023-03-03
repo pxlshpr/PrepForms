@@ -110,13 +110,6 @@ extension ParentFoodForm.ViewModel {
     }
 }
 
-extension ParentFoodForm.ViewModel {
-    var energyValue: FoodLabelValue {
-        let energy = items.reduce(0) { $0 + $1.energyInKcal }
-        return FoodLabelValue(amount: energy, unit: .kcal)
-    }
-}
-
 extension Array where Element == IngredientItem {
     var energyValuesInKcalDecreasing: [Double] {
         let scaled = self.map { $0.energyInKcal }

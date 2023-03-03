@@ -102,9 +102,10 @@ public struct FoodSearch: View {
         content
             .onAppear(perform: appeared)
             .transition(.opacity)
+            .navigationTitle("Foods")
             .navigationBarTitleDisplayMode(.inline)
 //            .toolbar { trailingContent }
-            .toolbar { principalContent }
+//            .toolbar { principalContent }
             .toolbar { leadingContent }
             .onChange(of: searchViewModel.searchText, perform: searchTextChanged)
             .onChange(of: searchIsFocused, perform: searchIsFocusedChanged)
@@ -119,7 +120,7 @@ public struct FoodSearch: View {
     var content: some View {
         SearchableView(
             searchText: $searchViewModel.searchText,
-            promptSuffix: "Foods",
+//            promptSuffix: "Foods",
             focused: $searchIsFocused,
             focusOnAppear: false,
 //            focusOnAppear: focusOnAppear,

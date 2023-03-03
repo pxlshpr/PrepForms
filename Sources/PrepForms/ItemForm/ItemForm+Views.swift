@@ -9,7 +9,7 @@ extension ItemForm {
 
     var scrollView: some View {
         ScrollView(showsIndicators: false) {
-            LazyVStack(spacing: 0) {
+            VStack(spacing: 0) {
                 Group {
                     foodButton
                     if let dayMeal = viewModel.dayMeal {

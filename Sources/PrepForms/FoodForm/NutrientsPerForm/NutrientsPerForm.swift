@@ -38,7 +38,7 @@ struct NutrientsPerForm: View {
     var body: some View {
         scrollView
 //        .toolbar { navigationTrailingContent }
-        .navigationTitle("Servings and Sizes")
+        .navigationTitle("Servings")
         .navigationBarTitleDisplayMode(.large)
         .sheet(isPresented: $showingAmountForm) { amountForm }
         .sheet(isPresented: $showingServingForm) { servingForm }

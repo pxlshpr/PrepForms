@@ -142,7 +142,7 @@ extension FoodForm {
     }
     
     var servingSection: some View {
-        FormStyledSection(header: Text("Servings and Sizes")) {
+        FormStyledSection(header: Text("Servings")) {
             NavigationLink {
                 NutrientsPerForm(fields: fields)
             } label: {
