@@ -11,7 +11,7 @@ import FoodLabel
 
 public struct ParentFoodForm: View {
 
-    @Environment(\.dismiss) var dismiss
+//    @Environment(\.dismiss) var dismiss
     
     @StateObject var viewModel: ViewModel
     @StateObject var fields = FoodForm.Fields()
@@ -24,7 +24,17 @@ public struct ParentFoodForm: View {
     
     @State var showingFoodLabel: Bool = false
     
-    public init(forRecipe: Bool, existingFood: Food? = nil) {
+    @StateObject var itemFormViewModel: ItemForm.ViewModel
+    
+    let shouldDismiss: () -> ()
+    
+    let id = UUID()
+    public init(forRecipe: Bool, existingFood: Food? = nil, shouldDismiss: @escaping () -> ()) {
+        
+        print("💭 ParentFoodForm.init() \(id)")
+        
+        self.shouldDismiss = shouldDismiss
+        
         let viewModel = ViewModel(forRecipe: forRecipe, existingFood: existingFood)
         _viewModel = StateObject(wrappedValue: viewModel)
         
@@ -33,10 +43,14 @@ public struct ParentFoodForm: View {
         } else {
             _showingFoodLabel = State(initialValue: false)
         }
+        
+        let itemFormViewModel = ItemForm.ViewModel(existingIngredientItem: nil)
+        _itemFormViewModel = StateObject(wrappedValue: itemFormViewModel)
     }
 
     public var body: some View {
-        content
+        let _ = Self._printChanges()
+        return content
             .sheet(isPresented: $showingDetailsForm) { detailsForm }
             .sheet(isPresented: $showingFoodSearch) { foodSearchForm }
             .onChange(of: viewModel.sortOrder, perform: sortOrderChanged)
@@ -83,7 +97,7 @@ public struct ParentFoodForm: View {
     
     var foodSearchForm: some View {
         ItemForm.FoodSearch(
-            viewModel: ItemForm.ViewModel(existingIngredientItem: nil),
+            viewModel: itemFormViewModel,
             isInitialFoodSearch: true,
             forIngredient: true,
             actionHandler: { handleItemAction($0, forEdit: false) }
@@ -160,7 +174,7 @@ public struct ParentFoodForm: View {
             }
         }
         
-        return FormStyledSection(header: header) {
+        return FormStyledSection(header: header, largeHeading: false) {
             IngredientsView(
                 actionHandler: handleIngredientsAction
             )
@@ -247,8 +261,12 @@ public struct ParentFoodForm: View {
                 }
             }
         } label: {
-            Image(systemName: "ellipsis")
-                .imageScale(.large)
+            Image(systemName: "ellipsis.circle")
+                .imageScale(.medium)
+//                .fontWeight(.regular)
+                .font(.title2)
+                .bold()
+
                 .foregroundColor(.accentColor)
                 .frame(maxHeight: .infinity)
                 .padding(.leading, 20)
@@ -270,7 +288,7 @@ public struct ParentFoodForm: View {
     }
     
     var detailsSection: some View {
-        FormStyledSection(header: Text("Details")) {
+        FormStyledSection(header: Text("Details"), largeHeading: false) {
             FoodDetailsCell(
                 didTapEmoji: { showingEmojiPicker = true },
                 didTapDetails: { showingDetailsForm = true }
@@ -280,7 +298,7 @@ public struct ParentFoodForm: View {
     }
     
     var servingSection: some View {
-        FormStyledSection(header: Text("Servings and Sizes")) {
+        FormStyledSection(header: Text("Servings"), largeHeading: false) {
             NavigationLink {
                 NutrientsPerForm(fields: fields, forIngredients: true)
             } label: {
@@ -368,7 +386,7 @@ public struct ParentFoodForm: View {
         var dismissConfirmationActions: some View {
             Button("Close without saving", role: .destructive) {
                 Haptics.feedback(style: .soft)
-                dismiss()
+                shouldDismiss()
             }
         }
         
@@ -382,7 +400,7 @@ public struct ParentFoodForm: View {
                 showingCancelConfirmation = true
             } else {
                 Haptics.feedback(style: .soft)
-                dismiss()
+                shouldDismiss()
             }
         } label: {
             CloseButtonLabel(forNavigationBar: true)

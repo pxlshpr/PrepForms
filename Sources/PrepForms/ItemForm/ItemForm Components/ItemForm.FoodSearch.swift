@@ -13,8 +13,10 @@ extension ItemForm {
         @State var foodToShowMacrosFor: Food? = nil
         @State var searchIsFocused = false
         
+        @State var presentedSheet: Sheet? = nil
         @State var presentedFullScreenSheet: Sheet? = nil
-
+        @State var hasAppearedDelayed: Bool = false
+        
         let isInitialFoodSearch: Bool
         let forIngredient: Bool
         let actionHandler: (ItemFormAction) -> ()
@@ -27,7 +29,7 @@ extension ItemForm {
             forIngredient: Bool = false,
             actionHandler: @escaping (ItemFormAction) -> ()
         ) {
-            print("💭 ItemForm.FoodSearch.init()")
+            print("💭 ItemForm.FoodSearch.init() \(id)")
             self.viewModel = viewModel
             self.isInitialFoodSearch = isInitialFoodSearch
             self.forIngredient = forIngredient
@@ -46,9 +48,6 @@ extension ItemForm.FoodSearch {
                 foodSearch
             }
         }
-        //TODO: Bring this back once we can tell if the search field is focused and
-//        .interactiveDismissDisabled(!viewModel.path.isEmpty)
-//        .interactiveDismissDisabled(!viewModel.path.isEmpty || searchIsFocused)
     }
 
     var navigationStack: some View {
@@ -57,6 +56,12 @@ extension ItemForm.FoodSearch {
                 .navigationDestination(for: ItemFormRoute.self) { route in
                     navigationDestination(for: route)
                 }
+        }
+    }
+    
+    var navigationView: some View {
+        NavigationView {
+            foodSearch
         }
     }
     
@@ -74,9 +79,8 @@ extension ItemForm.FoodSearch {
 //        .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
         .navigationBarBackButtonHidden(viewModel.food == nil)
         .toolbar { trailingContent }
-        .fullScreenCover(item: $presentedFullScreenSheet) {
-            sheet(for: $0)
-        }
+///        .sheet(item: $presentedSheet) { sheet(for: $0) }
+        .fullScreenCover(item: $presentedFullScreenSheet) { sheet(for: $0) }
     }
 
     @ViewBuilder
@@ -94,6 +98,28 @@ extension ItemForm.FoodSearch {
         case plateForm
         
         public var id: String { rawValue }
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        if presentedSheet != nil {
+            presentedSheet = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                Haptics.feedback(style: .soft)
+                presentedSheet = sheet
+            }
+        } else if presentedFullScreenSheet != nil {
+            presentedFullScreenSheet = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                Haptics.feedback(style: .soft)
+                presentedSheet = sheet
+            }
+        } else {
+            Haptics.feedback(style: .soft)
+            withAnimation(.interactiveSpring()) {
+                presentedSheet = sheet
+            }
+        }
     }
     
     func presentFullScreen(_ sheet: Sheet, delayIfPresented: Bool = true) {
@@ -117,9 +143,9 @@ extension ItemForm.FoodSearch {
         if presentedFullScreenSheet != nil {
             presentedFullScreenSheet = nil
             delayedPresent()
-//        } else if presentedSheet != nil {
-//            presentedSheet = nil
-//            delayedPresent()
+        } else if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
         } else {
             present()
         }
@@ -129,17 +155,9 @@ extension ItemForm.FoodSearch {
     func navigationDestination(for route: ItemFormRoute) -> some View {
         switch route {
         case .mealItemForm:
-            ItemForm(
-                viewModel: viewModel,
-                isEditing: false,
-                actionHandler: actionHandler
-            )
+            itemForm
         case .food:
-            ItemForm.FoodSearch(
-                viewModel: viewModel,
-                forIngredient: forIngredient,
-                actionHandler: actionHandler
-            )
+            itemFormSearch
         case .meal:
             mealPicker
         }

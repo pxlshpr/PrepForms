@@ -73,7 +73,7 @@ public struct FoodSearch: View {
         actionHandler: @escaping (Action) -> ()
     ) {
         self.id = id
-        print("💭 FoodSearch.init()")
+        print("💭 FoodSearch.init() \(id)")
 
         self.isRootInNavigationStack = isRootInNavigationStack
         self.shouldShowPlatesInFilter = shouldShowPlatesInFilter

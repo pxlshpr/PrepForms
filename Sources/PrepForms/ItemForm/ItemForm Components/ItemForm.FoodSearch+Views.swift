@@ -6,6 +6,21 @@ import SwiftUISugar
 
 extension ItemForm.FoodSearch {
     
+    var itemForm: some View {
+        ItemForm(
+            viewModel: viewModel,
+            isEditing: false,
+            actionHandler: actionHandler
+        )
+    }
+    
+    var itemFormSearch: some View {
+        ItemForm.FoodSearch(
+            viewModel: viewModel,
+            forIngredient: forIngredient,
+            actionHandler: actionHandler
+        )
+    }
     var mealPicker: some View {
         ItemForm.MealPicker(didTapDismiss: {
             actionHandler(.dismiss)
@@ -34,7 +49,11 @@ extension ItemForm.FoodSearch {
 //            FoodFormManager.shared.save(formOutput)
         }
         
-        return ParentFoodForm(forRecipe: true)
+        func shouldDismiss() {
+            presentedFullScreenSheet = nil
+        }
+        
+        return ParentFoodForm(forRecipe: true, shouldDismiss: shouldDismiss)
     }
 
     var plateForm: some View {
@@ -43,7 +62,11 @@ extension ItemForm.FoodSearch {
 //            FoodFormManager.shared.save(formOutput)
         }
         
-        return ParentFoodForm(forRecipe: false)
+        func shouldDismiss() {
+            presentedFullScreenSheet = nil
+        }
+
+        return ParentFoodForm(forRecipe: false, shouldDismiss: shouldDismiss)
     }
 
     func macrosView(for food: Food) -> some View {
