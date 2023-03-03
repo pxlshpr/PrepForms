@@ -35,7 +35,7 @@ struct FoodDetailsCell: View {
             actionHandler(.emoji)
         } label: {
             Text(fields.emoji)
-                .font(.system(size: 65))
+                .font(.system(size: 73))
                 .padding(10)
                 .background(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -61,7 +61,7 @@ struct FoodDetailsCell: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .multilineTextAlignment(.leading)
                 .padding(.horizontal, 10)
-                .padding(.vertical, 3)
+                .padding(.vertical, 5)
                 .background(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(Color(.secondarySystemFill).gradient)
@@ -90,7 +90,7 @@ struct FoodDetailsCell: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .multilineTextAlignment(.leading)
                 .padding(.horizontal, 10)
-                .padding(.vertical, 3)
+                .padding(.vertical, 5)
                 .background(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(Color(.secondarySystemFill).gradient)
@@ -119,7 +119,7 @@ struct FoodDetailsCell: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .multilineTextAlignment(.leading)
                 .padding(.horizontal, 10)
-                .padding(.vertical, 3)
+                .padding(.vertical, 5)
                 .background(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(Color(.secondarySystemFill).gradient)
