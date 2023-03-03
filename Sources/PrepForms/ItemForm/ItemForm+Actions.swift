@@ -40,8 +40,8 @@ extension ItemForm {
     func tappedDelete() {
         Haptics.selectionFeedback()
         if viewModel.forIngredient {
-            /// No confirmation if this is an ingredient
-            delete()
+//            delete()
+            showingDeleteConfirmation = true
         } else {
             showingDeleteConfirmation = true
         }

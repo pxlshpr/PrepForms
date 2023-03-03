@@ -14,11 +14,12 @@ extension ItemForm {
         @Published var isAnimatingAmountChange = false
         var startedAnimatingAmountChangeAt: Date = Date()
         let isRootInNavigationStack: Bool
-        let forIngredient: Bool
+        let parentFoodType: FoodType?
         
         /// `IngredientItem` specific
         @Published var ingredientItem: IngredientItem? = nil
         @Published var parentFood: Food?
+        let existingIngredientItem: IngredientItem?
 
         /// `MealItem` specific
         @Published var mealItem: MealItem?
@@ -37,7 +38,7 @@ extension ItemForm {
             initialPath: [ItemFormRoute] = []
         ) {
             self.path = initialPath
-            self.forIngredient = false
+            self.parentFoodType = nil
             self.parentFood = nil
             
             let day = DataManager.shared.day(for: date)
@@ -63,6 +64,7 @@ extension ItemForm {
 //            )
             
             self.existingMealItem = existingMealItem
+            self.existingIngredientItem = nil
             
             self.isRootInNavigationStack = existingMealItem != nil || food != nil
             
@@ -86,15 +88,15 @@ extension ItemForm {
         public init(
             existingIngredientItem: IngredientItem?,
             parentFood: Food? = nil,
-            food: Food? = nil,
-            amount: FoodValue? = nil,
+            parentFoodType: FoodType,
             initialPath: [ItemFormRoute] = []
         ) {
             self.path = initialPath
-            self.forIngredient = true
+            self.parentFoodType = parentFoodType
             self.parentFood = parentFood
-            self.food = food
-            self.isRootInNavigationStack = existingIngredientItem != nil || food != nil
+            self.food = existingIngredientItem?.food
+            self.existingIngredientItem = existingIngredientItem
+            self.isRootInNavigationStack = existingIngredientItem != nil
             
             self.day = nil
             self.dayMeals = nil
@@ -103,7 +105,7 @@ extension ItemForm {
             self.mealItem = nil
             self.existingMealItem = nil
             
-            if let amount, let food,
+            if let amount = existingIngredientItem?.amount, let food,
                let unit = FoodQuantity.Unit(foodValue: amount, in: food)
             {
                 self.amount = amount.value
@@ -147,15 +149,23 @@ extension ItemForm.ViewModel {
         return amount > 0
     }
     
+    var forIngredient: Bool {
+        parentFoodType != nil
+    }
+    
     var isDirty: Bool {        
-        guard let existing = existingMealItem else {
-            return amountIsValid
-        }
-        
-        if forIngredient {
+        if forIngredient
+        {
+            guard let existing = existingIngredientItem else {
+                return amountIsValid
+            }
             return existing.food.id != food?.id
             || (existing.amount != amountValue && amountIsValid)
-        } else {
+        }
+        else {
+            guard let existing = existingMealItem else {
+                return amountIsValid
+            }
             guard let dayMeal else { return false }
             return existing.food.id != food?.id
             || (existing.amount != amountValue && amountIsValid)
@@ -191,12 +201,12 @@ extension ItemForm.ViewModel {
         guard let food else { return }
         if forIngredient {
             self.ingredientItem = IngredientItem(
-                id: existingMealItem?.id ?? UUID(),
+                id: existingIngredientItem?.id ?? UUID(),
                 food: food,
                 amount: amountValue,
-                sortPosition: existingMealItem?.sortPosition ?? 1,
-                isSoftDeleted: existingMealItem?.isSoftDeleted ?? false,
-                energyInKcal: existingMealItem?.energyInKcal ?? 0,
+                sortPosition: existingIngredientItem?.sortPosition ?? 1,
+                isSoftDeleted: existingIngredientItem?.isSoftDeleted ?? false,
+                energyInKcal: existingIngredientItem?.energyInKcal ?? 0,
                 parentFoodId: parentFood?.id
             )
         } else {
@@ -253,7 +263,7 @@ extension ItemForm.ViewModel {
     }
     
     var isEditing: Bool {
-        existingMealItem != nil
+        existingMealItem != nil || existingIngredientItem != nil
     }
     
     var savePrefix: String {
@@ -264,16 +274,27 @@ extension ItemForm.ViewModel {
         }
     }
     
+    var entityName: String {
+        switch parentFoodType {
+        case .plate:
+            return "Food"
+        case .recipe:
+            return "Ingredient"
+        default:
+            return "Entry"
+        }
+    }
+    
     var navigationTitle: String {
         guard !isEditing else {
-            return "Edit Entry"
+            return "Edit \(entityName)"
         }
-        return "\(savePrefix) Food"
+        return "\(savePrefix) \(entityName)"
     }
     
     var saveButtonTitle: String {
 //        isEditing ? "Save" : "Add"
-        isEditing ? "Save" : "\(savePrefix) this Food"
+        isEditing ? "Save" : "\(savePrefix) this \(entityName)"
     }
     
     func stepAmount(by step: Int) {

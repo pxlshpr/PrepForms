@@ -16,8 +16,12 @@ struct IngredientsView: View {
     var content: some View {
         LazyVStack(spacing: 0) {
             ForEach(viewModel.items) { item in
-                Cell(item: item)
-                    .environmentObject(viewModel)
+                Button {
+                    actionHandler(.tappedItem(item))
+                } label: {
+                    Cell(item: item)
+                        .environmentObject(viewModel)
+                }
             }
             addMenu
         }
@@ -59,5 +63,6 @@ struct IngredientsView: View {
     
     enum Action {
         case add
+        case tappedItem(IngredientItem)
     }
 }

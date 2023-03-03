@@ -54,10 +54,10 @@ struct FoodDetailsCell: View {
         case .food:
             return "Flavor, Variety etc."
         case .recipe:
-            return "Date Cooked, etc."
+            return "Date prepared, etc."
 //            return "Description"
         case .plate:
-            return "Description"
+            return "Details"
 //            return "Description or Size"
         }
     }

@@ -20,15 +20,18 @@ public struct ItemForm: View {
     @State var showingQuantityForm = false
 
     let alreadyInNavigationStack: Bool
+    let forIngredient: Bool
     let actionHandler: (ItemFormAction) -> ()
 
     public init(
         viewModel: ViewModel,
         isEditing: Bool = false,
+        forIngredient: Bool = false,
         actionHandler: @escaping ((ItemFormAction) -> ())
     ) {
         self.viewModel = viewModel
         self.actionHandler = actionHandler
+        self.forIngredient = forIngredient
         alreadyInNavigationStack = !isEditing
     }
     
@@ -80,14 +83,14 @@ public struct ItemForm: View {
     
 
     var deleteConfirmationActions: some View {
-        Button("Delete Entry", role: .destructive) {
+        Button("Delete \(viewModel.entityName)", role: .destructive) {
             delete()
             actionHandler(.dismiss)
         }
     }
 
     var deleteConfirmationMessage: some View {
-        Text("Are you sure you want to delete this entry?")
+        Text("Are you sure you want to delete this \(viewModel.entityName.lowercased())?")
     }
 
     var trailingContent: some ToolbarContent {
@@ -107,6 +110,7 @@ public struct ItemForm: View {
         case .food:
             ItemForm.FoodSearch(
                 viewModel: viewModel,
+                forIngredient: forIngredient,
                 actionHandler: actionHandler
             )
         case .meal:

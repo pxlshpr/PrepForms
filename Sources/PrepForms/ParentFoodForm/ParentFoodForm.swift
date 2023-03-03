@@ -12,33 +12,25 @@ import EmojiPicker
 
 public struct ParentFoodForm: View {
 
-//    @Environment(\.dismiss) var dismiss
-    
     @StateObject var viewModel: ViewModel
     @StateObject var fields = FoodForm.Fields()
-    
+        
+    @State var presentedSheet: Sheet? = nil
+    @State var showingFoodLabel: Bool = false
     @State var showingCancelConfirmation = false
 
-    @State var showingDetailsForm = false
-    @State var showingEmojiPicker = false
-    @State var showingFoodSearch = false
-    
-    @State var showingBrandForm = false
-    @State var showingNameForm = false
-    @State var showingDetailForm = false
-    
-    @State var showingFoodLabel: Bool = false
-    
-    @StateObject var itemFormViewModel: ItemForm.ViewModel
-    
+    @AppStorage(UserDefaultsKeys.showingIngredientEmojis) var showingIngredientEmojis = PrepConstants.DefaultPreferences.showingIngredientEmojis
+    @AppStorage(UserDefaultsKeys.showingIngredientDetails) var showingIngredientDetails = PrepConstants.DefaultPreferences.showingIngredientDetails
+    @AppStorage(UserDefaultsKeys.showingIngredientBadges) var showingIngredientBadges = PrepConstants.DefaultPreferences.showingIngredientBadges
+
     let shouldDismiss: () -> ()
-    
     let id = UUID()
     
-    public init(forRecipe: Bool, existingFood: Food? = nil, shouldDismiss: @escaping () -> ()) {
-        
-        print("💭 ParentFoodForm.init() \(id)")
-        
+    public init(
+        forRecipe: Bool,
+        existingFood: Food? = nil,
+        shouldDismiss: @escaping () -> ()
+    ) {
         self.shouldDismiss = shouldDismiss
         
         let viewModel = ViewModel(forRecipe: forRecipe, existingFood: existingFood)
@@ -49,54 +41,17 @@ public struct ParentFoodForm: View {
         } else {
             _showingFoodLabel = State(initialValue: false)
         }
-        
-        let itemFormViewModel = ItemForm.ViewModel(existingIngredientItem: nil)
-        _itemFormViewModel = StateObject(wrappedValue: itemFormViewModel)
     }
-
+    
     public var body: some View {
         let _ = Self._printChanges()
         return content
-//            .sheet(isPresented: $showingDetailsForm) { detailsForm }
-            .sheet(isPresented: $showingNameForm) {
-                DetailsNameForm(title: "Name", isRequired: true, name: $fields.name)
-            }
-            .sheet(isPresented: $showingDetailForm) {
-                DetailsNameForm(title: "Detail", isRequired: false, name: $fields.detail)
-            }
-            .sheet(isPresented: $showingBrandForm) {
-                DetailsNameForm(title: "Brand", isRequired: false, name: $fields.brand)
-            }
-            .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
-            .sheet(isPresented: $showingFoodSearch) { foodSearchForm }
+            .sheet(item: $presentedSheet) { sheet(for: $0) }
             .onChange(of: viewModel.sortOrder, perform: sortOrderChanged)
             .onChange(of: viewModel.items, perform: itemsChanged)
+            .onChange(of: viewModel.itemsWithRecalculatedBadges, perform: itemsWithRecalculatedBadgesChanged)
     }
-    
-    var emojiPicker: some View {
-        EmojiPicker(
-            categories: [.foodAndDrink, .animalsAndNature],
-            focusOnAppear: true,
-            includeCancelButton: true
-        ) { emoji in
-            Haptics.successFeedback()
-            fields.emoji = emoji
-            showingEmojiPicker = false
-        }
-    }
-    
-    func itemsChanged(_ items: [IngredientItem]) {
-        withAnimation {
-            showingFoodLabel = !items.isEmpty
-        }
-    }
-    
-    func sortOrderChanged(_ newSortOrder: IngredientSortOrder) {
-        withAnimation {
-            viewModel.resortItems()
-        }
-    }
-    
+
     var content: some View {
         ZStack {
             navigationView
@@ -123,38 +78,6 @@ public struct ParentFoodForm: View {
         }
     }
     
-    var foodSearchForm: some View {
-        ItemForm.FoodSearch(
-            viewModel: itemFormViewModel,
-            isInitialFoodSearch: true,
-            forIngredient: true,
-            actionHandler: { handleItemAction($0, forEdit: false) }
-        )
-    }
-    
-    func handleItemAction(_ action: ItemFormAction, forEdit: Bool) {
-        switch action {
-        case .saveIngredientItem(let item):
-            Haptics.successFeedback()
-            if forEdit {
-                //TODO: Update ingredient
-            } else {
-                withAnimation {
-                    viewModel.add(item)
-                }
-            }
-            viewModel.recalculateBadgeWdiths()
-            
-        case .delete:
-            break
-            
-        case .dismiss:
-            showingFoodSearch = false
-            
-        default:
-            break
-        }
-    }
     
     var formLayer: some View {
         FormStyledScrollView(showsIndicators: false, isLazy: false) {
@@ -165,6 +88,49 @@ public struct ParentFoodForm: View {
             ingredientsSection
             foodLabel
             Spacer().frame(height: 60) /// to account for save button
+        }
+    }
+    
+    func itemsWithRecalculatedBadgesChanged(_ items: [IngredientItem]) {
+        withAnimation(.interactiveSpring()) {
+            viewModel.items = items
+        }
+    }
+    
+    func itemsChanged(_ items: [IngredientItem]) {
+        withAnimation {
+            showingFoodLabel = !items.isEmpty
+        }
+    }
+    
+    func sortOrderChanged(_ newSortOrder: IngredientSortOrder) {
+        withAnimation {
+            viewModel.resortItems()
+        }
+    }
+    
+    func handleItemAction(_ action: ItemFormAction, forEdit: Bool) {
+        switch action {
+        case .saveIngredientItem(let item):
+            Haptics.successFeedback()
+            if forEdit {
+                viewModel.update(item)
+                viewModel.recalculateBadgeWdiths(delay: 0)
+            } else {
+                withAnimation {
+                    viewModel.add(item)
+                }
+                viewModel.recalculateBadgeWdiths()
+            }
+            
+        case .delete:
+            break
+            
+        case .dismiss:
+            presentedSheet = nil
+            
+        default:
+            break
         }
     }
     
@@ -200,10 +166,6 @@ public struct ParentFoodForm: View {
             .environmentObject(viewModel)
         }
     }
-    
-    @AppStorage(UserDefaultsKeys.showingIngredientEmojis) var showingIngredientEmojis = PrepConstants.DefaultPreferences.showingIngredientEmojis
-    @AppStorage(UserDefaultsKeys.showingIngredientDetails) var showingIngredientDetails = PrepConstants.DefaultPreferences.showingIngredientDetails
-    @AppStorage(UserDefaultsKeys.showingIngredientBadges) var showingIngredientBadges = PrepConstants.DefaultPreferences.showingIngredientBadges
 
     var ingredientsMenu: some View {
         let emojisBinding = Binding<Bool>(
@@ -302,7 +264,12 @@ public struct ParentFoodForm: View {
     func handleIngredientsAction(_ action: IngredientsView.Action) {
         switch action {
         case .add:
-            showingFoodSearch = true
+            viewModel.prepareForAdding()
+            present(.foodSearch)
+            
+        case .tappedItem(let ingredientItem):
+            viewModel.prepareForEditing(ingredientItem)
+            present(.ingredientEdit)
         }
     }
     
@@ -320,16 +287,15 @@ public struct ParentFoodForm: View {
         Haptics.feedback(style: .soft)
         switch action {
         case .emoji:
-            showingEmojiPicker = true
+            present(.emoji)
         case .name:
-            showingNameForm = true
+            present(.name)
         case .detail:
-            showingDetailForm = true
+            present(.detail)
         case .brand:
-            showingBrandForm = true
+            present(.brand)
         }
     }
-
     
     var servingSection: some View {
         FormStyledSection(header: Text("Servings"), largeHeading: false) {
@@ -445,6 +411,16 @@ public struct ParentFoodForm: View {
             actions: { dismissConfirmationActions },
             message: { dismissConfirmationMessage }
         )
+    }
+    
+    enum Sheet: String, Identifiable {
+        case name
+        case detail
+        case brand
+        case emoji
+        case foodSearch
+        case ingredientEdit
+        var id: String { rawValue }
     }
 }
 

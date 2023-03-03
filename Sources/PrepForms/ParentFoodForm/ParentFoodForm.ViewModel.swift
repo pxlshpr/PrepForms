@@ -1,6 +1,7 @@
 import SwiftUI
 import PrepDataTypes
 import SwiftHaptics
+import SwiftSugar
 
 extension ParentFoodForm {
     class ViewModel: ObservableObject {
@@ -9,7 +10,9 @@ extension ParentFoodForm {
         let existingFood: Food?
         
         @Published var items: [IngredientItem] = []
+        @Published var itemsWithRecalculatedBadges: [IngredientItem] = []
         @Published var sortOrder: IngredientSortOrder = .none
+        @Published var itemFormViewModel: ItemForm.ViewModel
 
         init(
             forRecipe: Bool,
@@ -17,6 +20,11 @@ extension ParentFoodForm {
         ) {
             self.existingFood = existingFood
             self.forRecipe = forRecipe
+            
+            self.itemFormViewModel = ItemForm.ViewModel(
+                existingIngredientItem: nil,
+                parentFoodType: forRecipe ? .recipe : .plate
+            )
         }
     }
 }
@@ -50,6 +58,31 @@ extension ParentFoodForm.ViewModel {
         item.energyInKcal = item.scaledValueForEnergyInKcal
         self.items.append(item)
         resortItems()
+    }
+
+    func update(_ item: IngredientItem) {
+        guard let index = items.firstIndex(where: { $0.id == item.id }) else {
+            return
+        }
+        var item = item
+        item.energyInKcal = item.scaledValueForEnergyInKcal
+        item.badgeWidth = 0 /// so that its animated properly when filled
+        self.items[index] = item
+        resortItems()
+    }
+    
+    func prepareForAdding() {
+        self.itemFormViewModel = ItemForm.ViewModel(
+            existingIngredientItem: nil,
+            parentFoodType: forRecipe ? .recipe : .plate
+        )
+    }
+
+    func prepareForEditing(_ item: IngredientItem) {
+        self.itemFormViewModel = ItemForm.ViewModel(
+            existingIngredientItem: item,
+            parentFoodType: forRecipe ? .recipe : .plate
+        )
     }
     
     var sortBinding: Binding<IngredientSortOrder> {
@@ -87,8 +120,10 @@ extension ParentFoodForm.ViewModel {
         }
     }
     
-    func recalculateBadgeWdiths() {
+    func recalculateBadgeWdiths(delay: Double = 0) {
+        
         Task.detached(priority: .background) {
+            try await sleepTask(delay, tolerance: 0.1)
             var copy = self.items
             
             let start = CFAbsoluteTimeGetCurrent()
@@ -104,7 +139,8 @@ extension ParentFoodForm.ViewModel {
             print("🔹 Took: \(CFAbsoluteTimeGetCurrent()-start)s")
             
             await MainActor.run { [copy] in
-                self.items = copy
+                self.itemsWithRecalculatedBadges = copy
+//                self.items = copy
             }
         }
     }
