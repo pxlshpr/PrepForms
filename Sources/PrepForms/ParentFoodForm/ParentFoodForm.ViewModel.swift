@@ -60,6 +60,13 @@ extension ParentFoodForm.ViewModel {
         resortItems()
     }
 
+    func removeEditingItem() {
+        guard let id = itemFormViewModel.existingIngredientItem?.id,
+              let index = items.firstIndex(where: { $0.id == id })
+        else { return }
+        let _ = self.items.remove(at: index)
+    }
+
     func update(_ item: IngredientItem) {
         guard let index = items.firstIndex(where: { $0.id == item.id }) else {
             return

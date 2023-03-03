@@ -124,8 +124,14 @@ public struct ParentFoodForm: View {
             }
             
         case .delete:
-            break
-            
+//            Haptics.warningFeedback()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                withAnimation(.interactiveSpring()) {
+                    viewModel.removeEditingItem()
+                }
+                viewModel.recalculateBadgeWdiths()
+            }
+
         case .dismiss:
             presentedSheet = nil
             

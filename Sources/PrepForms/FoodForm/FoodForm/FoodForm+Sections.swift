@@ -54,10 +54,10 @@ struct FoodDetailsCell: View {
         case .food:
             return "Flavor, Variety etc."
         case .recipe:
-            return "Date prepared, etc."
+            return "Description"
 //            return "Description"
         case .plate:
-            return "Details"
+            return "Description"
 //            return "Description or Size"
         }
     }
@@ -166,7 +166,9 @@ struct FoodDetailsCell: View {
             VStack(alignment: .leading) {
                 nameButton
                 detailButton
-                brandButton
+                if foodType != .plate {
+                    brandButton
+                }
                 Spacer()
             }
             .frame(maxWidth: .infinity)

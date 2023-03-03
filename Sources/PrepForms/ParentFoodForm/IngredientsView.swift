@@ -20,6 +20,7 @@ struct IngredientsView: View {
                     actionHandler(.tappedItem(item))
                 } label: {
                     Cell(item: item)
+                        .transition(.move(edge: .trailing))
                         .environmentObject(viewModel)
                 }
             }
