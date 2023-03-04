@@ -58,6 +58,9 @@ extension ItemForm.FoodSearch {
             forRecipe: true,
             shouldDismiss: shouldDismiss
         )
+        .onDisappear {
+            ParentFoodForm.ViewModels.shared.remove(at: nestLevel)
+        }
     }
 
     var plateForm: some View {
@@ -75,6 +78,9 @@ extension ItemForm.FoodSearch {
             forRecipe: false,
             shouldDismiss: shouldDismiss
         )
+        .onDisappear {
+            ParentFoodForm.ViewModels.shared.remove(at: nestLevel)
+        }
     }
 
     func macrosView(for food: Food) -> some View {

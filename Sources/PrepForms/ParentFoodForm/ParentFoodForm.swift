@@ -23,6 +23,11 @@ public struct ParentFoodForm: View {
             }
             return objects[nestLevel]
         }
+        
+        func remove(at nestLevel: Int) {
+            guard nestLevel < objects.count else { return }
+            let _ = objects.remove(at: nestLevel)
+        }
     }
     
     @StateObject var viewModel: ViewModel
