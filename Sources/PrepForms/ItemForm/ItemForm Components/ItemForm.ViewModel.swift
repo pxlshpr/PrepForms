@@ -385,7 +385,7 @@ extension ItemForm.ViewModel {
         FoodValue(
             value: amount ?? 0,
             foodQuantityUnit: unit,
-            userOptions: DataManager.shared.user?.units ?? .standard
+            userOptions: DataManager.shared.user?.options ?? .standard
         )
     }
     
