@@ -5,7 +5,7 @@ import PrepDataTypes
 import PrepViews
 
 extension FoodCell {
-    init(result: FoodSearchResult) {
+    init(result: FoodSearchResult, showEmoji: Binding<Bool>) {
         self.init(
             emoji: result.emoji,
             name: result.name,
@@ -14,7 +14,8 @@ extension FoodCell {
             carb: result.carb,
             fat: result.fat,
             protein: result.protein,
-            nameFontWeight: .semibold
+            nameFontWeight: .semibold,
+            showEmoji: showEmoji
         )
     }
 }
@@ -33,7 +34,7 @@ struct FoodSearchResultCellPreview: View {
                     carb: 45,
                     fat: 2,
                     protein: 1
-                ))
+                ), showEmoji: .constant(true))
                 FoodCell(result: .init(
                     id: UUID(),
                     name: "Golden Beer Battered White Meat Chicken Strip Shaped Patties With Mashed Potatoes And Mixed Vegetables - Includes A Chocolate Brownie",
@@ -43,7 +44,7 @@ struct FoodSearchResultCellPreview: View {
                     carb: 25,
                     fat: 6,
                     protein: 45
-                ))
+                ), showEmoji: .constant(true))
                 FoodCell(result: .init(
                     id: UUID(),
                     name: "Golden Brown All Natural Pork Sausage Patties",
@@ -53,7 +54,7 @@ struct FoodSearchResultCellPreview: View {
                     carb: 4,
                     fat: 36,
                     protein: 22
-                ))
+                ), showEmoji: .constant(true))
                 FoodCell(result: .init(
                     id: UUID(),
                     name: "Banana",
@@ -62,7 +63,7 @@ struct FoodSearchResultCellPreview: View {
                     carb: 4,
                     fat: 36,
                     protein: 22
-                ))
+                ), showEmoji: .constant(true))
 
             }
         }

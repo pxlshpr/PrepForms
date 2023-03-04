@@ -593,7 +593,7 @@ import PrepDataTypes
 extension GoalViewModel {
     
     var equivalentUnitString: String? {
-        goal.equivalentUnitString(userOptions: goalSet.userOptions)
+        goal.equivalentUnitString(userUnits: goalSet.userUnits)
 //        switch type {
 //        case .energy(let type):
 //            switch type {

@@ -35,11 +35,12 @@ public struct GoalSetForm: View {
         type: GoalSetType,
         existingGoalSet: GoalSet? = nil,
         isDuplicating: Bool = false,
+        userUnits: UserOptions.Units,
         bodyProfile: BodyProfile? = nil,
         didTapSave: @escaping (GoalSet, BodyProfile?, Bool) -> ()
     ) {
         let goalSetViewModel = GoalSetViewModel(
-            userOptions: .standard,
+            userUnits: userUnits,
             type: type,
             existingGoalSet: existingGoalSet,
             isDuplicating: isDuplicating,
@@ -562,7 +563,7 @@ struct EnergyFormPreview: View {
     
     init() {
         let goalSetViewModel = GoalSetViewModel(
-            userOptions:.standard,
+            userUnits: UserOptions.defaultOptions.units,
             type: .day,
             existingGoalSet: nil,
             bodyProfile: BodyProfile(
@@ -605,7 +606,7 @@ struct MacroFormPreview: View {
     
     init() {
         let goalSet = GoalSetViewModel(
-            userOptions: .standard,
+            userUnits: UserOptions.defaultOptions.units,
             type: .day,
             existingGoalSet: GoalSet(
                 name: "Bulking",
@@ -728,6 +729,7 @@ public struct DietPreview: View {
         GoalSetForm(
             type: .day,
             existingGoalSet: Self.goalSet,
+            userUnits: UserOptions.defaultOptions.units,
             bodyProfile: BodyProfile.mockBodyProfile
         ) { goalSet, bodyProfile, overwritingPastUses in
             
@@ -777,6 +779,7 @@ public struct MealTypePreview: View {
         GoalSetForm(
             type: .meal,
             existingGoalSet: Self.goalSet,
+            userUnits: UserOptions.defaultOptions.units,
             bodyProfile: BodyProfile.mockBodyProfile
         ) { goalSet, bodyProfile, overwritingPastUses in
             

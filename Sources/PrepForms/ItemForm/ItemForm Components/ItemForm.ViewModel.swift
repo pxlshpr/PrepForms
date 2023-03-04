@@ -385,7 +385,7 @@ extension ItemForm.ViewModel {
         FoodValue(
             value: amount ?? 0,
             foodQuantityUnit: unit,
-            userOptions: DataManager.shared.user?.options ?? .standard
+            userUnits: UserManager.options.units
         )
     }
     
@@ -412,19 +412,19 @@ extension FoodValue {
     init(
         value: Double,
         foodQuantityUnit unit: FoodQuantity.Unit,
-        userOptions: UserOptions
+        userUnits: UserOptions.Units
     ) {
         
         let volumeExplicitUnit: VolumeExplicitUnit?
         if let volumeUnit = unit.formUnit.volumeUnit {
-            volumeExplicitUnit = userOptions.volume.volumeExplicitUnit(for: volumeUnit)
+            volumeExplicitUnit = userUnits.volume.volumeExplicitUnit(for: volumeUnit)
         } else {
             volumeExplicitUnit = nil
         }
 
         let sizeUnitVolumePrefixExplicitUnit: VolumeExplicitUnit?
         if let volumeUnit = unit.formUnit.sizeUnitVolumePrefixUnit {
-            sizeUnitVolumePrefixExplicitUnit = userOptions.volume.volumeExplicitUnit(for: volumeUnit)
+            sizeUnitVolumePrefixExplicitUnit = userUnits.volume.volumeExplicitUnit(for: volumeUnit)
         } else {
             sizeUnitVolumePrefixExplicitUnit = nil
         }

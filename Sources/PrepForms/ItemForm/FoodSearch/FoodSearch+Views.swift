@@ -5,6 +5,7 @@ import Camera
 import PrepDataTypes
 import SwiftUISugar
 import PrepViews
+import PrepCoreDataStack
 
 extension FoodSearch {
 
@@ -105,11 +106,16 @@ extension FoodSearch {
     }
     
     func foodButton(for food: Food) -> some View {
-        Button {
+        let showEmojiBinding = Binding<Bool>(
+            get: { UserManager.showLogEmojis },
+            set: { _ in }
+        )
+        return Button {
             tappedFood(food)
         } label: {
             FoodCell(
                 food: food,
+                showEmoji: showEmojiBinding,
                 isSelectable: $isComparing,
                 didTapMacrosIndicator: {
                     actionHandler(.tappedFoodBadge(food))

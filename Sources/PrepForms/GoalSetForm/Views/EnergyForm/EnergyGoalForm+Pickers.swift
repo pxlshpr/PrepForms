@@ -15,7 +15,7 @@ extension EnergyGoalForm {
     
     var mealTypePicker: some View {
         PickerLabel(
-            pickedMealEnergyGoalType.description(userEnergyUnit: viewModel.userOptions.energy),
+            pickedMealEnergyGoalType.description(userEnergyUnit: viewModel.userUnits.energy),
             systemImage: nil
         )
             .animation(.none, value: pickedMealEnergyGoalType)
@@ -48,11 +48,11 @@ extension EnergyGoalForm {
         return Menu {
             Picker(selection: binding, label: EmptyView()) {
                 ForEach(DietEnergyTypeOption.allCases, id: \.self) {
-                    Text($0.description(userEnergyUnit: viewModel.userOptions.energy)).tag($0)
+                    Text($0.description(userEnergyUnit: viewModel.userUnits.energy)).tag($0)
                 }
             }
         } label: {
-            PickerLabel(pickedDietEnergyGoalType.shortDescription(userEnergyUnit: viewModel.userOptions.energy))
+            PickerLabel(pickedDietEnergyGoalType.shortDescription(userEnergyUnit: viewModel.userUnits.energy))
                 .animation(.none, value: pickedDietEnergyGoalType)
         }
         .contentShape(Rectangle())

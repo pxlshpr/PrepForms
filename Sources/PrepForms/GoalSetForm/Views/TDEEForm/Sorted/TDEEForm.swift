@@ -23,12 +23,12 @@ public struct TDEEForm: View {
     
     public init(
         existingProfile: BodyProfile? = nil,
-        userOptions: UserOptions,
+        userUnits: UserOptions.Units,
         didTapSave: @escaping (BodyProfile) -> ()
     ) {
         let viewModel = ViewModel(
             existingProfile: existingProfile,
-            userOptions: userOptions
+            userUnits: userUnits
         )
         if let existingProfile, existingProfile.tdeeInUnit != nil {
             detentHeightPrimary = .collapsed

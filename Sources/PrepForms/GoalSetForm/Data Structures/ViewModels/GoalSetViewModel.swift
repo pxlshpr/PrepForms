@@ -10,7 +10,7 @@ public class GoalSetViewModel: ObservableObject {
     @Published var type: GoalSetType = .day
     
     /// Used to calculate equivalent values
-    let userOptions: UserOptions
+    let userUnits: UserOptions.Units
     @Published var bodyProfile: BodyProfile?
     
     @Published var nutrientTDEEFormViewModel: TDEEForm.ViewModel
@@ -21,7 +21,7 @@ public class GoalSetViewModel: ObservableObject {
     @Published var singleGoalViewModelToPushTo: GoalViewModel? = nil
     
     init(
-        userOptions: UserOptions,
+        userUnits: UserOptions.Units,
         type: GoalSetType,
         existingGoalSet existing: GoalSet?,
         isDuplicating: Bool = false,
@@ -35,13 +35,13 @@ public class GoalSetViewModel: ObservableObject {
         self.emoji = existing?.emoji ?? randomEmoji(forGoalSetType: type)
         self.type = type
 
-        self.userOptions = userOptions
+        self.userUnits = userUnits
         self.bodyProfile = bodyProfile
 
         self.isDuplicating = isDuplicating
         self.existingGoalSet = isDuplicating ? nil : existing
 
-        self.nutrientTDEEFormViewModel = TDEEForm.ViewModel(existingProfile: bodyProfile, userOptions: userOptions)
+        self.nutrientTDEEFormViewModel = TDEEForm.ViewModel(existingProfile: bodyProfile, userUnits: userUnits)
         self.goalViewModels = existing?.goals.goalViewModels(goalSet: self, goalSetType: type) ?? []
         self.createImplicitGoals()
     }
@@ -85,7 +85,7 @@ public class GoalSetViewModel: ObservableObject {
     }
     
     func setNutrientTDEEFormViewModel(with bodyProfile: BodyProfile?) {
-        nutrientTDEEFormViewModel = TDEEForm.ViewModel(existingProfile: bodyProfile, userOptions: userOptions)
+        nutrientTDEEFormViewModel = TDEEForm.ViewModel(existingProfile: bodyProfile, userUnits: userUnits)
     }
     
     func setBodyProfile(_ bodyProfile: BodyProfile) {
@@ -100,7 +100,7 @@ public class GoalSetViewModel: ObservableObject {
             newGoalViewModels.append(GoalViewModel(
                 goalSet: self,
                 goalSetType: type,
-                type: .energy(.fixed(userOptions.energy))
+                type: .energy(.fixed(userUnits.energy))
             ))
         }
         for macro in pickedMacros {
@@ -184,7 +184,7 @@ public class GoalSetViewModel: ObservableObject {
     
     func goalCalcParams(includeEnergyGoal: Bool = true) -> GoalCalcParams {
         GoalCalcParams(
-            userOptions: userOptions,
+            userUnits: userUnits,
             bodyProfile: bodyProfile,
             energyGoal: includeEnergyGoal ? energyGoal?.goal : nil
         )
@@ -201,7 +201,7 @@ public class GoalSetViewModel: ObservableObject {
     }
 
     var implicitEnergyType: GoalType {
-        .energy(.fixed(userOptions.energy))
+        .energy(.fixed(userUnits.energy))
     }
     
     var carbGoal: GoalViewModel? { goalViewModels.first { $0.type.macro == .carb } }

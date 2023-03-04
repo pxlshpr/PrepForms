@@ -1388,11 +1388,11 @@ extension TDEEForm {
         
         init(
             existingProfile: BodyProfile?,
-            userOptions: UserOptions
+            userUnits: UserOptions.Units
         ) {
-            self.userEnergyUnit = userOptions.energy
-            self.userWeightUnit = userOptions.weight
-            self.userHeightUnit = userOptions.height
+            self.userEnergyUnit = userUnits.energy
+            self.userWeightUnit = userUnits.weight
+            self.userHeightUnit = userUnits.height
             
             self.existingProfile = existingProfile
                         
