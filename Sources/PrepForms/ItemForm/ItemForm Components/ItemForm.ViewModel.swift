@@ -43,11 +43,20 @@ extension ItemForm {
             
             let day = DataManager.shared.day(for: date)
             self.day = day
-            self.dayMeals = day?.meals ?? []
+            let dayMeals = day?.meals ?? []
+            self.dayMeals = dayMeals
             
             self.food = food
             
-            let dayMealToSet = dayMeal ?? DayMeal(name: "New Meal", time: Date().timeIntervalSince1970)
+            let time = newMealTime(
+                for: date,
+                existingMealTimes: dayMeals.map { $0.timeDate }
+            )
+            let dayMealToSet = dayMeal ?? DayMeal(
+                name: "New Meal",
+//                time: Date().timeIntervalSince1970
+                time: time.timeIntervalSince1970
+            )
             self.dayMeal = dayMealToSet
             self.initialDayMeal = dayMeal
             
