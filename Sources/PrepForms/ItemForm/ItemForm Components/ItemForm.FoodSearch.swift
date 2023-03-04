@@ -22,14 +22,17 @@ extension ItemForm {
         let actionHandler: (ItemFormAction) -> ()
         
         let id = UUID()
+        let nestLevel: Int
         
         public init(
+            nestLevel: Int = 0,
             viewModel: ViewModel,
             isInitialFoodSearch: Bool = false,
             forIngredient: Bool = false,
             actionHandler: @escaping (ItemFormAction) -> ()
         ) {
-            print("💭 ItemForm.FoodSearch.init() \(id)")
+            print("🐣 ItemForm.FoodSearch created with nestLevel: \(nestLevel)")
+            self.nestLevel = nestLevel
             self.viewModel = viewModel
             self.isInitialFoodSearch = isInitialFoodSearch
             self.forIngredient = forIngredient

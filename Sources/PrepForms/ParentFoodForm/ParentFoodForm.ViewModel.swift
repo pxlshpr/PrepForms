@@ -14,6 +14,10 @@ extension ParentFoodForm {
         @Published var sortOrder: IngredientSortOrder = .none
         @Published var itemFormViewModel: ItemForm.ViewModel
 
+        @Published var presentedSheet: ParentFoodFormSheet? = nil
+        @Published var showingFoodLabel: Bool
+        @Published var showingCancelConfirmation = false
+
         init(
             forRecipe: Bool,
             existingFood: Food? = nil
@@ -25,6 +29,12 @@ extension ParentFoodForm {
                 existingIngredientItem: nil,
                 parentFoodType: forRecipe ? .recipe : .plate
             )
+            
+            if let existingFood, let ingredientItems = existingFood.ingredientItems {
+                showingFoodLabel = !ingredientItems.isEmpty
+            } else {
+                showingFoodLabel = false
+            }
         }
     }
 }
@@ -148,6 +158,28 @@ extension ParentFoodForm.ViewModel {
             await MainActor.run { [copy] in
                 self.itemsWithRecalculatedBadges = copy
 //                self.items = copy
+            }
+        }
+    }
+    
+    func present(_ sheet: ParentFoodFormSheet) {
+        
+        if presentedSheet != nil {
+            presentedSheet = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                Haptics.feedback(style: .soft)
+                self.presentedSheet = sheet
+            }
+//        } else if presentedFullScreenSheet != nil {
+//            presentedFullScreenSheet = nil
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+//                Haptics.feedback(style: .soft)
+//                presentedSheet = sheet
+//            }
+        } else {
+            Haptics.feedback(style: .soft)
+            withAnimation(.interactiveSpring()) {
+                presentedSheet = sheet
             }
         }
     }

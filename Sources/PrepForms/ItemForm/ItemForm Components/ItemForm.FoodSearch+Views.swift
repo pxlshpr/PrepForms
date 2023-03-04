@@ -53,7 +53,11 @@ extension ItemForm.FoodSearch {
             presentedFullScreenSheet = nil
         }
         
-        return ParentFoodForm(forRecipe: true, shouldDismiss: shouldDismiss)
+        return ParentFoodForm(
+            nestLevel: nestLevel,
+            forRecipe: true,
+            shouldDismiss: shouldDismiss
+        )
     }
 
     var plateForm: some View {
@@ -66,7 +70,11 @@ extension ItemForm.FoodSearch {
             presentedFullScreenSheet = nil
         }
 
-        return ParentFoodForm(forRecipe: false, shouldDismiss: shouldDismiss)
+        return ParentFoodForm(
+            nestLevel: nestLevel,
+            forRecipe: false,
+            shouldDismiss: shouldDismiss
+        )
     }
 
     func macrosView(for food: Food) -> some View {

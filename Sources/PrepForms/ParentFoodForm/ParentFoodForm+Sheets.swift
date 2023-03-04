@@ -13,7 +13,7 @@ import EmojiPicker
 extension ParentFoodForm {
     
     @ViewBuilder
-    func sheet(for sheet: Sheet) -> some View {
+    func sheet(for sheet: ParentFoodFormSheet) -> some View {
         switch sheet {
         case .name : nameForm
         case .detail : detailForm
@@ -44,12 +44,13 @@ extension ParentFoodForm {
         ) { emoji in
             Haptics.successFeedback()
             fields.emoji = emoji
-            present(.emoji)
+            viewModel.present(.emoji)
         }
     }
     
     var foodSearchForm: some View {
         ItemForm.FoodSearch(
+            nestLevel: nestLevel + 1,
             viewModel: viewModel.itemFormViewModel,
             isInitialFoodSearch: true,
             forIngredient: true,
@@ -64,27 +65,5 @@ extension ParentFoodForm {
             forIngredient: true,
             actionHandler: { handleItemAction($0, forEdit: true) }
         )
-    }
-    
-    func present(_ sheet: Sheet) {
-        
-        if presentedSheet != nil {
-            presentedSheet = nil
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                Haptics.feedback(style: .soft)
-                presentedSheet = sheet
-            }
-//        } else if presentedFullScreenSheet != nil {
-//            presentedFullScreenSheet = nil
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-//                Haptics.feedback(style: .soft)
-//                presentedSheet = sheet
-//            }
-        } else {
-            Haptics.feedback(style: .soft)
-            withAnimation(.interactiveSpring()) {
-                presentedSheet = sheet
-            }
-        }
     }
 }

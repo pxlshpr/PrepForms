@@ -11,42 +11,62 @@ import FoodLabel
 import EmojiPicker
 
 public struct ParentFoodForm: View {
-
-    @StateObject var viewModel: ViewModel
-    @StateObject var fields = FoodForm.Fields()
+    
+    class ViewModels: ObservableObject {
+        static let shared = ViewModels()
         
-    @State var presentedSheet: Sheet? = nil
-    @State var showingFoodLabel: Bool = false
-    @State var showingCancelConfirmation = false
+        var objects: [(ViewModel, FoodForm.Fields)] = []
+        
+        func objects(at nestLevel: Int) -> (viewModel: ViewModel, fields: FoodForm.Fields)? {
+            guard nestLevel < objects.count else {
+                return nil
+            }
+            return objects[nestLevel]
+        }
+    }
+    
+    @StateObject var viewModel: ViewModel
+    @StateObject var fields: FoodForm.Fields
 
     @AppStorage(UserDefaultsKeys.showingIngredientEmojis) var showingIngredientEmojis = PrepConstants.DefaultPreferences.showingIngredientEmojis
     @AppStorage(UserDefaultsKeys.showingIngredientDetails) var showingIngredientDetails = PrepConstants.DefaultPreferences.showingIngredientDetails
     @AppStorage(UserDefaultsKeys.showingIngredientBadges) var showingIngredientBadges = PrepConstants.DefaultPreferences.showingIngredientBadges
 
     let shouldDismiss: () -> ()
-    let id = UUID()
-    
+    let nestLevel: Int
+
     public init(
+        nestLevel: Int = 0,
         forRecipe: Bool,
         existingFood: Food? = nil,
         shouldDismiss: @escaping () -> ()
     ) {
+        print("🐣 ParentFoodForm created with nestLevel: \(nestLevel)")
+        self.nestLevel = nestLevel
         self.shouldDismiss = shouldDismiss
         
-        let viewModel = ViewModel(forRecipe: forRecipe, existingFood: existingFood)
-        _viewModel = StateObject(wrappedValue: viewModel)
-        
-        if let existingFood, let ingredientItems = existingFood.ingredientItems {
-            _showingFoodLabel = State(initialValue: !ingredientItems.isEmpty)
+        /// If we already have a `ViewModel` and a `Field` for this `nestLevel`
+        if let objects = ViewModels.shared.objects(at: nestLevel) {
+            /// then we're being re-created and should simply grab those.
+            _viewModel = StateObject(wrappedValue: objects.viewModel)
+            _fields = StateObject(wrappedValue: objects.fields)
         } else {
-            _showingFoodLabel = State(initialValue: false)
+            /// otherwise this is the first instantiation at this nestLevel, so create them
+            let viewModel = ViewModel(forRecipe: forRecipe, existingFood: existingFood)
+            _viewModel = StateObject(wrappedValue: viewModel)
+            
+            let fields = FoodForm.Fields()
+            _fields = StateObject(wrappedValue: fields)
+            
+            /// Add the `@StateObject`s to the shared `ViewModels` that keeps a reference to them
+            /// so that they may be reused upon re-creation.
+            ViewModels.shared.objects.append((viewModel, fields))
         }
     }
     
     public var body: some View {
-        let _ = Self._printChanges()
-        return content
-            .sheet(item: $presentedSheet) { sheet(for: $0) }
+        content
+            .sheet(item: $viewModel.presentedSheet) { sheet(for: $0) }
             .onChange(of: viewModel.sortOrder, perform: sortOrderChanged)
             .onChange(of: viewModel.items, perform: itemsChanged)
             .onChange(of: viewModel.itemsWithRecalculatedBadges, perform: itemsWithRecalculatedBadgesChanged)
@@ -99,7 +119,7 @@ public struct ParentFoodForm: View {
     
     func itemsChanged(_ items: [IngredientItem]) {
         withAnimation {
-            showingFoodLabel = !items.isEmpty
+            viewModel.showingFoodLabel = !items.isEmpty
         }
     }
     
@@ -133,7 +153,7 @@ public struct ParentFoodForm: View {
             }
 
         case .dismiss:
-            presentedSheet = nil
+            viewModel.presentedSheet = nil
             
         default:
             break
@@ -147,7 +167,7 @@ public struct ParentFoodForm: View {
         )
 
         return Group {
-            if showingFoodLabel {
+            if viewModel.showingFoodLabel {
                 FormStyledSection {
                     FoodLabel(data: dataBinding)
                         .transition(.move(edge: .bottom))
@@ -271,11 +291,11 @@ public struct ParentFoodForm: View {
         switch action {
         case .add:
             viewModel.prepareForAdding()
-            present(.foodSearch)
+            viewModel.present(.foodSearch)
             
         case .tappedItem(let ingredientItem):
             viewModel.prepareForEditing(ingredientItem)
-            present(.ingredientEdit)
+            viewModel.present(.ingredientEdit)
         }
     }
     
@@ -293,13 +313,13 @@ public struct ParentFoodForm: View {
         Haptics.feedback(style: .soft)
         switch action {
         case .emoji:
-            present(.emoji)
+            viewModel.present(.emoji)
         case .name:
-            present(.name)
+            viewModel.present(.name)
         case .detail:
-            present(.detail)
+            viewModel.present(.detail)
         case .brand:
-            present(.brand)
+            viewModel.present(.brand)
         }
     }
     
@@ -403,7 +423,7 @@ public struct ParentFoodForm: View {
         return Button {
             if fields.isDirty {
                 Haptics.warningFeedback()
-                showingCancelConfirmation = true
+                viewModel.showingCancelConfirmation = true
             } else {
                 Haptics.feedback(style: .soft)
                 shouldDismiss()
@@ -413,23 +433,22 @@ public struct ParentFoodForm: View {
         }
         .confirmationDialog(
             "",
-            isPresented: $showingCancelConfirmation,
+            isPresented: $viewModel.showingCancelConfirmation,
             actions: { dismissConfirmationActions },
             message: { dismissConfirmationMessage }
         )
     }
-    
-    enum Sheet: String, Identifiable {
-        case name
-        case detail
-        case brand
-        case emoji
-        case foodSearch
-        case ingredientEdit
-        var id: String { rawValue }
-    }
 }
 
+enum ParentFoodFormSheet: String, Identifiable {
+    case name
+    case detail
+    case brand
+    case emoji
+    case foodSearch
+    case ingredientEdit
+    var id: String { rawValue }
+}
 
 enum IngredientSortOrder: String, CaseIterable {
     case none

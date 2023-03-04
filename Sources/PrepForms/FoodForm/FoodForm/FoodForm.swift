@@ -51,7 +51,6 @@ public struct FoodForm: View {
         existingFood: Food? = nil,
         didSave: @escaping (FoodFormOutput) -> ()
     ) {
-        cprint("💭 FoodForm.init()")
         self.didSave = didSave
         self.existingFood = existingFood
     }
