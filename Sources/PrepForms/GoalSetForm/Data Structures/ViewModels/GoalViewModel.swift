@@ -593,12 +593,12 @@ import PrepDataTypes
 extension GoalViewModel {
     
     var equivalentUnitString: String? {
-        goal.equivalentUnitString(userUnits: goalSet.userUnits)
+        goal.equivalentUnitString(userOptions: goalSet.userOptions)
 //        switch type {
 //        case .energy(let type):
 //            switch type {
 //            default:
-//                return goalSet.userUnits.energy.shortDescription
+//                return goalSet.userOptions.energy.shortDescription
 //            }
 //        case .macro(let type, _):
 //            switch type {
@@ -702,7 +702,7 @@ extension GoalViewModel {
     var goalCalcParams: GoalCalcParams {
         goalSet.goalCalcParams(includeEnergyGoal: !type.isEnergy)
 //        GoalCalculationParameters(
-//            userUnits: goalSet.userUnits,
+//            userOptions: goalSet.userOptions,
 //            bodyProfile: goalSet.bodyProfile,
 //            energyGoal: energyGoalForCalculation
 //        )
@@ -855,7 +855,7 @@ extension GoalViewModel {
 //    //MARK: Helpers
 //    func convertEnergyToKcal(_ energy: Double?) -> Double? {
 //        guard let energy else { return nil }
-//        let energyUnit = goalSet.bodyProfile?.parameters.energyUnit ?? self.goalSet.userUnits.energy
+//        let energyUnit = goalSet.bodyProfile?.parameters.energyUnit ?? self.goalSet.userOptions.energy
 //        return energyUnit == .kcal ? energy : energy * KcalsPerKilojule
 //    }
 }

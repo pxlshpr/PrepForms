@@ -44,7 +44,7 @@ extension ParentFoodForm {
         ) { emoji in
             Haptics.successFeedback()
             fields.emoji = emoji
-            viewModel.present(.emoji)
+            viewModel.presentedSheet = nil
         }
     }
     

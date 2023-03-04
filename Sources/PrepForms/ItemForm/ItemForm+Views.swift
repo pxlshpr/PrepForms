@@ -208,7 +208,7 @@ extension ItemForm {
                 meal: dayMealBinding,
                 day: $viewModel.day,
                 lastUsedGoalSet: lastUsedGoalSetBinding,
-                userUnits: DataManager.shared.user?.units ?? .standard,
+                userOptions: DataManager.shared.user?.units ?? .standard,
 //                bodyProfile: viewModel.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
                 bodyProfile: DataManager.shared.user?.bodyProfile,
                 didTapGoalSetButton: didTapGoalSetButton
@@ -223,7 +223,7 @@ extension ItemForm {
             return IngredientPortion(
                 ingredientItem: itemBinding,
                 lastUsedGoalSet: lastUsedGoalSetBinding,
-                userUnits: DataManager.shared.user?.units ?? .standard,
+                userOptions: DataManager.shared.user?.units ?? .standard,
                 bodyProfile: DataManager.shared.user?.bodyProfile,
                 didTapGoalSetButton: didTapGoalSetButton
             )

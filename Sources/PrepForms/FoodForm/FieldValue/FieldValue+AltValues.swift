@@ -139,7 +139,7 @@ extension FoodLabelValue {
      */
     func withMicroUnit(for nutrientType: NutrientType) -> FoodLabelValue {
         guard let unit, nutrientType.supportsUnit(unit) else {
-            return FoodLabelValue(amount: amount, unit: nutrientType.defaultUnit.foodLabelUnit)
+            return FoodLabelValue(amount: amount, unit: nutrientType.defaultExtractedNutrientUnit.foodLabelUnit)
         }
         return self
     }
@@ -147,13 +147,21 @@ extension FoodLabelValue {
 
 extension NutrientType {
     
-    var defaultUnit: NutrientUnit {
+    /// This is used when we don't have a unit available during the Food Label extraction process.
+    ///
+    /// So if this nutrient supports percentages—`.p` for percentage is returned.
+    /// Otherwise, the first supported unit is returned, finally returning `.g` as a fallback.
+    var defaultExtractedNutrientUnit: NutrientUnit {
         guard !supportsPercentages else {
             return .p
         }
         return supportedNutrientUnits.first ?? .g
     }
-    
+
+    var defaultSupportedNutrientUnit: NutrientUnit {
+        supportedNutrientUnits.first ?? .g
+    }
+
     func supportsUnit(_ foodLabelUnit: FoodLabelUnit) -> Bool {
         guard let nutrientUnit = foodLabelUnit.nutrientUnit(for: self) else { return false }
         return supportsUnit(nutrientUnit)

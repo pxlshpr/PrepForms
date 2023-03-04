@@ -103,7 +103,7 @@ extension ItemForm {
             self.path = initialPath
             self.parentFoodType = parentFoodType
             self.parentFood = parentFood
-            self.food = existingIngredientItem?.food
+            self.food = existingIngredientItem?.food.detachedFood
             self.existingIngredientItem = existingIngredientItem
             self.isRootInNavigationStack = existingIngredientItem != nil
             
@@ -211,7 +211,7 @@ extension ItemForm.ViewModel {
         if forIngredient {
             self.ingredientItem = IngredientItem(
                 id: existingIngredientItem?.id ?? UUID(),
-                food: food,
+                food: food.ingredientFood,
                 amount: amountValue,
                 sortPosition: existingIngredientItem?.sortPosition ?? 1,
                 isSoftDeleted: existingIngredientItem?.isSoftDeleted ?? false,
@@ -385,7 +385,7 @@ extension ItemForm.ViewModel {
         FoodValue(
             value: amount ?? 0,
             foodQuantityUnit: unit,
-            userUnits: DataManager.shared.user?.units ?? .standard
+            userOptions: DataManager.shared.user?.units ?? .standard
         )
     }
     
@@ -412,19 +412,19 @@ extension FoodValue {
     init(
         value: Double,
         foodQuantityUnit unit: FoodQuantity.Unit,
-        userUnits: UserUnits
+        userOptions: UserOptions
     ) {
         
         let volumeExplicitUnit: VolumeExplicitUnit?
         if let volumeUnit = unit.formUnit.volumeUnit {
-            volumeExplicitUnit = userUnits.volume.volumeExplicitUnit(for: volumeUnit)
+            volumeExplicitUnit = userOptions.volume.volumeExplicitUnit(for: volumeUnit)
         } else {
             volumeExplicitUnit = nil
         }
 
         let sizeUnitVolumePrefixExplicitUnit: VolumeExplicitUnit?
         if let volumeUnit = unit.formUnit.sizeUnitVolumePrefixUnit {
-            sizeUnitVolumePrefixExplicitUnit = userUnits.volume.volumeExplicitUnit(for: volumeUnit)
+            sizeUnitVolumePrefixExplicitUnit = userOptions.volume.volumeExplicitUnit(for: volumeUnit)
         } else {
             sizeUnitVolumePrefixExplicitUnit = nil
         }

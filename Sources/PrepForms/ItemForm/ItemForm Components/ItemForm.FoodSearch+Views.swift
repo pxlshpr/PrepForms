@@ -43,40 +43,30 @@ extension ItemForm.FoodSearch {
         return FoodForm(didSave: didSaveFood)
     }
     
-    var recipeForm: some View {
-        func didSaveFood(_ formOutput: FoodFormOutput) {
-//            Haptics.successFeedback()
-//            FoodFormManager.shared.save(formOutput)
-        }
-        
-        func shouldDismiss() {
+    func handleParentFoodFormAction(_ action: ParentFoodForm.Action) {
+        switch action {
+            
+        case .dismiss:
             presentedFullScreenSheet = nil
-        }
-        
-        return ParentFoodForm(
-            nestLevel: nestLevel,
-            forRecipe: true,
-            shouldDismiss: shouldDismiss
-        )
-        .onDisappear {
-            ParentFoodForm.ViewModels.shared.remove(at: nestLevel)
+            
+        case .save(let output):
+            DataManager.shared.addNewParentFood(from: output, sourceId: id)
         }
     }
 
-    var plateForm: some View {
-        func didSaveFood(_ formOutput: FoodFormOutput) {
-//            Haptics.successFeedback()
-//            FoodFormManager.shared.save(formOutput)
-        }
-        
-        func shouldDismiss() {
-            presentedFullScreenSheet = nil
-        }
+    var recipeForm: some View {
+        parentFoodForm(forRecipe: true)
+    }
 
-        return ParentFoodForm(
+    var plateForm: some View {
+        parentFoodForm(forRecipe: false)
+    }
+    
+    func parentFoodForm(forRecipe: Bool) -> some View {
+        ParentFoodForm(
             nestLevel: nestLevel,
-            forRecipe: false,
-            shouldDismiss: shouldDismiss
+            forRecipe: forRecipe,
+            actionHandler: handleParentFoodFormAction
         )
         .onDisappear {
             ParentFoodForm.ViewModels.shared.remove(at: nestLevel)

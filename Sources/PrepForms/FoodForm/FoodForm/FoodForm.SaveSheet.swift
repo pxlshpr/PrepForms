@@ -3,27 +3,31 @@ import SwiftUISugar
 import SwiftHaptics
 import PrepDataTypes
 
-struct SaveSheet: View {
-    
-    @EnvironmentObject var fields: FoodForm.Fields
-    @EnvironmentObject var sources: FoodForm.Sources
-    
-    @Environment(\.colorScheme) var colorScheme
-    @State var size: CGSize = .zero
-    @State var safeAreaInsets: EdgeInsets = .init()
-    @State var height: CGFloat = 0
-
-    @Binding var isPresented: Bool
-    @Binding var validationMessage: ValidationMessage?
-    let didTapSavePublic: () -> ()
-    let didTapSavePrivate: () -> ()
-
-    let hardcodedSafeAreaBottomInset: CGFloat = 34.0
-    
-    @State var dragOffsetY: CGFloat = 0.0
-
-    @State var fadeOutOverlay: Bool = false
-    
+extension FoodForm {
+    struct SaveSheet: View {
+        
+        @EnvironmentObject var fields: FoodForm.Fields
+        @EnvironmentObject var sources: FoodForm.Sources
+        
+        @Environment(\.colorScheme) var colorScheme
+        @State var size: CGSize = .zero
+        @State var safeAreaInsets: EdgeInsets = .init()
+        @State var height: CGFloat = 0
+        
+        @Binding var isPresented: Bool
+        @Binding var validationMessage: ValidationMessage?
+        let didTapSavePublic: () -> ()
+        let didTapSavePrivate: () -> ()
+        
+        let hardcodedSafeAreaBottomInset: CGFloat = 34.0
+        
+        @State var dragOffsetY: CGFloat = 0.0
+        
+        @State var fadeOutOverlay: Bool = false
+    }
+}
+ 
+extension FoodForm.SaveSheet {
     var body: some View {
         ZStack {
             if isPresented && !fadeOutOverlay {
@@ -390,6 +394,8 @@ struct SaveSheet: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
+            default:
+                EmptyView()
             }
         }
         .foregroundColor(.secondary)

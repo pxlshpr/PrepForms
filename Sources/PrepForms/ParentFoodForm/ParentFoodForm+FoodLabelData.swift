@@ -39,7 +39,7 @@ extension ParentFoodForm.ViewModel {
         var dict: [NutrientType : FoodLabelValue] = [:]
 
         for nutrientType in nutrientTypes {
-            let value = value(for: .micro(nutrientType: nutrientType, nutrientUnit: nutrientType.defaultUnit))
+            let value = value(for: .micro(nutrientType: nutrientType, nutrientUnit: nutrientType.defaultSupportedNutrientUnit))
             dict[nutrientType] = value
         }
 
@@ -47,12 +47,25 @@ extension ParentFoodForm.ViewModel {
         return dict
     }
     
-    var energyValue: FoodLabelValue {
-        let energy = items.reduce(0) { $0 + $1.energyInKcal }
-        return FoodLabelValue(amount: energy, unit: .kcal)
+    var microsArray: [FoodNutrient] {
+        let start = CFAbsoluteTimeGetCurrent()
+        var array: [FoodNutrient] = []
+        for nutrientType in nutrientTypes {
+            let component: NutrientMeterComponent = .micro(nutrientType: nutrientType, nutrientUnit: nutrientType.defaultSupportedNutrientUnit)
+            let amount = amount(for: component)
+            let foodNutrient = FoodNutrient(
+                nutrientType: nutrientType,
+                value: amount,
+                nutrientUnit: nutrientType.defaultSupportedNutrientUnit
+            )
+            array.append(foodNutrient)
+        }
+        print("⌛️ Getting microsArray took: \(CFAbsoluteTimeGetCurrent()-start)s")
+        return array
     }
-
+    
     func amount(for component: NutrientMeterComponent) -> Double {
+        //TODO: Convert here
         items.reduce(0) { $0 + $1.scaledValue(for: component) }
     }
 

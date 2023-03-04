@@ -59,7 +59,7 @@ extension ExtractedNutrient {
                 fill: fill
             ))
         } else if let nutrientType = attribute.nutrientType {
-            let unit = value?.unit?.nutrientUnit(for: nutrientType) ?? nutrientType.defaultUnit
+            let unit = value?.unit?.nutrientUnit(for: nutrientType) ?? nutrientType.defaultExtractedNutrientUnit
             return FieldValue.micro(FieldValue.MicroValue(
                 nutrientType: nutrientType,
                 double: double,

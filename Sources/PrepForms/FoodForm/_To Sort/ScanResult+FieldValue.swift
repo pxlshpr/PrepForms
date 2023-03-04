@@ -119,7 +119,7 @@ extension ScanResult {
         }
         
         let fill = Fill.scanned(.init(valueText: valueText, imageId: id))
-        let unit = value.unit?.nutrientUnit(for: nutrientType) ?? nutrientType.defaultUnit
+        let unit = value.unit?.nutrientUnit(for: nutrientType) ?? nutrientType.defaultExtractedNutrientUnit
         
         return FieldValue.micro(FieldValue.MicroValue(
             nutrientType: nutrientType,

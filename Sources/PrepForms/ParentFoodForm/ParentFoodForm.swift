@@ -12,6 +12,11 @@ import EmojiPicker
 
 public struct ParentFoodForm: View {
     
+    public enum Action {
+        case dismiss
+        case save(ParentFoodFormOutput)
+    }
+    
     class ViewModels: ObservableObject {
         static let shared = ViewModels()
         
@@ -37,18 +42,18 @@ public struct ParentFoodForm: View {
     @AppStorage(UserDefaultsKeys.showingIngredientDetails) var showingIngredientDetails = PrepConstants.DefaultPreferences.showingIngredientDetails
     @AppStorage(UserDefaultsKeys.showingIngredientBadges) var showingIngredientBadges = PrepConstants.DefaultPreferences.showingIngredientBadges
 
-    let shouldDismiss: () -> ()
+    let actionHandler: (Action) -> ()
     let nestLevel: Int
 
     public init(
         nestLevel: Int = 0,
         forRecipe: Bool,
         existingFood: Food? = nil,
-        shouldDismiss: @escaping () -> ()
+        actionHandler: @escaping (Action) -> ()
     ) {
         print("🐣 ParentFoodForm created with nestLevel: \(nestLevel)")
         self.nestLevel = nestLevel
-        self.shouldDismiss = shouldDismiss
+        self.actionHandler = actionHandler
         
         /// If we already have a `ViewModel` and a `Field` for this `nestLevel`
         if let objects = ViewModels.shared.objects(at: nestLevel) {
@@ -89,8 +94,8 @@ public struct ParentFoodForm: View {
         var formContent: some View {
             ZStack {
                 formLayer
-//                saveButtonLayer
-//                    .zIndex(3)
+                saveButtonLayer
+                    .zIndex(3)
 //                loadingLayer
 //                    .zIndex(4)
             }
@@ -350,10 +355,6 @@ public struct ParentFoodForm: View {
             .environmentObject(fields)
     }
 
-    var saveSheet: some View {
-        EmptyView()
-    }
-    
     var navigationTrailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             Group {
@@ -390,7 +391,7 @@ public struct ParentFoodForm: View {
                 for _ in 0...20 {
                     let item = IngredientItem(
                         id: UUID(),
-                        food: food,
+                        food: food.ingredientFood,
                         amount: .init(WeightQuantity(100, .g)),
                         sortPosition: 1,
                         isSoftDeleted: false,
@@ -413,11 +414,15 @@ public struct ParentFoodForm: View {
         }
     }
     
+    func dismissWithHaptics() {
+        Haptics.feedback(style: .soft)
+        actionHandler(.dismiss)
+    }
+    
     var dismissButton: some View {
         var dismissConfirmationActions: some View {
             Button("Close without saving", role: .destructive) {
-                Haptics.feedback(style: .soft)
-                shouldDismiss()
+                dismissWithHaptics()
             }
         }
         
@@ -430,8 +435,7 @@ public struct ParentFoodForm: View {
                 Haptics.warningFeedback()
                 viewModel.showingCancelConfirmation = true
             } else {
-                Haptics.feedback(style: .soft)
-                shouldDismiss()
+                dismissWithHaptics()
             }
         } label: {
             CloseButtonLabel(forNavigationBar: true)

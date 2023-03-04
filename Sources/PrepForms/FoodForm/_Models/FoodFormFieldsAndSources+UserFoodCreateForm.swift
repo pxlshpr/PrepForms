@@ -55,20 +55,23 @@ extension FoodFormFieldsAndSources {
     }
     
     var foodSizes: [FoodSize] {
-        sizes.compactMap({ $0.size }).compactMap {
-            guard let quantity = $0.quantity,
-                  let value = $0.foodValue
-            else {
-                return nil
-            }
-            
-            return FoodSize(
-                name: $0.name,
-                volumePrefixExplicitUnit: $0.volumePrefixUnit?.volumeUnit?.volumeExplicitUnit,
-                quantity: quantity,
-                value: value
-            )
-        }
+        sizes
+            .compactMap({ $0.size })
+            .compactMap { FoodSize(formSize: $0) }
+//            .compactMap {
+//            guard let quantity = $0.quantity,
+//                  let value = $0.foodValue
+//            else {
+//                return nil
+//            }
+//
+//            return FoodSize(
+//                name: $0.name,
+//                volumePrefixExplicitUnit: $0.volumePrefixUnit?.volumeUnit?.volumeExplicitUnit,
+//                quantity: quantity,
+//                value: value
+//            )
+//        }
     }
     
     var foodNutrients: FoodNutrients? {

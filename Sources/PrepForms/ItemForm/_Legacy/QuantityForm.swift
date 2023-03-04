@@ -71,7 +71,7 @@
 //            foodItem: $viewModel.mealItem,
 //            meal: $viewModel.dayMeal,
 //            day: viewModel.day, //TODO: Get
-//            userUnits: DataManager.shared.user?.units ?? .standard,
+//            userOptions: DataManager.shared.user?.units ?? .standard,
 ////            bodyProfile: viewModel.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
 //            bodyProfile: DataManager.shared.user?.bodyProfile,
 //            didTapGoalSetButton: { forMeal in

@@ -95,12 +95,14 @@ extension FoodForm.NutrientsList {
                 {
                     field.value.microValue.unit = unit
                 } else {
-                    field.value.microValue.unit = nutrientType.defaultUnit
+//                    field.value.microValue.unit = nutrientType.defaultExtractedNutrientUnit
+                    field.value.microValue.unit = nutrientType.defaultSupportedNutrientUnit
                 }
                 field.registerUserInput()
             } else {
                 field.value.microValue.double = nil
-                field.value.microValue.unit = nutrientType.defaultUnit
+//                field.value.microValue.unit = nutrientType.defaultExtractedNutrientUnit
+                field.value.microValue.unit = nutrientType.defaultSupportedNutrientUnit
                 field.registerUserInput()
             }
         }

@@ -17,6 +17,7 @@ extension ParentFoodForm {
         @Published var presentedSheet: ParentFoodFormSheet? = nil
         @Published var showingFoodLabel: Bool
         @Published var showingCancelConfirmation = false
+        @Published var showingSaveSheet = false
 
         init(
             forRecipe: Bool,
@@ -41,7 +42,11 @@ extension ParentFoodForm {
 
 extension ParentFoodForm.ViewModel {
     var title: String {
-        "\(isEditing ? "Edit" : "New") \(forRecipe ? "Recipe" : "Plate")"
+        "\(isEditing ? "Edit" : "New") \(entityName)"
+    }
+    
+    var entityName: String {
+        forRecipe ? "Recipe" : "Plate"
     }
     
     var isEditing: Bool {

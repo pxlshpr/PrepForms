@@ -30,11 +30,10 @@ public struct FoodForm: View {
 
     @State var showingPhotosPicker = false
     @State var showingBarcodeScanner = false
-    @State var showingSaveSheet = false
-    @State var showingSaveButtons = false
     @State var showingAddLinkAlert = false
     @State var showingAddBarcodeAlert = false
     @State var showingDismissConfirmationDialog = false
+    @State var showingSaveSheet = false
 
     let existingFood: Food?
     @State var didPrefillFoodFields = false
@@ -148,27 +147,6 @@ public struct FoodForm: View {
     
     func showingAddBarcodeAlertChanged(_ newValue: Bool) {
         setShowingSaveButton()
-    }
-    
-    func setShowingSaveButton() {
-        /// Animating this doesn't work with the custom interactiveDismissal, so we're using a `.animation` modifier on the save button itself
-        self.viewModel.showingSaveButton = !(viewModel.showingWizard || showingAddLinkAlert || showingAddBarcodeAlert)
-    }
-        
-    var saveSheet: some View {
-        SaveSheet(
-            isPresented: $showingSaveSheet,
-            validationMessage: Binding<ValidationMessage?>(
-            get: { validationMessage },
-//            get: { .missingFields(["Protein"]) },
-            set: { _ in }
-        ), didTapSavePublic: {
-            tappedSavePublic()
-        }, didTapSavePrivate: {
-            tappedSavePrivate()
-        })
-        .environmentObject(fields)
-        .environmentObject(sources)
     }
     
     @ViewBuilder
@@ -312,116 +290,36 @@ public struct FoodForm: View {
         .padding(.bottom, 30)
         .padding(.horizontal, 20)
     }
+
+    //MARK: - Saving
     
-    var buttonsLayer: some View {
-        
-        let saveIsDisabled = Binding<Bool>(
-            get: { !fields.canBeSaved },
-            set: { _ in }
-        )
-        let saveSecondaryIsDisabled = Binding<Bool>(
-            get: { !sources.canBePublished },
-            set: { _ in }
-        )
-        let info = Binding<FormSaveInfo?>(
-            get: { formSaveInfo },
-            set: { _ in }
-        )
-        
-        var saveTitle: String {
-            /// [ ] Do this
-            //            if isEditingPublicFood {
-            //                return "Resubmit to Public Foods"
-            //            } else {
-            return "Submit to Public Foods"
-            //            }
+    var validationMessage: ValidationMessage? {
+//        guard !(showingWizard || fields.isInEmptyState) else {
+//            return nil
+//        }
+//
+        if !fields.missingRequiredFields.isEmpty {
+            return .missingFields(fields.missingRequiredFields)
+        } else if !sources.canBePublished {
+            return .needsSource
         }
-        
-        var saveSecondaryTitle: String {
-            /// [ ] Do this
-            //            if isEditingPublicFood {
-            //                return "Save and Make Private"
-            //            } else if isEditingPrivateFood {
-            //                return "Save Private Food"
-            //            } else {
-            //            return "Add as Private Food"
-            return "Save as Private Food"
-            //            }
-        }
-        
-        /// [ ] Check if form is dirty (if editing), or if new, if there's been substantial data entered
-        let cancelAction = FormConfirmableAction(
-            shouldConfirm: fields.isDirty,
-            confirmationMessage: nil,
-            confirmationButtonTitle: nil) {
-                Haptics.feedback(style: .soft)
-                dismiss()
-            }
-        
-        let saveAction = FormConfirmableAction {
-            tappedSavePublic()
-        }
-        
-        let saveSecondaryAction = FormConfirmableAction {
-            tappedSavePrivate()
-        }
-        
-        return FormDualSaveLayer(
-            saveIsDisabled: saveIsDisabled,
-            saveSecondaryIsDisabled: saveSecondaryIsDisabled,
-            saveTitle: saveTitle,
-            saveSecondaryTitle: saveSecondaryTitle,
-            info: info,
-            preconfirmationAction: nil,
-            cancelAction: cancelAction,
-            saveAction: saveAction,
-            saveSecondaryAction: saveSecondaryAction,
-            deleteAction: nil
-        )
+        return nil
     }
     
-    func tappedSavePublic() {
-        guard let data = foodFormOutput(shouldPublish: true) else {
-            return
-        }
-        didSave(data)
-        dismiss()
-    }
-    
-    func tappedSavePrivate() {
-        guard let data = foodFormOutput(shouldPublish: false) else {
-            return
-        }
-        didSave(data)
-        dismiss()
+
+    func setShowingSaveButton() {
+        /// Animating this doesn't work with the custom interactiveDismissal, so we're using a `.animation` modifier on the save button itself
+        self.viewModel.showingSaveButton = !(viewModel.showingWizard || showingAddLinkAlert || showingAddBarcodeAlert)
     }
     
     var saveButtonLayer: some View {
-        var fontSize: CGFloat {
-            25
-//            22
-        }
-        var size: CGFloat {
-            48
-//            38
-        }
+
+        var size: CGFloat { 48 }
+        var padding: CGFloat { 20 }
         
         var saveButton: some View {
-            var imageName: String {
-                "checkmark"
-            }
             
-            var shouldShowAccentColor: Bool {
-                fields.hasMinimumRequiredFields
-            }
-            
-            var foregroundColor: Color {
-                shouldShowAccentColor
-                ? .white
-                : Color(.secondaryLabel)
-            }
-            
-            return Button {
+            func didTapSave() {
                 withAnimation {
                     showingSaveSheet.toggle()
                 }
@@ -430,9 +328,10 @@ public struct FoodForm: View {
                 } else {
                     Haptics.feedback(style: .soft)
                 }
-            } label: {
-                Image(systemName: imageName)
-//                    .foregroundColor(Color.gray)
+            }
+            
+            var label: some View {
+                Image(systemName: "checkmark")
                     .font(.system(size: fontSize))
                     .fontWeight(.medium)
                     .foregroundColor(foregroundColor)
@@ -447,12 +346,25 @@ public struct FoodForm: View {
                         }
                         .shadow(color: Color(.black).opacity(0.2), radius: 3, x: 0, y: 3)
                     )
-
             }
-        }
-        
-        var padding: CGFloat {
-            20
+            
+            var fontSize: CGFloat { 25 }
+
+            var shouldShowAccentColor: Bool {
+                fields.hasMinimumRequiredFields
+            }
+            
+            var foregroundColor: Color {
+                shouldShowAccentColor
+                ? .white
+                : Color(.secondaryLabel)
+            }
+            
+            return Button {
+                didTapSave()
+            } label: {
+                label
+            }
         }
         
         var layer: some View {
@@ -476,59 +388,37 @@ public struct FoodForm: View {
     var saveSheetLayer: some View {
         saveSheet
     }
-
-    var buttonsLayer_legacy: some View {
-        VStack {
-            Spacer()
-            if !viewModel.showingWizard {
-                dismissButtonRow
-                    .transition(.move(edge: .bottom))
-            }
-            if fields.canBeSaved {
-                saveButtons
-                    .transition(.move(edge: .bottom))
-            }
-        }
-        .edgesIgnoringSafeArea(.bottom)
-    }
     
-    var saveButtons: some View {
-        var publicButton: some View {
-            FormPrimaryButton(title: "Submit to Prep Database") {
-                guard let data = foodFormOutput(shouldPublish: true) else {
-                    return
-                }
-                didSave(data)
-                dismiss()
+    var saveSheet: some View {
+        func tappedSavePublic() {
+            guard let data = foodFormOutput(shouldPublish: true) else {
+                return
             }
+            didSave(data)
+            dismiss()
         }
         
-        var privateButton: some View {
-            FormSecondaryButton(title: "Add to Private Database") {
-                guard let data = foodFormOutput(shouldPublish: false) else {
-                    return
-                }
-                didSave(data)
-                dismiss()
+        func tappedSavePrivate() {
+            guard let data = foodFormOutput(shouldPublish: false) else {
+                return
             }
+            didSave(data)
+            dismiss()
         }
         
-        return VStack(spacing: 0) {
-            Divider()
-            VStack {
-                if sources.canBePublished {
-                    publicButton
-                        .padding(.top)
-                    privateButton
-                } else {
-                    privateButton
-                        .padding(.vertical)
-                }
-            }
-            /// ** REMOVE THIS HARDCODED VALUE for the safe area bottom inset **
-            .padding(.bottom, 30)
-        }
-        .background(.thinMaterial)
+        return SaveSheet(
+            isPresented: $showingSaveSheet,
+            validationMessage: Binding<ValidationMessage?>(
+            get: { validationMessage },
+    //            get: { .missingFields(["Protein"]) },
+            set: { _ in }
+        ), didTapSavePublic: {
+            tappedSavePublic()
+        }, didTapSavePrivate: {
+            tappedSavePrivate()
+        })
+        .environmentObject(fields)
+        .environmentObject(sources)
     }
     
     //MARK: - Toolbars
@@ -630,19 +520,6 @@ extension FoodForm {
     
     func tappedMissingRequiredFields() {
         
-    }
-    
-    var validationMessage: ValidationMessage? {
-//        guard !(showingWizard || fields.isInEmptyState) else {
-//            return nil
-//        }
-//
-        if !fields.missingRequiredFields.isEmpty {
-            return .missingFields(fields.missingRequiredFields)
-        } else if !sources.canBePublished {
-            return .needsSource
-        }
-        return nil
     }
     
     var formSaveInfo: FormSaveInfo? {

@@ -39,7 +39,7 @@ public struct GoalSetForm: View {
         didTapSave: @escaping (GoalSet, BodyProfile?, Bool) -> ()
     ) {
         let goalSetViewModel = GoalSetViewModel(
-            userUnits: .standard,
+            userOptions: .standard,
             type: type,
             existingGoalSet: existingGoalSet,
             isDuplicating: isDuplicating,
@@ -562,7 +562,7 @@ struct EnergyFormPreview: View {
     
     init() {
         let goalSetViewModel = GoalSetViewModel(
-            userUnits:.standard,
+            userOptions:.standard,
             type: .day,
             existingGoalSet: nil,
             bodyProfile: BodyProfile(
@@ -605,7 +605,7 @@ struct MacroFormPreview: View {
     
     init() {
         let goalSet = GoalSetViewModel(
-            userUnits: .standard,
+            userOptions: .standard,
             type: .day,
             existingGoalSet: GoalSet(
                 name: "Bulking",
@@ -804,7 +804,7 @@ public enum GoalSetFormRoute: Hashable {
 //        let existingGoalSet: GoalSet?
 //
 //        init(
-//            userUnits: UserUnits,
+//            userOptions: UserUnits,
 //            bodyProfile: BodyProfile?,
 //            presentedGoalId: UUID? = nil,
 //            existingGoalSet: GoalSet?
@@ -813,7 +813,7 @@ public enum GoalSetFormRoute: Hashable {
 //
 //            self.nutrientTDEEFormViewModel = TDEEForm.ViewModel(
 //                existingProfile: bodyProfile,
-//                userUnits: userUnits
+//                userOptions: userOptions
 //            )
 //
 //            self.path = []
@@ -829,7 +829,7 @@ public enum GoalSetFormRoute: Hashable {
 //    }
 //
 //    func setNutrientTDEEFormViewModel(with bodyProfile: BodyProfile?) {
-//        nutrientTDEEFormViewModel = TDEEForm.ViewModel(existingProfile: bodyProfile, userUnits: userUnits)
+//        nutrientTDEEFormViewModel = TDEEForm.ViewModel(existingProfile: bodyProfile, userOptions: userOptions)
 //    }
 //
 //    func setBodyProfile(_ bodyProfile: BodyProfile) {

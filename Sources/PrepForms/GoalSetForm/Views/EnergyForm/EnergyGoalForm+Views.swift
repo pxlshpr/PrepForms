@@ -106,7 +106,7 @@ extension EnergyGoalForm {
     }
     
     var tdeeForm: some View {
-        TDEEForm(existingProfile: viewModel.bodyProfile, userUnits: .standard) { profile in
+        TDEEForm(existingProfile: viewModel.bodyProfile, userOptions: .standard) { profile in
             viewModel.setBodyProfile(profile)
         }
     }
