@@ -12,19 +12,21 @@ public struct ItemForm: View {
     @Environment(\.dismiss) var dismiss
     @FocusState var isFocused: Bool
 
-    @ObservedObject var viewModel: ViewModel
+    @ObservedObject var viewModel: ItemFormModel
 
     @State var hasAppeared: Bool = false
     @State var bottomHeight: CGFloat = 0.0
     @State var showingDeleteConfirmation = false
     @State var showingQuantityForm = false
+    
+    @State var showingMealPicker = false
 
     let alreadyInNavigationStack: Bool
     let forIngredient: Bool
     let actionHandler: (ItemFormAction) -> ()
 
     public init(
-        viewModel: ViewModel,
+        viewModel: ItemFormModel,
         isEditing: Bool = false,
         forIngredient: Bool = false,
         actionHandler: @escaping ((ItemFormAction) -> ())
@@ -44,6 +46,7 @@ public struct ItemForm: View {
             }
         }
         .onAppear(perform: appeared)
+        .sheet(isPresented: $showingMealPicker) { mealPicker }
     }
     
     func appeared() {

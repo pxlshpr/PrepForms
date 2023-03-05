@@ -7,7 +7,7 @@ import SwiftHaptics
 extension ItemForm {
     public struct MealPicker: View {
         
-        @EnvironmentObject var viewModel: ViewModel
+        @EnvironmentObject var viewModel: ItemFormModel
         
         @Environment(\.dismiss) var dismiss
       

@@ -408,7 +408,8 @@ extension ItemForm {
                 if viewModel.isRootInNavigationStack {
                     viewModel.path.append(.food)
                 } else {
-                    viewModel.path.removeLast()
+                    dismiss()
+//                    viewModel.path.removeLast()
                 }
             } label: {
                 foodCell(food)
@@ -419,7 +420,7 @@ extension ItemForm {
     func mealButton(dayMeal: DayMeal) -> some View {
         Button {
             Haptics.feedback(style: .soft)
-            viewModel.path.append(.meal)
+            showingMealPicker = true
         } label: {
             mealCell(dayMeal: dayMeal)
         }

@@ -24,7 +24,8 @@ extension ItemForm.FoodSearch {
         viewModel.setFood(food)
 
         if isInitialFoodSearch {
-            viewModel.path = [.mealItemForm]
+            viewModel.showingItem = true
+//            viewModel.path = [.mealItemForm]
         } else {
             dismiss()
         }

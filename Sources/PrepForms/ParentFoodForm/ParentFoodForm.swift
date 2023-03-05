@@ -17,57 +17,23 @@ public struct ParentFoodForm: View {
         case save(ParentFoodFormOutput)
     }
     
-    class ViewModels: ObservableObject {
-        static let shared = ViewModels()
-        
-        var objects: [(ViewModel, FoodForm.Fields)] = []
-        
-        func objects(at nestLevel: Int) -> (viewModel: ViewModel, fields: FoodForm.Fields)? {
-            guard nestLevel < objects.count else {
-                return nil
-            }
-            return objects[nestLevel]
-        }
-        
-        func remove(at nestLevel: Int) {
-            guard nestLevel < objects.count else { return }
-            let _ = objects.remove(at: nestLevel)
-        }
-    }
-    
     @StateObject var viewModel: ViewModel
     @StateObject var fields: FoodForm.Fields
 
     let actionHandler: (Action) -> ()
-    let nestLevel: Int
 
     public init(
-        nestLevel: Int = 0,
         forRecipe: Bool,
         existingFood: Food? = nil,
         actionHandler: @escaping (Action) -> ()
     ) {
-        print("🐣 ParentFoodForm created with nestLevel: \(nestLevel)")
-        self.nestLevel = nestLevel
         self.actionHandler = actionHandler
         
-        /// If we already have a `ViewModel` and a `Field` for this `nestLevel`
-        if let objects = ViewModels.shared.objects(at: nestLevel) {
-            /// then we're being re-created and should simply grab those.
-            _viewModel = StateObject(wrappedValue: objects.viewModel)
-            _fields = StateObject(wrappedValue: objects.fields)
-        } else {
-            /// otherwise this is the first instantiation at this nestLevel, so create them
-            let viewModel = ViewModel(forRecipe: forRecipe, existingFood: existingFood)
-            _viewModel = StateObject(wrappedValue: viewModel)
-            
-            let fields = FoodForm.Fields()
-            _fields = StateObject(wrappedValue: fields)
-            
-            /// Add the `@StateObject`s to the shared `ViewModels` that keeps a reference to them
-            /// so that they may be reused upon re-creation.
-            ViewModels.shared.objects.append((viewModel, fields))
-        }
+        let viewModel = ViewModel(forRecipe: forRecipe, existingFood: existingFood)
+        _viewModel = StateObject(wrappedValue: viewModel)
+        
+        let fields = FoodForm.Fields()
+        _fields = StateObject(wrappedValue: fields)
     }
     
     public var body: some View {

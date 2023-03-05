@@ -13,7 +13,7 @@ extension ParentFoodForm {
         @Published var items: [IngredientItem] = []
         @Published var itemsWithRecalculatedBadges: [IngredientItem] = []
         @Published var sortOrder: IngredientSortOrder = .none
-        @Published var itemFormViewModel: ItemForm.ViewModel
+        @Published var itemFormViewModel: ItemFormModel
 
         @Published var presentedSheet: ParentFoodFormSheet? = nil
         @Published var showingFoodLabel: Bool
@@ -32,7 +32,7 @@ extension ParentFoodForm {
             self.existingFood = existingFood
             self.forRecipe = forRecipe
             
-            self.itemFormViewModel = ItemForm.ViewModel(
+            self.itemFormViewModel = ItemFormModel(
                 existingIngredientItem: nil,
                 parentFoodType: forRecipe ? .recipe : .plate
             )
@@ -114,14 +114,14 @@ extension ParentFoodForm.ViewModel {
     }
     
     func prepareForAdding() {
-        self.itemFormViewModel = ItemForm.ViewModel(
+        self.itemFormViewModel = ItemFormModel(
             existingIngredientItem: nil,
             parentFoodType: forRecipe ? .recipe : .plate
         )
     }
 
     func prepareForEditing(_ item: IngredientItem) {
-        self.itemFormViewModel = ItemForm.ViewModel(
+        self.itemFormViewModel = ItemFormModel(
             existingIngredientItem: item,
             parentFoodType: forRecipe ? .recipe : .plate
         )

@@ -49,8 +49,11 @@ extension ParentFoodForm {
     }
     
     var foodSearchForm: some View {
+//        NewItemForm { action in
+//            handleItemAction(action, forEdit: false)
+//            viewModel.presentedSheet = nil
+//        }
         ItemForm.FoodSearch(
-            nestLevel: nestLevel + 1,
             viewModel: viewModel.itemFormViewModel,
             isInitialFoodSearch: true,
             forIngredient: true,
@@ -65,5 +68,24 @@ extension ParentFoodForm {
             forIngredient: true,
             actionHandler: { handleItemAction($0, forEdit: true) }
         )
+    }
+}
+
+struct NewItemForm: View {
+    let actionHandler: (ItemFormAction) -> ()
+    var body: some View {
+        Button("Add it") {
+            let food = DataManager.shared.recentFoods.first!
+            let ingredientItem = IngredientItem(
+                food: food.ingredientFood,
+                amount: .init(value: 1, formUnit: food.defaultFormUnit),
+                sortPosition: 1,
+                isSoftDeleted: false,
+                badgeWidth: 0,
+                energyInKcal: 0,
+                parentFoodId: nil
+            )
+            actionHandler(.saveIngredientItem(ingredientItem))
+        }
     }
 }

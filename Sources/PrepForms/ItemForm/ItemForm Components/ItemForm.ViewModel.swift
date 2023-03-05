@@ -3,67 +3,69 @@ import PrepDataTypes
 import PrepCoreDataStack
 import PrepViews
 
-extension ItemForm {
-    public class ViewModel: ObservableObject {
-        
-        @Published var path: [ItemFormRoute]
-        @Published var food: Food?
-        @Published var unit: FoodQuantity.Unit = .serving
-        @Published var internalAmountDouble: Double? = 1
-        @Published var internalAmountString: String = "1"
-        @Published var isAnimatingAmountChange = false
-        var startedAnimatingAmountChangeAt: Date = Date()
-        let isRootInNavigationStack: Bool
-        let parentFoodType: FoodType?
-        
-        /// `IngredientItem` specific
-        @Published var ingredientItem: IngredientItem? = nil
-        @Published var parentFood: Food?
-        let existingIngredientItem: IngredientItem?
+public class ItemFormModel: ObservableObject {
+    
+    @Published var path: [ItemFormRoute]
+    
+    @Published var showingItem: Bool = false
 
-        /// `MealItem` specific
-        @Published var mealItem: MealItem?
-        @Published var dayMeal: DayMeal?
-        @Published var dayMeals: [DayMeal]?
-        @Published var day: Day? = nil
-        let existingMealItem: MealItem?
-        let initialDayMeal: DayMeal?
+    @Published var food: Food?
+    @Published var unit: FoodQuantity.Unit = .serving
+    @Published var internalAmountDouble: Double? = 1
+    @Published var internalAmountString: String = "1"
+    @Published var isAnimatingAmountChange = false
+    var startedAnimatingAmountChangeAt: Date = Date()
+    let isRootInNavigationStack: Bool
+    let parentFoodType: FoodType?
+    
+    /// `IngredientItem` specific
+    @Published var ingredientItem: IngredientItem? = nil
+    @Published var parentFood: Food?
+    let existingIngredientItem: IngredientItem?
 
-        public init(
-            existingMealItem: MealItem?,
-            date: Date,
-            dayMeal: DayMeal? = nil,
-            food: Food? = nil,
-            amount: FoodValue? = nil,
-            initialPath: [ItemFormRoute] = []
-        ) {
-            self.path = initialPath
-            self.parentFoodType = nil
-            self.parentFood = nil
-            
-            let day = DataManager.shared.day(for: date)
-            self.day = day
-            let dayMeals = day?.meals ?? []
-            self.dayMeals = dayMeals
-            
-            self.food = food
-            
-            let time = newMealTime(
-                for: date,
-                existingMealTimes: dayMeals.map { $0.timeDate }
-            )
-            let dayMealToSet = dayMeal ?? DayMeal(
-                name: "New Meal",
+    /// `MealItem` specific
+    @Published var mealItem: MealItem?
+    @Published var dayMeal: DayMeal?
+    @Published var dayMeals: [DayMeal]?
+    @Published var day: Day? = nil
+    let existingMealItem: MealItem?
+    let initialDayMeal: DayMeal?
+
+    public init(
+        existingMealItem: MealItem?,
+        date: Date,
+        dayMeal: DayMeal? = nil,
+        food: Food? = nil,
+        amount: FoodValue? = nil,
+        initialPath: [ItemFormRoute] = []
+    ) {
+        self.path = initialPath
+        self.parentFoodType = nil
+        self.parentFood = nil
+        
+        let day = DataManager.shared.day(for: date)
+        self.day = day
+        let dayMeals = day?.meals ?? []
+        self.dayMeals = dayMeals
+        
+        self.food = food
+        
+        let time = newMealTime(
+            for: date,
+            existingMealTimes: dayMeals.map { $0.timeDate }
+        )
+        let dayMealToSet = dayMeal ?? DayMeal(
+            name: "New Meal",
 //                time: Date().timeIntervalSince1970
-                time: time.timeIntervalSince1970
-            )
-            self.dayMeal = dayMealToSet
-            self.initialDayMeal = dayMeal
-            
-            //TODO: Handle this in a better way
-            /// [ ] Try making `mealItem` nil and set it as that if we don't get a food here
-            /// [ ] Try and get this fed in with an existing `FoodItem`, from which we create this when editing!
-            self.mealItem = nil
+            time: time.timeIntervalSince1970
+        )
+        self.dayMeal = dayMealToSet
+        self.initialDayMeal = dayMeal
+        
+        //TODO: Handle this in a better way
+        /// [ ] Try making `mealItem` nil and set it as that if we don't get a food here
+        /// [ ] Try and get this fed in with an existing `FoodItem`, from which we create this when editing!
+        self.mealItem = nil
 //            self.mealItem = MealItem(
 //                food: food ?? Food.placeholder,
 //                amount: .init(0, .g),
@@ -71,63 +73,62 @@ extension ItemForm {
 //                energyInKcal: 0,
 //                mealId: dayMealToSet.id
 //            )
-            
-            self.existingMealItem = existingMealItem
-            self.existingIngredientItem = nil
-            
-            self.isRootInNavigationStack = existingMealItem != nil || food != nil
-            
-            if let amount, let food,
-               let unit = FoodQuantity.Unit(foodValue: amount, in: food)
-            {
-                self.amount = amount.value
-                self.unit = unit
-            } else {
-                setDefaultUnit()
-            }
-            setFoodItem()
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(didPickDayMeal),
-                name: .didPickDayMeal,
-                object: nil
-            )
-        }
         
-        public init(
-            existingIngredientItem: IngredientItem?,
-            parentFood: Food? = nil,
-            parentFoodType: FoodType,
-            initialPath: [ItemFormRoute] = []
-        ) {
-            self.path = initialPath
-            self.parentFoodType = parentFoodType
-            self.parentFood = parentFood
-            self.food = existingIngredientItem?.food.detachedFood
-            self.existingIngredientItem = existingIngredientItem
-            self.isRootInNavigationStack = existingIngredientItem != nil
-            
-            self.day = nil
-            self.dayMeals = nil
-            self.dayMeal = nil
-            self.initialDayMeal = nil
-            self.mealItem = nil
-            self.existingMealItem = nil
-            
-            if let amount = existingIngredientItem?.amount, let food,
-               let unit = FoodQuantity.Unit(foodValue: amount, in: food)
-            {
-                self.amount = amount.value
-                self.unit = unit
-            } else {
-                setDefaultUnit()
-            }
-            setFoodItem()
+        self.existingMealItem = existingMealItem
+        self.existingIngredientItem = nil
+        
+        self.isRootInNavigationStack = existingMealItem != nil || food != nil
+        
+        if let amount, let food,
+           let unit = FoodQuantity.Unit(foodValue: amount, in: food)
+        {
+            self.amount = amount.value
+            self.unit = unit
+        } else {
+            setDefaultUnit()
         }
+        setFoodItem()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didPickDayMeal),
+            name: .didPickDayMeal,
+            object: nil
+        )
+    }
+    
+    public init(
+        existingIngredientItem: IngredientItem?,
+        parentFood: Food? = nil,
+        parentFoodType: FoodType,
+        initialPath: [ItemFormRoute] = []
+    ) {
+        self.path = initialPath
+        self.parentFoodType = parentFoodType
+        self.parentFood = parentFood
+        self.food = existingIngredientItem?.food.detachedFood
+        self.existingIngredientItem = existingIngredientItem
+        self.isRootInNavigationStack = existingIngredientItem != nil
+        
+        self.day = nil
+        self.dayMeals = nil
+        self.dayMeal = nil
+        self.initialDayMeal = nil
+        self.mealItem = nil
+        self.existingMealItem = nil
+        
+        if let amount = existingIngredientItem?.amount, let food,
+           let unit = FoodQuantity.Unit(foodValue: amount, in: food)
+        {
+            self.amount = amount.value
+            self.unit = unit
+        } else {
+            setDefaultUnit()
+        }
+        setFoodItem()
     }
 }
 
-extension ItemForm.ViewModel {
+extension ItemFormModel {
     
     @objc func didPickDayMeal(notification: Notification) {
         guard let userInfo = notification.userInfo,
@@ -220,7 +221,7 @@ extension ItemForm.ViewModel {
             )
         } else {
             guard let dayMeal else {
-                print("No DayMeal in ItemForm.ViewModel used for Meal")
+                print("No DayMeal in ItemFormModel used for Meal")
                 return
             }
             self.mealItem = MealItem(
@@ -440,7 +441,7 @@ extension FoodValue {
     }
 }
 
-extension ItemForm.ViewModel {
+extension ItemFormModel {
     var equivalentQuantities: [FoodQuantity] {
         guard let currentQuantity else { return [] }
         let quantities = currentQuantity.equivalentQuantities(using: DataManager.shared.userVolumeUnits)
@@ -461,7 +462,7 @@ extension ItemForm.ViewModel {
     }    
 }
 
-extension ItemForm.ViewModel: NutritionSummaryProvider {
+extension ItemFormModel: NutritionSummaryProvider {
     public var energyAmount: Double {
         amount(for: .energy)
     }

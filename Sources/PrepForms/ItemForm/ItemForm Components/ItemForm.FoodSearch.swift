@@ -9,12 +9,13 @@ extension ItemForm {
         
         @Environment(\.dismiss) var dismiss
         
-        @ObservedObject var viewModel: ViewModel
+        @ObservedObject var viewModel: ItemFormModel
+        
         @State var foodToShowMacrosFor: Food? = nil
         @State var searchIsFocused = false
         
-        @State var presentedSheet: Sheet? = nil
-        @State var presentedFullScreenSheet: Sheet? = nil
+        @State var presentedSheet: ItemFormSheet? = nil
+        @State var presentedFullScreenSheet: ItemFormSheet? = nil
         @State var hasAppearedDelayed: Bool = false
         
         let isInitialFoodSearch: Bool
@@ -22,17 +23,13 @@ extension ItemForm {
         let actionHandler: (ItemFormAction) -> ()
         
         let id = UUID()
-        let nestLevel: Int
         
         public init(
-            nestLevel: Int = 0,
-            viewModel: ViewModel,
+            viewModel: ItemFormModel,
             isInitialFoodSearch: Bool = false,
             forIngredient: Bool = false,
             actionHandler: @escaping (ItemFormAction) -> ()
         ) {
-            print("🐣 ItemForm.FoodSearch created with nestLevel: \(nestLevel)")
-            self.nestLevel = nestLevel
             self.viewModel = viewModel
             self.isInitialFoodSearch = isInitialFoodSearch
             self.forIngredient = forIngredient
@@ -54,11 +51,15 @@ extension ItemForm.FoodSearch {
     }
 
     var navigationStack: some View {
-        NavigationStack(path: $viewModel.path) {
+//        NavigationStack(path: $viewModel.path) {
+        NavigationStack {
             foodSearch
-                .navigationDestination(for: ItemFormRoute.self) { route in
-                    navigationDestination(for: route)
+                .navigationDestination(isPresented: $viewModel.showingItem) {
+                    itemForm
                 }
+//                .navigationDestination(for: ItemFormRoute.self) { route in
+//                    navigationDestination(for: route)
+//                }
         }
     }
     
@@ -82,12 +83,12 @@ extension ItemForm.FoodSearch {
 //        .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
         .navigationBarBackButtonHidden(viewModel.food == nil)
         .toolbar { trailingContent }
-///        .sheet(item: $presentedSheet) { sheet(for: $0) }
+        .sheet(item: $presentedSheet) { sheet(for: $0) }
         .fullScreenCover(item: $presentedFullScreenSheet) { sheet(for: $0) }
     }
 
     @ViewBuilder
-    func sheet(for sheet: Sheet) -> some View {
+    func sheet(for sheet: ItemFormSheet) -> some View {
         switch sheet {
         case .foodForm: foodForm
         case .recipeForm: recipeForm
@@ -95,15 +96,7 @@ extension ItemForm.FoodSearch {
         }
     }
 
-    enum Sheet: String, Identifiable  {
-        case foodForm
-        case recipeForm
-        case plateForm
-        
-        public var id: String { rawValue }
-    }
-    
-    func present(_ sheet: Sheet) {
+    func present(_ sheet: ItemFormSheet) {
         
         if presentedSheet != nil {
             presentedSheet = nil
@@ -125,7 +118,7 @@ extension ItemForm.FoodSearch {
         }
     }
     
-    func presentFullScreen(_ sheet: Sheet, delayIfPresented: Bool = true) {
+    func presentFullScreen(_ sheet: ItemFormSheet, delayIfPresented: Bool = true) {
         
         func present() {
             Haptics.feedback(style: .soft)
@@ -177,5 +170,14 @@ extension Food {
             return .weight(.g)
         }
     }
+}
+
+
+enum ItemFormSheet: String, Identifiable  {
+    case foodForm
+    case recipeForm
+    case plateForm
+    
+    public var id: String { rawValue }
 }
 

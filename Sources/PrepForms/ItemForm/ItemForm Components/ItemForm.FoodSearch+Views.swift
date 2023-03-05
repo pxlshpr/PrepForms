@@ -38,6 +38,7 @@ extension ItemForm.FoodSearch {
         func didSaveFood(_ formOutput: FoodFormOutput) {
             Haptics.successFeedback()
             FoodFormManager.shared.save(formOutput, sourceId: self.id)
+//            FoodFormManager.shared.save(formOutput, sourceId: UUID())
         }
         
         return FoodForm(didSave: didSaveFood)
@@ -51,6 +52,7 @@ extension ItemForm.FoodSearch {
             
         case .save(let output):
             DataManager.shared.addNewParentFood(from: output, sourceId: id)
+//            DataManager.shared.addNewParentFood(from: output, sourceId: UUID())
         }
     }
 
@@ -64,13 +66,9 @@ extension ItemForm.FoodSearch {
     
     func parentFoodForm(forRecipe: Bool) -> some View {
         ParentFoodForm(
-            nestLevel: nestLevel,
             forRecipe: forRecipe,
             actionHandler: handleParentFoodFormAction
         )
-        .onDisappear {
-            ParentFoodForm.ViewModels.shared.remove(at: nestLevel)
-        }
     }
 
     func macrosView(for food: Food) -> some View {
