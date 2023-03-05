@@ -43,7 +43,7 @@ extension FoodForm.SourcesForm {
     
     var form: some View {
         FormStyledScrollView {
-            if !sources.imageViewModels.isEmpty {
+            if !sources.imageModels.isEmpty {
                 imagesSection
             } else {
                 addImagesSection
@@ -133,7 +133,7 @@ extension FoodForm.SourcesForm {
     }
 
     var imagesCarousel: some View {
-        SourceImagesCarousel(imageViewModels: $sources.imageViewModels) { index in
+        SourceImagesCarousel(imageModels: $sources.imageModels) { index in
             sources.presentingImageIndex = index
             showingTextPicker = true
         } didTapDeleteOnImage: { index in

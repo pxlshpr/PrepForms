@@ -6,9 +6,9 @@
 //    let name: String
 //    let imageTexts: [ImageText]
 //    
-//    func containsTexts(from imageViewModel: ImageViewModel) -> Bool {
+//    func containsTexts(from imageModel: ImageModel) -> Bool {
 //        imageTexts.contains {
-//            $0.imageId == imageViewModel.id
+//            $0.imageId == imageModel.id
 //        }
 //    }
 //    

@@ -7,7 +7,7 @@ let EqualSymbol = "equal.square"
 
 struct GoalCell: View {
     @Environment(\.colorScheme) var colorScheme
-    @ObservedObject var goal: GoalViewModel
+    @ObservedObject var goal: GoalModel
     @Binding var showingEquivalentValues: Bool
 
     var body: some View {

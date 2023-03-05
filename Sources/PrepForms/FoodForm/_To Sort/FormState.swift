@@ -16,14 +16,14 @@ extension Field {
      
      So for a `FieldValue.size`, for instance:
         - `FormState.invalid` is returned if the amount is empty, the name is empty, or the quantity and amount aren't greater than 0.
-        - `FormState.duplicate` is returned with the duplicate if the `FoodFormViewModel.shared` singleton already contains a size with that name and volume prefix unit.
+        - `FormState.duplicate` is returned with the duplicate if the `FoodFormModel.shared` singleton already contains a size with that name and volume prefix unit.
      
      Further types will be handled as required.
      */
-    func formState(existingFieldViewModel: Field? = nil) -> FormState {
+    func formState(existingFieldModel: Field? = nil) -> FormState {
         switch self.value {
         case .size(let sizeValue):
-            let sizeBeingEdited = existingFieldViewModel?.value.size
+            let sizeBeingEdited = existingFieldModel?.value.size
             return sizeValue.size.formState(sizeBeingEdited: sizeBeingEdited)
         default:
             return .okToSave
@@ -34,7 +34,7 @@ extension Field {
 extension FormSize {
     func formState(sizeBeingEdited: FormSize? = nil) -> FormState {
         //TODO: Bring this back before using this
-//        if FoodFormViewModel.shared.containsSize(withName: name, andVolumePrefixUnit: volumePrefixUnit, ignoring: sizeBeingEdited) {
+//        if FoodFormModel.shared.containsSize(withName: name, andVolumePrefixUnit: volumePrefixUnit, ignoring: sizeBeingEdited) {
 //            return .duplicate
 //        }
 

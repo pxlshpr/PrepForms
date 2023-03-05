@@ -32,7 +32,7 @@ extension FoodForm.AmountPerForm.SizeForm {
     
     var amountForm: some View {
         Amount(field: field)
-            .environmentObject(formViewModel)
+            .environmentObject(formModel)
     }
     
     var unitPickerForVolumePrefix: some View {

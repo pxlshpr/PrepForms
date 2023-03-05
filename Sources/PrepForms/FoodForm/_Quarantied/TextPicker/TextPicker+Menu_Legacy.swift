@@ -5,14 +5,14 @@
 //    var topMenuButton: some View {
 //        Menu {
 //            Button {
-//                if textPickerViewModel.columnCountForCurrentImage == 1 {
+//                if textPickerModel.columnCountForCurrentImage == 1 {
 //                    /// Show confirmation dialog if we have only one column
 //                    Haptics.warningFeedback()
 //                    showingAutoFillConfirmation = true
 //                } else {
 //                    Haptics.feedback(style: .soft)
 //                    /// Otherwise show the column picker
-//                    textPickerViewModel.tappedAutoFill()
+//                    textPickerModel.tappedAutoFill()
 //                }
 //            } label: {
 //                Label("AutoFill", systemImage: "text.viewfinder")
@@ -20,12 +20,12 @@
 //            Button {
 //                Haptics.feedback(style: .soft)
 //                withAnimation {
-//                    textPickerViewModel.showingBoxes.toggle()
+//                    textPickerModel.showingBoxes.toggle()
 //                }
 //            } label: {
 //                Label(
-//                    "\(textPickerViewModel.showingBoxes ? "Hide" : "Show") Texts",
-//                    systemImage: "eye\(textPickerViewModel.showingBoxes ? ".slash" : "")"
+//                    "\(textPickerModel.showingBoxes ? "Hide" : "Show") Texts",
+//                    systemImage: "eye\(textPickerModel.showingBoxes ? ".slash" : "")"
 //                )
 //            }
 //            Divider()
@@ -58,7 +58,7 @@
 ////        .confirmationDialog("AutoFill", isPresented: $showingAutoFillConfirmation) {
 ////            Button("Confirm AutoFill") {
 ////                Haptics.successFeedback()
-////                textPickerViewModel.tappedConfirmAutoFill()
+////                textPickerModel.tappedConfirmAutoFill()
 ////            }
 ////        } message: {
 ////            Text("This will replace any existing data with those detected in this image")
@@ -66,7 +66,7 @@
 //        .confirmationDialog("", isPresented: $showingDeleteConfirmation, titleVisibility: .hidden) {
 //            Button("Delete Photo", role: .destructive) {
 //                Haptics.errorFeedback()
-//                textPickerViewModel.deleteCurrentImage()
+//                textPickerModel.deleteCurrentImage()
 //            }
 //        } message: {
 //            Text("This photo will be deleted while the data you filled from it will remain")

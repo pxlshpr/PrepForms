@@ -3,7 +3,7 @@ import SwiftHaptics
 
 struct SourceImagesCarousel: View {
     
-    @Binding var imageViewModels: [ImageViewModel]
+    @Binding var imageModels: [ImageModel]
     
     var didTapViewOnImage: ((Int) -> ())? = nil
     var didTapDeleteOnImage: ((Int) -> ())? = nil
@@ -11,10 +11,10 @@ struct SourceImagesCarousel: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 0) {
-                ForEach(imageViewModels.indices, id: \.self) { index in
+                ForEach(imageModels.indices, id: \.self) { index in
                     sourceImage(at: index)
                         .padding(.leading, index == 0 ? 10 : 0)
-                        .padding(.trailing, index ==  imageViewModels.count - 1 ? 10 : 0)
+                        .padding(.trailing, index ==  imageModels.count - 1 ? 10 : 0)
                 }
             }
         }
@@ -34,7 +34,7 @@ struct SourceImagesCarousel: View {
                 Text("Delete")
             }
         } label: {
-            SourceImage(imageViewModel: imageViewModels[index])
+            SourceImage(imageModel: imageModels[index])
         } primaryAction: {
             Haptics.feedback(style: .soft)
             didTapViewOnImage?(index)

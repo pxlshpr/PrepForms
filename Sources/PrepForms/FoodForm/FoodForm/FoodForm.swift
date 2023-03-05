@@ -162,7 +162,7 @@ public struct FoodForm: View {
     func selectedPhotosChanged(to items: [PhotosPickerItem]) {
         //        guard let item = items.first else { return }
         //        presentLabelScanner(forCamera: false)
-        //        let _ = ImageViewModel(photosPickerItem: item) { image in
+        //        let _ = ImageModel(photosPickerItem: item) { image in
         //                self.selectedPhoto = image
         //        }
         //        sources.selectedPhotos = []

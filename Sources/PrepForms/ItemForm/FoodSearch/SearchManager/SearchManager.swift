@@ -4,12 +4,12 @@ import SwiftSugar
 
 public class SearchManager: ObservableObject {
 
-    var searchViewModel: SearchViewModel
+    var searchModel: SearchModel
     
     let dataProvider: SearchDataProvider
     
-    public init(searchViewModel: SearchViewModel, dataProvider: SearchDataProvider) {
-        self.searchViewModel = searchViewModel
+    public init(searchModel: SearchModel, dataProvider: SearchDataProvider) {
+        self.searchModel = searchModel
         self.dataProvider = dataProvider
     }
     
@@ -17,9 +17,9 @@ public class SearchManager: ObservableObject {
     var networkSearchTask: Task<Void, Error>? = nil
 
     func performBackendSearch() async {
-        guard !searchViewModel.searchText.isEmpty else {
+        guard !searchModel.searchText.isEmpty else {
             await MainActor.run {
-                searchViewModel.clearSearch()
+                searchModel.clearSearch()
             }
             return
         }
@@ -28,8 +28,8 @@ public class SearchManager: ObservableObject {
         backendSearchTask = Task {
             let start = CFAbsoluteTimeGetCurrent()
             do {
-                try await self.search(scope: .backend, with: self.searchViewModel.searchText)
-                try await self.search(scope: .verifiedLocal, with: self.searchViewModel.searchText)
+                try await self.search(scope: .backend, with: self.searchModel.searchText)
+                try await self.search(scope: .verifiedLocal, with: self.searchModel.searchText)
                 cprint("🔎 Backend Search completed in \(CFAbsoluteTimeGetCurrent()-start)s")
             } catch let error where error is CancellationError {
                 cprint("🔎✋🏽 Backend Search was cancelled")
@@ -51,7 +51,7 @@ public class SearchManager: ObservableObject {
                 for scope in supportedScopes {
                     group.addTask {
                         do {
-                            try await self.search(scope: scope, with: self.searchViewModel.searchText)
+                            try await self.search(scope: scope, with: self.searchModel.searchText)
                             return .success(scope)
                         } catch let error where error is CancellationError {
                             return .failure(.cancelled(scope))
@@ -90,7 +90,7 @@ public class SearchManager: ObservableObject {
         
         await MainActor.run {
             withAnimation {
-                searchViewModel.setInitialLoadingState(for: scope)
+                searchModel.setInitialLoadingState(for: scope)
             }
         }
         
@@ -102,7 +102,7 @@ public class SearchManager: ObservableObject {
 
         await MainActor.run {
             withAnimation {
-                searchViewModel.addResults(
+                searchModel.addResults(
                     for: scope,
                     with: foods,
                     haveMoreResults: haveMoreResults
@@ -112,18 +112,18 @@ public class SearchManager: ObservableObject {
     }
     
     func loadMoreResults(for scope: SearchScope) {
-        searchViewModel.setLoadingState(for: scope)
+        searchModel.setLoadingState(for: scope)
 
         Task {
             let (foods, haveMoreResults) = try await dataProvider.getFoods(
                 scope: scope,
-                searchText: searchViewModel.searchText,
-                page: searchViewModel.currentPage + 1
+                searchText: searchModel.searchText,
+                page: searchModel.currentPage + 1
             )
 
             await MainActor.run {
                 withAnimation {
-                    searchViewModel.addResults(
+                    searchModel.addResults(
                         for: scope,
                         with: foods,
                         haveMoreResults: haveMoreResults

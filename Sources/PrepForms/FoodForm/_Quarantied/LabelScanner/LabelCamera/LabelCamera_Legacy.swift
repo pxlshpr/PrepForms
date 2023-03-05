@@ -7,7 +7,7 @@
 //public struct LabelCamera: View {
 //
 //    @Environment(\.dismiss) var dismiss
-//    @StateObject var cameraViewModel: CameraViewModel
+//    @StateObject var cameraModel: CameraModel
 //    @StateObject var model: Model
 //    
 //    public init(mockData: (ScanResult, UIImage)? = nil, imageHandler: @escaping ImageHandler) {
@@ -15,7 +15,7 @@
 //        let model = Model(mockData: mockData, imageHandler: imageHandler)
 //        _model = StateObject(wrappedValue: model)
 //        
-//        let cameraViewModel = CameraViewModel(
+//        let cameraModel = CameraModel(
 //            mode: .capture,
 //            showCaptureAnimation: false,
 //            shouldShowScanOverlay: false,
@@ -25,7 +25,7 @@
 //            showPhotoPickerButton: false,
 //            showCapturedImagesCount: false
 //        )
-//        _cameraViewModel = StateObject(wrappedValue: cameraViewModel)
+//        _cameraModel = StateObject(wrappedValue: cameraModel)
 //    }
 //    
 //    @State var hasAppeared = false
@@ -54,7 +54,7 @@
 //                dismiss()
 //            }
 //        }
-//        .onChange(of: cameraViewModel.shouldDismiss) { newShouldDismiss in
+//        .onChange(of: cameraModel.shouldDismiss) { newShouldDismiss in
 //            if newShouldDismiss {
 //                dismiss()
 //            }
@@ -64,7 +64,7 @@
 //    func tappedStart() {
 //        Haptics.feedback(style: .heavy)
 //        withAnimation {
-//            cameraViewModel.shouldShowScanOverlay = true
+//            cameraModel.shouldShowScanOverlay = true
 //            model.started = true
 //        }
 //#if targetEnvironment(simulator)
@@ -74,7 +74,7 @@
 //    
 //    var cameraLayer: some View {
 //        BaseCamera(imageHandler: handleCapturedImage)
-//            .environmentObject(cameraViewModel)
+//            .environmentObject(cameraModel)
 //    }
 //    
 //    func handleCapturedImage(_ image: UIImage) {

@@ -3,9 +3,9 @@ import Foundation
 extension EnergyGoalForm {
 
     func appeared() {
-        pickedMealEnergyGoalType = MealEnergyTypeOption(goalViewModel: goal) ?? .fixed
-        pickedDietEnergyGoalType = DietEnergyTypeOption(goalViewModel: goal) ?? .fixed
-        pickedDelta = EnergyDeltaOption(goalViewModel: goal) ?? .below
+        pickedMealEnergyGoalType = MealEnergyTypeOption(goalModel: goal) ?? .fixed
+        pickedDietEnergyGoalType = DietEnergyTypeOption(goalModel: goal) ?? .fixed
+        pickedDelta = EnergyDeltaOption(goalModel: goal) ?? .below
         refreshBool.toggle()
     }
     

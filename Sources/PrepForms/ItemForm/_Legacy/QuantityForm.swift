@@ -13,7 +13,7 @@
 //extension MealItemForm {
 //    public struct QuantityForm: View {
 //        
-//        @EnvironmentObject var model: MealItemViewModel
+//        @EnvironmentObject var model: MealItemModel
 //
 //        @Namespace var namespace
 //        @Environment(\.colorScheme) var colorScheme

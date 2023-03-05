@@ -4,7 +4,7 @@ import SwiftHaptics
 
 struct FiltersSheet: View {
     
-    @StateObject var model = FiltersSheetViewModel()
+    @StateObject var model = FiltersSheetModel()
 
     init() { }
     

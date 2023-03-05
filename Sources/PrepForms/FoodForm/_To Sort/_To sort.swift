@@ -108,7 +108,7 @@ extension Field {
 }
 
 extension FormSize {
-    var asFieldViewModelForUserInput: Field {
+    var asFieldModelForUserInput: Field {
         Field(fieldValue: .size(.init(size: self, fill: .userInput)))
     }
 }
@@ -595,8 +595,8 @@ extension ScanResult {
         if serving?.amount != nil {
             count += 1
         }
-        let count1 = allSizeViewModels(at: 1).count
-        let count2 = allSizeViewModels(at: 2).count
+        let count1 = allSizeModels(at: 1).count
+        let count2 = allSizeModels(at: 2).count
         count += max(count1, count2)
 //        if let serving {
 //            if serving.amount != nil {
@@ -626,7 +626,7 @@ extension ScanResult {
     }
 }
 
-extension ImageViewModel {    
+extension ImageModel {    
     func writeImage(to directoryUrl: URL) async throws {
         guard let imageData else { return }
         let imageUrl = directoryUrl.appending(component: "\(id).jpg")
@@ -895,7 +895,7 @@ extension VolumeUnit {
 }
 
 
-extension ImageViewModel {
+extension ImageModel {
     func saveScanResultToJson() {
         guard let scanResult else {
             return
@@ -1216,7 +1216,7 @@ extension FieldValue.BarcodeValue {
 }
 
 extension VolumeUnit {
-    //TODO: Choose these based on user settings, to be provided to FoodViewModel upon creating the form
+    //TODO: Choose these based on user settings, to be provided to FoodModel upon creating the form
     var volumeExplicitUnit: VolumeExplicitUnit {
         switch self {
         case .gallon:

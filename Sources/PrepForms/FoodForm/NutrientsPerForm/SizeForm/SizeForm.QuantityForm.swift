@@ -8,7 +8,7 @@ extension SizeForm {
 
         @EnvironmentObject var fields: FoodForm.Fields
         
-        @ObservedObject var sizeFormViewModel: SizeFormViewModel
+        @ObservedObject var sizeFormModel: SizeFormModel
         @StateObject var model: Model
 
         @Environment(\.dismiss) var dismiss
@@ -18,9 +18,9 @@ extension SizeForm {
         @State var hasFocusedOnAppear: Bool = false
         @State var hasCompletedFocusedOnAppearAnimation: Bool = false
         
-        init(sizeFormViewModel: SizeFormViewModel) {
-            self.sizeFormViewModel = sizeFormViewModel
-            let model = Model(initialDouble: sizeFormViewModel.quantity)
+        init(sizeFormModel: SizeFormModel) {
+            self.sizeFormModel = sizeFormModel
+            let model = Model(initialDouble: sizeFormModel.quantity)
             _model = StateObject(wrappedValue: model)
         }
         
@@ -82,7 +82,7 @@ extension SizeForm.QuantityForm {
     var doneButton: some View {
         FormInlineDoneButton(disabled: model.shouldDisableDone) {
             Haptics.feedback(style: .rigid)
-            sizeFormViewModel.quantity = model.internalDouble ?? 1
+            sizeFormModel.quantity = model.internalDouble ?? 1
             dismiss()
         }
     }

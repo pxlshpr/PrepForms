@@ -13,8 +13,8 @@
 //
 //    //TODO: Remove these after moving to Model
 //
-////    @StateObject var model: LabelScannerViewModel
-//    @ObservedObject var model: LabelScannerViewModel
+////    @StateObject var model: LabelScannerModel
+//    @ObservedObject var model: LabelScannerModel
 //
 ////    public init(
 ////        isCamera: Bool = true,
@@ -30,7 +30,7 @@
 ////        _animatingCollapse = animatingCollapse ?? .constant(false)
 ////
 ////
-////        let model = LabelScannerViewModel(
+////        let model = LabelScannerModel(
 ////            isCamera: isCamera,
 ////            animatingCollapse: animatingCollapse?.wrappedValue ?? false,
 ////            imageHandler: imageHandler,
@@ -41,7 +41,7 @@
 ////    }
 //    
 //    public init(
-//        scanner: LabelScannerViewModel,
+//        scanner: LabelScannerModel,
 //        image: Binding<UIImage?> = .constant(nil)
 //    ) {
 //        _selectedImage = image
@@ -196,7 +196,7 @@
 //        }
 //        
 ////        textBoxes.append(
-////            contentsOf: barcodes(for: imageViewModel).map {
+////            contentsOf: barcodes(for: imageModel).map {
 ////                TextBox(boundingBox: $0.boundingBox,
 ////                        color: color(for: $0),
 ////                        tapHandler: tapHandler(for: $0)

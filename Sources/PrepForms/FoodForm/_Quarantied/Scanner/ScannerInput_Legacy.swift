@@ -41,12 +41,12 @@
 //
 //    let attributesListAnimation: Animation = Bounce
 //
-//    @ObservedObject var model: ScannerViewModel
+//    @ObservedObject var model: ScannerModel
 //
 //    let scannerDidChangeAttribute = NotificationCenter.default.publisher(for: .scannerDidChangeAttribute)
 //
 //    public init(
-//        model: ScannerViewModel,
+//        model: ScannerModel,
 //        actionHandler: @escaping (ScannerAction) -> ()
 //    ) {
 //        self.model = model
@@ -1345,7 +1345,7 @@
 //
 //    let delay: CGFloat = 0.5
 //    @State var selectedColumn: Int = 1
-//    @StateObject var model: ScannerViewModel = ScannerViewModel()
+//    @StateObject var model: ScannerModel = ScannerModel()
 //
 //    public init() { }
 //    public var body: some View {

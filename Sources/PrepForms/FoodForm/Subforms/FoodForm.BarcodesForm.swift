@@ -128,8 +128,8 @@ extension FoodForm.BarcodesForm {
 //                       payloadString: $0,
 //                       symbology: .ean13,
 //                       fill: .userInput)
-//                   let fieldViewModel = Field(fieldValue: .barcode(barcodeValue))
-//                   let _ = model.add(barcodeViewModel: fieldViewModel)
+//                   let fieldModel = Field(fieldValue: .barcode(barcodeValue))
+//                   let _ = model.add(barcodeModel: fieldModel)
 //                   Haptics.successFeedback()
 //               }
 //           )

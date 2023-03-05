@@ -8,7 +8,7 @@ extension SizeForm {
 
         @EnvironmentObject var fields: FoodForm.Fields
         
-        @ObservedObject var sizeFormViewModel: SizeFormViewModel
+        @ObservedObject var sizeFormModel: SizeFormModel
         @StateObject var model: Model
 
         @Environment(\.dismiss) var dismiss
@@ -18,9 +18,9 @@ extension SizeForm {
         @State var hasFocusedOnAppear: Bool = false
         @State var hasCompletedFocusedOnAppearAnimation: Bool = false
         
-        init(sizeFormViewModel: SizeFormViewModel) {
-            self.sizeFormViewModel = sizeFormViewModel
-            let model = Model(initialString: sizeFormViewModel.name)
+        init(sizeFormModel: SizeFormModel) {
+            self.sizeFormModel = sizeFormModel
+            let model = Model(initialString: sizeFormModel.name)
             _model = StateObject(wrappedValue: model)
         }
         
@@ -91,7 +91,7 @@ extension SizeForm.NameForm {
     
     func dismissAfterSetting(_ string: String) {
         Haptics.feedback(style: .rigid)
-        sizeFormViewModel.name = string.lowercased()
+        sizeFormModel.name = string.lowercased()
         dismiss()
     }
     

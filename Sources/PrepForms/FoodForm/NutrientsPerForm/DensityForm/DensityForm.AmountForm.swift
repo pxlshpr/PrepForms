@@ -9,7 +9,7 @@ extension DensityForm {
 
         @EnvironmentObject var fields: FoodForm.Fields
         
-        @ObservedObject var densityFormViewModel: DensityFormViewModel
+        @ObservedObject var densityFormModel: DensityFormModel
         @StateObject var model: Model
 
         @Environment(\.dismiss) var dismiss
@@ -22,9 +22,9 @@ extension DensityForm {
         
         let forWeight: Bool
         
-        init(densityFormViewModel vm: DensityFormViewModel, forWeight: Bool) {
+        init(densityFormModel vm: DensityFormModel, forWeight: Bool) {
             self.forWeight = forWeight
-            self.densityFormViewModel = vm
+            self.densityFormModel = vm
             let model = Model(
                 initialDouble: forWeight ? vm.weightAmount : vm.volumeAmount,
                 initialUnit: forWeight ? .weight(vm.weightUnit) : .volume(vm.volumeUnit)
@@ -109,11 +109,11 @@ extension DensityForm.AmountForm {
         FormInlineDoneButton(disabled: model.shouldDisableDone) {
             Haptics.feedback(style: .rigid)
             if forWeight {
-                densityFormViewModel.weightAmount = model.internalDouble
-                densityFormViewModel.weightUnit = model.internalUnit.weightUnit ?? .g
+                densityFormModel.weightAmount = model.internalDouble
+                densityFormModel.weightUnit = model.internalUnit.weightUnit ?? .g
             } else {
-                densityFormViewModel.volumeAmount = model.internalDouble
-                densityFormViewModel.volumeUnit = model.internalUnit.volumeUnit ?? .cup
+                densityFormModel.volumeAmount = model.internalDouble
+                densityFormModel.volumeUnit = model.internalUnit.volumeUnit ?? .cup
             }
             dismiss()
         }

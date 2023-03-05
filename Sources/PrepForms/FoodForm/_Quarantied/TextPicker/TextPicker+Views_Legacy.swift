@@ -8,20 +8,20 @@
 //
 //    var pagerLayer: some View {
 //        Pager(
-//            page: textPickerViewModel.page,
-//            data: textPickerViewModel.imageViewModels,
+//            page: textPickerModel.page,
+//            data: textPickerModel.imageModels,
 //            id: \.hashValue,
-//            content: { imageViewModel in
-//                zoomableScrollView(for: imageViewModel)
+//            content: { imageModel in
+//                zoomableScrollView(for: imageModel)
 //                    .background(.black)
 //            })
 //        .sensitivity(.high)
 //        .pagingPriority(.high)
 //        .onPageWillChange { index in
-//            textPickerViewModel.pageWillChange(to: index)
+//            textPickerModel.pageWillChange(to: index)
 //        }
 //        .onPageChanged { index in
-//            textPickerViewModel.pageDidChange(to: index)
+//            textPickerModel.pageDidChange(to: index)
 //        }
 //        .edgesIgnoringSafeArea(.all)
 //    }
@@ -31,7 +31,7 @@
 //        VStack(spacing: 0) {
 //            topBar
 //            Spacer()
-//            if textPickerViewModel.shouldShowBottomBar {
+//            if textPickerModel.shouldShowBottomBar {
 //                bottomBar
 //                //TODO: Bring this back after figuring out what's causing the EXC_BAD_ACCESS (code=1) crash
 //                //                    .transition(.move(edge: .bottom))
@@ -61,13 +61,13 @@
 //
 //    func thumbnail(at index: Int) -> some View {
 //        var isSelected: Bool {
-//            textPickerViewModel.currentIndex == index
+//            textPickerModel.currentIndex == index
 //        }
 //
 //        return Group {
-//            if let image = textPickerViewModel.imageViewModels[index].image {
+//            if let image = textPickerModel.imageModels[index].image {
 //                Button {
-//                    textPickerViewModel.didTapThumbnail(at: index)
+//                    textPickerModel.didTapThumbnail(at: index)
 //                } label: {
 //                    Image(uiImage: image)
 //                        .interpolation(.none)
@@ -97,50 +97,50 @@
 //
 //extension TextPicker {
 //
-//    func index(of imageViewModel: ImageViewModel) -> Int? {
-//        guard let index = textPickerViewModel.imageViewModels.firstIndex(of: imageViewModel),
-//              index < textPickerViewModel.zoomBoxes.count
+//    func index(of imageModel: ImageModel) -> Int? {
+//        guard let index = textPickerModel.imageModels.firstIndex(of: imageModel),
+//              index < textPickerModel.zoomBoxes.count
 //        else { return nil }
 //        return index
 //    }
 //
-//    func id(for imageViewModel: ImageViewModel) -> UUID? {
-//        guard let index = index(of: imageViewModel) else { return nil }
-//        return textPickerViewModel.imageViewModels[index].id
+//    func id(for imageModel: ImageModel) -> UUID? {
+//        guard let index = index(of: imageModel) else { return nil }
+//        return textPickerModel.imageModels[index].id
 //    }
 //
-//    func zoomBoxBinding(for imageViewModel: ImageViewModel) -> Binding<ZBox?>? {
-//        guard let index = index(of: imageViewModel) else { return nil }
+//    func zoomBoxBinding(for imageModel: ImageModel) -> Binding<ZBox?>? {
+//        guard let index = index(of: imageModel) else { return nil }
 //        return Binding<ZBox?>(
-//            get: { textPickerViewModel.zoomBoxes[index] },
+//            get: { textPickerModel.zoomBoxes[index] },
 //            set: { _ in }
 //        )
 //    }
 //
 //    var showingBoxesBinding: Binding<Bool> {
 //        Binding<Bool>(
-//            get: { textPickerViewModel.showingBoxes },
+//            get: { textPickerModel.showingBoxes },
 //            set: { _ in }
 //        )
 //    }
 //
 //    var textPickerHasAppearedBinding: Binding<Bool> {
 //        Binding<Bool>(
-//            get: { textPickerViewModel.hasAppeared },
+//            get: { textPickerModel.hasAppeared },
 //            set: { _ in }
 //        )
 //    }
 //
 //    @ViewBuilder
-//    func zoomableScrollView_new(for imageViewModel: ImageViewModel) -> some View {
-//        if let id = id(for: imageViewModel),
-//           let zoomBoxBinding = zoomBoxBinding(for: imageViewModel),
-//           let image = imageViewModel.image
+//    func zoomableScrollView_new(for imageModel: ImageModel) -> some View {
+//        if let id = id(for: imageModel),
+//           let zoomBoxBinding = zoomBoxBinding(for: imageModel),
+//           let image = imageModel.image
 //        {
 //            ImageViewer(
 //                id: id,
 //                image: image,
-//                textBoxes: .constant(textPickerViewModel.textBoxes(for: imageViewModel)),
+//                textBoxes: .constant(textPickerModel.textBoxes(for: imageModel)),
 //                zoomBox: zoomBoxBinding,
 //                showingBoxes: showingBoxesBinding,
 //                textPickerHasAppeared: textPickerHasAppearedBinding
@@ -154,32 +154,32 @@
 //extension TextPicker {
 //
 //    @ViewBuilder
-//    func zoomableScrollView(for imageViewModel: ImageViewModel) -> some View {
-//        if let index = textPickerViewModel.imageViewModels.firstIndex(of: imageViewModel),
-//           index < textPickerViewModel.zoomBoxes.count,
-//           let image = imageViewModel.image
+//    func zoomableScrollView(for imageModel: ImageModel) -> some View {
+//        if let index = textPickerModel.imageModels.firstIndex(of: imageModel),
+//           index < textPickerModel.zoomBoxes.count,
+//           let image = imageModel.image
 //        {
 //            ZoomableScrollView {
 ////            ZoomableScrollView(
-////                id: textPickerViewModel.imageViewModels[index].id,
-////                zoomBox: $textPickerViewModel.zoomBoxes[index],
+////                id: textPickerModel.imageModels[index].id,
+////                zoomBox: $textPickerModel.zoomBoxes[index],
 ////                backgroundColor: .black
 ////            ) {
 //                imageView(image)
-//                    .overlay(textBoxesLayer(for: imageViewModel))
+//                    .overlay(textBoxesLayer(for: imageModel))
 //            }
 //        }
 //    }
 //
-//    func textBoxesLayer(for imageViewModel: ImageViewModel) -> some View {
+//    func textBoxesLayer(for imageModel: ImageModel) -> some View {
 //        let binding = Binding<[TextBox]>(
-//            get: { textPickerViewModel.textBoxes(for: imageViewModel) },
+//            get: { textPickerModel.textBoxes(for: imageModel) },
 //            set: { _ in }
 //        )
 //        return TextBoxesLayer(textBoxes: binding)
-//            .opacity((textPickerViewModel.hasAppeared && textPickerViewModel.showingBoxes) ? 1 : 0)
-//            .animation(.default, value: textPickerViewModel.hasAppeared)
-//            .animation(.default, value: textPickerViewModel.showingBoxes)
+//            .opacity((textPickerModel.hasAppeared && textPickerModel.showingBoxes) ? 1 : 0)
+//            .animation(.default, value: textPickerModel.hasAppeared)
+//            .animation(.default, value: textPickerModel.showingBoxes)
 //    }
 //
 //    @ViewBuilder
@@ -188,7 +188,7 @@
 //            .resizable()
 //            .scaledToFit()
 //            .background(.black)
-//            .opacity(textPickerViewModel.showingBoxes ? 0.7 : 1)
-//            .animation(.default, value: textPickerViewModel.showingBoxes)
+//            .opacity(textPickerModel.showingBoxes ? 0.7 : 1)
+//            .animation(.default, value: textPickerModel.showingBoxes)
 //    }
 //}

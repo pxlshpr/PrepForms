@@ -8,13 +8,13 @@
 //
 //    var bottomBarHeight: CGFloat {
 //        var height: CGFloat = 0
-//        if textPickerViewModel.showShowImageSelector {
+//        if textPickerModel.showShowImageSelector {
 //            height += actionBarHeight
 //        }
-//        if textPickerViewModel.shouldShowSelectedTextsBar {
+//        if textPickerModel.shouldShowSelectedTextsBar {
 //            height += selectedTextsBarHeight
 //        }
-//        if textPickerViewModel.shouldShowColumnPickerBar {
+//        if textPickerModel.shouldShowColumnPickerBar {
 //            height += columnPickerBarHeight
 //        }
 //
@@ -22,6 +22,6 @@
 //    }
 //    
 //    var title: String? {
-//        textPickerViewModel.mode.prompt
+//        textPickerModel.mode.prompt
 //    }
 //}

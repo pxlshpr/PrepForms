@@ -10,8 +10,8 @@
 //     */
 //    var columnSelectionDoneButton: some View {
 //        Button {
-//            textPickerViewModel.tappedColumnSelectionDone()
-//            if textPickerViewModel.shouldDismissAfterTappingDone() {
+//            textPickerModel.tappedColumnSelectionDone()
+//            if textPickerModel.shouldDismissAfterTappingDone() {
 //                Haptics.feedback(style: .medium)
 //                DispatchQueue.main.async {
 //                    dismiss()
@@ -39,9 +39,9 @@
 //
 //    @ViewBuilder
 //    var doneButton_legacy: some View {
-//        if textPickerViewModel.shouldShowDoneButton {
+//        if textPickerModel.shouldShowDoneButton {
 //            Button {
-//                if textPickerViewModel.shouldDismissAfterTappingDone() {
+//                if textPickerModel.shouldDismissAfterTappingDone() {
 //                    Haptics.successFeedback()
 //                    DispatchQueue.main.async {
 //                        dismiss()
@@ -67,7 +67,7 @@
 //                    .padding(.vertical, 10)
 //                    .contentShape(Rectangle())
 //            }
-//            .disabled(textPickerViewModel.selectedImageTexts.isEmpty)
+//            .disabled(textPickerModel.selectedImageTexts.isEmpty)
 //            .transition(.scale)
 //            .buttonStyle(.borderless)
 //        }
@@ -76,7 +76,7 @@
 //    var dismissButton: some View {
 //        Button {
 //            Haptics.feedback(style: .soft)
-//            textPickerViewModel.tappedDismiss()
+//            textPickerModel.tappedDismiss()
 //            dismiss()
 //        } label: {
 //            Image(systemName: "xmark")
@@ -99,7 +99,7 @@
 //    func selectedTextButton(for column: TextColumn) -> some View {
 //        Button {
 //            withAnimation {
-//                textPickerViewModel.pickedColumn(column.column)
+//                textPickerModel.pickedColumn(column.column)
 //            }
 //        } label: {
 //            ZStack {
@@ -124,7 +124,7 @@
 //    func selectedTextButton(for imageText: ImageText) -> some View {
 //        Button {
 //            withAnimation {
-//                textPickerViewModel.selectedImageTexts.removeAll(where: { $0 == imageText })
+//                textPickerModel.selectedImageTexts.removeAll(where: { $0 == imageText })
 //            }
 //        } label: {
 //            ZStack {
@@ -147,7 +147,7 @@
 //    }
 //    
 //    func columnPicker(columns: [TextColumn]) -> some View {
-//        Picker("", selection: $textPickerViewModel.selectedColumn) {
+//        Picker("", selection: $textPickerModel.selectedColumn) {
 //            ForEach(columns.indices, id: \.self) { i in
 //                Text(columns[i].name)
 //                    .tag(i+1)
@@ -157,9 +157,9 @@
 //        .padding(.leading, 20)
 //        .frame(maxWidth: .infinity)
 //        .frame(height: 40)
-//        .onChange(of: textPickerViewModel.selectedColumn) { newValue in
+//        .onChange(of: textPickerModel.selectedColumn) { newValue in
 //            Haptics.feedback(style: .soft)
-//            textPickerViewModel.pickedColumn(newValue)
+//            textPickerModel.pickedColumn(newValue)
 //        }
 //    }
 //}

@@ -123,7 +123,7 @@ extension FoodForm.Fields {
         }
 
         updateFormState()
-        FoodForm.Sources.shared.markAllImageViewModelsAsProcessed()
+        FoodForm.Sources.shared.markAllImageModelsAsProcessed()
     }
     
     func handleOneToOneExtractedNutrientFieldValue(_ fieldValue: FieldValue, from output: ExtractorOutput) {

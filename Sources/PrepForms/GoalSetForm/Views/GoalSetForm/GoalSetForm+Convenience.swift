@@ -13,6 +13,6 @@ extension GoalSetForm {
     }
     
     func hasMicronutrient(_ nutrientType: NutrientType) -> Bool {
-        goalSetViewModel.containsMicro(nutrientType)
+        goalSetModel.containsMicro(nutrientType)
     }
 }

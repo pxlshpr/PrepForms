@@ -5,9 +5,9 @@ extension FoodForm {
     
     var imagesDict: [UUID: UIImage] {
         var dict: [UUID: UIImage] = [:]
-        for imageViewModel in sources.imageViewModels {
-            guard let image = imageViewModel.image else { continue }
-            dict[imageViewModel.id] = image
+        for imageModel in sources.imageModels {
+            guard let image = imageModel.image else { continue }
+            dict[imageModel.id] = image
         }
         return dict
     }

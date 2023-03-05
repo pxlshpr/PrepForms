@@ -10,14 +10,14 @@
 //public struct Scanner: View {
 //    
 //    @Binding var selectedImage: UIImage?
-//    @ObservedObject var model: ScannerViewModel
+//    @ObservedObject var model: ScannerModel
 //
 //    /// ⌨️ Keyboard-height stuff
 ////    let keyboardDidShow = NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)
 ////    let keyboardDidHide = NotificationCenter.default.publisher(for: UIResponder.keyboardDidHideNotification)
 //
 //    public init(
-//        scanner: ScannerViewModel,
+//        scanner: ScannerModel,
 //        image: Binding<UIImage?> = .constant(nil)
 //    ) {
 //        _selectedImage = image
@@ -33,11 +33,11 @@
 //        .onChange(of: model.showingValuePickerUI) { showingValuePickerUI in
 //            guard showingValuePickerUI, let scanResult = model.scanResult
 //            else { return }
-//            configureValuesPickerViewModel(with: scanResult)
+//            configureValuesPickerModel(with: scanResult)
 //        }
 ////        .onChange(of: model.scanResult) { scanResult in
 ////            guard let scanResult else { return }
-////            configureValuesPickerViewModel(with: scanResult)
+////            configureValuesPickerModel(with: scanResult)
 ////        }
 ////        .onChange(of: model.animatingCollapse) { newValue in
 ////            withAnimation {
@@ -287,7 +287,7 @@
 //        model.toggleAttributeConfirmation(attribute)
 //    }
 //    
-//    func configureValuesPickerViewModel(with scanResult: ScanResult) {
+//    func configureValuesPickerModel(with scanResult: ScanResult) {
 //        model.resetNutrients()
 //        guard let firstAttribute = scanResult.nutrientAttributes.first else {
 //            return

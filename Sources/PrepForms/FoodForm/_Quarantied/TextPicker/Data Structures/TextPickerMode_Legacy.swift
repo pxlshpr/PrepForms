@@ -195,16 +195,16 @@
 //        return false
 //    }
 //    
-//    func initialImageIndex(from imageViewModels: [ImageViewModel]) -> Int {
+//    func initialImageIndex(from imageModels: [ImageModel]) -> Int {
 //        switch self {
 //        case .imageViewer(let initialImageIndex, _, _):
 //            return initialImageIndex
 //        case .singleSelection(_, let selectedImageText, _):
 //            guard let selectedImageText else { return 0 }
-//            return imageViewModels.firstIndex(where: { $0.id == selectedImageText.imageId }) ?? 0
+//            return imageModels.firstIndex(where: { $0.id == selectedImageText.imageId }) ?? 0
 //        case .multiSelection(_, let selectedImageTexts, _):
 //            guard let first = selectedImageTexts.first else { return 0 }
-//            return imageViewModels.firstIndex(where: { $0.id == first.imageId }) ?? 0
+//            return imageModels.firstIndex(where: { $0.id == first.imageId }) ?? 0
 //        case .columnSelection:
 //            return 0
 //        }

@@ -4,7 +4,7 @@ import SwiftHaptics
 extension FoodForm.AmountPerForm.SizeForm {
     struct Amount: View {
         @EnvironmentObject var fields: FoodForm.Fields
-        @EnvironmentObject var formViewModel: SizeFormViewModel_Legacy
+        @EnvironmentObject var formModel: SizeFormModel_Legacy
         @ObservedObject var field: Field
         
         @Environment(\.dismiss) var dismiss
@@ -59,9 +59,9 @@ extension FoodForm.AmountPerForm.SizeForm.Amount {
     var unitPickerForAmount: some View {
         UnitPicker_Legacy(
             pickedUnit: field.sizeAmountUnit,
-            includeServing: formViewModel.includeServing,
+            includeServing: formModel.includeServing,
             servingDescription: fields.serving.doubleValueDescription,
-            allowAddSize: formViewModel.allowAddSize)
+            allowAddSize: formModel.allowAddSize)
         {
             showingSizeForm = true
         } didPickUnit: { unit in
@@ -70,8 +70,8 @@ extension FoodForm.AmountPerForm.SizeForm.Amount {
         .environmentObject(fields)
         .sheet(isPresented: $showingSizeForm) {
             Color.red
-            FoodForm.AmountPerForm.SizeForm(includeServing: fields.hasServing, allowAddSize: false) { sizeViewModel in
-                guard let size = sizeViewModel.size else { return }
+            FoodForm.AmountPerForm.SizeForm(includeServing: fields.hasServing, allowAddSize: false) { sizeModel in
+                guard let size = sizeModel.size else { return }
                 withAnimation {
                     self.field.sizeAmountUnit = .size(size, size.volumePrefixUnit?.defaultVolumeUnit)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

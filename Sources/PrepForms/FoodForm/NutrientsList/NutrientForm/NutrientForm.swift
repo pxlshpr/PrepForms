@@ -14,7 +14,7 @@ struct NutrientForm: View {
     @State var hasFocusedOnAppear: Bool = false
     @State var hasCompletedFocusedOnAppearAnimation: Bool = false
 
-    @StateObject var model: NutrientFormViewModel
+    @StateObject var model: NutrientFormModel
     
     init(
         nutrient: AnyNutrient,

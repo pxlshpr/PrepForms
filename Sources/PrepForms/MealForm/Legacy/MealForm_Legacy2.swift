@@ -8,7 +8,7 @@ import PrepViews
 
 public struct MealForm_Legacy2: View {
 
-    @StateObject var model: MealFormViewModel
+    @StateObject var model: MealFormModel
 
     @Environment(\.dismiss) var dismiss
     @FocusState var isFocused: Bool
@@ -44,7 +44,7 @@ public struct MealForm_Legacy2: View {
         getTimelineItemsHandler: GetTimelineItemsHandler? = nil,
         didSave: @escaping (String, Date, GoalSet?) -> ()
     ) {
-        let model = MealFormViewModel(
+        let model = MealFormModel(
             mealBeingEdited: mealBeingEdited,
             date: date,
             recents: recents,

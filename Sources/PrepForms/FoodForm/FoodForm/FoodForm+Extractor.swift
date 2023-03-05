@@ -35,7 +35,7 @@ extension FoodForm {
             /// - there would already be the food label, so we wouldn't need to refresh it
             /// - the user has most likely scrolled down the list at this point, so refreshing would cause the
             /// scroll offset to reset
-            if sources.imageViewModels.count == 1 {
+            if sources.imageModels.count == 1 {
                 refreshBool.toggle()
             }
         }

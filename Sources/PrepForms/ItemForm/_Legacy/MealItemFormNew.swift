@@ -8,7 +8,7 @@ import SwiftUISugar
 //struct MealItemFormNew: View {
 //
 //    @Environment(\.colorScheme) var colorScheme
-//    @ObservedObject var model: MealItemViewModel
+//    @ObservedObject var model: MealItemModel
 //    @State var hasAppeared: Bool = false
 //    @State var bottomHeight: CGFloat = 0.0
 //
@@ -24,7 +24,7 @@ import SwiftUISugar
 //}
 
 //struct MealItemFormQuantity: View {
-//    @ObservedObject var model: MealItemViewModel
+//    @ObservedObject var model: MealItemModel
 //    @FocusState var isFocused: Bool
 //    @State var showingUnitPicker = false
 //}

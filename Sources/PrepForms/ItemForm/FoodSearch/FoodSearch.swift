@@ -27,7 +27,7 @@ public struct FoodSearch: View {
     @State var focusFakeKeyboardWhenVisible = false
     @FocusState var fakeKeyboardFocused: Bool
 
-    @StateObject var searchViewModel: SearchViewModel
+    @StateObject var searchModel: SearchModel
     @StateObject var searchManager: SearchManager
 
     @State var showingBarcodeScanner = false
@@ -82,11 +82,11 @@ public struct FoodSearch: View {
         self.isRootInNavigationStack = isRootInNavigationStack
         self.shouldShowPlatesInFilter = shouldShowPlatesInFilter
         
-        let searchViewModel = SearchViewModel(recents: dataProvider.recentFoods)
-        _searchViewModel = StateObject(wrappedValue: searchViewModel)
+        let searchModel = SearchModel(recents: dataProvider.recentFoods)
+        _searchModel = StateObject(wrappedValue: searchModel)
         
         let searchManager = SearchManager(
-            searchViewModel: searchViewModel,
+            searchModel: searchModel,
             dataProvider: dataProvider
         )
         _searchManager = StateObject(wrappedValue: searchManager)
@@ -111,7 +111,7 @@ public struct FoodSearch: View {
 //            .toolbar { trailingContent }
 //            .toolbar { principalContent }
             .toolbar { leadingContent }
-            .onChange(of: searchViewModel.searchText, perform: searchTextChanged)
+            .onChange(of: searchModel.searchText, perform: searchTextChanged)
             .onChange(of: searchIsFocused, perform: searchIsFocusedChanged)
             .onReceive(didAddFood, perform: didAddFood)
             .onReceive(didUpdateUser, perform: didUpdateUser)
@@ -124,7 +124,7 @@ public struct FoodSearch: View {
     @ViewBuilder
     var content: some View {
         SearchableView(
-            searchText: $searchViewModel.searchText,
+            searchText: $searchModel.searchText,
 //            promptSuffix: "Foods",
             focused: $searchIsFocused,
             focusOnAppear: false,
@@ -156,6 +156,6 @@ public struct FoodSearch: View {
     }
     
     var title: String {
-        return isComparing ? "Select \(searchViewModel.foodType.description)s to Compare" : "Search"
+        return isComparing ? "Select \(searchModel.foodType.description)s to Compare" : "Search"
     }
 }

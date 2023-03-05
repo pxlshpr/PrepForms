@@ -123,7 +123,7 @@ extension Array where Element == ScanResult {
         allBarcodeFieldValues.map { Field(fieldValue: $0) }
     }
     
-    func allSizeViewModels(at column: Int) -> [Field] {
+    func allSizeModels(at column: Int) -> [Field] {
         allSizeFieldValues(at: column)
             .map { Field(fieldValue: $0) }
     }

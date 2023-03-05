@@ -17,7 +17,7 @@ struct ServingForm: View {
     @State var hasFocusedOnAppear: Bool = false
     @State var hasCompletedFocusedOnAppearAnimation: Bool = false
 
-    @StateObject var model: ServingFormViewModel
+    @StateObject var model: ServingFormModel
     
     init(
         isServingSize: Bool,

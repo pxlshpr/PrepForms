@@ -95,8 +95,8 @@ extension FoodForm.SourcesSummaryCell {
         .padding(.vertical, 15)
     }
     
-    func removeImageViewModel(_ imageViewModel: ImageViewModel) {
-        guard let index = sources.imageViewModels.firstIndex(where: { $0.id == imageViewModel.id }) else {
+    func removeImageModel(_ imageModel: ImageModel) {
+        guard let index = sources.imageModels.firstIndex(where: { $0.id == imageModel.id }) else {
             return
         }
         
@@ -104,7 +104,7 @@ extension FoodForm.SourcesSummaryCell {
         withAnimation {
             sources.removeImage(at: index)
         }
-        FoodForm.Fields.shared.resetFillsForFieldsUsingImage(with: imageViewModel.id)
+        FoodForm.Fields.shared.resetFillsForFieldsUsingImage(with: imageModel.id)
     }
     
     var buttonWidth: CGFloat {
@@ -112,7 +112,7 @@ extension FoodForm.SourcesSummaryCell {
     }
     
     private var axes: Axis.Set {
-        let count = sources.imageViewModels.count + (sources.linkInfo != nil ? 1 : 0)
+        let count = sources.imageModels.count + (sources.linkInfo != nil ? 1 : 0)
         let shouldScroll = count > 2
         return shouldScroll ? .horizontal : []
     }
@@ -122,11 +122,11 @@ extension FoodForm.SourcesSummaryCell {
             ScrollView(axes, showsIndicators: false) {
                 HStack(spacing: 8.0) {
                     /// Images
-                    ForEach(sources.imageViewModels, id: \.self.hashValue) { imageViewModel in
-                        if let image = imageViewModel.image {
+                    ForEach(sources.imageModels, id: \.self.hashValue) { imageModel in
+                        if let image = imageModel.image {
                             Menu {
                                 Button(role: .destructive) {
-                                    removeImageViewModel(imageViewModel)
+                                    removeImageModel(imageModel)
                                 } label: {
                                     Label("Remove", systemImage: "minus.circle")
                                 }
@@ -276,7 +276,7 @@ extension FoodForm.SourcesSummaryCell {
     
     @ViewBuilder
     var imagesRow: some View {
-        if !sources.imageViewModels.isEmpty {
+        if !sources.imageModels.isEmpty {
             HStack(alignment: .top, spacing: LabelSpacing) {
                 Image(systemName: "photo.on.rectangle.angled")
                     .foregroundColor(.secondary)
@@ -298,9 +298,9 @@ extension FoodForm.SourcesSummaryCell {
 
     var imagesGrid: some View {
         HStack {
-            ForEach(sources.imageViewModels, id: \.self.hashValue) { imageViewModel in
+            ForEach(sources.imageModels, id: \.self.hashValue) { imageModel in
                 SourceImage(
-                    imageViewModel: imageViewModel,
+                    imageModel: imageModel,
                     imageSize: .small
                 )
             }
@@ -394,7 +394,7 @@ extension FoodForm.SourcesSummaryCell {
     //MARK: - Sheets
     var camera: some View {
         Camera { image in
-            sources.addImageViewModel(ImageViewModel(image))
+            sources.addImageModel(ImageModel(image))
         }
     }
 //    var foodLabelCamera: some View {

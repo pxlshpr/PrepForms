@@ -56,7 +56,7 @@ extension FoodForm {
     }
     
     func handleScannedBarcodes(_ barcodes: [RecognizedBarcode], on image: UIImage) {
-        let imageViewModel = ImageViewModel(barcodeImage: image, recognizedBarcodes: barcodes)
+        let imageModel = ImageModel(barcodeImage: image, recognizedBarcodes: barcodes)
         var didAddABarcode = false
         for barcode in barcodes {
             let field = Field(fieldValue:
@@ -66,14 +66,14 @@ extension FoodForm {
                         fill: .barcodeScanned(
                             ScannedFillInfo(
                                 recognizedBarcode: barcode,
-                                imageId: imageViewModel.id)
+                                imageId: imageModel.id)
                         )
                     ))
             )
             didAddABarcode = fields.add(barcodeField: field)
         }
         if didAddABarcode {
-            sources.addImageViewModel(imageViewModel)
+            sources.addImageModel(imageModel)
             sources.updateImageSetStatusToScanned()
         }
     }
@@ -104,7 +104,7 @@ extension FoodForm {
     }
 
     func didDismissColumnPicker() {
-        sources.removeUnprocessedImageViewModels()
+        sources.removeUnprocessedImageModels()
     }
     
     func extract(column: Int, from results: [ScanResult], shouldOverwrite: Bool) {
@@ -127,15 +127,15 @@ extension FoodForm {
     /// Change all `.scanned` and `.selection` autofills that depend on this to `.userInput`
     //TODO: Move this to a Fields
     func resetFillForFieldsUsingImage(at index: Int) {
-//        guard index < imageViewModels.count else {
+//        guard index < imageModels.count else {
 //            return
 //        }
 //
-//        let id = imageViewModels[index].id
+//        let id = imageModels[index].id
 //
 //        /// Selectively reset fills for fields that are using this image
-//        for fieldViewModel in allFieldViewModels {
-//            fieldViewModel.registerDiscardScanIfUsingImage(withId: id)
+//        for fieldModel in allFieldModels {
+//            fieldModel.registerDiscardScanIfUsingImage(withId: id)
 //        }
 //
 //        /// Now remove the saved scanned field values that are also using this image
@@ -208,7 +208,7 @@ extension FoodForm {
             let (data, _) = try await URLSession.shared.data(from: url)
             let fieldsAndSources = try JSONDecoder().decode(FoodFormFieldsAndSources.self, from: data)
             
-            var imageViewModels: [ImageViewModel] = []
+            var imageModels: [ImageModel] = []
             for foodImage in fieldsAndSources.images {
                 let imageURL = imageURL(imageId: foodImage.id)
                 let (data, _) = try await URLSession.shared.data(from: imageURL)
@@ -219,12 +219,12 @@ extension FoodForm {
                 print("⬇️ Got back an image of size: \(image.size)")
                 
                 if let scanResult = foodImage.scanResult {
-                    imageViewModels.append(.init(
+                    imageModels.append(.init(
                         image: image,
                         scanResult: scanResult
                     ))
                 } else {
-                    imageViewModels.append(.init(
+                    imageModels.append(.init(
                         image: image,
                         id: foodImage.id
                     ))
@@ -233,7 +233,7 @@ extension FoodForm {
             
             await MainActor.run {
 
-                sources.imageViewModels = imageViewModels
+                sources.imageModels = imageModels
             //TODO: Do this first, and only do the local copy if we don't get the json data successfully
             
             /// Now set the Fills and crop the images

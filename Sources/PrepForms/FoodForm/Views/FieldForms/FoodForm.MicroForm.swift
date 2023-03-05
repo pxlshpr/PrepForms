@@ -40,7 +40,7 @@ extension FoodForm.NutrientsList.MicroForm {
     }
     
     var supplementaryViewHeaderString: String? {
-//        if fieldViewModel.fieldValue.microValue.unit == .p {
+//        if fieldModel.fieldValue.microValue.unit == .p {
         if field.value.microValue.convertedFromPercentage != nil {
             return "Equivalent Value"
         }
@@ -48,7 +48,7 @@ extension FoodForm.NutrientsList.MicroForm {
     }
 
     var supplementaryViewFooterString: String? {
-//        if fieldViewModel.fieldValue.microValue.unit == .p {
+//        if fieldModel.fieldValue.microValue.unit == .p {
         if field.value.microValue.convertedFromPercentage != nil {
             return "% values will be converted and saved as their equivalent amounts."
         }

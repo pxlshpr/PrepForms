@@ -70,7 +70,7 @@ extension FoodSearch {
         hideHeroAddButton()
         withAnimation {
             shouldShowRecents = searchText.isEmpty
-            shouldShowSearchPrompt = searchViewModel.hasNotSubmittedSearchYet && searchText.count >= 3
+            shouldShowSearchPrompt = searchModel.hasNotSubmittedSearchYet && searchText.count >= 3
         }
         Task {
             await searchManager.performBackendSearch()

@@ -31,7 +31,7 @@ extension ExtractorView {
             }
         }
         
-        return ImageViewer(model: imageViewerViewModel)
+        return ImageViewer(model: imageViewerModel)
             .overlay(overlay)
 //            .opacity(extractor.dismissState.shouldShrinkImage ? 0 : 1)
             .offset(y: extractor.dismissState.shouldShrinkImage ? UIScreen.main.bounds.height + extractor.imageOffset : 0)
@@ -57,7 +57,7 @@ extension ExtractorView {
     func setImageInImageViewer(_ image: UIImage) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             withAnimation(.easeInOut(duration: 0.5)) {
-                imageViewerViewModel.image = image
+                imageViewerModel.image = image
             }
         }
     }

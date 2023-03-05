@@ -7,8 +7,8 @@ enum DietNutrientGoal: CaseIterable {
     case quantityPerEnergy
     case percentageOfEnergy
     
-    init?(goalViewModel: GoalViewModel) {
-        switch goalViewModel.nutrientGoalType {
+    init?(goalModel: GoalModel) {
+        switch goalModel.nutrientGoalType {
         case .fixed:
             self = .fixed
         case .quantityPerBodyMass:

@@ -42,9 +42,9 @@ extension FoodSearch {
     @ViewBuilder
     var emptySearchContents: some View {
         Group {
-            if !searchViewModel.recents.isEmpty {
+            if !searchModel.recents.isEmpty {
                 recentsSection
-            } else if !searchViewModel.allMyFoods.isEmpty {
+            } else if !searchModel.allMyFoods.isEmpty {
                 allMyFoodsSection
             }
 //            createSection
@@ -98,7 +98,7 @@ extension FoodSearch {
         }
         
         return Section(header: header) {
-            ForEach(searchViewModel.recents, id: \.self) { food in
+            ForEach(searchModel.recents, id: \.self) { food in
                 foodButton(for: food)
             }
         }
@@ -150,7 +150,7 @@ extension FoodSearch {
             Button {
                 didSubmit()
             } label: {
-                Text("Tap search to find foods matching '\(searchViewModel.searchText)' in our databases.")
+                Text("Tap search to find foods matching '\(searchModel.searchText)' in our databases.")
                     .foregroundColor(.secondary)
             }
             .listRowBackground(FormCellBackground())
@@ -158,7 +158,7 @@ extension FoodSearch {
         }
     }
     func foodsSection(for scope: SearchScope) -> some View {
-        let results = searchViewModel.results(for: scope)
+        let results = searchModel.results(for: scope)
         return Group {
             if let foods = results.foods {
                 Section(header: header(for: scope)) {
@@ -264,7 +264,7 @@ extension FoodSearch {
     var barcodeScanner: some View {
         BarcodeScanner { barcodes in
             if let barcode = barcodes.first {
-                searchViewModel.searchText = barcode.string
+                searchModel.searchText = barcode.string
             }
         }
     }
@@ -372,7 +372,7 @@ extension FoodSearch {
                         .font(.headline)
                 } else {
                     Menu {
-                        Picker(selection: $searchViewModel.foodType, label: EmptyView()) {
+                        Picker(selection: $searchModel.foodType, label: EmptyView()) {
                             ForEach(foodTypes, id: \.self) {
                                 Label("\($0.description)s", systemImage: $0.systemImage).tag($0)
                                     .labelStyle(.titleAndIcon)
@@ -380,15 +380,15 @@ extension FoodSearch {
                         }
                     } label: {
                         HStack {
-                            Label("\(searchViewModel.foodType.description)s", systemImage: searchViewModel.foodType.systemImage)
+                            Label("\(searchModel.foodType.description)s", systemImage: searchModel.foodType.systemImage)
                                 .labelStyle(.titleAndIcon)
                             Image(systemName: "chevron.up.chevron.down")
                                 .imageScale(.small)
                                 .fontWeight(.medium)
                         }
-                        .animation(.none, value: searchViewModel.foodType)
+                        .animation(.none, value: searchModel.foodType)
                     }
-//                    Picker("", selection: $searchViewModel.foodType) {
+//                    Picker("", selection: $searchModel.foodType) {
 //                        ForEach(FoodType.allCases, id: \.self) {
 //
 //                            Label("\($0.description)s", systemImage: $0.systemImage).tag($0)
@@ -416,7 +416,7 @@ extension FoodSearch {
     
     @ViewBuilder
     var compareButton: some View {
-        if searchViewModel.hasResults {
+        if searchModel.hasResults {
             Button {
                 tappedCompare()
             } label: {

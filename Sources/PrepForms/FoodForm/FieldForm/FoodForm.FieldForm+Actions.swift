@@ -6,7 +6,7 @@ extension FoodForm.FieldForm {
     
     func saveAndDismiss() {
         doNotRegisterUserInput = true
-        /// Copy the data across from the transient `FieldViewModel` we were using here to persist the data
+        /// Copy the data across from the transient `FieldModel` we were using here to persist the data
         existingField.copyData(from: field)
         if let didSave {
             didSave()

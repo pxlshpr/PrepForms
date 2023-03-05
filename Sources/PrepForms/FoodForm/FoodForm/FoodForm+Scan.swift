@@ -16,7 +16,7 @@ extension FoodForm {
         
         /// Set the `ImageSetStatus` in `Sources` with the counts from `Fields`
         sources.imageSetStatus = .scanned(
-            numberOfImages: sources.imageViewModels.count,
+            numberOfImages: sources.imageModels.count,
 //            counts: fields.dataPointsCount //TODO: Do this
             counts: DataPointsCount(total: 0, autoFilled: 0, selected: 0, barcodes: 0)
         )

@@ -17,7 +17,7 @@ public struct SizeForm: View {
     @State var hasFocusedOnAppear: Bool = false
     @State var hasCompletedFocusedOnAppearAnimation: Bool = false
 
-    @StateObject var model: SizeFormViewModel
+    @StateObject var model: SizeFormModel
     
     @State var showingQuantityForm = false
     @State var showingAmountForm = false
@@ -84,15 +84,15 @@ public struct SizeForm: View {
     }
     
     var amountForm: some View {
-        AmountForm(sizeFormViewModel: model)
+        AmountForm(sizeFormModel: model)
     }
     
     var quantityForm: some View {
-        QuantityForm(sizeFormViewModel: model)
+        QuantityForm(sizeFormModel: model)
     }
     
     var nameForm: some View {
-        NameForm(sizeFormViewModel: model)
+        NameForm(sizeFormModel: model)
     }
 }
 

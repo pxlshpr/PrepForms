@@ -172,7 +172,7 @@
 //                    Haptics.feedback(style: .soft)
 //                    didSubmit()
 //                }
-////                        guard !searchViewModel.searchText.isEmpty else {
+////                        guard !searchModel.searchText.isEmpty else {
 ////                            dismiss()
 ////                            return
 ////                        }

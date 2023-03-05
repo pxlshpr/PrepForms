@@ -12,7 +12,7 @@ public struct DensityForm: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     
-    @StateObject var model: DensityFormViewModel
+    @StateObject var model: DensityFormModel
     
     @State var showingWeightForm = false
     @State var showingVolumeForm = false
@@ -46,11 +46,11 @@ public struct DensityForm: View {
     }
     
     var weightForm: some View {
-        AmountForm(densityFormViewModel: model, forWeight: true)
+        AmountForm(densityFormModel: model, forWeight: true)
     }
     
     var volumeForm: some View {
-        AmountForm(densityFormViewModel: model, forWeight: false)
+        AmountForm(densityFormModel: model, forWeight: false)
     }
     
 }

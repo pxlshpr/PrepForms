@@ -11,8 +11,8 @@ enum MealEnergyTypeOption: CaseIterable {
         }
     }
     
-    init?(goalViewModel: GoalViewModel) {
-        switch goalViewModel.energyGoalType {
+    init?(goalModel: GoalModel) {
+        switch goalModel.energyGoalType {
         case .fixed:
             self = .fixed
         default:

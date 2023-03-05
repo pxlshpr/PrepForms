@@ -7,8 +7,8 @@ struct NutrientGoalForm: View {
     
     @Environment(\.dismiss) var dismiss
     
-    @EnvironmentObject var goalSet: GoalSetViewModel
-    @ObservedObject var goal: GoalViewModel
+    @EnvironmentObject var goalSet: GoalSetModel
+    @ObservedObject var goal: GoalModel
 
     let nutrientUnit: NutrientUnit
     
@@ -27,16 +27,16 @@ struct NutrientGoalForm: View {
     
     @State var shouldResignFocus = false
     
-    let didTapDelete: (GoalViewModel) -> ()
+    let didTapDelete: (GoalModel) -> ()
 
-    init(goal: GoalViewModel, didTapDelete: @escaping ((GoalViewModel) -> ())) {
+    init(goal: GoalModel, didTapDelete: @escaping ((GoalModel) -> ())) {
         
         self.goal = goal
         
         self.nutrientUnit = goal.nutrientUnit ?? .g
         
-        let pickedMealNutrientGoal = MealNutrientGoal(goalViewModel: goal) ?? .fixed
-        let pickedDietNutrientGoal = DietNutrientGoal(goalViewModel: goal) ?? .fixed
+        let pickedMealNutrientGoal = MealNutrientGoal(goalModel: goal) ?? .fixed
+        let pickedDietNutrientGoal = DietNutrientGoal(goalModel: goal) ?? .fixed
         let bodyMassType = goal.bodyMassType ?? .weight
         let bodyMassUnit = goal.bodyMassUnit ?? .kg // TODO: User's default unit here
         let workoutDurationUnit = goal.workoutDurationUnit ?? .min
@@ -251,18 +251,18 @@ struct NutrientGoalForm: View {
         NutrientWeightForm(existingProfile: goalSet.bodyProfile, didTapSave: { bodyProfile in
             goalSet.setBodyProfile(bodyProfile)
         }, didTapClose: {
-            goalSet.resetNutrientTDEEFormViewModel()
+            goalSet.resetNutrientTDEEFormModel()
         })
-        .environmentObject(goalSet.nutrientTDEEFormViewModel)
+        .environmentObject(goalSet.nutrientTDEEFormModel)
     }
     
     var leanMassForm: some View {
         NutrientLeanBodyMassForm(existingProfile: goalSet.bodyProfile, didTapSave: { bodyProfile in
             goalSet.setBodyProfile(bodyProfile)
         }, didTapClose: {
-            goalSet.resetNutrientTDEEFormViewModel()
+            goalSet.resetNutrientTDEEFormModel()
         })
-        .environmentObject(goalSet.nutrientTDEEFormViewModel)
+        .environmentObject(goalSet.nutrientTDEEFormModel)
     }
 
     //MARK: - Convenience
@@ -599,7 +599,7 @@ struct NutrientGoalForm: View {
     }
 }
 
-extension GoalViewModel {
+extension GoalModel {
     @ViewBuilder
     var equivalentTextHStack: some View {
         if let equivalentUnitString {

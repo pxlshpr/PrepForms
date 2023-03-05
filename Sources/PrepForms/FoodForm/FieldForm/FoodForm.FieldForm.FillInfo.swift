@@ -73,7 +73,7 @@ extension FoodForm.FillInfo {
                         .fixedSize(horizontal: true, vertical: false)
                 }
                 //TODO: Get prefillUrl passed into this (from sources perhaps)
-//                if let prefillUrl = fieldViewModel.prefillUrl {
+//                if let prefillUrl = fieldModel.prefillUrl {
 //                    prefillSection(for: prefillUrl)
 //                }
             }

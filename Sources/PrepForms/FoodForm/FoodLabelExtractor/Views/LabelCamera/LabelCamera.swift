@@ -7,7 +7,7 @@ import FoodLabelScanner
 public struct LabelCamera: View {
 
     @Environment(\.dismiss) var dismiss
-    @StateObject var cameraViewModel: CameraViewModel
+    @StateObject var cameraModel: CameraModel
     @StateObject var model: Model
     @State var hasAppeared = false
     
@@ -23,7 +23,7 @@ public struct LabelCamera: View {
         let model = Model(mockData: mockData, imageHandler: imageHandler)
         _model = StateObject(wrappedValue: model)
         
-        let cameraViewModel = CameraViewModel(
+        let cameraModel = CameraModel(
             mode: .capture,
             showCaptureAnimation: false,
             shouldShowScanOverlay: false,
@@ -33,7 +33,7 @@ public struct LabelCamera: View {
             showPhotoPickerButton: false,
             showCapturedImagesCount: false
         )
-        _cameraViewModel = StateObject(wrappedValue: cameraViewModel)
+        _cameraModel = StateObject(wrappedValue: cameraModel)
     }
     
     public var body: some View {
@@ -50,7 +50,7 @@ public struct LabelCamera: View {
                 dismiss()
             }
         }
-        .onChange(of: cameraViewModel.shouldDismiss) { newValue in
+        .onChange(of: cameraModel.shouldDismiss) { newValue in
             if newValue {
                 didTapDismiss()
             }
@@ -74,7 +74,7 @@ public struct LabelCamera: View {
     func tappedStart() {
         Haptics.feedback(style: .heavy)
         withAnimation {
-            cameraViewModel.shouldShowScanOverlay = true
+            cameraModel.shouldShowScanOverlay = true
             model.started = true
         }
 #if targetEnvironment(simulator)
@@ -84,7 +84,7 @@ public struct LabelCamera: View {
     
     var cameraLayer: some View {
         BaseCamera(imageHandler: handleCapturedImage)
-            .environmentObject(cameraViewModel)
+            .environmentObject(cameraModel)
     }
     
     func handleCapturedImage(_ image: UIImage) {

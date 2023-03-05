@@ -26,7 +26,7 @@ let package = Package(
         .package(url: "https://github.com/pxlshpr/PrepViews", from: "0.0.149"),
         .package(url: "https://github.com/pxlshpr/SwiftHaptics", from: "0.1.3"),
         .package(url: "https://github.com/pxlshpr/SwiftSugar", from: "0.0.88"),
-        .package(url: "https://github.com/pxlshpr/SwiftUICamera", from: "0.0.41"),
+        .package(url: "https://github.com/pxlshpr/SwiftUICamera", from: "0.0.42"),
         .package(url: "https://github.com/pxlshpr/SwiftUISugar", from: "0.0.371"),
         .package(url: "https://github.com/pxlshpr/VisionSugar", from: "0.0.78"),
         .package(url: "https://github.com/pxlshpr/SwiftUIPopovers", from: "1.3.3"),

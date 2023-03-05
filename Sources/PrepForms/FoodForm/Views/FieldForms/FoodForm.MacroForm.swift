@@ -10,8 +10,8 @@ extension FoodForm.NutrientsList {
         init(existingField: Field) {
             self.existingField = existingField
             
-            let fieldViewModel = existingField
-            _field = StateObject(wrappedValue: fieldViewModel)
+            let fieldModel = existingField
+            _field = StateObject(wrappedValue: fieldModel)
         }
     }
 }

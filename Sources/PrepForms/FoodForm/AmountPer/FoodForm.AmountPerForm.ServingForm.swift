@@ -110,14 +110,14 @@ extension FoodForm.AmountPerForm.ServingForm {
     
     //TODO: AmountPerForm Revisit this
     func modifyServingAmount(for unit: FormUnit) {
-//        guard fieldViewModel.fieldValue.doubleValue.unit.isServingBased,
-//              case .size(let size, _) = fieldViewModel.fieldValue.doubleValue.unit
+//        guard fieldModel.fieldValue.doubleValue.unit.isServingBased,
+//              case .size(let size, _) = fieldModel.fieldValue.doubleValue.unit
 //        else {
 //            return
 //        }
 //        let newAmount: Double
 //        if let quantity = size.quantity,
-//           let servingAmount = fieldViewModel.fieldValue.doubleValue.double, servingAmount > 0
+//           let servingAmount = fieldModel.fieldValue.doubleValue.double, servingAmount > 0
 //        {
 //            newAmount = quantity / servingAmount
 //        } else {

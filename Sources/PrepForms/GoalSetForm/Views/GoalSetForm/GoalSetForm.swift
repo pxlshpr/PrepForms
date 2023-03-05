@@ -9,7 +9,7 @@ public struct GoalSetForm: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     
-    @StateObject var goalSetViewModel: GoalSetViewModel
+    @StateObject var goalSetModel: GoalSetModel
 //    @StateObject var model: Model
     
     @State var showingNutrientsPicker: Bool = false
@@ -39,22 +39,22 @@ public struct GoalSetForm: View {
         bodyProfile: BodyProfile? = nil,
         didTapSave: @escaping (GoalSet, BodyProfile?, Bool) -> ()
     ) {
-        let goalSetViewModel = GoalSetViewModel(
+        let goalSetModel = GoalSetModel(
             userUnits: userUnits,
             type: type,
             existingGoalSet: existingGoalSet,
             isDuplicating: isDuplicating,
             bodyProfile: bodyProfile
         )
-        _goalSetViewModel = StateObject(wrappedValue: goalSetViewModel)
-        _showingEquivalentValuesToggle = State(initialValue: goalSetViewModel.containsGoalWithEquivalentValues)
+        _goalSetModel = StateObject(wrappedValue: goalSetModel)
+        _showingEquivalentValuesToggle = State(initialValue: goalSetModel.containsGoalWithEquivalentValues)
         self.didTapSave = didTapSave
         
         _showingSaveButton = State(initialValue: isDuplicating)
     }
     
     public var body: some View {
-        NavigationStack(path: $goalSetViewModel.path) {
+        NavigationStack(path: $goalSetModel.path) {
             content
             .background(Color(.systemGroupedBackground))
             .navigationTitle(title)
@@ -64,9 +64,9 @@ public struct GoalSetForm: View {
             .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
             .navigationDestination(for: GoalSetFormRoute.self, destination: navigationDestination)
             .scrollDismissesKeyboard(.interactively)
-            .onChange(of: goalSetViewModel.containsGoalWithEquivalentValues, perform: containsGoalWithEquivalentValuesChanged)
+            .onChange(of: goalSetModel.containsGoalWithEquivalentValues, perform: containsGoalWithEquivalentValuesChanged)
             .onChange(of: canBeSaved, perform: canBeSavedChanged)
-            .onChange(of: goalSetViewModel.singleGoalViewModelToPushTo, perform: singleGoalViewModelToPushTo)
+            .onChange(of: goalSetModel.singleGoalModelToPushTo, perform: singleGoalModelToPushTo)
             .sheet(isPresented: $showingNameForm) { nameForm }
             .confirmationDialog(
                 editConfirmationTitle,
@@ -80,14 +80,14 @@ public struct GoalSetForm: View {
     
     var duplicateAlert: Alert {
         Alert(
-            title: Text("Existing \(goalSetViewModel.type.description)"),
-            message: Text("Please choose a different name than ‘\(goalSetViewModel.name)’, as this one has already been used."),
+            title: Text("Existing \(goalSetModel.type.description)"),
+            message: Text("Please choose a different name than ‘\(goalSetModel.name)’, as this one has already been used."),
             dismissButton: .default(Text("OK"))
         )
     }
     
     var editConfirmationTitle: String {
-        "This \(goalSetViewModel.type.description) has been used \(numberOfPreviousUses) times. Are you sure you want to modify all of them?"
+        "This \(goalSetModel.type.description) has been used \(numberOfPreviousUses) times. Are you sure you want to modify all of them?"
     }
     
     @ViewBuilder
@@ -101,14 +101,14 @@ public struct GoalSetForm: View {
     }
 
     var nameForm: some View {
-        NameForm(name: $goalSetViewModel.name )
+        NameForm(name: $goalSetModel.name )
     }
     
-    func singleGoalViewModelToPushTo(to goalViewModel: GoalViewModel?) {
-        guard let goalViewModel else { return }
+    func singleGoalModelToPushTo(to goalModel: GoalModel?) {
+        guard let goalModel else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             isFocused = false
-            goalSetViewModel.path.append(.goal(goalViewModel))
+            goalSetModel.path.append(.goal(goalModel))
         }
     }
     
@@ -127,18 +127,18 @@ public struct GoalSetForm: View {
     @ViewBuilder
     func navigationDestination(for route: GoalSetFormRoute) -> some View {
         switch route {
-        case .goal(let goalViewModel):
-            goalForm(for: goalViewModel)
+        case .goal(let goalModel):
+            goalForm(for: goalModel)
         }
     }
     
     var title: String {
-        let typeName = goalSetViewModel.type.description
+        let typeName = goalSetModel.type.description
         let prefix: String
-        if goalSetViewModel.existingGoalSet == nil {
+        if goalSetModel.existingGoalSet == nil {
             prefix = "New"
         } else {
-            prefix = goalSetViewModel.isDuplicating ? "New" : "Edit"
+            prefix = goalSetModel.isDuplicating ? "New" : "Edit"
         }
         return "\(prefix) \(typeName)"
     }
@@ -210,7 +210,7 @@ public struct GoalSetForm: View {
             Spacer()
             HStack {
                 Spacer()
-                if !goalSetViewModel.goalViewModels.isEmpty {
+                if !goalSetModel.goalModels.isEmpty {
                     addHeroButton
                         .transition(.move(edge: .trailing))
                 }
@@ -226,20 +226,20 @@ public struct GoalSetForm: View {
     }
     
     var canBeSaved: Bool {
-        goalSetViewModel.shouldShowSaveButton
+        goalSetModel.shouldShowSaveButton
     }
     
     func tappedSave() {
         
-        if !goalSetViewModel.isEditing || goalSetViewModel.isDuplicating {
-            guard !DataManager.shared.hasGoalSet(named: goalSetViewModel.name, type: goalSetViewModel.type) else {
+        if !goalSetModel.isEditing || goalSetModel.isDuplicating {
+            guard !DataManager.shared.hasGoalSet(named: goalSetModel.name, type: goalSetModel.type) else {
                 showingDuplicateAlert = true
                 return
             }
         }
         
-        if goalSetViewModel.isEditing,
-           let existing = goalSetViewModel.existingGoalSet
+        if goalSetModel.isEditing,
+           let existing = goalSetModel.existingGoalSet
         {
             self.numberOfPreviousUses = DataManager.shared.numberOfNonDeletedUsesForGoalSet(existing)
             if numberOfPreviousUses > 0 {
@@ -254,7 +254,7 @@ public struct GoalSetForm: View {
     }
     
     func saveAndDismiss(overwritingPreviousUses: Bool = false) {
-        didTapSave(goalSetViewModel.goalSet, goalSetViewModel.bodyProfile, overwritingPreviousUses)
+        didTapSave(goalSetModel.goalSet, goalSetModel.bodyProfile, overwritingPreviousUses)
         dismiss()
     }
 
@@ -278,43 +278,43 @@ public struct GoalSetForm: View {
     
     @ViewBuilder
     var energyCell: some View {
-        if let goal = goalSetViewModel.energyGoal {
+        if let goal = goalSetModel.energyGoal {
             cell(for: goal)
-        } else if let index = goalSetViewModel.implicitEnergyGoalIndex {
-            cell(for: goalSetViewModel.implicitGoals[index], isButton: false)
+        } else if let index = goalSetModel.implicitEnergyGoalIndex {
+            cell(for: goalSetModel.implicitGoals[index], isButton: false)
         }
     }
 
     @ViewBuilder
     var carbCell: some View {
-        if let goal = goalSetViewModel.carbGoal {
+        if let goal = goalSetModel.carbGoal {
             cell(for: goal)
-        } else if let index = goalSetViewModel.implicitMacroGoalIndex(for: .carb) {
-            cell(for: goalSetViewModel.implicitGoals[index], isButton: false)
+        } else if let index = goalSetModel.implicitMacroGoalIndex(for: .carb) {
+            cell(for: goalSetModel.implicitGoals[index], isButton: false)
         }
     }
     @ViewBuilder
     var fatCell: some View {
-        if let goal = goalSetViewModel.fatGoal {
+        if let goal = goalSetModel.fatGoal {
             cell(for: goal)
-        } else if let index = goalSetViewModel.implicitMacroGoalIndex(for: .fat) {
-            cell(for: goalSetViewModel.implicitGoals[index], isButton: false)
+        } else if let index = goalSetModel.implicitMacroGoalIndex(for: .fat) {
+            cell(for: goalSetModel.implicitGoals[index], isButton: false)
         }
     }
     @ViewBuilder
     var proteinCell: some View {
-        if let goal = goalSetViewModel.proteinGoal {
+        if let goal = goalSetModel.proteinGoal {
             cell(for: goal)
-        } else if let index = goalSetViewModel.implicitMacroGoalIndex(for: .protein) {
-            cell(for: goalSetViewModel.implicitGoals[index], isButton: false)
+        } else if let index = goalSetModel.implicitMacroGoalIndex(for: .protein) {
+            cell(for: goalSetModel.implicitGoals[index], isButton: false)
         }
     }
 
     
-    func cell(for goalViewModel: GoalViewModel, isButton: Bool = true) -> some View {
+    func cell(for goalModel: GoalModel, isButton: Bool = true) -> some View {
         var label: some View {
             GoalCell(
-                goal: goalViewModel,
+                goal: goalModel,
                 showingEquivalentValues: $showingEquivalentValues
             )
         }
@@ -322,7 +322,7 @@ public struct GoalSetForm: View {
             if isButton {
                 Button {
                     isFocused = false
-                    goalSetViewModel.path.append(.goal(goalViewModel))
+                    goalSetModel.path.append(.goal(goalModel))
                 } label: {
                     label
                 }
@@ -334,13 +334,13 @@ public struct GoalSetForm: View {
         
     @ViewBuilder
     var macroCells: some View {
-        if !goalSetViewModel.macroGoals.isEmpty {
+        if !goalSetModel.macroGoals.isEmpty {
             Group {
                 subtitleCell("Macros")
                 carbCell
                 fatCell
                 proteinCell
-//                ForEach(goalSetViewModel.macroGoals, id: \.self) {
+//                ForEach(goalSetModel.macroGoals, id: \.self) {
 //                    cell(for: $0)
 //                }
             }
@@ -349,10 +349,10 @@ public struct GoalSetForm: View {
     
     @ViewBuilder
     var microCells: some View {
-        if !goalSetViewModel.microGoals.isEmpty {
+        if !goalSetModel.microGoals.isEmpty {
             Group {
                 subtitleCell("Micronutrients")
-                ForEach(goalSetViewModel.microGoals, id: \.self) {
+                ForEach(goalSetModel.microGoals, id: \.self) {
                     cell(for: $0)
                 }
             }
@@ -364,11 +364,11 @@ public struct GoalSetForm: View {
             HStack {
                 emojiButton
                 Group {
-                    if goalSetViewModel.name.isEmpty {
+                    if goalSetModel.name.isEmpty {
                         Text("Enter a name")
                             .foregroundColor(Color(.tertiaryLabel))
                     } else {
-                        Text(goalSetViewModel.name)
+                        Text(goalSetModel.name)
                             .foregroundColor(.primary)
                     }
                 }
@@ -395,18 +395,18 @@ public struct GoalSetForm: View {
     var footerInfoContent: some View {
         
         var dynamicGoalsString: String {
-            let prefix = goalSetViewModel.dynamicGoalsCount == 1 ? "This is a dynamic goal" : "These are dynamic goals"
+            let prefix = goalSetModel.dynamicGoalsCount == 1 ? "This is a dynamic goal" : "These are dynamic goals"
             return "\(prefix) and will automatically update when new data is synced from the Health App."
         }
         
         var containsFooterContent: Bool {
-            goalSetViewModel.containsDynamicGoal || goalSetViewModel.containsImplicitGoal
+            goalSetModel.containsDynamicGoal || goalSetModel.containsImplicitGoal
         }
 
         return Group {
             if containsFooterContent {
                 VStack(alignment: .leading, spacing: 10) {
-                    if goalSetViewModel.containsDynamicGoal {
+                    if goalSetModel.containsDynamicGoal {
                         HStack(alignment: .firstTextBaseline) {
                             appleHealthBolt
                                 .imageScale(.small)
@@ -414,7 +414,7 @@ public struct GoalSetForm: View {
                             Text(dynamicGoalsString)
                         }
                     }
-                    if let implicitGoalName = goalSetViewModel.implicitGoalName {
+                    if let implicitGoalName = goalSetModel.implicitGoalName {
                         HStack(alignment: .firstTextBaseline) {
                             Image(systemName: "sparkles")
                                 .imageScale(.medium)
@@ -442,14 +442,14 @@ public struct GoalSetForm: View {
             Haptics.feedback(style: .soft)
             showingEmojiPicker = true
         } label: {
-            Text(goalSetViewModel.emoji)
+            Text(goalSetModel.emoji)
                 .font(.system(size: 50))
         }
     }
     
     @ViewBuilder
     var nameTextField: some View {
-        TextField("Enter a Name", text: $goalSetViewModel.name)
+        TextField("Enter a Name", text: $goalSetModel.name)
             .font(.title3)
             .multilineTextAlignment(.leading)
             .focused($isFocused)
@@ -558,11 +558,11 @@ struct MacroForm_Previews: PreviewProvider {
 
 struct EnergyFormPreview: View {
     
-    @StateObject var model: GoalSetViewModel
-    @StateObject var goalViewModel: GoalViewModel
+    @StateObject var model: GoalSetModel
+    @StateObject var goalModel: GoalModel
     
     init() {
-        let goalSetViewModel = GoalSetViewModel(
+        let goalSetModel = GoalSetModel(
             userUnits: UserOptions.defaultOptions.units,
             type: .day,
             existingGoalSet: nil,
@@ -576,20 +576,20 @@ struct EnergyFormPreview: View {
                 activeEnergySource: .userEntered
             )
         )
-        let goalViewModel = GoalViewModel(
-            goalSet: goalSetViewModel,
+        let goalModel = GoalModel(
+            goalSet: goalSetModel,
             goalSetType: .day,
             type: .energy(.fromMaintenance(.kcal, .deficit)),
             lowerBound: 500
 //            , upperBound: 750
         )
-        _model = StateObject(wrappedValue: goalSetViewModel)
-        _goalViewModel = StateObject(wrappedValue: goalViewModel)
+        _model = StateObject(wrappedValue: goalSetModel)
+        _goalModel = StateObject(wrappedValue: goalModel)
     }
     
     var body: some View {
         NavigationView {
-            EnergyGoalForm(goal: goalViewModel, didTapDelete: { _ in
+            EnergyGoalForm(goal: goalModel, didTapDelete: { _ in
                 
             })
             .environmentObject(model)
@@ -601,11 +601,11 @@ struct EnergyFormPreview: View {
 
 struct MacroFormPreview: View {
     
-    @StateObject var goalSet: GoalSetViewModel
-    @StateObject var goal: GoalViewModel
+    @StateObject var goalSet: GoalSetModel
+    @StateObject var goal: GoalModel
     
     init() {
-        let goalSet = GoalSetViewModel(
+        let goalSet = GoalSetModel(
             userUnits: UserOptions.defaultOptions.units,
             type: .day,
             existingGoalSet: GoalSet(
@@ -620,7 +620,7 @@ struct MacroFormPreview: View {
                 lbm: 77
             )
         )
-        let goal = GoalViewModel(
+        let goal = GoalModel(
             goalSet: goalSet,
             goalSetType: .day,
             type: .macro(.percentageOfEnergy, .carb),
@@ -797,12 +797,12 @@ extension BodyProfile {
 }
 
 public enum GoalSetFormRoute: Hashable {
-    case goal(GoalViewModel)
+    case goal(GoalModel)
 }
 
 //extension GoalSetForm {
 //    public class Model: ObservableObject {
-//        @Published var nutrientTDEEFormViewModel: TDEEForm.Model
+//        @Published var nutrientTDEEFormModel: TDEEForm.Model
 //        @Published var path: [GoalSetFormRoute] = []
 //        let existingGoalSet: GoalSet?
 //
@@ -814,31 +814,31 @@ public enum GoalSetFormRoute: Hashable {
 //        ) {
 //            self.existingGoalSet = existingGoalSet
 //
-//            self.nutrientTDEEFormViewModel = TDEEForm.Model(
+//            self.nutrientTDEEFormModel = TDEEForm.Model(
 //                existingProfile: bodyProfile,
 //                userOptions: userOptions
 //            )
 //
 //            self.path = []
 //            //TODO: Bring this back
-////            if let presentedGoalId, let goalViewModel = goals.first(where: { $0.id == presentedGoalId }) {
-////                self.path = [.goal(goalViewModel)]
+////            if let presentedGoalId, let goalModel = goals.first(where: { $0.id == presentedGoalId }) {
+////                self.path = [.goal(goalModel)]
 ////            }
 //        }
 //    }
 //
-//    func resetNutrientTDEEFormViewModel() {
-//        setNutrientTDEEFormViewModel(with: bodyProfile)
+//    func resetNutrientTDEEFormModel() {
+//        setNutrientTDEEFormModel(with: bodyProfile)
 //    }
 //
-//    func setNutrientTDEEFormViewModel(with bodyProfile: BodyProfile?) {
-//        nutrientTDEEFormViewModel = TDEEForm.Model(existingProfile: bodyProfile, userOptions: userOptions)
+//    func setNutrientTDEEFormModel(with bodyProfile: BodyProfile?) {
+//        nutrientTDEEFormModel = TDEEForm.Model(existingProfile: bodyProfile, userOptions: userOptions)
 //    }
 //
 //    func setBodyProfile(_ bodyProfile: BodyProfile) {
-//        /// in addition to setting the current body Profile, we also update the view model (TDEEForm.Model) we have  in GoalSetViewModel (or at least the relevant fields for weight and lbm)
+//        /// in addition to setting the current body Profile, we also update the view model (TDEEForm.Model) we have  in GoalSetModel (or at least the relevant fields for weight and lbm)
 //        self.bodyProfile = bodyProfile
-//        setNutrientTDEEFormViewModel(with: bodyProfile)
+//        setNutrientTDEEFormModel(with: bodyProfile)
 //    }
 //}
 

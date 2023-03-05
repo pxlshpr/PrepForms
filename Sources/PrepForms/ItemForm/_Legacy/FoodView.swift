@@ -6,7 +6,7 @@
 //
 //struct FoodView: View {
 //    
-//    @EnvironmentObject var foodSearchViewModel: FoodSearchViewModel
+//    @EnvironmentObject var foodSearchModel: FoodSearchModel
 //
 //    @Environment(\.colorScheme) var colorScheme
 //    
@@ -30,7 +30,7 @@
 //            }
 //        }
 //        .onAppear {
-//            if let result, let food = foodSearchViewModel.foods.first(where: { $0.id == result.id }) {
+//            if let result, let food = foodSearchModel.foods.first(where: { $0.id == result.id }) {
 //                self.food = food
 //            } else {
 //                //TODO: Do the task business here
@@ -140,12 +140,12 @@
 //}
 //struct FoodViewPreview: View {
 //    
-//    @StateObject var foodSearchViewModel = FoodSearchViewModel()
+//    @StateObject var foodSearchModel = FoodSearchModel()
 //    
 //    var body: some View {
 //        if let prepFood {
 //            FoodView(prepFood)
-//                .environmentObject(foodSearchViewModel)
+//                .environmentObject(foodSearchModel)
 //        } else {
 //            Color.red
 //        }

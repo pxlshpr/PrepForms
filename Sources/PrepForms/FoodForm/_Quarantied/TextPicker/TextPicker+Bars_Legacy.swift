@@ -19,7 +19,7 @@
 //            }
 //            HStack {
 //                Spacer()
-//                if textPickerViewModel.shouldShowMenuInTopBar {
+//                if textPickerModel.shouldShowMenuInTopBar {
 //                    topMenuButton
 ////                        .transition(.move(edge: .trailing))
 //                }
@@ -35,13 +35,13 @@
 //        ZStack {
 //            Color.clear
 //            VStack(spacing: 0) {
-//                if textPickerViewModel.shouldShowSelectedTextsBar {
+//                if textPickerModel.shouldShowSelectedTextsBar {
 //                    selectedTextsBar
 //                }
-//                if textPickerViewModel.shouldShowColumnPickerBar {
+//                if textPickerModel.shouldShowColumnPickerBar {
 //                    columnPickerBar
 //                }
-//                if textPickerViewModel.showShowImageSelector {
+//                if textPickerModel.showShowImageSelector {
 //                    actionBar
 //                }
 //            }
@@ -53,7 +53,7 @@
 //    var actionBar: some View {
 //        HStack {
 //            HStack(spacing: 5) {
-//                ForEach(textPickerViewModel.imageViewModels.indices, id: \.self) { index in
+//                ForEach(textPickerModel.imageModels.indices, id: \.self) { index in
 //                    thumbnail(at: index)
 //                }
 //            }
@@ -71,7 +71,7 @@
 //    var selectedTextsBar: some View {
 //        ScrollView(.horizontal, showsIndicators: false) {
 //            HStack {
-//                ForEach(textPickerViewModel.selectedImageTexts, id: \.self) { imageText in
+//                ForEach(textPickerModel.selectedImageTexts, id: \.self) { imageText in
 //                    selectedTextButton(for: imageText)
 //                }
 //            }
@@ -84,7 +84,7 @@
 //
 //    @ViewBuilder
 //    var columnPickerBar: some View {
-//        if let columns = textPickerViewModel.columns {
+//        if let columns = textPickerModel.columns {
 //            HStack {
 //                columnPicker(columns: columns)
 //                columnSelectionDoneButton

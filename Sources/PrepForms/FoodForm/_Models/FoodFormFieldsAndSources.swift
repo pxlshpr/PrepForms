@@ -50,7 +50,7 @@ struct FoodFormFieldsAndSources: Codable {
         self.prefilledFood = fields.prefilledFood
 
         self.link = sources.linkInfo?.urlString
-        self.images = sources.imageViewModels.map { FoodImage($0) }
+        self.images = sources.imageModels.map { FoodImage($0) }
         
         self.shouldPublish = shouldPublish
     }
@@ -83,8 +83,8 @@ struct FoodFormFieldsAndSources: Codable {
             let directoryUrl = documentsUrl.appending(component: UUID().uuidString)
             try FileManager.default.createDirectory(at: directoryUrl, withIntermediateDirectories: false)
             
-            for imageViewModel in sources.imageViewModels {
-                try await imageViewModel.writeImage(to: directoryUrl)
+            for imageModel in sources.imageModels {
+                try await imageModel.writeImage(to: directoryUrl)
             }
 
             let encoder = JSONEncoder()

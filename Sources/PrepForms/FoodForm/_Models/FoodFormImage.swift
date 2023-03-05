@@ -8,7 +8,7 @@ struct FoodImage: Codable {
     let scanResult: ScanResult?
     let barcodes: [RecognizedBarcode]
     
-    init(_ imv: ImageViewModel) {
+    init(_ imv: ImageModel) {
         self.id = imv.id
         self.scanResult = imv.scanResult
         self.barcodes = imv.recognizedBarcodes

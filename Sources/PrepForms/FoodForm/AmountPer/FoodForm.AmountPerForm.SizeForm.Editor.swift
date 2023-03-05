@@ -3,7 +3,7 @@ import NamePicker
 
 extension FoodForm.AmountPerForm.SizeForm {
     struct Editor: View {
-        @EnvironmentObject var formViewModel: SizeFormViewModel_Legacy
+        @EnvironmentObject var formModel: SizeFormModel_Legacy
         @ObservedObject var field: Field
         
         @Binding var path: [Route]
@@ -30,7 +30,7 @@ extension FoodForm.AmountPerForm.SizeForm.Editor {
                 Spacer()
             }
             HStack(spacing: 0) {
-                if formViewModel.showingVolumePrefix {
+                if formModel.showingVolumePrefix {
                     button(field.sizeVolumePrefixString) {
                         showingUnitPickerForVolumePrefix = true
                     }

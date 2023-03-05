@@ -27,10 +27,10 @@
 ////    let attributesListAnimation: Animation = Bounce2
 ////    let attributesListAnimation: Animation = .interactiveSpring()
 //
-//    @ObservedObject var model: ScannerViewModel
+//    @ObservedObject var model: ScannerModel
 //    
 //    public init(
-//        model: ScannerViewModel,
+//        model: ScannerModel,
 //        isVisibleBinding: Binding<Bool>,
 //        didTapDismiss: (() -> ())? = nil,
 //        didTapCheckmark: @escaping () -> (),
@@ -587,7 +587,7 @@
 //public struct ValuesPickerOverlayPreview: View {
 //    @State var selectedColumn: Int = 1
 //    
-//    @StateObject var model: ScannerViewModel = ScannerViewModel()
+//    @StateObject var model: ScannerModel = ScannerModel()
 //    
 //    public init() { }
 //    public var body: some View {

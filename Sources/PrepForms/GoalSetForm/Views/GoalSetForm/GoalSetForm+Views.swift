@@ -8,11 +8,11 @@ import SwiftUISugar
 extension GoalSetForm {
     
     var shouldShowEnergyInPicker: Bool {
-        !goalSetViewModel.goalViewModels.containsEnergy
+        !goalSetModel.goalModels.containsEnergy
     }
     
     func shouldShowMacroInPicker(_ macro: Macro) -> Bool {
-        !goalSetViewModel.containsMacro(macro)
+        !goalSetModel.containsMacro(macro)
     }
 
     var nutrientsPicker: some View {
@@ -23,7 +23,7 @@ extension GoalSetForm {
 //            shouldDisableLastMacroOrEnergy: true,
             hasUnusedMicros: hasUnusedMicros,
             hasMicronutrient: hasMicronutrient,
-            didAddNutrients: goalSetViewModel.didAddNutrients
+            didAddNutrients: goalSetModel.didAddNutrients
         )
     }
     
@@ -33,31 +33,31 @@ extension GoalSetForm {
             includeCancelButton: true) { emoji in
                 Haptics.successFeedback()
                 showingEmojiPicker = false
-                goalSetViewModel.emoji = emoji
+                goalSetModel.emoji = emoji
             }
     }
     
     @ViewBuilder
-    func goalForm(for goal: GoalViewModel) -> some View {
+    func goalForm(for goal: GoalModel) -> some View {
         if goal.type.isEnergy {
             EnergyGoalForm(goal: goal, didTapDelete: didTapDeleteOnGoal)
-                .environmentObject(goalSetViewModel)
+                .environmentObject(goalSetModel)
 //                .onDisappear {
 //                    isFocused = false
 //                }
         } else if goal.type.isMacro {
             NutrientGoalForm(goal: goal, didTapDelete: didTapDeleteOnGoal)
-                .environmentObject(goalSetViewModel)
+                .environmentObject(goalSetModel)
         } else {
             NutrientGoalForm(goal: goal, didTapDelete: didTapDeleteOnGoal)
-                .environmentObject(goalSetViewModel)
+                .environmentObject(goalSetModel)
         }
     }
     
-    func didTapDeleteOnGoal(_ goal: GoalViewModel) {
-        goalSetViewModel.path = []
+    func didTapDeleteOnGoal(_ goal: GoalModel) {
+        goalSetModel.path = []
         withAnimation {
-            goalSetViewModel.goalViewModels.removeAll(where: { $0.type.identifyingHashValue == goal.type.identifyingHashValue })
+            goalSetModel.goalModels.removeAll(where: { $0.type.identifyingHashValue == goal.type.identifyingHashValue })
         }
     }
     
@@ -91,7 +91,7 @@ extension GoalSetForm {
     
     @ViewBuilder
     var addButton: some View {
-        if !goalSetViewModel.goalViewModels.isEmpty {
+        if !goalSetModel.goalModels.isEmpty {
             Button {
                 presentNutrientsPicker()
             } label: {
@@ -102,7 +102,7 @@ extension GoalSetForm {
 
     @ViewBuilder
     var addCell: some View {
-        if !goalSetViewModel.goalViewModels.isEmpty {
+        if !goalSetModel.goalModels.isEmpty {
             addGoalsButton
         }
     }
@@ -110,7 +110,7 @@ extension GoalSetForm {
     
     @ViewBuilder
     var emptyContent: some View {
-        if goalSetViewModel.goalViewModels.isEmpty {
+        if goalSetModel.goalModels.isEmpty {
             emptyPrompt
         }
     }

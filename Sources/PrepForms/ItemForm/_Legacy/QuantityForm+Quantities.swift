@@ -62,7 +62,7 @@
 //}
 //
 //struct AmountFormPreview: View {
-//    @StateObject var model = MealItemViewModel(food: .init(mockName: "Cheese", emoji: "🧀"), meal: nil, dayMeals: [])
+//    @StateObject var model = MealItemModel(food: .init(mockName: "Cheese", emoji: "🧀"), meal: nil, dayMeals: [])
 //    var body: some View {
 //        MealItemForm.QuantityForm(isPresented: .constant(true))
 //            .environmentObject(model)

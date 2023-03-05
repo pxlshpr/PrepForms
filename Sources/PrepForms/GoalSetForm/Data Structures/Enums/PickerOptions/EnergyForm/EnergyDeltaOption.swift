@@ -13,8 +13,8 @@ enum EnergyDeltaOption: CaseIterable {
         }
     }
     
-    init?(goalViewModel: GoalViewModel) {
-        switch goalViewModel.energyGoalType {
+    init?(goalModel: GoalModel) {
+        switch goalModel.energyGoalType {
         case .fromMaintenance(_, let delta):
             self = delta.deltaPickerOption
         case .percentFromMaintenance(let delta):

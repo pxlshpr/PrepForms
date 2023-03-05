@@ -146,7 +146,7 @@ extension FoodForm.FieldForm {
     var navigationLeadingContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
             Button {
-                /// Do nothing to revert the values as the original `FieldViewModel` is still untouched
+                /// Do nothing to revert the values as the original `FieldModel` is still untouched
                 doNotRegisterUserInput = true
                 dismiss()
             } label: {

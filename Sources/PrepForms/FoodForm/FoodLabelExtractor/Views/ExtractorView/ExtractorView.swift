@@ -5,8 +5,8 @@ public struct ExtractorView: View {
     @Environment(\.scenePhase) var scenePhase
 
     @ObservedObject var extractor: Extractor
-//    @StateObject var imageViewerViewModel = ImageViewer.Model()
-    @StateObject var imageViewerViewModel = ImageViewer.Model.shared
+//    @StateObject var imageViewerModel = ImageViewer.Model()
+    @StateObject var imageViewerModel = ImageViewer.Model.shared
     let startedWithCamera: Bool
     
     let homeViewDidBecomeInactive = NotificationCenter.default.publisher(for: .homeViewDidBecomeInactive)
@@ -146,41 +146,41 @@ public struct ExtractorView: View {
     
     func showingBoxesChanged(_ newValue: Bool) {
         withAnimation {
-            imageViewerViewModel.showingBoxes = newValue
+            imageViewerModel.showingBoxes = newValue
         }
     }
     
     func textBoxesChanged(_ newValue: [TextBox]) {
         withAnimation(.interactiveSpring()) {
-            imageViewerViewModel.textBoxes = newValue
+            imageViewerModel.textBoxes = newValue
         }
     }
 
     func selectableTextBoxesChanged(_ newValue: [TextBox]) {
         withAnimation(.interactiveSpring()) {
-            imageViewerViewModel.selectableTextBoxes = newValue
+            imageViewerModel.selectableTextBoxes = newValue
         }
     }
     
     func cutoutTextBoxesChanged(_ newValue: [TextBox]) {
         withAnimation(.interactiveSpring()) {
-            imageViewerViewModel.cutoutTextBoxes = newValue
-            imageViewerViewModel.showingCutouts = true
+            imageViewerModel.cutoutTextBoxes = newValue
+            imageViewerModel.showingCutouts = true
         }
     }
 
     func stateChanged(_ state: ExtractorState) {
         withAnimation {
-            imageViewerViewModel.isShimmering = state == .classifying
-            imageViewerViewModel.showingBoxes = state.shouldShowTextBoxes
-            imageViewerViewModel.isFocused = state.shouldShowTextBoxes
+            imageViewerModel.isShimmering = state == .classifying
+            imageViewerModel.showingBoxes = state.shouldShowTextBoxes
+            imageViewerModel.isFocused = state.shouldShowTextBoxes
         }
     }
 
     func transitionStateChanged(_ state: ExtractorCaptureTransitionState) {
         guard let image = extractor.image else { return }
         if state == .setup {
-            imageViewerViewModel.image = image
+            imageViewerModel.image = image
         }
         
         if state == .endTransition {

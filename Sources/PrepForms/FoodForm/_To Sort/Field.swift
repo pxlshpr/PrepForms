@@ -107,16 +107,16 @@ public class Field: ObservableObject, Identifiable {
         return new
     }
     
-    func copyData(from fieldViewModel: Field) {
-        value = fieldViewModel.value
+    func copyData(from fieldModel: Field) {
+        value = fieldModel.value
         
         if value.fill.usesImage {
             /// If the the image is still being cropped—do the crop ourselves instead of setting it here incorrectly
-            if fieldViewModel.isCropping {
+            if fieldModel.isCropping {
                 isCropping = true
                 cropFilledImage()
             } else {
-                image = fieldViewModel.image
+                image = fieldModel.image
                 isCropping = false
             }
         } else {

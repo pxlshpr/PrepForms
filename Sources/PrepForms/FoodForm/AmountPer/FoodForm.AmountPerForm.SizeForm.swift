@@ -21,10 +21,10 @@ extension FoodForm.AmountPerForm {
 
         let existingField: Field?
         
-        /// This stores a copy of the data from fieldViewModel until we're ready to persist the change
+        /// This stores a copy of the data from fieldModel until we're ready to persist the change
         @StateObject var field: Field
         
-        @StateObject var formViewModel: SizeFormViewModel_Legacy
+        @StateObject var formModel: SizeFormModel_Legacy
         @State var showingVolumePrefixToggle: Bool
 
         @State var shouldAnimateOptions = false
@@ -37,19 +37,19 @@ extension FoodForm.AmountPerForm {
 //        @State var showingNamePicker = false
 //        @State var showingAmountForm = false
 
-        var didAddSizeViewModel: ((Field) -> ())?
+        var didAddSizeModel: ((Field) -> ())?
 
         init(field: Field? = nil,
              includeServing: Bool = true,
              allowAddSize: Bool = true,
-             didAddSizeViewModel: ((Field) -> ())? = nil
+             didAddSizeModel: ((Field) -> ())? = nil
         ) {
-            let formViewModel = SizeFormViewModel_Legacy(
+            let formModel = SizeFormModel_Legacy(
                 includeServing: includeServing,
                 allowAddSize: allowAddSize,
                 formState: field == nil ? .empty : .noChange
             )
-            _formViewModel = StateObject(wrappedValue: formViewModel)
+            _formModel = StateObject(wrappedValue: formModel)
 
             self.existingField = field
             
@@ -61,7 +61,7 @@ extension FoodForm.AmountPerForm {
                 _field = StateObject(wrappedValue: Field.emptySize)
             }
             
-            self.didAddSizeViewModel = didAddSizeViewModel
+            self.didAddSizeModel = didAddSizeModel
         }
     }
 }
@@ -100,7 +100,7 @@ extension FoodForm.AmountPerForm.SizeForm {
                     path: $path,
                     showingUnitPickerForVolumePrefix: $showingUnitPickerForVolumePrefix
                 )
-                    .environmentObject(formViewModel)
+                    .environmentObject(formModel)
             }
             if field.sizeAmountUnit.unitType == .weight || !field.sizeAmountIsValid {
                 volumePrefixSection

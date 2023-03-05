@@ -7,7 +7,7 @@ extension FoodForm.AmountPerForm.SizeForm {
     func changedShowingVolumePrefixToggle(to newValue: Bool) {
         withAnimation {
             field.registerUserInput()
-            formViewModel.showingVolumePrefix = showingVolumePrefixToggle
+            formModel.showingVolumePrefix = showingVolumePrefixToggle
             /// If we've turned it on and there's no volume prefix for the size—set it to cup
             if showingVolumePrefixToggle {
                 if field.value.size?.volumePrefixUnit == nil {
@@ -16,7 +16,7 @@ extension FoodForm.AmountPerForm.SizeForm {
             } else {
                 field.value.size?.volumePrefixUnit = nil
             }
-//                formViewModel.updateFormState(of: field, comparedToExisting: existingField)
+//                formModel.updateFormState(of: field, comparedToExisting: existingField)
         }
     }
     
@@ -82,9 +82,9 @@ extension FoodForm.AmountPerForm.SizeForm {
             fields.edit(existingField, with: field)
         } else {
             if fields.add(sizeField: field),
-               let didAddSizeViewModel = didAddSizeViewModel
+               let didAddSizeModel = didAddSizeModel
             {
-                didAddSizeViewModel(field)
+                didAddSizeModel(field)
             }
         }
         

@@ -23,7 +23,7 @@ extension FoodForm.AmountPerForm.SizeForm {
     var volumePrefixSection: some View {
         var footer: some View {
             Text("This will let you log this food in volumes of different densities or thicknesses, like – ‘cups shredded’, ‘cups sliced’.")
-                .foregroundColor(!formViewModel.showingVolumePrefix ? FormFooterEmptyColor : FormFooterFilledColor)
+                .foregroundColor(!formModel.showingVolumePrefix ? FormFooterEmptyColor : FormFooterFilledColor)
         }
         
         return FormStyledSection(footer: footer) {
@@ -60,11 +60,11 @@ extension FoodForm.AmountPerForm.SizeForm {
         
         @ViewBuilder
         var statusElement: some View {
-            switch formViewModel.formState {
+            switch formModel.formState {
             case .okToSave:
                 VStack {
 //                    addButton
-//                    if didAddSizeViewModel == nil && !isEditing {
+//                    if didAddSizeModel == nil && !isEditing {
 //                        addAndAddAnotherButton
 //                    }
                 }

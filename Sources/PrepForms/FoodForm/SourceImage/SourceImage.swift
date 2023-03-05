@@ -3,7 +3,7 @@ import ActivityIndicatorView
 
 struct SourceImage: View {
     
-    @ObservedObject var imageViewModel: ImageViewModel
+    @ObservedObject var imageModel: ImageModel
     
     let imageSize: ImageSize
     
@@ -19,15 +19,15 @@ struct SourceImage: View {
         }
     }
     
-    init(imageViewModel: ImageViewModel, imageSize: ImageSize = .medium) {
-        _imageViewModel = ObservedObject(wrappedValue: imageViewModel)
+    init(imageModel: ImageModel, imageSize: ImageSize = .medium) {
+        _imageModel = ObservedObject(wrappedValue: imageModel)
         self.imageSize = imageSize
     }
     
     var image: UIImage? {
         switch imageSize {
-        case .medium: return imageViewModel.mediumThumbnail
-        case .small: return imageViewModel.smallThumbnail
+        case .medium: return imageModel.mediumThumbnail
+        case .small: return imageModel.smallThumbnail
         }
     }
     
@@ -45,8 +45,8 @@ struct SourceImage: View {
 //            RoundedRectangle(cornerRadius: 10, style: .continuous)
             RoundedRectangle(cornerRadius: 6, style: .continuous)
         )
-        .shadow(radius: imageViewModel.status == .scanning ? 0 : 3, x: 0, y: 3)
-        .animation(.default, value: imageViewModel.status)
+        .shadow(radius: imageModel.status == .scanning ? 0 : 3, x: 0, y: 3)
+        .animation(.default, value: imageModel.status)
     }
     
     var placeholder: some View {
@@ -70,7 +70,7 @@ struct SourceImage: View {
     var overlay: some View {
         @ViewBuilder
         var color: some View {
-            switch imageViewModel.status {
+            switch imageModel.status {
             case .scanning:
                 Color(.darkGray)
                     .opacity(0.5)
@@ -91,7 +91,7 @@ struct SourceImage: View {
         
         @ViewBuilder
         var activityView: some View {
-            if imageViewModel.status == .scanning {
+            if imageModel.status == .scanning {
                 ActivityIndicatorView(isVisible: .constant(true), type: .scalingDots(count: 3, inset: 2))
 //                ActivityIndicatorView(isVisible: .constant(true), type: .flickeringDots(count: 8))
 //                    .frame(width: 50, height: 50)
@@ -102,7 +102,7 @@ struct SourceImage: View {
         
         @ViewBuilder
         var checkmark: some View {
-            if let image = imageViewModel.statusSystemImage {
+            if let image = imageModel.statusSystemImage {
                 VStack {
                     Spacer()
                     HStack {
@@ -136,16 +136,16 @@ struct SourceImage: View {
 
 //public struct SourceImagePreview: View {
 //        
-//    @StateObject var model: ImageViewModel
+//    @StateObject var model: ImageModel
 //    
 //    public init() {
 //        let image = PrepFoodForm.sampleImage(6)!
-//        let model = ImageViewModel(image)
+//        let model = ImageModel(image)
 //        _model = StateObject(wrappedValue: model)
 //    }
 //    
 //    public var body: some View {
-//        SourceImage(imageViewModel: model)
+//        SourceImage(imageModel: model)
 //    }
 //}
 //

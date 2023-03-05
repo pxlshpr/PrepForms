@@ -3,7 +3,7 @@ import Foundation
 extension FoodForm.AmountPerForm.SizeForm {
     
     var selectedImageIndex: Int? {
-        FoodForm.Sources.shared.imageViewModels.firstIndex(where: { $0.id == field.fill.imageId })
+        FoodForm.Sources.shared.imageModels.firstIndex(where: { $0.id == field.fill.imageId })
     }
     
     var detentHeight: CGFloat {

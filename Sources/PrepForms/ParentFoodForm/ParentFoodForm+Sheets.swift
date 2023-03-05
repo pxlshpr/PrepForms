@@ -54,7 +54,7 @@ extension ParentFoodForm {
 //            model.presentedSheet = nil
 //        }
         ItemForm.FoodSearch(
-            model: model.itemFormViewModel,
+            model: model.itemFormModel,
             isInitialFoodSearch: true,
             forIngredient: true,
             actionHandler: { handleItemAction($0, forEdit: false) }
@@ -63,7 +63,7 @@ extension ParentFoodForm {
 
     var ingredientEditSheet: some View {
         ItemForm(
-            model: model.itemFormViewModel,
+            model: model.itemFormModel,
             isEditing: true,
             forIngredient: true,
             actionHandler: { handleItemAction($0, forEdit: true) }

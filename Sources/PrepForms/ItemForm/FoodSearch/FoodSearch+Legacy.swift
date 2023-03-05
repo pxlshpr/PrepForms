@@ -19,7 +19,7 @@ extension FoodSearch {
     
 //    var resultsContents_legacy: some View {
 //        Group {
-//            ForEach(searchViewModel.results) { result in
+//            ForEach(searchModel.results) { result in
 //                Button {
 //                    Haptics.feedback(style: .soft)
 //                    searchIsFocused = false
@@ -28,10 +28,10 @@ extension FoodSearch {
 //                        .buttonStyle(.borderless)
 //                }
 //                .onAppear {
-//                    searchViewModel.loadMoreContentIfNeeded(currentResult: result)
+//                    searchModel.loadMoreContentIfNeeded(currentResult: result)
 //                }
 //            }
-//            if searchViewModel.isLoadingPage {
+//            if searchModel.isLoadingPage {
 //                HStack {
 //                    Spacer()
 //                    ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
