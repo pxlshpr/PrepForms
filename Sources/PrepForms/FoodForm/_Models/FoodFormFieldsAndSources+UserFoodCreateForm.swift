@@ -75,7 +75,7 @@ extension FoodFormFieldsAndSources {
     }
     
     var foodNutrients: FoodNutrients? {
-        guard let energy = energy.energyInKcal,
+        guard let energyInKcal = energy.energyInKcal,
               let carb = carb.macroDouble,
               let fat = fat.macroDouble,
               let protein = protein.macroDouble
@@ -84,7 +84,8 @@ extension FoodFormFieldsAndSources {
         }
               
         return FoodNutrients(
-            energyInKcal: energy,
+            energyInKcal: energyInKcal,
+//            energy: energy.value,
             carb: carb,
             protein: protein,
             fat: fat,

@@ -439,13 +439,13 @@ enum IngredientSortOrder: String, CaseIterable {
         case .name:
             return "Name"
         case .energy:
-            return "Energy"
+            return "High-Calorie"
         case .carbPortion:
-            return "Highest Carb"
+            return "High-Carb"
         case .proteinPortion:
-            return "Highest Protein"
+            return "High-Protein"
         case .fatPortion:
-            return "Highest Fat"
+            return "High-Fat"
         }
     }
     var systemImage: String {
@@ -457,11 +457,11 @@ enum IngredientSortOrder: String, CaseIterable {
         case .energy:
             return "flame"
         case .carbPortion:
-            return "c.square.fill"
+            return "c.square"
         case .proteinPortion:
-            return "p.square.fill"
+            return "p.square"
         case .fatPortion:
-            return "f.square.fill"
+            return "f.square"
         }
     }
 }
