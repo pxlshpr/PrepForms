@@ -33,7 +33,7 @@ extension DensityForm {
 
         var weightButton: some View {
             button(
-                viewModel.weightDescription,
+                model.weightDescription,
                 placeholder: "weight",
                 colorScheme: colorScheme
             ) {
@@ -45,7 +45,7 @@ extension DensityForm {
 
         var volumeButton: some View {
             button(
-                viewModel.volumeDescription,
+                model.volumeDescription,
                 placeholder: "volume",
                 colorScheme: colorScheme
             ) {

@@ -110,7 +110,7 @@ extension FoodForm.BarcodesForm {
 //
 //    var scanBarcodeAction: BottomMenuAction {
 //        BottomMenuAction(title: "Scan a Barcode", systemImage: "barcode.viewfinder", tapHandler: {
-//            viewModel.showingBarcodeScanner = true
+//            model.showingBarcodeScanner = true
 //        })
 //    }
 //    var enterBarcodeManuallyLink: BottomMenuAction {
@@ -129,7 +129,7 @@ extension FoodForm.BarcodesForm {
 //                       symbology: .ean13,
 //                       fill: .userInput)
 //                   let fieldViewModel = Field(fieldValue: .barcode(barcodeValue))
-//                   let _ = viewModel.add(barcodeViewModel: fieldViewModel)
+//                   let _ = model.add(barcodeViewModel: fieldViewModel)
 //                   Haptics.successFeedback()
 //               }
 //           )
@@ -140,7 +140,7 @@ extension FoodForm.BarcodesForm {
 //        let isValid = RSUnifiedCodeValidator.shared.isValid(
 //            string,
 //            machineReadableCodeObjectType: AVMetadataObject.ObjectType.ean13.rawValue)
-//        let exists = viewModel.contains(barcode: string)
+//        let exists = model.contains(barcode: string)
 //        return isValid && !exists
 //    }
 }

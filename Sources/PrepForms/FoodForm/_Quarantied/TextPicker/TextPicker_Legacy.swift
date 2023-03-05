@@ -10,11 +10,11 @@
 //    @State var showingDeleteConfirmation = false
 //
 //    init(imageViewModels: [ImageViewModel], mode: TextPickerMode) {
-//        let viewModel = TextPickerViewModel(
+//        let model = TextPickerViewModel(
 //            imageViewModels: imageViewModels,
 //            mode: mode
 //        )
-//        _textPickerViewModel = StateObject(wrappedValue: viewModel)
+//        _textPickerViewModel = StateObject(wrappedValue: model)
 //    }
 //    
 //    var body: some View {

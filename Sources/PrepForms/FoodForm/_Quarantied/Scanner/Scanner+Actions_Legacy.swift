@@ -10,7 +10,7 @@
 //
 //    func handleCapturedImage(_ image: UIImage) {
 //        withAnimation(.easeInOut(duration: 0.7)) {
-//            viewModel.image = image
+//            model.image = image
 //            cprint("👀 image has been set: \(image.size)")
 //            //TODO: Is this needed?
 //            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -21,7 +21,7 @@
 //        }
 //        
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//            viewModel.begin(image)
+//            model.begin(image)
 //        }
 //    }
 //}

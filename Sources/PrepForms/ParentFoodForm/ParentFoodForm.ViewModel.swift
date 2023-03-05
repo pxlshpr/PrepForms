@@ -5,7 +5,7 @@ import SwiftSugar
 import PrepCoreDataStack
 
 extension ParentFoodForm {
-    class ViewModel: ObservableObject {
+    class Model: ObservableObject {
         
         let forRecipe: Bool
         let existingFood: Food?
@@ -52,7 +52,7 @@ extension ParentFoodForm {
     }
 }
 
-extension ParentFoodForm.ViewModel {
+extension ParentFoodForm.Model {
     var title: String {
         "\(isEditing ? "Edit" : "New") \(entityName)"
     }
@@ -78,7 +78,7 @@ extension ParentFoodForm.ViewModel {
     }
 }
 
-extension ParentFoodForm.ViewModel {
+extension ParentFoodForm.Model {
     
     @objc func didUpdateUser(_ notification: Notification) {
         withAnimation {

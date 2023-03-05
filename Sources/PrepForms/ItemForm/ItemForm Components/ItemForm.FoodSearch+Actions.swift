@@ -21,11 +21,11 @@ extension ItemForm.FoodSearch {
     
     func didTapFood(_ food: Food) {
         Haptics.feedback(style: .soft)
-        viewModel.setFood(food)
+        model.setFood(food)
 
         if isInitialFoodSearch {
-            viewModel.showingItem = true
-//            viewModel.path = [.mealItemForm]
+            model.showingItem = true
+//            model.path = [.mealItemForm]
         } else {
             dismiss()
         }
@@ -44,7 +44,7 @@ extension ItemForm.FoodSearch {
     func didTapAddFood() {
         FoodForm.Fields.shared.reset()
         FoodForm.Sources.shared.reset()
-        FoodForm.ViewModel.shared.reset()
+        FoodForm.Model.shared.reset()
         
         Haptics.feedback(style: .soft)
         presentFullScreen(.foodForm)
@@ -65,7 +65,7 @@ extension ItemForm.FoodSearch {
     func didTapScanFoodLabel() {
         FoodForm.Fields.shared.reset()
         FoodForm.Sources.shared.reset()
-        FoodForm.ViewModel.shared.reset(startWithCamera: true)
+        FoodForm.Model.shared.reset(startWithCamera: true)
 
         Haptics.feedback(style: .heavy)
         presentFullScreen(.foodForm)

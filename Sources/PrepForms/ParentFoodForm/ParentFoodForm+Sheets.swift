@@ -44,17 +44,17 @@ extension ParentFoodForm {
         ) { emoji in
             Haptics.successFeedback()
             fields.emoji = emoji
-            viewModel.presentedSheet = nil
+            model.presentedSheet = nil
         }
     }
     
     var foodSearchForm: some View {
 //        NewItemForm { action in
 //            handleItemAction(action, forEdit: false)
-//            viewModel.presentedSheet = nil
+//            model.presentedSheet = nil
 //        }
         ItemForm.FoodSearch(
-            viewModel: viewModel.itemFormViewModel,
+            model: model.itemFormViewModel,
             isInitialFoodSearch: true,
             forIngredient: true,
             actionHandler: { handleItemAction($0, forEdit: false) }
@@ -63,7 +63,7 @@ extension ParentFoodForm {
 
     var ingredientEditSheet: some View {
         ItemForm(
-            viewModel: viewModel.itemFormViewModel,
+            model: model.itemFormViewModel,
             isEditing: true,
             forIngredient: true,
             actionHandler: { handleItemAction($0, forEdit: true) }

@@ -5,7 +5,7 @@ import PrepDataTypes
 public struct NutrientLeanBodyMassForm: View {
 
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var viewModel: TDEEForm.ViewModel
+    @EnvironmentObject var model: TDEEForm.Model
     
     @State var showingSaveButton: Bool = false
     
@@ -45,7 +45,7 @@ public struct NutrientLeanBodyMassForm: View {
     var form: some View {
         LeanBodyMassForm()
             .safeAreaInset(edge: .bottom) { safeAreaInset }
-            .environmentObject(viewModel)
+            .environmentObject(model)
     }
 
     var leadingContent: some ToolbarContent {
@@ -81,7 +81,7 @@ public struct NutrientLeanBodyMassForm: View {
     var saveButton: some View {
         var saveButton: some View {
             FormPrimaryButton(title: "Save") {
-                didTapSave(viewModel.bodyProfile)
+                didTapSave(model.bodyProfile)
                 dismiss()
             }
         }
@@ -101,12 +101,12 @@ extension NutrientLeanBodyMassForm {
     var canBeSaved:Bool {
         /// If we have an existing profile—return false if the parameters are exactly the same
         if let existingProfile {
-            guard existingProfile != viewModel.bodyProfile else {
+            guard existingProfile != model.bodyProfile else {
                 return false
             }
         }
         /// In either case, return true only if there is a valid lean body mass value
-        return viewModel.bodyProfile.hasLBM
+        return model.bodyProfile.hasLBM
     }
 }
 

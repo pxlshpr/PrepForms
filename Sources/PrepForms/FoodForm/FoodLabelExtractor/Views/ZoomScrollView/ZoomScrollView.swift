@@ -135,7 +135,7 @@ fileprivate struct ZoomScrollViewRepresentable<Content: View>: UIViewControllerR
                let zoomScale = ZoomScrollViewData.shared.lastZoomScale
             {
                 /// This is done to mitigate cases where this gets re-instantiated when moving to the background.
-                /// We're storing the last known viewport in `ImageViewer.ViewModel.shared`, which we'll be restoring.
+                /// We're storing the last known viewport in `ImageViewer.Model.shared`, which we'll be restoring.
                 self.scrollView.setZoomScale(zoomScale, animated: false)
                 self.scrollView.setContentOffset(contentOffset, animated: false)
             } else {

@@ -10,7 +10,7 @@ extension ItemForm {
     struct QuantityForm: View {
         
         let food: Food
-        @StateObject var viewModel: ViewModel
+        @StateObject var model: Model
 
         @Environment(\.dismiss) var dismiss
         @Environment(\.colorScheme) var colorScheme
@@ -28,16 +28,16 @@ extension ItemForm {
             unit: FormUnit,
             didSubmit: @escaping (Double, FormUnit) -> ()
         ) {
-            let viewModel = ViewModel(
+            let model = Model(
                 initialDouble: double,
                 initialUnit: unit
             )
-            _viewModel = StateObject(wrappedValue: viewModel)
+            _model = StateObject(wrappedValue: model)
             self.food = food
             self.didSubmit = didSubmit
         }
         
-        class ViewModel: ObservableObject {
+        class Model: ObservableObject {
             let initialDouble: Double?
             let initialUnit: FormUnit
             @Published var internalString: String = ""
@@ -111,9 +111,9 @@ extension ItemForm.QuantityForm {
     }
     
     var doneButton: some View {
-        FormInlineDoneButton(disabled: viewModel.shouldDisableDone) {
+        FormInlineDoneButton(disabled: model.shouldDisableDone) {
             Haptics.feedback(style: .rigid)
-            didSubmit(viewModel.internalDouble ?? 1, viewModel.internalUnit)
+            didSubmit(model.internalDouble ?? 1, model.internalUnit)
             dismiss()
         }
     }
@@ -126,10 +126,10 @@ extension ItemForm.QuantityForm {
     
     var textField: some View {
         let binding = Binding<String>(
-            get: { viewModel.textFieldString },
+            get: { model.textFieldString },
             set: { newValue in
                 withAnimation {
-                    viewModel.textFieldString = newValue
+                    model.textFieldString = newValue
                 }
             }
         )
@@ -158,7 +158,7 @@ extension ItemForm.QuantityForm {
     
     var unitPicker: some View {
         UnitPickerGridTiered(
-            pickedUnit: viewModel.internalUnit,
+            pickedUnit: model.internalUnit,
             includeServing: food.servingQuantity != nil,
             includeWeights: food.canBeMeasuredInWeight,
             includeVolumes: food.canBeMeasuredInVolume,
@@ -167,7 +167,7 @@ extension ItemForm.QuantityForm {
             didPickUnit: { newUnit in
                 withAnimation {
                     Haptics.feedback(style: .rigid)
-                    viewModel.internalUnit = newUnit
+                    model.internalUnit = newUnit
                 }
             }
         )
@@ -179,7 +179,7 @@ extension ItemForm.QuantityForm {
             showingUnitPicker = true
         } label: {
             HStack(spacing: 2) {
-                Text(viewModel.internalUnit.shortDescription)
+                Text(model.internalUnit.shortDescription)
                     .multilineTextAlignment(.trailing)
                     .lineLimit(2)
                     .minimumScaleFactor(0.3)
@@ -198,7 +198,7 @@ extension ItemForm.QuantityForm {
                         colorScheme == .dark ? 0.1 : 0.15
                     ))
             )
-//            .animation(.none, value: viewModel.internalUnit)
+//            .animation(.none, value: model.internalUnit)
         }
         .contentShape(Rectangle())
     }

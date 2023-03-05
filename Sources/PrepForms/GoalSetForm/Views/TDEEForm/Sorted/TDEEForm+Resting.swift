@@ -119,11 +119,11 @@ extension TDEEForm {
     
     var restingEnergySection: some View {
 //        var syncWithHealthAppToggle: some View {
-//            Toggle(isOn: viewModel.restingEnergyFormulaUsingSyncedHealthDataBinding) {
+//            Toggle(isOn: model.restingEnergyFormulaUsingSyncedHealthDataBinding) {
 //                HStack {
 //                    appleHealthSymbol
 //                        .matchedGeometryEffect(id: "resting-health-icon", in: namespace)
-//                    Text("Sync\(viewModel.restingEnergyFormulaUsingSyncedHealthData ? "ed" : "") with Health App")
+//                    Text("Sync\(model.restingEnergyFormulaUsingSyncedHealthData ? "ed" : "") with Health App")
 //                }
 //            }
 //            .toggleStyle(.button)
@@ -132,7 +132,7 @@ extension TDEEForm {
         var sourceSection: some View {
             var sourceMenu: some View {
                 Menu {
-                    Picker(selection: viewModel.restingEnergySourceBinding, label: EmptyView()) {
+                    Picker(selection: model.restingEnergySourceBinding, label: EmptyView()) {
                         ForEach(RestingEnergySource.allCases, id: \.self) {
                             Label($0.menuDescription, systemImage: $0.systemImage).tag($0)
                         }
@@ -140,22 +140,22 @@ extension TDEEForm {
                 } label: {
                     HStack(spacing: 5) {
                         HStack {
-                            if viewModel.restingEnergySource == .healthApp {
+                            if model.restingEnergySource == .healthApp {
                                 appleHealthSymbol
                             } else {
-                                if let systemImage = viewModel.restingEnergySource?.systemImage {
+                                if let systemImage = model.restingEnergySource?.systemImage {
                                     Image(systemName: systemImage)
                                         .foregroundColor(.secondary)
                                 }
                             }
-                            Text(viewModel.restingEnergySource?.pickerDescription ?? "")
+                            Text(model.restingEnergySource?.pickerDescription ?? "")
                         }
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         Image(systemName: "chevron.up.chevron.down")
                             .imageScale(.small)
                     }
                     .foregroundColor(.secondary)
-                    .animation(.none, value: viewModel.restingEnergySource)
+                    .animation(.none, value: model.restingEnergySource)
                     .fixedSize(horizontal: true, vertical: false)
                 }
                 .contentShape(Rectangle())
@@ -183,7 +183,7 @@ extension TDEEForm {
         var formulaRow: some View {
             var formulaMenu: some View {
                 Menu {
-                    Picker(selection: viewModel.restingEnergyFormulaBinding, label: EmptyView()) {
+                    Picker(selection: model.restingEnergyFormulaBinding, label: EmptyView()) {
                         ForEach(RestingEnergyFormula.latest, id: \.self) { formula in
                             Text(formula.pickerDescription + " • " + formula.year).tag(formula)
                         }
@@ -194,13 +194,13 @@ extension TDEEForm {
                     }
                 } label: {
 //                    PickerLabel(
-//                        viewModel.restingEnergyFormula.year,
-//                        prefix: viewModel.restingEnergyFormula.menuDescription,
+//                        model.restingEnergyFormula.year,
+//                        prefix: model.restingEnergyFormula.menuDescription,
 //                        foregroundColor: .secondary,
 //                        prefixColor: .primary
 //                    )
-                    PickerLabel(viewModel.restingEnergyFormula.menuDescription)
-                    .animation(.none, value: viewModel.restingEnergyFormula)
+                    PickerLabel(model.restingEnergyFormula.menuDescription)
+                    .animation(.none, value: model.restingEnergyFormula)
                     .fixedSize(horizontal: true, vertical: false)
                 }
             }
@@ -222,46 +222,46 @@ extension TDEEForm {
                 ZStack {
                     Capsule(style: .continuous)
                         .foregroundColor(Color(.clear))
-                    Text(viewModel.restingEnergyFormula == .katchMcardle ? "with" : "as")
+                    Text(model.restingEnergyFormula == .katchMcardle ? "with" : "as")
                         .foregroundColor(Color(.tertiaryLabel))
                     .frame(height: 25)
                     .padding(.vertical, 5)
                     .padding(.bottom, 2)
                 }
                 .fixedSize(horizontal: true, vertical: true)
-                if viewModel.restingEnergyFormula.usesLeanBodyMass {
+                if model.restingEnergyFormula.usesLeanBodyMass {
 //                    Button {
-//                        viewModel.path.append(.leanBodyMassForm)
+//                        model.path.append(.leanBodyMassForm)
                     NavigationLink {
                         LeanBodyMassForm()
-                            .environmentObject(viewModel)
+                            .environmentObject(model)
                     } label: {
                         MeasurementLabel(
-                            label: viewModel.hasLeanBodyMass ? "lean body mass" : "set lean body mass",
-                            valueString: viewModel.lbmFormattedWithUnit,
-                            useHealthAppData: viewModel.restingEnergyFormulaUsingSyncedHealthData
+                            label: model.hasLeanBodyMass ? "lean body mass" : "set lean body mass",
+                            valueString: model.lbmFormattedWithUnit,
+                            useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
                         )
                     }
                 } else {
 //                    Button {
-//                        viewModel.path.append(.profileForm)
+//                        model.path.append(.profileForm)
                     NavigationLink {
                         ProfileForm()
-                            .environmentObject(viewModel)
+                            .environmentObject(model)
                     } label: {
-                        if viewModel.hasProfile,
-                           let age = viewModel.age,
-                           let sex = viewModel.sex,
-                           let weight = viewModel.weight
+                        if model.hasProfile,
+                           let age = model.age,
+                           let sex = model.sex,
+                           let weight = model.weight
                         {
                             ProfileLabel(
                                 age: age,
                                 sex: sex,
                                 weight: weight,
-                                height: viewModel.height,
-                                weightUnit: viewModel.userWeightUnit,
-                                heightUnit: viewModel.userHeightUnit,
-                                isSynced: viewModel.profileIsSynced
+                                height: model.height,
+                                weightUnit: model.userWeightUnit,
+                                heightUnit: model.userHeightUnit,
+                                isSynced: model.profileIsSynced
                             )
                         } else {
                             MeasurementLabel(
@@ -280,25 +280,25 @@ extension TDEEForm {
 //                        MeasurementLabel(
 //                            label: "sex",
 //                            valueString: "male",
-//                            useHealthAppData: viewModel.restingEnergyFormulaUsingSyncedHealthData
+//                            useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
 //                        )
 //                    }
 //                    Button {
-//                        viewModel.path.append(.weightForm)
+//                        model.path.append(.weightForm)
 //                    } label: {
 //                        MeasurementLabel(
 //                            label: "weight",
 //                            valueString: "93.6 kg",
-//                            useHealthAppData: viewModel.restingEnergyFormulaUsingSyncedHealthData
+//                            useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
 //                        )
 //                    }
 //                    Button {
-//                        viewModel.path.append(.heightForm)
+//                        model.path.append(.heightForm)
 //                    } label: {
 //                        MeasurementLabel(
 //                            label: "height",
 //                            valueString: "177 cm",
-//                            useHealthAppData: viewModel.restingEnergyFormulaUsingSyncedHealthData
+//                            useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
 //                        )
 //                    }
                 }
@@ -310,7 +310,7 @@ extension TDEEForm {
         var content: some View {
             VStack {
                 Group {
-                    if let source = viewModel.restingEnergySource {
+                    if let source = model.restingEnergySource {
                         Group {
                             sourceSection
                             switch source {
@@ -338,7 +338,7 @@ extension TDEEForm {
 //        }
         
         func tappedManualEntry() {
-            viewModel.changeRestingEnergySource(to: .userEntered)
+            model.changeRestingEnergySource(to: .userEntered)
             restingEnergyTextFieldIsFocused = true
         }
         
@@ -347,9 +347,9 @@ extension TDEEForm {
                 do {
                     try await HealthKitManager.shared.requestPermission(for: .basalEnergyBurned)
                     withAnimation {
-                        viewModel.restingEnergySource = .healthApp
+                        model.restingEnergySource = .healthApp
                     }
-                    viewModel.fetchRestingEnergyFromHealth()
+                    model.fetchRestingEnergyFromHealth()
                 } catch {
                     cprint("Error syncing with Health: \(error)")
                 }
@@ -357,7 +357,7 @@ extension TDEEForm {
         }
         
         func tappedFormula() {
-            viewModel.changeRestingEnergySource(to: .formula)
+            model.changeRestingEnergySource(to: .formula)
         }
 
         var emptyContent: some View {
@@ -384,7 +384,7 @@ extension TDEEForm {
         
         var healthContent: some View {
             Group {
-                if viewModel.restingEnergyFetchStatus == .notAuthorized {
+                if model.restingEnergyFetchStatus == .notAuthorized {
                     permissionRequiredContent
                 } else {
                     healthPeriodContent
@@ -397,29 +397,29 @@ extension TDEEForm {
         var energyRow: some View {
             @ViewBuilder
             var health: some View {
-                if viewModel.restingEnergyFetchStatus != .notAuthorized {
+                if model.restingEnergyFetchStatus != .notAuthorized {
                     HStack {
                         Spacer()
-                        if viewModel.restingEnergyFetchStatus == .fetching {
+                        if model.restingEnergyFetchStatus == .fetching {
                             ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
                                 .frame(width: 25, height: 25)
                                 .foregroundColor(.secondary)
                         } else {
-                            if let prefix = viewModel.restingEnergyPrefix {
+                            if let prefix = model.restingEnergyPrefix {
                                 Text(prefix)
                                     .font(.subheadline)
                                     .foregroundColor(Color(.tertiaryLabel))
                             }
-                            Text(viewModel.restingEnergyFormatted)
+                            Text(model.restingEnergyFormatted)
                                 .font(.system(.title3, design: .rounded, weight: .semibold))
-                                .foregroundColor(viewModel.restingEnergySource == .userEntered ? .primary : .secondary)
+                                .foregroundColor(model.restingEnergySource == .userEntered ? .primary : .secondary)
                                 .fixedSize(horizontal: true, vertical: false)
                                 .matchedGeometryEffect(id: "resting", in: namespace)
-                                .if(!viewModel.hasRestingEnergy) { view in
+                                .if(!model.hasRestingEnergy) { view in
                                     view
                                         .redacted(reason: .placeholder)
                                 }
-                            Text(viewModel.userEnergyUnit.shortDescription)
+                            Text(model.userEnergyUnit.shortDescription)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -429,16 +429,16 @@ extension TDEEForm {
             var formula: some View {
                 HStack {
                     Spacer()
-                    Text(viewModel.restingEnergyFormatted)
+                    Text(model.restingEnergyFormatted)
                         .font(.system(.title3, design: .rounded, weight: .semibold))
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: true, vertical: false)
                         .matchedGeometryEffect(id: "resting", in: namespace)
-                        .if(!viewModel.hasRestingEnergy) { view in
+                        .if(!model.hasRestingEnergy) { view in
                             view
                                 .redacted(reason: .placeholder)
                         }
-                    Text(viewModel.userEnergyUnit.shortDescription)
+                    Text(model.userEnergyUnit.shortDescription)
                         .foregroundColor(.secondary)
                 }
             }
@@ -446,7 +446,7 @@ extension TDEEForm {
             var manualEntry: some View {
                 HStack {
                     Spacer()
-                    TextField("energy in", text: viewModel.restingEnergyTextFieldStringBinding)
+                    TextField("energy in", text: model.restingEnergyTextFieldStringBinding)
                         .keyboardType(.decimalPad)
                         .focused($restingEnergyTextFieldIsFocused)
                         .fixedSize(horizontal: true, vertical: false)
@@ -454,13 +454,13 @@ extension TDEEForm {
 //                        .fixedSize(horizontal: true, vertical: false)
                         .font(.system(.title3, design: .rounded, weight: .semibold))
                         .matchedGeometryEffect(id: "resting", in: namespace)
-                    Text(viewModel.userEnergyUnit.shortDescription)
+                    Text(model.userEnergyUnit.shortDescription)
                         .foregroundColor(.secondary)
                 }
             }
             
             return Group {
-                switch viewModel.restingEnergySource {
+                switch model.restingEnergySource {
                 case .healthApp:
                     health
                 case .formula:
@@ -477,62 +477,62 @@ extension TDEEForm {
         var healthPeriodContent: some View {
             var periodTypeMenu: some View {
                Menu {
-                   Picker(selection: viewModel.restingEnergyPeriodBinding, label: EmptyView()) {
+                   Picker(selection: model.restingEnergyPeriodBinding, label: EmptyView()) {
                         ForEach(HealthPeriodOption.allCases, id: \.self) {
                             Text($0.pickerDescription).tag($0)
                         }
                     }
                 } label: {
                     PickerLabel(
-                        viewModel.restingEnergyPeriod.menuDescription,
+                        model.restingEnergyPeriod.menuDescription,
                         imageColor: Color(hex: "F3DED7"),
                         backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
                         backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
                         foregroundColor: .white
                     )
-                    .animation(.none, value: viewModel.restingEnergyPeriod)
+                    .animation(.none, value: model.restingEnergyPeriod)
                     .fixedSize(horizontal: true, vertical: false)
                 }
             }
             
             var periodValueMenu: some View {
                 Menu {
-                    Picker(selection: viewModel.restingEnergyIntervalValueBinding, label: EmptyView()) {
-                        ForEach(viewModel.restingEnergyIntervalValues, id: \.self) { quantity in
+                    Picker(selection: model.restingEnergyIntervalValueBinding, label: EmptyView()) {
+                        ForEach(model.restingEnergyIntervalValues, id: \.self) { quantity in
                             Text("\(quantity)").tag(quantity)
                         }
                     }
                 } label: {
                     PickerLabel(
-                        "\(viewModel.restingEnergyIntervalValue)",
+                        "\(model.restingEnergyIntervalValue)",
                         imageColor: Color(hex: "F3DED7"),
                         backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
                         backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
                         foregroundColor: .white
                     )
-                    .animation(.none, value: viewModel.restingEnergyIntervalValue)
-                    .animation(.none, value: viewModel.restingEnergyInterval)
+                    .animation(.none, value: model.restingEnergyIntervalValue)
+                    .animation(.none, value: model.restingEnergyInterval)
                     .fixedSize(horizontal: true, vertical: false)
                 }
             }
             
             var periodIntervalMenu: some View {
                 Menu {
-                    Picker(selection: viewModel.restingEnergyIntervalBinding, label: EmptyView()) {
+                    Picker(selection: model.restingEnergyIntervalBinding, label: EmptyView()) {
                         ForEach(HealthAppInterval.allCases, id: \.self) { interval in
-                            Text("\(interval.description)\(viewModel.restingEnergyIntervalValue > 1 ? "s" : "")").tag(interval)
+                            Text("\(interval.description)\(model.restingEnergyIntervalValue > 1 ? "s" : "")").tag(interval)
                         }
                     }
                 } label: {
                     PickerLabel(
-                        "\(viewModel.restingEnergyInterval.description)\(viewModel.restingEnergyIntervalValue > 1 ? "s" : "")",
+                        "\(model.restingEnergyInterval.description)\(model.restingEnergyIntervalValue > 1 ? "s" : "")",
                         imageColor: Color(hex: "F3DED7"),
                         backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
                         backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
                         foregroundColor: .white
                     )
-                    .animation(.none, value: viewModel.restingEnergyInterval)
-                    .animation(.none, value: viewModel.restingEnergyIntervalValue)
+                    .animation(.none, value: model.restingEnergyInterval)
+                    .animation(.none, value: model.restingEnergyIntervalValue)
                     .fixedSize(horizontal: true, vertical: false)
                 }
             }
@@ -560,7 +560,7 @@ extension TDEEForm {
                     }
                     Spacer()
                 }
-                if viewModel.restingEnergyPeriod == .average {
+                if model.restingEnergyPeriod == .average {
                     intervalRow
                 }
             }
@@ -568,7 +568,7 @@ extension TDEEForm {
         
         @ViewBuilder
         var footer: some View {
-            if let string = viewModel.restingEnergyFooterString {
+            if let string = model.restingEnergyFooterString {
                 Text(string)
                     .fixedSize(horizontal: false, vertical: true)
                     .foregroundColor(Color(.secondaryLabel))
@@ -596,7 +596,7 @@ extension TDEEForm {
                         .foregroundColor(Color(.secondarySystemGroupedBackground))
                         .matchedGeometryEffect(id: "resting-bg", in: namespace)
                 )
-                .if(viewModel.restingEnergyFooterString == nil) { view in
+                .if(model.restingEnergyFooterString == nil) { view in
                     view.padding(.bottom, 10)
                 }
                 footer

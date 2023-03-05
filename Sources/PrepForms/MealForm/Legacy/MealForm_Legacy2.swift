@@ -8,7 +8,7 @@ import PrepViews
 
 public struct MealForm_Legacy2: View {
 
-    @StateObject var viewModel: MealFormViewModel
+    @StateObject var model: MealFormViewModel
 
     @Environment(\.dismiss) var dismiss
     @FocusState var isFocused: Bool
@@ -44,7 +44,7 @@ public struct MealForm_Legacy2: View {
         getTimelineItemsHandler: GetTimelineItemsHandler? = nil,
         didSave: @escaping (String, Date, GoalSet?) -> ()
     ) {
-        let viewModel = MealFormViewModel(
+        let model = MealFormViewModel(
             mealBeingEdited: mealBeingEdited,
             date: date,
             recents: recents,
@@ -53,7 +53,7 @@ public struct MealForm_Legacy2: View {
             didSave: didSave
         )
         
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _model = StateObject(wrappedValue: model)
     }
     
     public var body: some View {
@@ -61,7 +61,7 @@ public struct MealForm_Legacy2: View {
 //        NavigationView {
             content
                 .background(Color(.systemGroupedBackground))
-                .navigationTitle(viewModel.navigationTitle)
+                .navigationTitle(model.navigationTitle)
                 .navigationBarTitleDisplayMode(.large)
                 .toolbar { navigationLeadingButton }
                 .navigationBarTitleDisplayMode(.inline)
@@ -127,10 +127,10 @@ public struct MealForm_Legacy2: View {
         Button {
             saveAndDismiss()
         } label: {
-            Text(viewModel.saveButtonTitle)
+            Text(model.saveButtonTitle)
                 .bold()
         }
-        .disabled(!viewModel.isDirty)
+        .disabled(!model.isDirty)
     }
     
     var closeButton: some View {
@@ -154,7 +154,7 @@ public struct MealForm_Legacy2: View {
                 Haptics.successFeedback()
                 saveAndDismiss()
             } label: {
-                Text(viewModel.saveButtonTitle)
+                Text(model.saveButtonTitle)
                     .bold()
                     .foregroundColor(.white)
                     .padding(.vertical)
@@ -168,7 +168,7 @@ public struct MealForm_Legacy2: View {
             }
             .buttonStyle(.borderless)
             
-//            FormPrimaryButton(title: viewModel.saveButtonTitle) {
+//            FormPrimaryButton(title: model.saveButtonTitle) {
 //                Haptics.successFeedback()
 //                saveAndDismiss()
 //            }
@@ -183,7 +183,7 @@ public struct MealForm_Legacy2: View {
         }
 
         var deleteButton: some View {
-            FormSecondaryButton(title: "Delete", foregroundColor: NutrientMeter.ViewModel.Colors.Excess.fill) {
+            FormSecondaryButton(title: "Delete", foregroundColor: NutrientMeter.Model.Colors.Excess.fill) {
                 Haptics.selectionFeedback()
                 showingDeleteConfirmation = true
             }
@@ -255,7 +255,7 @@ public struct MealForm_Legacy2: View {
         var formLayer: some View {
             form
 //                .safeAreaInset(edge: .bottom) { bottomSafeAreaInset }
-                .navigationTitle(viewModel.navigationTitle)
+                .navigationTitle(model.navigationTitle)
 //                .toolbar { trailingContents }
                 .scrollDismissesKeyboard(.interactively)
                 .confirmationDialog(
@@ -267,7 +267,7 @@ public struct MealForm_Legacy2: View {
         }
         
         var tappedDelete: (() -> ())? {
-            if viewModel.isEditing {
+            if model.isEditing {
                 return {
                     Haptics.warningFeedback()
                     showingDeleteConfirmation = true
@@ -285,14 +285,14 @@ public struct MealForm_Legacy2: View {
         }
         
         let saveIsDisabledBinding = Binding<Bool>(
-            get: { !viewModel.isDirty },
+            get: { !model.isDirty },
             set: { _ in }
         )
         
         var infoBinding: Binding<FormSaveInfo?> {
             Binding<FormSaveInfo?>(
                 get: {
-                    guard viewModel.name.isEmpty else {
+                    guard model.name.isEmpty else {
                         return nil
                     }
                     return FormSaveInfo(title: "Name Required", systemImage: "exclamationmark.triangle.fill")
@@ -303,7 +303,7 @@ public struct MealForm_Legacy2: View {
         
         var cancelAction: FormConfirmableAction {
             FormConfirmableAction(
-                shouldConfirm: viewModel.shouldConfirmCancellation,
+                shouldConfirm: model.shouldConfirmCancellation,
                 handler: tappedCancel
             )
         }
@@ -315,7 +315,7 @@ public struct MealForm_Legacy2: View {
         }
         
         var deleteAction: FormConfirmableAction? {
-            if viewModel.isEditing {
+            if model.isEditing {
                 return FormConfirmableAction(
                     handler: { tappedDelete?() }
                 )
@@ -386,7 +386,7 @@ public struct MealForm_Legacy2: View {
     
     var nameRow: some View {
         HStack {
-            TextField("Required", text: $viewModel.name)
+            TextField("Required", text: $model.name)
                 .multilineTextAlignment(.leading)
                 .focused($isFocused)
                 .onReceive(NotificationCenter.default.publisher(for: UITextField.textDidBeginEditingNotification)) { obj in
@@ -481,7 +481,7 @@ public struct MealForm_Legacy2: View {
         
         @ViewBuilder
         var goalSetLabel: some View {
-            if let goalSet = viewModel.goalSet {
+            if let goalSet = model.goalSet {
                 Text("\(goalSet.emoji) \(goalSet.name)")
                     .foregroundColor(.primary)
             } else {
@@ -521,7 +521,7 @@ public struct MealForm_Legacy2: View {
         
         @ViewBuilder
         var footer: some View {
-            if viewModel.shouldShowDurationPicker {
+            if model.shouldShowDurationPicker {
                 Text("Workout duration is used to calculate the carbohydrate goal for this meal type.")
 //                Text("Workout duration is used to calculate the carbohydrate, protein and sodium goals for this meal type.")
             }
@@ -531,7 +531,7 @@ public struct MealForm_Legacy2: View {
             VStack {
                 pickerRow
                     .padding(.horizontal, 17)
-                if viewModel.shouldShowDurationPicker {
+                if model.shouldShowDurationPicker {
                     divider
                     durationRow
                         .padding(.horizontal, 17)
@@ -559,7 +559,7 @@ public struct MealForm_Legacy2: View {
     ) -> some View {
         Button {
             Haptics.feedback(style: hapticStyle)
-            viewModel.didTapTimeButton()
+            model.didTapTimeButton()
         } label: {
             let systemName: String
             if let increment = increment {
@@ -581,8 +581,8 @@ public struct MealForm_Legacy2: View {
     var datePicker: some View {
         DatePicker(
             "",
-            selection: $viewModel.time,
-            in: viewModel.dateRangeForPicker,
+            selection: $model.time,
+            in: model.dateRangeForPicker,
             displayedComponents: [.date]
         )
         .datePickerStyle(.compact)
@@ -591,13 +591,13 @@ public struct MealForm_Legacy2: View {
     var datePickerTime: some View {
         DatePicker(
             "",
-            selection: $viewModel.time,
-            in: viewModel.dateRangeForPicker,
+            selection: $model.time,
+            in: model.dateRangeForPicker,
             displayedComponents: [.date, .hourAndMinute]
         )
         .datePickerStyle(.compact)
         .labelsHidden()
-        .onChange(of: viewModel.time, perform: onChangeOfTime)
+        .onChange(of: model.time, perform: onChangeOfTime)
         .id(refreshDatePicker)
     }
     
@@ -616,12 +616,12 @@ public struct MealForm_Legacy2: View {
     
     var namePicker: some View {
         NamePicker(
-            name: $viewModel.name,
+            name: $model.name,
             showTextField: false,
             showClearButton: true,
 //            focusOnAppear: true,
-            recentStrings: viewModel.recents,
-            presetStrings: viewModel.presets
+            recentStrings: model.recents,
+            presetStrings: model.presets
         )
         .navigationTitle("Meal Name")
         .navigationBarTitleDisplayMode(.large)
@@ -629,10 +629,10 @@ public struct MealForm_Legacy2: View {
     
     var timePicker: some View {
         TimeForm(
-            name: viewModel.name,
-            time: viewModel.timeBinding,
-            date: viewModel.date,
-            getTimelineItemsHandler: viewModel.getTimelineItemsHandler
+            name: model.name,
+            time: model.timeBinding,
+            date: model.date,
+            getTimelineItemsHandler: model.getTimelineItemsHandler
         )
     }
     
@@ -641,13 +641,13 @@ public struct MealForm_Legacy2: View {
 //        GoalSetPicker(
 //            meal: nil,
 //            showCloseButton: false,
-//            selectedGoalSet: viewModel.goalSet,
+//            selectedGoalSet: model.goalSet,
 //            didSelectGoalSet: didSelectGoalSet
 //        )
     }
     
     func didSelectGoalSet(_ goalSet: GoalSet?, day: Day?) {
-        viewModel.goalSet = goalSet
+        model.goalSet = goalSet
     }
     
     //MARK: - Actions
@@ -657,10 +657,10 @@ public struct MealForm_Legacy2: View {
 
     func actuallySaveAndDismiss() {
         dismiss()
-        if viewModel.isEditing {
+        if model.isEditing {
             Haptics.successFeedback()
         }
-        viewModel.tappedAdd()
+        model.tappedAdd()
     }
     
     func saveAndDismiss() {

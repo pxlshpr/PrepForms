@@ -11,10 +11,10 @@
 //    
 //    @Binding var selectedImage: UIImage?
 //
-//    //TODO: Remove these after moving to ViewModel
+//    //TODO: Remove these after moving to Model
 //
-////    @StateObject var viewModel: LabelScannerViewModel
-//    @ObservedObject var viewModel: LabelScannerViewModel
+////    @StateObject var model: LabelScannerViewModel
+//    @ObservedObject var model: LabelScannerViewModel
 //
 ////    public init(
 ////        isCamera: Bool = true,
@@ -30,14 +30,14 @@
 ////        _animatingCollapse = animatingCollapse ?? .constant(false)
 ////
 ////
-////        let viewModel = LabelScannerViewModel(
+////        let model = LabelScannerViewModel(
 ////            isCamera: isCamera,
 ////            animatingCollapse: animatingCollapse?.wrappedValue ?? false,
 ////            imageHandler: imageHandler,
 ////            scanResultHandler: scanResultHandler,
 ////            dismissHandler: dismissHandler
 ////        )
-////        _viewModel = StateObject(wrappedValue: viewModel)
+////        _model = StateObject(wrappedValue: model)
 ////    }
 //    
 //    public init(
@@ -45,12 +45,12 @@
 //        image: Binding<UIImage?> = .constant(nil)
 //    ) {
 //        _selectedImage = image
-//        self.viewModel = scanner
+//        self.model = scanner
 //    }
 //    
 //    public var body: some View {
 //        ZStack {
-//            if viewModel.showingBlackBackground {
+//            if model.showingBlackBackground {
 //                Color(.systemBackground)
 ////                Color.black
 //                    .edgesIgnoringSafeArea(.all)
@@ -59,7 +59,7 @@
 //            imageViewerLayer
 //            cameraLayer
 //            columnPickerLayer
-//            if !viewModel.animatingCollapse {
+//            if !model.animatingCollapse {
 //                dismissLayer
 //                    .transition(.scale)
 //            }
@@ -68,12 +68,12 @@
 //            guard let newValue else { return }
 //            handleCapturedImage(newValue)
 //        }
-////        .onChange(of: viewModel.animatingCollapse) { newValue in
+////        .onChange(of: model.animatingCollapse) { newValue in
 ////            withAnimation {
 ////                self.animatingCollapse = newValue
 ////            }
 ////        }
-//        .onChange(of: viewModel.clearSelectedImage) { newValue in
+//        .onChange(of: model.clearSelectedImage) { newValue in
 //            guard newValue else { return }
 //            withAnimation {
 //                self.selectedImage = nil
@@ -83,27 +83,27 @@
 //    
 //    func dismiss() {
 //        Haptics.feedback(style: .soft)
-//        viewModel.cancelAllTasks()
-//        viewModel.dismissHandler?()
+//        model.cancelAllTasks()
+//        model.dismissHandler?()
 //    }
 //    
 //    var dismissLayer: some View {
 //        var cornerRadius: CGFloat {
-//            viewModel.showingColumnPickerUI ? 12 : 19
+//            model.showingColumnPickerUI ? 12 : 19
 //        }
 //        
 //        var height: CGFloat {
-//            viewModel.showingColumnPickerUI ? 50 : 38
+//            model.showingColumnPickerUI ? 50 : 38
 //        }
 //        
 //        var foregroundStyle: Material {
-//            viewModel.showingColumnPickerUI
+//            model.showingColumnPickerUI
 //            ? .ultraThinMaterial
 //            : .ultraThickMaterial
 //        }
 //
 //        var bottomPadding: CGFloat {
-//            viewModel.showingColumnPickerUI ? 16 : 0
+//            model.showingColumnPickerUI ? 16 : 0
 //        }
 //        
 //        return VStack {
@@ -132,12 +132,12 @@
 //    
 //    var columnPickerLayer: some View {
 //        ColumnPickerOverlay(
-//            isVisibleBinding: $viewModel.showingColumnPickerUI,
-//            leftTitle: viewModel.leftColumnTitle,
-//            rightTitle: viewModel.rightColumnTitle,
-//            selectedColumn: viewModel.selectedColumnBinding,
-//            didTapDismiss: viewModel.dismissHandler,
-//            didTapAutofill: { viewModel.columnSelectionHandler() }
+//            isVisibleBinding: $model.showingColumnPickerUI,
+//            leftTitle: model.leftColumnTitle,
+//            rightTitle: model.rightColumnTitle,
+//            selectedColumn: model.selectedColumnBinding,
+//            didTapDismiss: model.dismissHandler,
+//            didTapAutofill: { model.columnSelectionHandler() }
 //        )
 //    }
 //    
@@ -154,19 +154,19 @@
 ////                    Color.black
 ////                        .opacity(shimmeringImage ? 0.6 : 0)
 //                }
-//                .scaleEffect(viewModel.animatingCollapse ? 0 : 1)
-//                .padding(.top, viewModel.animatingCollapse ? 400 : 0)
-//                .padding(.trailing, viewModel.animatingCollapse ? 300 : 0)
+//                .scaleEffect(model.animatingCollapse ? 0 : 1)
+//                .padding(.top, model.animatingCollapse ? 400 : 0)
+//                .padding(.trailing, model.animatingCollapse ? 300 : 0)
 //                textBoxesLayer
 //                croppedImagesCutoutLayer
-//                    .scaleEffect(viewModel.animatingCollapseOfCutouts ? 0 : 1)
-//                    .opacity(viewModel.animatingCollapseOfCutouts ? 0 : 1)
-//                    .padding(.top, viewModel.animatingCollapseOfCutouts ? 400 : 0)
-//                    .padding(.trailing, viewModel.animatingCollapseOfCutouts ? 300 : 0)
+//                    .scaleEffect(model.animatingCollapseOfCutouts ? 0 : 1)
+//                    .opacity(model.animatingCollapseOfCutouts ? 0 : 1)
+//                    .padding(.top, model.animatingCollapseOfCutouts ? 400 : 0)
+//                    .padding(.trailing, model.animatingCollapseOfCutouts ? 300 : 0)
 //                croppedImagesLayer
-//                    .scaleEffect(viewModel.animatingCollapseOfCroppedImages ? 0 : 1)
-//                    .padding(.top, viewModel.animatingCollapseOfCroppedImages ? 0 : 0)
-//                    .padding(.trailing, viewModel.animatingCollapseOfCroppedImages ? 300 : 0)
+//                    .scaleEffect(model.animatingCollapseOfCroppedImages ? 0 : 1)
+//                    .padding(.top, model.animatingCollapseOfCroppedImages ? 0 : 0)
+//                    .padding(.trailing, model.animatingCollapseOfCroppedImages ? 300 : 0)
 //            }
 //            .edgesIgnoringSafeArea(.all)
 ////            .transition(.move(edge: .bottom))

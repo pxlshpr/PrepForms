@@ -5,7 +5,7 @@
 //extension MealItemForm.QuantityForm {
 //    var textFieldSection: some View {
 //        var header: some View {
-//            Text(viewModel.amountHeaderString)
+//            Text(model.amountHeaderString)
 //        }
 //        
 //        return FormStyledSection(header: header) {
@@ -33,7 +33,7 @@
 //        }
 //
 //        return Group {
-//            if !viewModel.equivalentQuantities.isEmpty {
+//            if !model.equivalentQuantities.isEmpty {
 //                FormStyledSection(header: header, horizontalPadding: 0) {
 //                    quantitiesContent
 //                }

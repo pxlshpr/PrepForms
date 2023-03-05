@@ -9,7 +9,7 @@ extension SizeForm {
         @EnvironmentObject var fields: FoodForm.Fields
         
         @ObservedObject var sizeFormViewModel: SizeFormViewModel
-        @StateObject var viewModel: ViewModel
+        @StateObject var model: Model
 
         @Environment(\.dismiss) var dismiss
         @Environment(\.colorScheme) var colorScheme
@@ -20,11 +20,11 @@ extension SizeForm {
         
         init(sizeFormViewModel: SizeFormViewModel) {
             self.sizeFormViewModel = sizeFormViewModel
-            let viewModel = ViewModel(initialString: sizeFormViewModel.name)
-            _viewModel = StateObject(wrappedValue: viewModel)
+            let model = Model(initialString: sizeFormViewModel.name)
+            _model = StateObject(wrappedValue: model)
         }
         
-        class ViewModel: ObservableObject {
+        class Model: ObservableObject {
             let initialString: String
             @Published var internalString: String = ""
 
@@ -63,13 +63,13 @@ extension SizeForm.NameForm {
     }
     
     var doneButton: some View {
-        FormInlineDoneButton(disabled: viewModel.shouldDisableDone) {
+        FormInlineDoneButton(disabled: model.shouldDisableDone) {
             tappedDone()
         }
     }
     
     func tappedDone() {
-        dismissAfterSetting(viewModel.internalString)
+        dismissAfterSetting(model.internalString)
     }
     
     var textFieldSection: some View {
@@ -140,10 +140,10 @@ extension SizeForm.NameForm {
 
     var textField: some View {
         let binding = Binding<String>(
-            get: { viewModel.internalString },
+            get: { model.internalString },
             set: { newValue in
                 withAnimation {
-                    viewModel.internalString = newValue.lowercased()
+                    model.internalString = newValue.lowercased()
                 }
             }
         )

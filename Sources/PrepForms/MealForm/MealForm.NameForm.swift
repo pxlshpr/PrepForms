@@ -7,7 +7,7 @@ import PrepDataTypes
 extension MealForm {
     struct NameForm: View {
 
-        @StateObject var viewModel: ViewModel
+        @StateObject var model: Model
 
         @Environment(\.dismiss) var dismiss
         @Environment(\.colorScheme) var colorScheme
@@ -19,12 +19,12 @@ extension MealForm {
         @Binding var name: String
         
         init(name: Binding<String>) {
-            let viewModel = ViewModel(initialString: name.wrappedValue)
-            _viewModel = StateObject(wrappedValue: viewModel)
+            let model = Model(initialString: name.wrappedValue)
+            _model = StateObject(wrappedValue: model)
             _name = name
         }
         
-        class ViewModel: ObservableObject {
+        class Model: ObservableObject {
             let initialString: String
             @Published var internalString: String = ""
 
@@ -63,13 +63,13 @@ extension MealForm.NameForm {
     }
     
     var doneButton: some View {
-        FormInlineDoneButton(disabled: viewModel.shouldDisableDone) {
+        FormInlineDoneButton(disabled: model.shouldDisableDone) {
             tappedDone()
         }
     }
     
     func tappedDone() {
-        dismissAfterSetting(viewModel.internalString)
+        dismissAfterSetting(model.internalString)
     }
     
     var textFieldSection: some View {
@@ -140,10 +140,10 @@ extension MealForm.NameForm {
 
     var textField: some View {
         let binding = Binding<String>(
-            get: { viewModel.internalString },
+            get: { model.internalString },
             set: { newValue in
                 withAnimation {
-                    viewModel.internalString = newValue
+                    model.internalString = newValue
                 }
             }
         )

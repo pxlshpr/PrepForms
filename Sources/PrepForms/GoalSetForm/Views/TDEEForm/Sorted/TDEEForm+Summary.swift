@@ -12,7 +12,7 @@ extension TDEEForm {
                         .matchedGeometryEffect(id: "maintenance-header-icon", in: namespace)
                         .foregroundColor(Color(.tertiaryLabel))
                         .imageScale(.medium)
-                    Text(viewModel.maintenanceEnergyFormatted)
+                    Text(model.maintenanceEnergyFormatted)
                         .foregroundColor(.primary)
                         .matchedGeometryEffect(id: "maintenance", in: namespace)
                         .font(.system(.title3, design: .default, weight: .bold))
@@ -41,14 +41,14 @@ extension TDEEForm {
                             .matchedGeometryEffect(id: "resting-header-icon", in: namespace)
                             .foregroundColor(Color(.tertiaryLabel))
                             .imageScale(.medium)
-                        if viewModel.restingEnergyIsDynamic {
+                        if model.restingEnergyIsDynamic {
 //                            appleHealthSymbol
                             appleHealthBolt
                                 .imageScale(.small)
                                 .matchedGeometryEffect(id: "resting-health-icon", in: namespace)
                         }
                     }
-                    Text(viewModel.restingEnergyFormatted)
+                    Text(model.restingEnergyFormatted)
                         .matchedGeometryEffect(id: "resting", in: namespace)
                         .fixedSize(horizontal: true, vertical: false)
                         .font(.system(.title3, design: .default, weight: .regular))
@@ -80,14 +80,14 @@ extension TDEEForm {
                             .matchedGeometryEffect(id: "active-header-icon", in: namespace)
                             .foregroundColor(Color(.tertiaryLabel))
                             .imageScale(.medium)
-                        if viewModel.activeEnergyIsDynamic {
+                        if model.activeEnergyIsDynamic {
 //                            appleHealthSymbol
                             appleHealthBolt
                                 .matchedGeometryEffect(id: "active-health-icon", in: namespace)
                                 .imageScale(.small)
                         }
                     }
-                    Text(viewModel.activeEnergyFormatted)
+                    Text(model.activeEnergyFormatted)
                         .matchedGeometryEffect(id: "active", in: namespace)
                         .font(.system(.title3, design: .default, weight: .regular))
                         .foregroundColor(.primary)

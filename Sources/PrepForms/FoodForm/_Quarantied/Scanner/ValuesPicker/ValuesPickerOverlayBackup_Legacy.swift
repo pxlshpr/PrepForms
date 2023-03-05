@@ -27,16 +27,16 @@
 ////    let attributesListAnimation: Animation = Bounce2
 ////    let attributesListAnimation: Animation = .interactiveSpring()
 //
-//    @ObservedObject var viewModel: ScannerViewModel
+//    @ObservedObject var model: ScannerViewModel
 //    
 //    public init(
-//        viewModel: ScannerViewModel,
+//        model: ScannerViewModel,
 //        isVisibleBinding: Binding<Bool>,
 //        didTapDismiss: (() -> ())? = nil,
 //        didTapCheckmark: @escaping () -> (),
 //        didTapAutofill: @escaping () -> ()
 //    ) {
-//        self.viewModel = viewModel
+//        self.model = model
 //        _isVisibleBinding = isVisibleBinding
 //        self.didTapDismiss = didTapDismiss
 //        self.didTapCheckmark = didTapCheckmark
@@ -45,13 +45,13 @@
 //    
 //    public var body: some View {
 //        ZStack {
-//            if !viewModel.showingTextField {
+//            if !model.showingTextField {
 //                baseLayer
 //            }
 ////            if showingAttributePicker {
 ////                attributeLayer
 ////            }
-//            if viewModel.showingTextField {
+//            if model.showingTextField {
 //                searchLayer
 //                    .transition(.move(edge: .bottom))
 //            }
@@ -81,7 +81,7 @@
 //    
 //    var attributesList: some View {
 //        List {
-//            ForEach(viewModel.nutrients, id: \.self) {
+//            ForEach(model.nutrients, id: \.self) {
 //                Text($0.attribute.description)
 //            }
 //        }
@@ -192,7 +192,7 @@
 //            .onSubmit {
 //                withAnimation {
 //                    HardcodedBounds = CGRectMake(0, 0, 430, HeightWithoutKeyboard)
-//                    viewModel.showingTextField = false
+//                    model.showingTextField = false
 //                }
 //                NotificationCenter.default.post(
 //                    name: .scannerDidDismissKeyboard,
@@ -264,9 +264,9 @@
 //        isFocused = false
 //        withAnimation {
 //            HardcodedBounds = CGRectMake(0, 0, 430, HeightWithoutKeyboard)
-////            viewModel.showingTextField = false
+////            model.showingTextField = false
 //        }
-//        guard let imageSize = viewModel.image?.size else { return }
+//        guard let imageSize = model.image?.size else { return }
 //        let delay: CGFloat
 //        if imageSize.isTaller(than: HardcodedBounds.size) {
 //            cprint("⚱️ image is taller delay 0.3")
@@ -279,7 +279,7 @@
 //        //TODO: Only do this for tall images
 //        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
 //            withAnimation {
-//                viewModel.showingTextField = false
+//                model.showingTextField = false
 //            }
 //        }
 //        NotificationCenter.default.post(
@@ -425,12 +425,12 @@
 //    }
 //    
 //    var userInfoForCurrentAttributeZoom: [String: Any]? {
-//        guard let imageSize = viewModel.image?.size,
-//              let attributeText = viewModel.currentAttributeText
+//        guard let imageSize = model.image?.size,
+//              let attributeText = model.currentAttributeText
 //        else { return nil }
 //        
 //        var boundingBox = attributeText.boundingBox
-//        if let valueText = viewModel.currentValueText {
+//        if let valueText = model.currentValueText {
 //            boundingBox = boundingBox.union(valueText.boundingBox)
 //        }
 //        
@@ -439,8 +439,8 @@
 //    }
 //
 //    var userInfoForAllAttributesZoom: [String: Any]? {
-//        guard let imageSize = viewModel.image?.size,
-//              let boundingBox = viewModel.scanResult?.columnsWithAttributesBoundingBox
+//        guard let imageSize = model.image?.size,
+//              let boundingBox = model.scanResult?.columnsWithAttributesBoundingBox
 //        else { return nil }
 //        let zBox = ZBox(boundingBox: boundingBox, imageSize: imageSize)
 //        return [Notification.ZoomableScrollViewKeys.zoomBox: zBox]
@@ -467,7 +467,7 @@
 //            isFocused = true
 //            withAnimation {
 //                HardcodedBounds = CGRectMake(0, 0, 430, HeightWithKeyboard)
-//                viewModel.showingTextField = true
+//                model.showingTextField = true
 //            }
 //            NotificationCenter.default.post(
 //                name: .scannerDidPresentKeyboard,
@@ -476,9 +476,9 @@
 //            )
 //        } label: {
 //            HStack(alignment: .firstTextBaseline, spacing: 2) {
-//                Text(viewModel.currentAmountString)
+//                Text(model.currentAmountString)
 //                    .foregroundColor(amountColor)
-//                Text(viewModel.currentUnitString)
+//                Text(model.currentUnitString)
 //                    .foregroundColor(unitColor)
 //                    .font(.system(size: 18, weight: .medium, design: .default))
 //            }
@@ -562,7 +562,7 @@
 //            }
 //        } label: {
 //            VStack {
-//                Text(viewModel.currentAttribute.description)
+//                Text(model.currentAttribute.description)
 //                    .font(.title3)
 //                    .minimumScaleFactor(0.2)
 //                    .lineLimit(2)
@@ -587,7 +587,7 @@
 //public struct ValuesPickerOverlayPreview: View {
 //    @State var selectedColumn: Int = 1
 //    
-//    @StateObject var viewModel: ScannerViewModel = ScannerViewModel()
+//    @StateObject var model: ScannerViewModel = ScannerViewModel()
 //    
 //    public init() { }
 //    public var body: some View {
@@ -599,7 +599,7 @@
 //    
 //    var overlay: some View {
 //        ValuesPickerOverlay(
-//            viewModel: viewModel,
+//            model: model,
 //            isVisibleBinding: .constant(true),
 //            didTapDismiss: {},
 //            didTapCheckmark: {},

@@ -13,7 +13,7 @@
 //extension MealItemForm {
 //    public struct QuantityForm: View {
 //        
-//        @EnvironmentObject var viewModel: MealItemViewModel
+//        @EnvironmentObject var model: MealItemViewModel
 //
 //        @Namespace var namespace
 //        @Environment(\.colorScheme) var colorScheme
@@ -68,11 +68,11 @@
 //    
 //    var metersSection: some View {
 //        MealItemMeters(
-//            foodItem: $viewModel.mealItem,
-//            meal: $viewModel.dayMeal,
-//            day: viewModel.day, //TODO: Get
+//            foodItem: $model.mealItem,
+//            meal: $model.dayMeal,
+//            day: model.day, //TODO: Get
 //            userOptions: DataManager.shared.user?.units ?? .standard,
-////            bodyProfile: viewModel.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
+////            bodyProfile: model.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
 //            bodyProfile: DataManager.shared.user?.bodyProfile,
 //            didTapGoalSetButton: { forMeal in
 //                
@@ -330,10 +330,10 @@
 //                colorBox($0.preppedColor)
 //            }
 //            if showCompletion {
-//                colorBox(NutrientMeter.ViewModel.Colors.Complete.placeholder)
+//                colorBox(NutrientMeter.Model.Colors.Complete.placeholder)
 //            }
 //            if showExcess {
-//                colorBox(NutrientMeter.ViewModel.Colors.Excess.placeholder)
+//                colorBox(NutrientMeter.Model.Colors.Excess.placeholder)
 //            }
 //        }
 //        .fixedSize()
@@ -345,10 +345,10 @@
 //                colorBox($0.eatenColor)
 //            }
 //            if showCompletion {
-//                colorBox(NutrientMeter.ViewModel.Colors.Complete.fill)
+//                colorBox(NutrientMeter.Model.Colors.Complete.fill)
 //            }
 //            if showExcess {
-//                colorBox(NutrientMeter.ViewModel.Colors.Excess.fill)
+//                colorBox(NutrientMeter.Model.Colors.Excess.fill)
 //            }
 //        }
 //        .fixedSize()
@@ -369,7 +369,7 @@
 ////                    .foregroundColor(NutrientMeterComponent.energy.textColor)
 ////                    .font(.footnote)
 //////                    .font(.title3)
-////                NutrientMeter(viewModel: .init(
+////                NutrientMeter(model: .init(
 ////                    component: .energy, goal: 400, burned: 0, planned: 170, increment: 180))
 ////                .frame(height: 15)
 ////            }
@@ -379,7 +379,7 @@
 ////                    .font(.footnote)
 //////                    .fontWeight(.bold)
 //////                    .font(.title3)
-////                NutrientMeter(viewModel: .init(
+////                NutrientMeter(model: .init(
 ////                    component: .carb, goal: 400, burned: 0, planned: 170, increment: 20))
 ////                .frame(height: 15)
 ////            }
@@ -389,7 +389,7 @@
 ////                    .font(.footnote)
 //////                    .fontWeight(.bold)
 //////                    .font(.title3)
-////                NutrientMeter(viewModel: .init(
+////                NutrientMeter(model: .init(
 ////                    component: .fat, goal: 300, burned: 0, planned: 70, increment: 60))
 ////                .frame(height: 15)
 ////            }
@@ -399,7 +399,7 @@
 ////                    .font(.footnote)
 //////                    .fontWeight(.bold)
 //////                    .font(.title3)
-////                NutrientMeter(viewModel: .init(
+////                NutrientMeter(model: .init(
 ////                    component: .protein, goal: 600, burned: 0, planned: 170, increment: 70))
 ////                .frame(height: 15)
 ////            }
@@ -413,16 +413,16 @@
 ////    let spacing: CGFloat = 2
 ////    var body: some View {
 ////        VStack(spacing: spacing) {
-////            NutrientMeter(viewModel: .init(
+////            NutrientMeter(model: .init(
 ////                component: .energy, goal: 400, burned: 0, planned: 170, increment: 180))
 ////            .frame(height: height)
-////            NutrientMeter(viewModel: .init(
+////            NutrientMeter(model: .init(
 ////                component: .carb, goal: 400, burned: 0, planned: 170, increment: 20))
 ////            .frame(height: height)
-////            NutrientMeter(viewModel: .init(
+////            NutrientMeter(model: .init(
 ////                component: .fat, goal: 300, burned: 0, planned: 70, increment: 60))
 ////            .frame(height: height)
-////            NutrientMeter(viewModel: .init(
+////            NutrientMeter(model: .init(
 ////                component: .protein, goal: 600, burned: 0, planned: 170, increment: 70))
 ////            .frame(height: height)
 ////        }

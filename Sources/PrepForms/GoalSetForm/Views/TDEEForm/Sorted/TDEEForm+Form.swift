@@ -4,7 +4,7 @@ import SwiftUISugar
 extension TDEEForm {
     var form: some View {
         FormStyledScrollView {
-            if viewModel.isEditing {
+            if model.isEditing {
                 editContents
             } else {
                 viewContents
@@ -36,7 +36,7 @@ extension TDEEForm {
     var saveButton: some View {
         var saveButton: some View {
             FormPrimaryButton(title: "Save") {
-                didTapSave(viewModel.bodyProfile)
+                didTapSave(model.bodyProfile)
                 dismiss()
             }
         }
@@ -56,12 +56,12 @@ extension TDEEForm {
     var viewContents: some View {
         Group {
             promptSection
-            if viewModel.shouldShowSummary {
+            if model.shouldShowSummary {
                 arrowSection
                 summarySection
                     .padding(.top, 5)
                     .padding(.bottom, 10)
-                if viewModel.isDynamic {
+                if model.isDynamic {
                     HStack(alignment: .firstTextBaseline) {
 //                        appleHealthSymbol
                         appleHealthBolt

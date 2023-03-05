@@ -11,14 +11,14 @@ extension ParentFoodForm {
         var saveButton: some View {
             
             var isValid: Bool {
-                !fields.name.isEmpty && viewModel.items.count > 1
+                !fields.name.isEmpty && model.items.count > 1
             }
             
             func didTapSave() {
                 withAnimation {
-                    viewModel.showingSaveSheet.toggle()
+                    model.showingSaveSheet.toggle()
                 }
-                if viewModel.showingSaveSheet, !isValid {
+                if model.showingSaveSheet, !isValid {
                     Haptics.warningFeedback()
                 } else {
                     Haptics.feedback(style: .soft)
@@ -81,7 +81,7 @@ extension ParentFoodForm {
     var saveSheet: some View {
         func tappedSave() {
             let start = CFAbsoluteTimeGetCurrent()
-            let fieldsAndItems = ParentFoodFormFieldsAndItems(fields: fields, viewModel: viewModel)
+            let fieldsAndItems = ParentFoodFormFieldsAndItems(fields: fields, model: model)
             guard let output = fieldsAndItems?.output else {
                 return
             }
@@ -95,14 +95,14 @@ extension ParentFoodForm {
             if fields.name.isEmpty {
                 return .missingFields(["Name"])
             }
-            if viewModel.items.count < 2 {
+            if model.items.count < 2 {
                 return .notEnoughIngredients
             }
             return nil
         }
         
         return SaveSheet(
-            isPresented: $viewModel.showingSaveSheet,
+            isPresented: $model.showingSaveSheet,
             validationMessage: Binding<ValidationMessage?>(
             get: { validationMessage },
             set: { _ in }
@@ -110,7 +110,7 @@ extension ParentFoodForm {
             tappedSave()
         })
         .environmentObject(fields)
-        .environmentObject(viewModel)
+        .environmentObject(model)
     }
 }
 
@@ -145,9 +145,9 @@ struct ParentFoodFormFieldsAndItems {
     let density: FieldValue?
     let sizes: [FieldValue]
     
-    let viewModel: ParentFoodForm.ViewModel
+    let model: ParentFoodForm.Model
     
-    init?(fields: FoodForm.Fields, viewModel: ParentFoodForm.ViewModel) {
+    init?(fields: FoodForm.Fields, model: ParentFoodForm.Model) {
         self.name = fields.name
         self.emoji = fields.emoji
         self.detail = fields.detail
@@ -156,15 +156,15 @@ struct ParentFoodFormFieldsAndItems {
         self.serving = fields.serving.value
         self.density = fields.density.value
         self.sizes = fields.allSizeFields.map { $0.value }
-        self.viewModel = viewModel
+        self.model = model
     }
     
     var output: ParentFoodFormOutput? {
         guard let createForm else { return nil }
         return ParentFoodFormOutput(
             createForm: createForm,
-            items: viewModel.items,
-            forRecipe: viewModel.forRecipe
+            items: model.items,
+            forRecipe: model.forRecipe
         )
     }
     var createForm: UserFoodCreateForm? {
@@ -209,11 +209,11 @@ struct ParentFoodFormFieldsAndItems {
     
     var foodNutrients: FoodNutrients {
         FoodNutrients(
-            energyInKcal: viewModel.amount(for: .energy),
-            carb: viewModel.amount(for: .carb),
-            protein: viewModel.amount(for: .protein),
-            fat: viewModel.amount(for: .fat),
-            micros: viewModel.microsArray
+            energyInKcal: model.amount(for: .energy),
+            carb: model.amount(for: .carb),
+            protein: model.amount(for: .protein),
+            fat: model.amount(for: .fat),
+            micros: model.microsArray
         )
     }
     

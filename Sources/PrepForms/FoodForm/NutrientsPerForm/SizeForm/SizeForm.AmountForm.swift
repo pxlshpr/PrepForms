@@ -10,7 +10,7 @@ extension SizeForm {
         @EnvironmentObject var fields: FoodForm.Fields
         
         @ObservedObject var sizeFormViewModel: SizeFormViewModel
-        @StateObject var viewModel: ViewModel
+        @StateObject var model: Model
 
         @Environment(\.dismiss) var dismiss
         @Environment(\.colorScheme) var colorScheme
@@ -22,14 +22,14 @@ extension SizeForm {
         
         init(sizeFormViewModel: SizeFormViewModel) {
             self.sizeFormViewModel = sizeFormViewModel
-            let viewModel = ViewModel(
+            let model = Model(
                 initialDouble: sizeFormViewModel.amount,
                 initialUnit: sizeFormViewModel.amountUnit
             )
-            _viewModel = StateObject(wrappedValue: viewModel)
+            _model = StateObject(wrappedValue: model)
         }
         
-        class ViewModel: ObservableObject {
+        class Model: ObservableObject {
             let initialDouble: Double?
             let initialUnit: FormUnit
             @Published var internalString: String = ""
@@ -103,10 +103,10 @@ extension SizeForm.AmountForm {
     }
     
     var doneButton: some View {
-        FormInlineDoneButton(disabled: viewModel.shouldDisableDone) {
+        FormInlineDoneButton(disabled: model.shouldDisableDone) {
             Haptics.feedback(style: .rigid)
-            sizeFormViewModel.amount = viewModel.internalDouble
-            sizeFormViewModel.amountUnit = viewModel.internalUnit
+            sizeFormViewModel.amount = model.internalDouble
+            sizeFormViewModel.amountUnit = model.internalUnit
             dismiss()
         }
     }
@@ -119,10 +119,10 @@ extension SizeForm.AmountForm {
     
     var textField: some View {
         let binding = Binding<String>(
-            get: { viewModel.textFieldString },
+            get: { model.textFieldString },
             set: { newValue in
                 withAnimation {
-                    viewModel.textFieldString = newValue
+                    model.textFieldString = newValue
                 }
             }
         )
@@ -151,7 +151,7 @@ extension SizeForm.AmountForm {
     
     var unitPicker: some View {
         UnitPickerGridTiered(
-            pickedUnit: viewModel.internalUnit,
+            pickedUnit: model.internalUnit,
             includeServing: true,
             includeWeights: true,
             includeVolumes: true,
@@ -160,7 +160,7 @@ extension SizeForm.AmountForm {
             didPickUnit: { newUnit in
                 withAnimation {
                     Haptics.feedback(style: .rigid)
-                    viewModel.internalUnit = newUnit
+                    model.internalUnit = newUnit
                 }
             }
         )
@@ -172,7 +172,7 @@ extension SizeForm.AmountForm {
             showingUnitPicker = true
         } label: {
             HStack(spacing: 2) {
-                Text(viewModel.internalUnit.shortDescription)
+                Text(model.internalUnit.shortDescription)
                     .fontWeight(.semibold)
                 Image(systemName: "chevron.up.chevron.down")
                     .imageScale(.small)
@@ -186,7 +186,7 @@ extension SizeForm.AmountForm {
                         colorScheme == .dark ? 0.1 : 0.15
                     ))
             )
-//            .animation(.none, value: viewModel.internalUnit)
+//            .animation(.none, value: model.internalUnit)
         }
         .contentShape(Rectangle())
     }

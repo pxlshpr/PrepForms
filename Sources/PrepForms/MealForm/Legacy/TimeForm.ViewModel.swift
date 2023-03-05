@@ -3,7 +3,7 @@ import Timeline
 import PrepDataTypes
 
 extension TimeForm {
-    class ViewModel: ObservableObject {
+    class Model: ObservableObject {
         @Published var time: Date = Date()
     }
 }

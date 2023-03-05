@@ -7,7 +7,7 @@ import SwiftHaptics
 extension ItemForm {
     public struct MealPicker: View {
         
-        @EnvironmentObject var viewModel: ItemFormModel
+        @EnvironmentObject var model: ItemFormModel
         
         @Environment(\.dismiss) var dismiss
       
@@ -28,7 +28,7 @@ public extension ItemForm.MealPicker {
     
     var body: some View {
         Timeline(
-            items: viewModel.timelineItems,
+            items: model.timelineItems,
             newItem: nil, //mealItem,
             shouldStylizeTappableItems: true,
             didTapItem: didTapItem,
@@ -42,7 +42,7 @@ public extension ItemForm.MealPicker {
     
     func didTapItem(_ item: TimelineItem) {
         Haptics.feedback(style: .rigid)
-        if let dayMeals = viewModel.dayMeals,
+        if let dayMeals = model.dayMeals,
            let meal = dayMeals.first(where: { $0.id.uuidString == item.id })
         {
             didTapMeal(meal)

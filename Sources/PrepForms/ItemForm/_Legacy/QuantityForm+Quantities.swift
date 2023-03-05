@@ -17,7 +17,7 @@
 //    var quantitiesGrid: some View {
 //        FlowLayout(
 //            mode: .scrollable,
-//            items: viewModel.equivalentQuantities,
+//            items: model.equivalentQuantities,
 //            itemSpacing: 4,
 //            shouldAnimateHeight: .constant(true)
 //        ) { quantity in
@@ -29,7 +29,7 @@
 //    var quantitiesScrollView: some View {
 //        ScrollView(.horizontal, showsIndicators: false) {
 //            HStack {
-//                ForEach(viewModel.equivalentQuantities, id: \.self) { quantity in
+//                ForEach(model.equivalentQuantities, id: \.self) { quantity in
 //                    quantityButton(for: quantity)
 //                }
 //            }
@@ -40,7 +40,7 @@
 //    func quantityButton(for quantity: FoodQuantity) -> some View {
 //        Button {
 //            Haptics.feedback(style: .rigid)
-//            viewModel.didPickQuantity(quantity)
+//            model.didPickQuantity(quantity)
 //        } label: {
 //            ZStack {
 //                Capsule(style: .continuous)
@@ -62,10 +62,10 @@
 //}
 //
 //struct AmountFormPreview: View {
-//    @StateObject var viewModel = MealItemViewModel(food: .init(mockName: "Cheese", emoji: "🧀"), meal: nil, dayMeals: [])
+//    @StateObject var model = MealItemViewModel(food: .init(mockName: "Cheese", emoji: "🧀"), meal: nil, dayMeals: [])
 //    var body: some View {
 //        MealItemForm.QuantityForm(isPresented: .constant(true))
-//            .environmentObject(viewModel)
+//            .environmentObject(model)
 //    }
 //}
 //

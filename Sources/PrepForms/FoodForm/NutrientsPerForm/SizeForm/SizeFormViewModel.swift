@@ -98,7 +98,7 @@ class SizeFormViewModel: ObservableObject {
             showingVolumePrefix = showingVolumePrefixToggle
             //TODO: Rewrite this
 //            /// If we've turned it on and there's no volume prefix for the size—set it to cup
-//            if viewModel.showingVolumePrefixToggle {
+//            if model.showingVolumePrefixToggle {
 //                if field.value.size?.volumePrefixUnit == nil {
 //                    field.value.size?.volumePrefixUnit = .volume(.cup)
 //                }

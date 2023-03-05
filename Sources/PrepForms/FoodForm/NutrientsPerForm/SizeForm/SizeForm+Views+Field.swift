@@ -7,7 +7,7 @@ extension SizeForm {
     var fieldSection: some View {
         @ViewBuilder
         var footer: some View {
-            if viewModel.showingVolumePrefix {
+            if model.showingVolumePrefix {
                 Text("e.g. 2 × cup, shredded = 125 g")
             } else {
                 Text("e.g. 5 × cookies = 58 g")
@@ -51,9 +51,9 @@ extension SizeForm {
 
         var quantityButton: some View {
             button(
-                viewModel.quantity.cleanAmount,
+                model.quantity.cleanAmount,
                 colorScheme: colorScheme,
-                isCompact: viewModel.showingVolumePrefix
+                isCompact: model.showingVolumePrefix
             ) {
                 Haptics.feedback(style: .soft)
                 showingQuantityForm = true
@@ -67,9 +67,9 @@ extension SizeForm {
         
         var volumePrefixButton: some View {
             button(
-                viewModel.volumePrefixUnit.shortDescription,
+                model.volumePrefixUnit.shortDescription,
                 colorScheme: colorScheme,
-                isCompact: viewModel.showingVolumePrefix
+                isCompact: model.showingVolumePrefix
             ) {
                 Haptics.feedback(style: .soft)
                 showingVolumePrefixUnitPicker = true
@@ -86,10 +86,10 @@ extension SizeForm {
         
         var nameButton: some View {
             button(
-                viewModel.name,
+                model.name,
                 placeholder: "name",
                 colorScheme: colorScheme,
-                isCompact: viewModel.showingVolumePrefix
+                isCompact: model.showingVolumePrefix
             ) {
                 Haptics.feedback(style: .soft)
                 showingNameForm = true
@@ -104,10 +104,10 @@ extension SizeForm {
         
         var amountButton: some View {
             button(
-                viewModel.amountDescription,
+                model.amountDescription,
                 placeholder: "amount",
                 colorScheme: colorScheme,
-                isCompact: viewModel.showingVolumePrefix
+                isCompact: model.showingVolumePrefix
             ) {
                 Haptics.feedback(style: .soft)
                 showingAmountForm = true
@@ -124,7 +124,7 @@ extension SizeForm {
                 Spacer()
             }
             HStack(spacing: 0) {
-                if viewModel.showingVolumePrefix {
+                if model.showingVolumePrefix {
                     volumePrefixButton
                     volumePrefixCommaSymbol
                 }

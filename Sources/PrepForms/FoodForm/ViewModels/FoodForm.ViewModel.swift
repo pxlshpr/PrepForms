@@ -1,8 +1,8 @@
 import SwiftUI
 
 extension FoodForm {
-    public class ViewModel: ObservableObject {
-        public static let shared = ViewModel()
+    public class Model: ObservableObject {
+        public static let shared = Model()
 
         @Published var shouldShowWizard: Bool = true
         @Published var showingWizardOverlay: Bool  = true
@@ -34,7 +34,7 @@ extension FoodForm {
             self.startWithCamera = startWithCamera
             showingSaveButton = startWithCamera
             showingExtractorView = startWithCamera
-            ImageViewer.ViewModel.shared.reset()
+            ImageViewer.Model.shared.reset()
 
             if startWithCamera {
                 Task {

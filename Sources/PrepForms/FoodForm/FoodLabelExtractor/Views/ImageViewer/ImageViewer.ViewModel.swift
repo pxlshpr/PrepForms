@@ -1,9 +1,9 @@
 import SwiftUI
 
 public extension ImageViewer {
-    class ViewModel: ObservableObject {
+    class Model: ObservableObject {
         
-        static let shared = ViewModel()
+        static let shared = Model()
         
 //        var lastContentOffset: CGPoint? = nil
 //        var lastZoomScale: CGFloat? = nil
@@ -33,7 +33,7 @@ public extension ImageViewer {
     }
 }
 
-extension ImageViewer.ViewModel {
+extension ImageViewer.Model {
     
     func reset() {
         self.id = UUID()

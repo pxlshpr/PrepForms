@@ -8,7 +8,7 @@ extension TDEEForm {
 //    var bodyMeasurementsSection: some View {
 //        @ViewBuilder
 //        var footer: some View {
-//            if viewModel.restingEnergyUsesHealthMeasurements {
+//            if model.restingEnergyUsesHealthMeasurements {
 //                Text("Your measurements from HealthKit will be kept in sync to keep your maintenance calories up-to-date.")
 //            }
 //        }
@@ -18,7 +18,7 @@ extension TDEEForm {
 //        }
 //
 //        return Section(header: header, footer: footer) {
-//            Toggle(isOn: formToggleBinding($viewModel.restingEnergyUsesHealthMeasurements)) {
+//            Toggle(isOn: formToggleBinding($model.restingEnergyUsesHealthMeasurements)) {
 //                HStack {
 //                    Image(systemName: "heart.fill")
 //                        .renderingMode(.original)
@@ -41,7 +41,7 @@ extension TDEEForm {
 //            } label: {
 //                HStack(spacing: 5) {
 //                    Text(biologicalSex.description.lowercased())
-//                    if !viewModel.restingEnergyUsesHealthMeasurements {
+//                    if !model.restingEnergyUsesHealthMeasurements {
 //                        Image(systemName: "chevron.up.chevron.down")
 //                            .imageScale(.small)
 //                    }
@@ -53,7 +53,7 @@ extension TDEEForm {
 //            .simultaneousGesture(TapGesture().onEnded {
 //                Haptics.feedback(style: .soft)
 //            })
-//            .disabled(viewModel.restingEnergyUsesHealthMeasurements)
+//            .disabled(model.restingEnergyUsesHealthMeasurements)
 //        }
 //
 //        return HStack {

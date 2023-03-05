@@ -4,11 +4,11 @@ extension TDEEForm {
     
     var promptSection: some View {
         VStack {
-            viewModel.maintenanceEnergyFooterText
+            model.maintenanceEnergyFooterText
                 .matchedGeometryEffect(id: "maintenance-footer", in: namespace)
                 .multilineTextAlignment(.leading)
                 .foregroundColor(Color(.secondaryLabel))
-            if viewModel.shouldShowInitialSetupButton {
+            if model.shouldShowInitialSetupButton {
                 Button {
                     transitionToEditState()
                 } label: {
@@ -97,12 +97,12 @@ extension TDEEForm {
     }
     
     var canBeSaved: Bool {
-        viewModel.shouldShowSaveButton && viewModel.bodyProfile.hasTDEE
+        model.shouldShowSaveButton && model.bodyProfile.hasTDEE
     }
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            if viewModel.shouldShowEditButton {
+            if model.shouldShowEditButton {
                 Button {
                     transitionToEditState()
                 } label: {

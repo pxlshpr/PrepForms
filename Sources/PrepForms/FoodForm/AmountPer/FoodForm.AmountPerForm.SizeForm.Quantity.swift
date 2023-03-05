@@ -45,7 +45,7 @@ extension FoodForm.AmountPerForm.SizeForm.Quantity {
 
     var header: some View {
         Text("Quantity")
-//        Text(viewModel.amountUnit.unitType.description.lowercased())
+//        Text(model.amountUnit.unitType.description.lowercased())
     }
     
     var footer: some View {
@@ -60,11 +60,11 @@ For e.g. when the serving size reads '5 cookies (57g)', you would enter 5 as the
     
 
 //    var quantiativeName: String {
-//        "\(viewModel.quantityString) \(viewModel.name.isEmpty ? "of this size" : viewModel.name.lowercased())"
+//        "\(model.quantityString) \(model.name.isEmpty ? "of this size" : model.name.lowercased())"
 //    }
 //
 //    var description: String {
-//        switch viewModel.amountUnit {
+//        switch model.amountUnit {
 //        case .volume:
 //            return "the volume of \(quantiativeName)"
 //        case .weight:

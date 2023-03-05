@@ -5,8 +5,8 @@ public struct ExtractorView: View {
     @Environment(\.scenePhase) var scenePhase
 
     @ObservedObject var extractor: Extractor
-//    @StateObject var imageViewerViewModel = ImageViewer.ViewModel()
-    @StateObject var imageViewerViewModel = ImageViewer.ViewModel.shared
+//    @StateObject var imageViewerViewModel = ImageViewer.Model()
+    @StateObject var imageViewerViewModel = ImageViewer.Model.shared
     let startedWithCamera: Bool
     
     let homeViewDidBecomeInactive = NotificationCenter.default.publisher(for: .homeViewDidBecomeInactive)
@@ -59,7 +59,7 @@ public struct ExtractorView: View {
             attributesLayer
             cameraLayer
             cameraTransitionLayer
-//            if !viewModel.animatingCollapse {
+//            if !model.animatingCollapse {
 //                buttonsLayer
 //                    .transition(.scale)
 //            }

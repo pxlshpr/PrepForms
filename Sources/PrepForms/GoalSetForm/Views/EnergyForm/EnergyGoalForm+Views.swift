@@ -28,7 +28,7 @@ extension EnergyGoalForm {
     
     func disappeared() {
         goal.validateEnergy()
-        viewModel.createImplicitGoals()
+        model.createImplicitGoals()
     }
     
     var trailingContent: some ToolbarContent {
@@ -107,10 +107,10 @@ extension EnergyGoalForm {
     
     var tdeeForm: some View {
         TDEEForm(
-            existingProfile: viewModel.bodyProfile,
-            userUnits: viewModel.userUnits)
+            existingProfile: model.bodyProfile,
+            userUnits: model.userUnits)
         { profile in
-            viewModel.setBodyProfile(profile)
+            model.setBodyProfile(profile)
         }
     }
     
@@ -122,7 +122,7 @@ extension EnergyGoalForm {
                 Haptics.feedback(style: .soft)
                 showingTDEEForm = true
             } label: {
-                if let profile = viewModel.bodyProfile, let formattedTDEE = profile.formattedTDEEWithUnit {
+                if let profile = model.bodyProfile, let formattedTDEE = profile.formattedTDEEWithUnit {
                     if profile.hasDynamicTDEE {
                         PickerLabel(
                             formattedTDEE,

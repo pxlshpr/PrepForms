@@ -24,7 +24,7 @@ extension FoodForm {
         if let output {
             processExtractorOutput(output)
         }
-        viewModel.showingExtractorView = false
+        model.showingExtractorView = false
         extractor.cancelAllTasks()
         /// Do this now so that the cropped images are cleared out of memeory
         extractor.setup(attributesToIgnore: filledInAttributes)
@@ -43,7 +43,7 @@ extension FoodForm {
     
     func showExtractor(with item: PhotosPickerItem) {
         extractor.setup(attributesToIgnore: filledInAttributes)
-        viewModel.showingExtractorView = true
+        model.showingExtractorView = true
         
         Task(priority: .low) {
             guard let image = try await loadImage(pickerItem: item) else { return }
@@ -57,7 +57,7 @@ extension FoodForm {
     func showExtractorViewWithCamera() {
         extractor.setup(forCamera: true)
         withAnimation {
-            viewModel.showingExtractorView = true
+            model.showingExtractorView = true
         }
     }
     

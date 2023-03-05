@@ -4,7 +4,7 @@ import SwiftHaptics
 
 struct FiltersSheet: View {
     
-    @StateObject var viewModel = FiltersSheetViewModel()
+    @StateObject var model = FiltersSheetViewModel()
 
     init() { }
     
@@ -27,17 +27,17 @@ struct FiltersSheet: View {
     }
     
     func appeared() {
-        viewModel.footerText = viewModel.getFooterText()
+        model.footerText = model.getFooterText()
     }
     
     var footer: some View {
-        viewModel.footerText
+        model.footerText
     }
     
     var databasesSection: some View {
         FlowLayout(
             mode: .scrollable,
-            items: viewModel.databaseFilters,
+            items: model.databaseFilters,
             itemSpacing: 4,
             shouldAnimateHeight: .constant(false)
         ) {
@@ -48,7 +48,7 @@ struct FiltersSheet: View {
     var typesSection: some View {
         FlowLayout(
             mode: .scrollable,
-            items: viewModel.typeFilters,
+            items: model.typeFilters,
             itemSpacing: 4,
             shouldAnimateHeight: .constant(false)
         ) {
@@ -58,10 +58,10 @@ struct FiltersSheet: View {
 
     @ViewBuilder
     func databaseButton(for database: Filter) -> some View {
-        if let index = viewModel.databaseFilters.firstIndex(where: { $0.id == database.id }) {
+        if let index = model.databaseFilters.firstIndex(where: { $0.id == database.id }) {
             FilterButton(
-                filter: $viewModel.databaseFilters[index],
-                onlyOneFilterSelectedInGroup: $viewModel.onlyOneDatabaseIsSelected) {
+                filter: $model.databaseFilters[index],
+                onlyOneFilterSelectedInGroup: $model.onlyOneDatabaseIsSelected) {
             }
             .buttonStyle(.borderless)
         }
@@ -69,10 +69,10 @@ struct FiltersSheet: View {
     
     @ViewBuilder
     func typeButton(for database: Filter) -> some View {
-        if let index = viewModel.typeFilters.firstIndex(where: { $0.id == database.id }) {
+        if let index = model.typeFilters.firstIndex(where: { $0.id == database.id }) {
             FilterButton(
-                filter: $viewModel.typeFilters[index],
-                onlyOneFilterSelectedInGroup: $viewModel.onlyOneTypeIsSelected) {
+                filter: $model.typeFilters[index],
+                onlyOneFilterSelectedInGroup: $model.onlyOneTypeIsSelected) {
             }
             .buttonStyle(.borderless)
         }

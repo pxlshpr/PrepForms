@@ -10,11 +10,11 @@
 //    
 //    @ViewBuilder
 //    var croppedImagesCutoutLayer: some View {
-//        if viewModel.showingCroppedImages {
+//        if model.showingCroppedImages {
 //            ZStack {
 //                Color.clear
-//                ForEach(viewModel.images.indices, id: \.self) { i in
-//                    croppedImageCutout(rect: viewModel.images[i].1)
+//                ForEach(model.images.indices, id: \.self) { i in
+//                    croppedImageCutout(rect: model.images[i].1)
 //                }
 //            }
 //            .edgesIgnoringSafeArea(.all)

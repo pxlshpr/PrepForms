@@ -6,7 +6,7 @@ import PrepDataTypes
 extension ParentFoodForm {
     struct SaveSheet: View {
         
-        @EnvironmentObject var viewModel: ParentFoodForm.ViewModel
+        @EnvironmentObject var model: ParentFoodForm.Model
         @EnvironmentObject var fields: FoodForm.Fields
         
         @Environment(\.colorScheme) var colorScheme
@@ -239,7 +239,7 @@ extension ParentFoodForm.SaveSheet {
 
     var saveIsDisabled: Binding<Bool> {
         Binding<Bool>(
-            get: { viewModel.items.count < 2 || fields.name.isEmpty },
+            get: { model.items.count < 2 || fields.name.isEmpty },
             set: { _ in }
         )
     }
@@ -251,7 +251,7 @@ extension ParentFoodForm.SaveSheet {
     var shadowOpacity: CGFloat { 0.2 }
     
     var saveTitle: String {
-        "\(viewModel.isEditing ? "Save" : "Add") \(viewModel.forRecipe ? "Recipe" : "Plate")"
+        "\(model.isEditing ? "Save" : "Add") \(model.forRecipe ? "Recipe" : "Plate")"
     }
     
     var saveButton: some View {
@@ -295,11 +295,11 @@ extension ParentFoodForm.SaveSheet {
             switch validationMessage {
             case .missingFields(let fieldNames):
                 if let fieldName = fieldNames.first, fieldNames.count == 1 {
-                    Text("Please fill in the \(Text(fieldName).bold()) value to be able to save this \(viewModel.entityName.lowercased()).")
+                    Text("Please fill in the \(Text(fieldName).bold()) value to be able to save this \(model.entityName.lowercased()).")
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
                     VStack(alignment: .leading) {
-                        Text("Please fill in the following to be able to save this \(viewModel.entityName.lowercased()):")
+                        Text("Please fill in the following to be able to save this \(model.entityName.lowercased()):")
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.bottom, 1)
                         ForEach(fieldNames, id: \.self) { fieldName in
@@ -310,7 +310,7 @@ extension ParentFoodForm.SaveSheet {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             case .notEnoughIngredients:
-                Text("Please add at least two \(viewModel.ingredientsTitle.lowercased()) to be able to save this \(viewModel.entityName.lowercased()).")
+                Text("Please add at least two \(model.ingredientsTitle.lowercased()) to be able to save this \(model.entityName.lowercased()).")
                     .fixedSize(horizontal: false, vertical: true)
             default:
                 EmptyView()

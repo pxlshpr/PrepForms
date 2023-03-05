@@ -8,7 +8,7 @@ import SwiftUISugar
 //struct MealItemFormNew: View {
 //
 //    @Environment(\.colorScheme) var colorScheme
-//    @ObservedObject var viewModel: MealItemViewModel
+//    @ObservedObject var model: MealItemViewModel
 //    @State var hasAppeared: Bool = false
 //    @State var bottomHeight: CGFloat = 0.0
 //
@@ -24,7 +24,7 @@ import SwiftUISugar
 //}
 
 //struct MealItemFormQuantity: View {
-//    @ObservedObject var viewModel: MealItemViewModel
+//    @ObservedObject var model: MealItemViewModel
 //    @FocusState var isFocused: Bool
 //    @State var showingUnitPicker = false
 //}
@@ -56,16 +56,16 @@ import SwiftUISugar
 //
 //    var textField: some View {
 //        let binding = Binding<String>(
-//            get: { viewModel.amountString },
+//            get: { model.amountString },
 //            set: { newValue in
 //                withAnimation {
-//                    viewModel.amountString = newValue
+//                    model.amountString = newValue
 //                }
 //            }
 //        )
 //
 //        var font: Font {
-//            return viewModel.amountString.isEmpty ? .body : .largeTitle
+//            return model.amountString.isEmpty ? .body : .largeTitle
 //        }
 //
 //        return TextField("Required", text: binding)
@@ -88,7 +88,7 @@ import SwiftUISugar
 //                showingUnitPicker = true
 //            } label: {
 //                HStack(spacing: 5) {
-//                    Text(viewModel.unitDescription)
+//                    Text(model.unitDescription)
 //                        .multilineTextAlignment(.trailing)
 ////                        .foregroundColor(.secondary)
 //                        .font(.title3)
@@ -104,7 +104,7 @@ import SwiftUISugar
 ////            if supportedUnits.count > 1 {
 //                unitButton
 ////            } else {
-////                Text(viewModel.unitDescription)
+////                Text(model.unitDescription)
 ////                    .multilineTextAlignment(.trailing)
 ////                    .foregroundColor(.secondary)
 ////                    .font(.title3)
@@ -114,14 +114,14 @@ import SwiftUISugar
 //
 //    var unitPicker: some View {
 //        UnitPickerGridTiered(
-//            pickedUnit: viewModel.unit.formUnit,
-//            includeServing: viewModel.shouldShowServingInUnitPicker,
-//            includeWeights: viewModel.shouldShowWeightUnits,
-//            includeVolumes: viewModel.shouldShowVolumeUnits,
-//            sizes: viewModel.foodSizes,
-//            servingDescription: viewModel.servingDescription,
+//            pickedUnit: model.unit.formUnit,
+//            includeServing: model.shouldShowServingInUnitPicker,
+//            includeWeights: model.shouldShowWeightUnits,
+//            includeVolumes: model.shouldShowVolumeUnits,
+//            sizes: model.foodSizes,
+//            servingDescription: model.servingDescription,
 //            allowAddSize: false,
-//            didPickUnit: viewModel.didPickUnit
+//            didPickUnit: model.didPickUnit
 //        )
 //    }
 //}

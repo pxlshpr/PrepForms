@@ -7,13 +7,13 @@ import HealthKit
 
 struct BiologicalSexSection: View {
     
-    @EnvironmentObject var viewModel: TDEEForm.ViewModel
+    @EnvironmentObject var model: TDEEForm.Model
     @Namespace var namespace
     
     var content: some View {
         VStack {
             Group {
-                if let source = viewModel.sexSource {
+                if let source = model.sexSource {
                     Group {
                         sourceSection
                         switch source {
@@ -32,11 +32,11 @@ struct BiologicalSexSection: View {
     }
 
     func tappedSyncWithHealth() {
-        viewModel.changeSexSource(to: .healthApp)
+        model.changeSexSource(to: .healthApp)
     }
     
     func tappedManualEntry() {
-        viewModel.changeSexSource(to: .userEntered)
+        model.changeSexSource(to: .userEntered)
     }
     
     var emptyContent: some View {
@@ -58,32 +58,32 @@ struct BiologicalSexSection: View {
     var bottomRow: some View {
         var picker: some View {
             Menu {
-                if viewModel.sexSource == .userEntered {
-                    Picker(selection: viewModel.sexPickerBinding, label: EmptyView()) {
+                if model.sexSource == .userEntered {
+                    Picker(selection: model.sexPickerBinding, label: EmptyView()) {
                         Text("female").tag(HKBiologicalSex.female)
                         Text("male").tag(HKBiologicalSex.male)
                     }
                 }
             } label: {
-                if viewModel.sexFetchStatus != .notAuthorized {
+                if model.sexFetchStatus != .notAuthorized {
                     HStack(spacing: 5) {
-                        if viewModel.sexFetchStatus == .fetching {
+                        if model.sexFetchStatus == .fetching {
                             ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
                                 .frame(width: 25, height: 25)
                                 .foregroundColor(.secondary)
                         } else {
-                            Text(viewModel.sexFormatted ?? "not specified")
+                            Text(model.sexFormatted ?? "not specified")
                                 .font(.system(.title3, design: .rounded, weight: .semibold))
-                                .foregroundColor(viewModel.sexSource == .userEntered ? .primary : .secondary)
+                                .foregroundColor(model.sexSource == .userEntered ? .primary : .secondary)
                                 .foregroundColor(.primary)
-                                .animation(.none, value: viewModel.sex)
-                                .animation(.none, value: viewModel.sexSource)
+                                .animation(.none, value: model.sex)
+                                .animation(.none, value: model.sexSource)
                                 .fixedSize(horizontal: true, vertical: true)
-                                .if(!viewModel.hasSex && viewModel.sexSource != .userEntered) { view in
+                                .if(!model.hasSex && model.sexSource != .userEntered) { view in
                                     view
                                         .redacted(reason: .placeholder)
                                 }
-                            if viewModel.sexSource == .userEntered {
+                            if model.sexSource == .userEntered {
                                 Image(systemName: "chevron.up.chevron.down")
                                     .imageScale(.small)
                                     .foregroundColor(.secondary)
@@ -93,7 +93,7 @@ struct BiologicalSexSection: View {
                 }
             }
             .simultaneousGesture(TapGesture().onEnded {
-                if viewModel.sexSource == .userEntered {
+                if model.sexSource == .userEntered {
                     Haptics.feedback(style: .soft)
                 }
             })
@@ -108,7 +108,7 @@ struct BiologicalSexSection: View {
     var sourceSection: some View {
         var sourceMenu: some View {
             Menu {
-                Picker(selection: viewModel.sexSourceBinding, label: EmptyView()) {
+                Picker(selection: model.sexSourceBinding, label: EmptyView()) {
                     ForEach(MeasurementSource.allCases, id: \.self) {
                         Label($0.pickerDescription, systemImage: $0.systemImage).tag($0)
                     }
@@ -116,22 +116,22 @@ struct BiologicalSexSection: View {
             } label: {
                 HStack(spacing: 5) {
                     HStack {
-                        if viewModel.sexSource == .healthApp {
+                        if model.sexSource == .healthApp {
                             appleHealthSymbol
                         } else {
-                            if let systemImage = viewModel.sexSource?.systemImage {
+                            if let systemImage = model.sexSource?.systemImage {
                                 Image(systemName: systemImage)
                                     .foregroundColor(.secondary)
                             }
                         }
-                        Text(viewModel.sexSource?.menuDescription ?? "")
+                        Text(model.sexSource?.menuDescription ?? "")
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     Image(systemName: "chevron.up.chevron.down")
                         .imageScale(.small)
                 }
                 .foregroundColor(.secondary)
-                .animation(.none, value: viewModel.sexSource)
+                .animation(.none, value: model.sexSource)
                 .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
@@ -163,6 +163,6 @@ struct BiologicalSexSection: View {
         FormStyledSection(header: header, footer: footer) {
             content
         }
-        .onChange(of: viewModel.sexSource, perform: sexSourceChanged)
+        .onChange(of: model.sexSource, perform: sexSourceChanged)
     }
 }

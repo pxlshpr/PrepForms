@@ -20,7 +20,7 @@ extension SizeForm {
     }
     
     var toggle: some View {
-        Toggle("Use a volume prefix", isOn: $viewModel.showingVolumePrefixToggle)
+        Toggle("Use a volume prefix", isOn: $model.showingVolumePrefixToggle)
     }
 
     var footer: some View {

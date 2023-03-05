@@ -127,11 +127,11 @@ extension TDEEForm {
                 return PickerLabel(
                     string,
                     prefix: prefix,
-                    systemImage: viewModel.restingEnergyFormulaUsingSyncedHealthData ? nil : "chevron.right",
+                    systemImage: model.restingEnergyFormulaUsingSyncedHealthData ? nil : "chevron.right",
 //                    imageColor: <#T##Color#>,
-                    backgroundColor:  viewModel.restingEnergyFormulaUsingSyncedHealthData ? Color(.systemGroupedBackground) : backgroundColor,
-                    foregroundColor: viewModel.restingEnergyFormulaUsingSyncedHealthData ? Color(.secondaryLabel) : Color.primary,
-                    prefixColor: viewModel.restingEnergyFormulaUsingSyncedHealthData ? Color(.tertiaryLabel) : Color.secondary,
+                    backgroundColor:  model.restingEnergyFormulaUsingSyncedHealthData ? Color(.systemGroupedBackground) : backgroundColor,
+                    foregroundColor: model.restingEnergyFormulaUsingSyncedHealthData ? Color(.secondaryLabel) : Color.primary,
+                    prefixColor: model.restingEnergyFormulaUsingSyncedHealthData ? Color(.tertiaryLabel) : Color.secondary,
 //                    imageScale: <#T##Image.Scale#>,
                     infiniteMaxHeight: false
                 )
@@ -159,7 +159,7 @@ extension TDEEForm {
                     label("sex", "male")
                 }
                 Button {
-                    viewModel.path.append(.leanBodyMassForm)
+                    model.path.append(.leanBodyMassForm)
                 } label: {
                     label("fat", "29 %")
                 }
@@ -168,7 +168,7 @@ extension TDEEForm {
         }
         
         let useHealthAppDataBinding = Binding<Bool>(
-            get: { viewModel.restingEnergyFormulaUsingSyncedHealthData },
+            get: { model.restingEnergyFormulaUsingSyncedHealthData },
             set: { newValue in
             }
         )
@@ -187,7 +187,7 @@ extension TDEEForm {
                     Toggle(isOn: useHealthAppDataBinding) {
                         HStack {
                             appleHealthSymbol
-                            Text("\(viewModel.restingEnergyFormulaUsingSyncedHealthData ? "Using " : "Use") Health App Data")
+                            Text("\(model.restingEnergyFormulaUsingSyncedHealthData ? "Using " : "Use") Health App Data")
                         }
                     }
                     .toggleStyle(.button)
@@ -263,7 +263,7 @@ extension TDEEForm {
     
     var activeEnergyHealthAppPeriodLink: some View {
         Button {
-//            viewModel.path.append(.healthAppPeriod)
+//            model.path.append(.healthAppPeriod)
         } label: {
             HStack(spacing: 5) {
                 Text("Average of past 2 weeks")

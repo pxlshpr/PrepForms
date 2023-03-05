@@ -12,7 +12,7 @@ public struct ItemForm: View {
     @Environment(\.dismiss) var dismiss
     @FocusState var isFocused: Bool
 
-    @ObservedObject var viewModel: ItemFormModel
+    @ObservedObject var model: ItemFormModel
 
     @State var hasAppeared: Bool = false
     @State var bottomHeight: CGFloat = 0.0
@@ -26,12 +26,12 @@ public struct ItemForm: View {
     let actionHandler: (ItemFormAction) -> ()
 
     public init(
-        viewModel: ItemFormModel,
+        model: ItemFormModel,
         isEditing: Bool = false,
         forIngredient: Bool = false,
         actionHandler: @escaping ((ItemFormAction) -> ())
     ) {
-        self.viewModel = viewModel
+        self.model = model
         self.actionHandler = actionHandler
         self.forIngredient = forIngredient
         alreadyInNavigationStack = !isEditing
@@ -58,7 +58,7 @@ public struct ItemForm: View {
     }
     
     var navigationStack: some View {
-        NavigationStack(path: $viewModel.path) {
+        NavigationStack(path: $model.path) {
             content
                 .background(background)
                 .navigationDestination(for: ItemFormRoute.self, destination: navigationDestination)
@@ -71,7 +71,7 @@ public struct ItemForm: View {
             saveLayer
         }
         .safeAreaInset(edge: .bottom) { Spacer().frame(height: 80) }
-        .navigationTitle(viewModel.navigationTitle)
+        .navigationTitle(model.navigationTitle)
         .navigationBarTitleDisplayMode(.large)
         .scrollDismissesKeyboard(.interactively)
         .sheet(isPresented: $showingQuantityForm) { quantityForm }
@@ -86,20 +86,20 @@ public struct ItemForm: View {
     
 
     var deleteConfirmationActions: some View {
-        Button("Delete \(viewModel.entityName)", role: .destructive) {
+        Button("Delete \(model.entityName)", role: .destructive) {
             delete()
             actionHandler(.dismiss)
         }
     }
 
     var deleteConfirmationMessage: some View {
-        Text("Are you sure you want to delete this \(viewModel.entityName.lowercased())?")
+        Text("Are you sure you want to delete this \(model.entityName.lowercased())?")
     }
 
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             HStack(spacing: 2) {
-                if viewModel.isEditing {
+                if model.isEditing {
                     deleteButton
                 }
                 closeButton
@@ -112,7 +112,7 @@ public struct ItemForm: View {
         switch route {
         case .food:
             ItemForm.FoodSearch(
-                viewModel: viewModel,
+                model: model,
                 forIngredient: forIngredient,
                 actionHandler: actionHandler
             )

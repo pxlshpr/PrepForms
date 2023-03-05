@@ -6,7 +6,7 @@
 //public typealias ImageHandler = (UIImage) -> ()
 //
 //extension LabelCamera {
-//    class ViewModel: ObservableObject {
+//    class Model: ObservableObject {
 //        
 //        @Published var shouldDismiss = false
 //        @Published var started: Bool = false
@@ -25,7 +25,7 @@
 //    }
 //}
 //
-//extension LabelCamera.ViewModel {
+//extension LabelCamera.Model {
 //    
 //    var isMock: Bool {
 //        mockData != nil

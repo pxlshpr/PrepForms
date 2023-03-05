@@ -51,7 +51,7 @@ extension AttributesLayer {
         
         var noTextBoxPrompt: String {
             "Enter value or select from image."
-//            viewModel.textFieldAmountString.isEmpty
+//            model.textFieldAmountString.isEmpty
 //            ? "or select a detected text from the image."
 //            : "Select a detected text from the image."
         }

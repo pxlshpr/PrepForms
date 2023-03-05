@@ -17,7 +17,7 @@ public struct SizeForm: View {
     @State var hasFocusedOnAppear: Bool = false
     @State var hasCompletedFocusedOnAppearAnimation: Bool = false
 
-    @StateObject var viewModel: SizeFormViewModel
+    @StateObject var model: SizeFormViewModel
     
     @State var showingQuantityForm = false
     @State var showingAmountForm = false
@@ -28,7 +28,7 @@ public struct SizeForm: View {
         initialField: Field? = nil,
         handleNewSize: @escaping (FormSize) -> ()
     ) {
-        _viewModel = StateObject(wrappedValue: .init(
+        _model = StateObject(wrappedValue: .init(
             initialField: initialField,
             handleNewSize: handleNewSize
         ))
@@ -37,7 +37,7 @@ public struct SizeForm: View {
     public var body: some View {
         NavigationStack {
             QuickForm(
-                title: viewModel.title,
+                title: model.title,
                 info: saveInfoBinding,
                 saveAction: saveActionBinding,
                 deleteAction: deleteActionBinding
@@ -48,8 +48,8 @@ public struct SizeForm: View {
             }
             .toolbar(.hidden, for: .navigationBar)
             .onChange(of: isFocused, perform: isFocusedChanged)
-            .onChange(of: viewModel.showingVolumePrefixToggle,
-                      perform: viewModel.changedShowingVolumePrefixToggle
+            .onChange(of: model.showingVolumePrefixToggle,
+                      perform: model.changedShowingVolumePrefixToggle
             )
             .sheet(isPresented: $showingAmountForm) { amountForm }
             .sheet(isPresented: $showingQuantityForm) { quantityForm }
@@ -62,7 +62,7 @@ public struct SizeForm: View {
     
     var unitPicker: some View {
         UnitPickerGridTiered(
-            pickedUnit: .volume(viewModel.volumePrefixUnit),
+            pickedUnit: .volume(model.volumePrefixUnit),
             includeServing: false,
             includeWeights: false,
             includeVolumes: true,
@@ -71,7 +71,7 @@ public struct SizeForm: View {
             didPickUnit: { newUnit in
                 withAnimation {
                     Haptics.feedback(style: .rigid)
-                    viewModel.volumePrefixUnit = newUnit.volumeUnit ?? .cup
+                    model.volumePrefixUnit = newUnit.volumeUnit ?? .cup
                 }
             }
         )
@@ -84,15 +84,15 @@ public struct SizeForm: View {
     }
     
     var amountForm: some View {
-        AmountForm(sizeFormViewModel: viewModel)
+        AmountForm(sizeFormViewModel: model)
     }
     
     var quantityForm: some View {
-        QuantityForm(sizeFormViewModel: viewModel)
+        QuantityForm(sizeFormViewModel: model)
     }
     
     var nameForm: some View {
-        NameForm(sizeFormViewModel: viewModel)
+        NameForm(sizeFormViewModel: model)
     }
 }
 
@@ -102,10 +102,10 @@ extension SizeForm {
         Binding<FormConfirmableAction?>(
             get: {
                 .init(
-                    confirmationButtonTitle: viewModel.saveButtonTitle,
-                    isDisabled: viewModel.shouldDisableDone,
+                    confirmationButtonTitle: model.saveButtonTitle,
+                    isDisabled: model.shouldDisableDone,
                     handler: {
-                        viewModel.save()
+                        model.save()
                     }
                 )
             },
@@ -116,14 +116,14 @@ extension SizeForm {
     var deleteActionBinding: Binding<FormConfirmableAction?> {
         Binding<FormConfirmableAction?>(
             get: {
-                guard viewModel.isEditing else { return nil }
+                guard model.isEditing else { return nil }
                 return .init(
                     shouldConfirm: true,
                     confirmationMessage: nil,
                     isDisabled: false,
                     buttonImage: "trash.fill",
                     handler: {
-                        guard let initialSize = viewModel.initialField?.size else { return }
+                        guard let initialSize = model.initialField?.size else { return }
                         withAnimation {
                             fields.removeSize(initialSize)
                         }

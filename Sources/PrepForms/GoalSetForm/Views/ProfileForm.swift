@@ -6,21 +6,21 @@ import SwiftUISugar
 
 struct ProfileForm: View {
     
-    @EnvironmentObject var viewModel: TDEEForm.ViewModel
+    @EnvironmentObject var model: TDEEForm.Model
     @Namespace var namespace
 
     var infoSection: some View {
         FormStyledSection {
-            Text("Please provide these details in order to calculate your resting energy using the \(viewModel.restingEnergyFormula.menuDescription) formula.")
+            Text("Please provide these details in order to calculate your resting energy using the \(model.restingEnergyFormula.menuDescription) formula.")
                 .foregroundColor(.secondary)
         }
     }
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            if viewModel.shouldShowSyncAllForProfileForm {
+            if model.shouldShowSyncAllForProfileForm {
                 Button {
-                    viewModel.tappedSyncAllOnProfileForm()
+                    model.tappedSyncAllOnProfileForm()
                 } label: {
                     HStack {
                         appleHealthSymbol
@@ -37,11 +37,11 @@ struct ProfileForm: View {
             AgeSection()
             BiologicalSexSection()
             WeightSection()
-            if viewModel.restingEnergyFormula.requiresHeight {
+            if model.restingEnergyFormula.requiresHeight {
                 HeightSection()
             }
         }
-//        .navigationTitle(viewModel.restingEnergyFormula.menuDescription + " Formula")
+//        .navigationTitle(model.restingEnergyFormula.menuDescription + " Formula")
         .navigationTitle("Body Profile")
         .toolbar { trailingContent }
     }

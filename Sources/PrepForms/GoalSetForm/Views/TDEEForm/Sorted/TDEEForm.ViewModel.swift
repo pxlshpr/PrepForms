@@ -36,7 +36,7 @@ extension HeightUnit {
     }
 }
 
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     var maintenanceEnergy: Double? {
         guard let activeEnergyValue, let restingEnergyValue else {
             return nil
@@ -61,7 +61,7 @@ extension TDEEForm.ViewModel {
 }
 
 //MARK: - Biological Sex
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     var sexSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.sexSource ?? .userEntered },
@@ -143,7 +143,7 @@ extension TDEEForm.ViewModel {
 
 //MARK: - Age
 
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     var ageSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.ageSource ?? .userEntered },
@@ -224,7 +224,7 @@ extension TDEEForm.ViewModel {
 }
 
 //MARK: - Height
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     var heightSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.heightSource ?? .userEntered },
@@ -308,7 +308,7 @@ extension TDEEForm.ViewModel {
 }
 
 //MARK: - Weight
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     var weightSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.weightSource ?? .userEntered },
@@ -399,7 +399,7 @@ extension TDEEForm.ViewModel {
 }
 
 //MARK: - LBM
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     var lbmSourceBinding: Binding<LeanBodyMassSource> {
         Binding<LeanBodyMassSource>(
             get: { self.lbmSource ?? .userEntered },
@@ -579,7 +579,7 @@ extension TDEEForm.ViewModel {
 }
 
 //MARK: - LBM Form
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     
     var shouldShowSyncAllForLBMForm: Bool {
         guard lbmSource == .formula else { return false }
@@ -619,7 +619,7 @@ extension TDEEForm.ViewModel {
 }
 
 //MARK: - Profile Form
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     
     var hasProfile: Bool {
         let hasCore = (sex == .male || sex == .female)
@@ -685,7 +685,7 @@ extension TDEEForm.ViewModel {
 
 //MARK: - Resting Energy
 
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     
     var restingEnergyIsDynamic: Bool {
         switch restingEnergySource {
@@ -970,7 +970,7 @@ extension TDEEForm.ViewModel {
 
 //MARK: - Active Energy
 
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
 
     var activeEnergyIsDynamic: Bool {
         switch activeEnergySource {
@@ -1214,7 +1214,7 @@ extension TDEEForm.ViewModel {
 }
 
 //MARK: - UI Helpers
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
     
     var maintenanceEnergyFooterText: Text {
         let energy = userEnergyUnit == .kcal ? "calories" : "kiljoules"
@@ -1255,7 +1255,7 @@ extension TDEEForm.ViewModel {
         restingEnergyIsDynamic || activeEnergyIsDynamic
     }
 }
-extension TDEEForm.ViewModel {
+extension TDEEForm.Model {
  
     
     //MARK: - Profile
@@ -1319,7 +1319,7 @@ extension TDEEForm.ViewModel {
 //MARK: - Definition
 
 extension TDEEForm {
-    class ViewModel: ObservableObject {
+    class Model: ObservableObject {
         let userEnergyUnit: EnergyUnit
         let userWeightUnit: WeightUnit
         let userHeightUnit: HeightUnit

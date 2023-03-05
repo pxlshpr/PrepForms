@@ -12,7 +12,7 @@ extension FoodForm.NutrientsList {
 //                .environmentObject(fields)
 //                .environmentObject(sources)
         Button {
-            viewModel.nutrientBeingEdited = .energy
+            model.nutrientBeingEdited = .energy
             showingNutrientForm = true
         } label: {
             FieldCell(field: fields.energy, showImage: $showingImages)
@@ -36,7 +36,7 @@ extension FoodForm.NutrientsList {
 //                .environmentObject(fields)
 //                .environmentObject(sources)
         Button {
-            viewModel.nutrientBeingEdited = .macro(field.value.macroValue.macro)
+            model.nutrientBeingEdited = .macro(field.value.macroValue.macro)
             showingNutrientForm = true
         } label: {
             FieldCell(field: field, showImage: $showingImages)
@@ -80,7 +80,7 @@ extension FoodForm.NutrientsList {
 //                .environmentObject(fields)
 //                .environmentObject(sources)
         Button {
-            viewModel.nutrientBeingEdited = .micro(field.value.microValue.nutrientType)
+            model.nutrientBeingEdited = .micro(field.value.microValue.nutrientType)
             showingNutrientForm = true
         } label: {
             FieldCell(field: field, showImage: $showingImages)

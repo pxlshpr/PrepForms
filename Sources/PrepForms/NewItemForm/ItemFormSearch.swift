@@ -8,7 +8,7 @@ public struct ItemFoodSearch: View {
 
     @Environment(\.dismiss) var dismiss
     
-    @ObservedObject var viewModel: ItemFormModel
+    @ObservedObject var model: ItemFormModel
     let isInitialFoodSearch: Bool
     let forIngredient: Bool
     let actionHandler: (ItemFormAction) -> ()
@@ -20,12 +20,12 @@ public struct ItemFoodSearch: View {
     @State var hasAppearedDelayed: Bool = false
 
     public init(
-        viewModel: ItemFormModel,
+        model: ItemFormModel,
         isInitialFoodSearch: Bool = false,
         forIngredient: Bool = false,
         actionHandler: @escaping (ItemFormAction) -> ()
     ) {
-        self.viewModel = viewModel
+        self.model = model
         self.isInitialFoodSearch = isInitialFoodSearch
         self.forIngredient = forIngredient
         self.actionHandler = actionHandler
@@ -44,7 +44,7 @@ public struct ItemFoodSearch: View {
     @State var showingSomething = false
     
     var navigationStack: some View {
-        NavigationStack(path: $viewModel.path) {
+        NavigationStack(path: $model.path) {
             foodSearch
 //                .navigationDestination(for: ItemFormRoute.self) { route in
 //                    EmptyView()
@@ -70,7 +70,7 @@ public struct ItemFoodSearch: View {
             actionHandler: handleFoodSearchAction
         )
 //        .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
-        .navigationBarBackButtonHidden(viewModel.food == nil)
+        .navigationBarBackButtonHidden(model.food == nil)
         .toolbar { trailingContent }
 ///        .sheet(item: $presentedSheet) { sheet(for: $0) }
         .fullScreenCover(item: $presentedFullScreenSheet) { sheet(for: $0) }
@@ -91,7 +91,7 @@ public struct ItemFoodSearch: View {
     var itemForm: some View {
         EmptyView()
 //        ItemForm(
-//            viewModel: viewModel,
+//            model: model,
 //            isEditing: false,
 //            actionHandler: actionHandler
 //        )
@@ -100,7 +100,7 @@ public struct ItemFoodSearch: View {
     var itemFormSearch: some View {
         EmptyView()
 //        ItemForm.FoodSearch(
-//            viewModel: viewModel,
+//            model: model,
 //            forIngredient: forIngredient,
 //            actionHandler: actionHandler
 //        )
@@ -116,7 +116,7 @@ public struct ItemFoodSearch: View {
 //                userInfo: [Notification.Keys.dayMeal: pickedMeal]
 //            )
 //        })
-//        .environmentObject(viewModel)
+//        .environmentObject(model)
     }
 
     func handleFoodSearchAction(_ action: FoodSearch.Action) {

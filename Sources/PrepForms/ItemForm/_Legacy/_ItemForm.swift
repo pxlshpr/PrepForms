@@ -57,10 +57,10 @@
 //    var foodSearchLayer: some View {
 //        func didTapFood(_ food: Food) {
 //            Haptics.feedback(style: .soft)
-////            viewModel.setFood(food)
+////            model.setFood(food)
 ////
 ////            if isInitialFoodSearch {
-////                viewModel.path = [.mealItemForm]
+////                model.path = [.mealItemForm]
 ////            } else {
 ////                dismiss()
 ////            }

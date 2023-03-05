@@ -46,7 +46,7 @@
 //    func stepButton(step: Int) -> some View {
 //        Button {
 //            Haptics.feedback(style: .soft)
-//            viewModel.stepAmount(by: step)
+//            model.stepAmount(by: step)
 //        } label: {
 //            Text("\(step > 0 ? "+" : "-") \(abs(step))")
 //            .monospacedDigit()
@@ -64,7 +64,7 @@
 //                    )
 //            )
 //        }
-//        .disabled(!viewModel.amountCanBeStepped(by: step))
+//        .disabled(!model.amountCanBeStepped(by: step))
 //    }
 //
 //    var unitBottomButton: some View {

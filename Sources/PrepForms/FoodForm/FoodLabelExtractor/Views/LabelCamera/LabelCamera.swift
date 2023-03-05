@@ -8,7 +8,7 @@ public struct LabelCamera: View {
 
     @Environment(\.dismiss) var dismiss
     @StateObject var cameraViewModel: CameraViewModel
-    @StateObject var viewModel: ViewModel
+    @StateObject var model: Model
     @State var hasAppeared = false
     
     let didTapDismiss: () -> ()
@@ -20,8 +20,8 @@ public struct LabelCamera: View {
     ) {
         self.didTapDismiss = didTapDismiss
         
-        let viewModel = ViewModel(mockData: mockData, imageHandler: imageHandler)
-        _viewModel = StateObject(wrappedValue: viewModel)
+        let model = Model(mockData: mockData, imageHandler: imageHandler)
+        _model = StateObject(wrappedValue: model)
         
         let cameraViewModel = CameraViewModel(
             mode: .capture,
@@ -45,7 +45,7 @@ public struct LabelCamera: View {
                 }
             }
         }
-        .onChange(of: viewModel.shouldDismiss) { newValue in
+        .onChange(of: model.shouldDismiss) { newValue in
             if newValue {
                 dismiss()
             }
@@ -63,7 +63,7 @@ public struct LabelCamera: View {
                 .edgesIgnoringSafeArea(.all)
             cameraLayer
                 .opacity(hasAppeared ? 1 : 0)
-            if !viewModel.started {
+            if !model.started {
                 Instructions(tappedStart: tappedStart)
                     .zIndex(10)
                     .transition(.opacity)
@@ -75,10 +75,10 @@ public struct LabelCamera: View {
         Haptics.feedback(style: .heavy)
         withAnimation {
             cameraViewModel.shouldShowScanOverlay = true
-            viewModel.started = true
+            model.started = true
         }
 #if targetEnvironment(simulator)
-        viewModel.simulateScan()
+        model.simulateScan()
 #endif
     }
     
@@ -88,7 +88,7 @@ public struct LabelCamera: View {
     }
     
     func handleCapturedImage(_ image: UIImage) {
-        viewModel.imageHandler?(image)
-        viewModel.imageHandler = nil
+        model.imageHandler?(image)
+        model.imageHandler = nil
     }
 }

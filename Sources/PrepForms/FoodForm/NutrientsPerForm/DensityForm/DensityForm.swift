@@ -12,7 +12,7 @@ public struct DensityForm: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     
-    @StateObject var viewModel: DensityFormViewModel
+    @StateObject var model: DensityFormViewModel
     
     @State var showingWeightForm = false
     @State var showingVolumeForm = false
@@ -21,7 +21,7 @@ public struct DensityForm: View {
         initialField: Field? = nil,
         handleNewDensity: @escaping (FoodDensity?) -> ()
     ) {
-        _viewModel = StateObject(wrappedValue: .init(
+        _model = StateObject(wrappedValue: .init(
             initialField: initialField,
             handleNewDensity: handleNewDensity
         ))
@@ -30,7 +30,7 @@ public struct DensityForm: View {
     public var body: some View {
         NavigationStack {
             QuickForm(
-                title: viewModel.title,
+                title: model.title,
                 info: saveInfoBinding,
                 saveAction: saveActionBinding,
                 deleteAction: deleteActionBinding
@@ -46,11 +46,11 @@ public struct DensityForm: View {
     }
     
     var weightForm: some View {
-        AmountForm(densityFormViewModel: viewModel, forWeight: true)
+        AmountForm(densityFormViewModel: model, forWeight: true)
     }
     
     var volumeForm: some View {
-        AmountForm(densityFormViewModel: viewModel, forWeight: false)
+        AmountForm(densityFormViewModel: model, forWeight: false)
     }
     
 }
@@ -61,10 +61,10 @@ extension DensityForm {
         Binding<FormConfirmableAction?>(
             get: {
                 .init(
-                    confirmationButtonTitle: viewModel.saveButtonTitle,
-                    isDisabled: viewModel.shouldDisableDone,
+                    confirmationButtonTitle: model.saveButtonTitle,
+                    isDisabled: model.shouldDisableDone,
                     handler: {
-                        viewModel.save()
+                        model.save()
                     }
                 )
             },
@@ -75,7 +75,7 @@ extension DensityForm {
     var deleteActionBinding: Binding<FormConfirmableAction?> {
         Binding<FormConfirmableAction?>(
             get: {
-                guard viewModel.isEditing else { return nil }
+                guard model.isEditing else { return nil }
                 return .init(
                     shouldConfirm: true,
                     confirmationMessage: nil,

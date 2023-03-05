@@ -10,11 +10,11 @@ extension FoodForm {
 
     func appeared() {
         
-        guard !viewModel.didAppear else {
+        guard !model.didAppear else {
             return
         }
         
-//        if viewModel.startWithCamera {
+//        if model.startWithCamera {
 //            showExtractorViewWithCamera()
 //        }
         
@@ -22,16 +22,16 @@ extension FoodForm {
         
         /// This used to ensure that the (conditional) display of the wizard is restricted
         /// to only the first invocation of this, as moving to the background and returning causes
-        if viewModel.shouldShowWizard {
+        if model.shouldShowWizard {
             withAnimation(WizardAnimation) {
-                viewModel.formDisabled = true
-                viewModel.showingWizard = true
-                viewModel.shouldShowWizard = false
+                model.formDisabled = true
+                model.showingWizard = true
+                model.shouldShowWizard = false
             }
         } else {
-            viewModel.showingWizard = false
-            viewModel.showingWizardOverlay = false
-            viewModel.formDisabled = false
+            model.showingWizard = false
+            model.showingWizardOverlay = false
+            model.formDisabled = false
         }
         
         if let existingFood {
@@ -40,7 +40,7 @@ extension FoodForm {
             }
         }
         
-        viewModel.didAppear = true
+        model.didAppear = true
     }
     
     func autoFillColumn(_ selectedColumn: Int, from scanResult: ScanResult?) {
@@ -169,12 +169,12 @@ extension FoodForm {
     
     func dismissWizard() {
         withAnimation(WizardAnimation) {
-            viewModel.showingWizard = false
+            model.showingWizard = false
         }
         withAnimation(.easeOut(duration: 0.1)) {
-            viewModel.showingWizardOverlay = false
+            model.showingWizardOverlay = false
         }
-        viewModel.formDisabled = false
+        model.formDisabled = false
     }
 }
 

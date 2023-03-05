@@ -12,7 +12,7 @@ extension ItemForm {
             VStack(spacing: 0) {
                 Group {
                     foodButton
-                    if let dayMeal = viewModel.dayMeal {
+                    if let dayMeal = model.dayMeal {
                         mealButton(dayMeal: dayMeal)
                     }
                 }
@@ -58,14 +58,14 @@ extension ItemForm {
     //MARK: - Sheets
     @ViewBuilder
     var quantityForm: some View {
-        if let food = viewModel.food {
+        if let food = model.food {
             QuantityForm(
                 food: food,
-                double: viewModel.amountValue.value,
-                unit: viewModel.unit.formUnit
+                double: model.amountValue.value,
+                unit: model.unit.formUnit
             ) { double, unit in
-                viewModel.amount = double
-                viewModel.didPickUnit(unit)
+                model.amount = double
+                model.didPickUnit(unit)
             }
         }
     }
@@ -80,7 +80,7 @@ extension ItemForm {
                 userInfo: [Notification.Keys.dayMeal: pickedMeal]
             )
         })
-        .environmentObject(viewModel)
+        .environmentObject(model)
     }
 
     //MARK: - Cells
@@ -196,20 +196,20 @@ extension ItemForm {
         
         var itemPortion: some View {
             let itemBinding = Binding<MealItem>(
-                get: { viewModel.mealItem! },
+                get: { model.mealItem! },
                 set: { _ in }
             )
             let dayMealBinding = Binding<DayMeal>(
-                get: { viewModel.dayMeal! },
+                get: { model.dayMeal! },
                 set: { _ in }
             )
             return ItemPortion(
                 foodItem: itemBinding,
                 meal: dayMealBinding,
-                day: $viewModel.day,
+                day: $model.day,
                 lastUsedGoalSet: lastUsedGoalSetBinding,
                 userUnits: UserManager.units,
-//                bodyProfile: viewModel.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
+//                bodyProfile: model.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
                 bodyProfile: UserManager.bodyProfile,
                 didTapGoalSetButton: didTapGoalSetButton
             )
@@ -217,7 +217,7 @@ extension ItemForm {
         
         var ingredientPortion: some View {
             let itemBinding = Binding<IngredientItem>(
-                get: { viewModel.ingredientItem! },
+                get: { model.ingredientItem! },
                 set: { _ in }
             )
             return IngredientPortion(
@@ -230,9 +230,9 @@ extension ItemForm {
         }
         
         return Group {
-            if !viewModel.forIngredient, viewModel.mealItem != nil {
+            if !model.forIngredient, model.mealItem != nil {
                 itemPortion
-            } else if viewModel.ingredientItem != nil {
+            } else if model.ingredientItem != nil {
                 ingredientPortion
             } else {
                 EmptyView()
@@ -251,7 +251,7 @@ extension ItemForm {
             }
             
             var disabled: Bool {
-                !viewModel.amountCanBeStepped(by: step)
+                !model.amountCanBeStepped(by: step)
             }
             var fontWeight: Font.Weight {
 //                disabled ? .thin : .semibold
@@ -311,7 +311,7 @@ extension ItemForm {
             
             return Button {
                 Haptics.feedback(style: .soft)
-                viewModel.stepAmount(by: step)
+                model.stepAmount(by: step)
             } label: {
                 label
             }
@@ -338,9 +338,9 @@ extension ItemForm {
             HStack(alignment: .firstTextBaseline, spacing: 3) {
                 Color.clear
                     .animatedMealItemQuantity(
-                        value: viewModel.internalAmountDouble!,
-                        unitString: viewModel.unitDescription,
-                        isAnimating: viewModel.isAnimatingAmountChange
+                        value: model.internalAmountDouble!,
+                        unitString: model.unitDescription,
+                        isAnimating: model.isAnimatingAmountChange
                     )
             }
         }
@@ -379,13 +379,13 @@ extension ItemForm {
     
     var saveButton: some View {
         var saveIsDisabled: Bool {
-            !viewModel.isDirty
+            !model.isDirty
         }
         
         return Button {
             tappedSave()
         } label: {
-            Text(viewModel.saveButtonTitle)
+            Text(model.saveButtonTitle)
                 .bold()
                 .foregroundColor((colorScheme == .light && saveIsDisabled) ? .black : .white)
                 .frame(height: 52)
@@ -402,14 +402,14 @@ extension ItemForm {
 
     @ViewBuilder
     var foodButton: some View {
-        if let food = viewModel.food {
+        if let food = model.food {
             Button {
                 Haptics.feedback(style: .soft)
-                if viewModel.isRootInNavigationStack {
-                    viewModel.path.append(.food)
+                if model.isRootInNavigationStack {
+                    model.path.append(.food)
                 } else {
                     dismiss()
-//                    viewModel.path.removeLast()
+//                    model.path.removeLast()
                 }
             } label: {
                 foodCell(food)

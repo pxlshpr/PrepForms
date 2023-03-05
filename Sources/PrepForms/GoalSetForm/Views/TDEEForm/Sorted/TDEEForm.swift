@@ -10,7 +10,7 @@ public struct TDEEForm: View {
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
-    @StateObject var viewModel: ViewModel
+    @StateObject var model: Model
     
     @FocusState var restingEnergyTextFieldIsFocused: Bool
     @FocusState var activeEnergyTextFieldIsFocused: Bool
@@ -26,7 +26,7 @@ public struct TDEEForm: View {
         userUnits: UserOptions.Units,
         didTapSave: @escaping (BodyProfile) -> ()
     ) {
-        let viewModel = ViewModel(
+        let model = Model(
             existingProfile: existingProfile,
             userUnits: userUnits
         )
@@ -37,7 +37,7 @@ public struct TDEEForm: View {
             detentHeightPrimary = .empty
             detentHeightSecondary = .empty
         }
-        _viewModel = StateObject(wrappedValue: viewModel)
+        _model = StateObject(wrappedValue: model)
         
         self.didTapSave = didTapSave
     }
@@ -45,7 +45,7 @@ public struct TDEEForm: View {
     @ViewBuilder
     public var body: some View {
         Group {
-            if viewModel.hasAppeared {
+            if model.hasAppeared {
                 navigationView
             } else {
                 Color(.systemGroupedBackground)
@@ -53,12 +53,12 @@ public struct TDEEForm: View {
             }
         }
         .onReceive(didEnterForeground, perform: didEnterForeground)
-        .presentationDetents(viewModel.detents, selection: $viewModel.presentationDetent)
+        .presentationDetents(model.detents, selection: $model.presentationDetent)
         .presentationDragIndicator(.hidden)
     }
     
     var navigationView: some View {
-//        NavigationStack(path: $viewModel.path) {
+//        NavigationStack(path: $model.path) {
         NavigationView {
             ZStack {
                 form
@@ -69,11 +69,11 @@ public struct TDEEForm: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { trailingContent }
             .toolbar { leadingContent }
-            .onChange(of: viewModel.restingEnergySource, perform: restingEnergySourceChanged)
-            .onChange(of: viewModel.activeEnergySource, perform: activeEnergySourceChanged)
+            .onChange(of: model.restingEnergySource, perform: restingEnergySourceChanged)
+            .onChange(of: model.activeEnergySource, perform: activeEnergySourceChanged)
             .onChange(of: canBeSaved, perform: canBeSavedChanged)
 //            .navigationDestination(for: TDEEFormRoute.self, destination: navigationDestinationForm)
-            .interactiveDismissDisabled(viewModel.isEditing && canBeSaved)
+            .interactiveDismissDisabled(model.isEditing && canBeSaved)
             .task { await initialTask() }
         }
     }
@@ -90,10 +90,10 @@ public struct TDEEForm: View {
             switch route {
             case .profileForm:
                 ProfileForm()
-                    .environmentObject(viewModel)
+                    .environmentObject(model)
             case .leanBodyMassForm:
                 LeanBodyMassForm()
-                    .environmentObject(viewModel)
+                    .environmentObject(model)
             }
         }
     }

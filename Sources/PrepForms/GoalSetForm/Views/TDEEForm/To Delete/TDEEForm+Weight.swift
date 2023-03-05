@@ -15,7 +15,7 @@ extension TDEEForm {
 //            } label: {
 //                HStack(spacing: 5) {
 //                    Text(weightUnit.shortDescription)
-//                    if !viewModel.restingEnergyUsesHealthMeasurements {
+//                    if !model.restingEnergyUsesHealthMeasurements {
 //                        Image(systemName: "chevron.up.chevron.down")
 //                            .imageScale(.small)
 //                    }
@@ -27,7 +27,7 @@ extension TDEEForm {
 //            .simultaneousGesture(TapGesture().onEnded {
 //                Haptics.feedback(style: .soft)
 //            })
-//            .disabled(viewModel.restingEnergyUsesHealthMeasurements)
+//            .disabled(model.restingEnergyUsesHealthMeasurements)
 //        }
 //        
 //        let weightBinding = Binding<String>(
@@ -54,7 +54,7 @@ extension TDEEForm {
 //            TextField("weight in", text: weightBinding)
 //                .keyboardType(.decimalPad)
 //                .multilineTextAlignment(.trailing)
-//                .disabled(viewModel.restingEnergyUsesHealthMeasurements)
+//                .disabled(model.restingEnergyUsesHealthMeasurements)
 //        }
 //        
 //        @ViewBuilder

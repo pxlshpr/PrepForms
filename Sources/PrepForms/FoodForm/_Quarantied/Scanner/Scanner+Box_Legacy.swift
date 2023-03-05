@@ -12,7 +12,7 @@
 //        func textBoxView(_ box: TextBox) -> some View {
 //            
 //            var rect: CGRect {
-//                guard let image = viewModel.image else { return .zero }
+//                guard let image = model.image else { return .zero }
 //                let screen = UIScreen.main.bounds
 //                let rectForSize: CGRect
 //                let x: CGFloat
@@ -51,8 +51,8 @@
 //        
 //        return ZStack {
 //            Color.clear
-//            ForEach(viewModel.textBoxes.indices, id: \.self) { i in
-//                textBoxView(viewModel.textBoxes[i])
+//            ForEach(model.textBoxes.indices, id: \.self) { i in
+//                textBoxView(model.textBoxes[i])
 //            }
 //        }
 //        .edgesIgnoringSafeArea(.all)

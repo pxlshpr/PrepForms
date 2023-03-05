@@ -6,10 +6,10 @@
 //    
 //    var textField: some View {
 //        let binding = Binding<String>(
-//            get: { viewModel.amountString },
+//            get: { model.amountString },
 //            set: { newValue in
 //                withAnimation {
-//                    viewModel.amountString = newValue
+//                    model.amountString = newValue
 //                }
 //            }
 //        )
@@ -34,7 +34,7 @@
 //            showingUnitPicker = true
 //        } label: {
 //            HStack(spacing: 5) {
-//                Text(viewModel.unitDescription)
+//                Text(model.unitDescription)
 ////                    .font(.title)
 //                    .multilineTextAlignment(.trailing)
 //                Image(systemName: "chevron.up.chevron.down")
@@ -49,18 +49,18 @@
 //    @ViewBuilder
 //    var unitPicker: some View {
 //        UnitPickerGridTiered(
-//            pickedUnit: viewModel.unit.formUnit,
-//            includeServing: viewModel.shouldShowServingInUnitPicker,
-//            includeWeights: viewModel.shouldShowWeightUnits,
-//            includeVolumes: viewModel.shouldShowVolumeUnits,
-//            sizes: viewModel.foodSizes,
-//            servingDescription: viewModel.servingDescription,
+//            pickedUnit: model.unit.formUnit,
+//            includeServing: model.shouldShowServingInUnitPicker,
+//            includeWeights: model.shouldShowWeightUnits,
+//            includeVolumes: model.shouldShowVolumeUnits,
+//            sizes: model.foodSizes,
+//            servingDescription: model.servingDescription,
 //            allowAddSize: false,
-//            didPickUnit: viewModel.didPickUnit
+//            didPickUnit: model.didPickUnit
 //        )
 //    }
 //    
 //    var textFieldFont: Font {
-//        viewModel.internalAmountDouble == nil ? .body : .largeTitle
+//        model.internalAmountDouble == nil ? .body : .largeTitle
 //    }
 //}

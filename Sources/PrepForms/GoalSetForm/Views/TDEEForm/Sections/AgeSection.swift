@@ -7,14 +7,14 @@ import HealthKit
 
 struct AgeSection: View {
     
-    @EnvironmentObject var viewModel: TDEEForm.ViewModel
+    @EnvironmentObject var model: TDEEForm.Model
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
     var content: some View {
         VStack {
             Group {
-                if let source = viewModel.ageSource {
+                if let source = model.ageSource {
                     Group {
                         sourceSection
                         switch source {
@@ -33,11 +33,11 @@ struct AgeSection: View {
     }
 
     func tappedSyncWithHealth() {
-        viewModel.changeAgeSource(to: .healthApp)
+        model.changeAgeSource(to: .healthApp)
     }
     
     func tappedManualEntry() {
-        viewModel.changeAgeSource(to: .userEntered)
+        model.changeAgeSource(to: .userEntered)
         isFocused = true
     }
     
@@ -55,19 +55,19 @@ struct AgeSection: View {
     var bottomRow: some View {
         @ViewBuilder
         var health: some View {
-            if viewModel.dobFetchStatus != .notAuthorized {
+            if model.dobFetchStatus != .notAuthorized {
                 HStack {
                     Spacer()
-                    if viewModel.dobFetchStatus == .fetching {
+                    if model.dobFetchStatus == .fetching {
                         ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
                             .frame(width: 25, height: 25)
                             .foregroundColor(.secondary)
                     } else {
-                        Text(viewModel.ageFormatted)
+                        Text(model.ageFormatted)
                             .font(.system(.title3, design: .rounded, weight: .semibold))
-                            .foregroundColor(viewModel.sexSource == .userEntered ? .primary : .secondary)
+                            .foregroundColor(model.sexSource == .userEntered ? .primary : .secondary)
                             .matchedGeometryEffect(id: "age", in: namespace)
-                            .if(!viewModel.hasAge) { view in
+                            .if(!model.hasAge) { view in
                                 view
                                     .redacted(reason: .placeholder)
                             }
@@ -81,7 +81,7 @@ struct AgeSection: View {
         var manualEntry: some View {
             HStack {
                 Spacer()
-                TextField("age", text: viewModel.ageTextFieldStringBinding)
+                TextField("age", text: model.ageTextFieldStringBinding)
                     .keyboardType(.decimalPad)
                     .focused($isFocused)
                     .multilineTextAlignment(.trailing)
@@ -93,7 +93,7 @@ struct AgeSection: View {
         }
         
         return Group {
-            switch viewModel.ageSource {
+            switch model.ageSource {
             case .healthApp:
                 health
             case .userEntered:
@@ -107,7 +107,7 @@ struct AgeSection: View {
     var sourceSection: some View {
         var sourceMenu: some View {
             Menu {
-                Picker(selection: viewModel.ageSourceBinding, label: EmptyView()) {
+                Picker(selection: model.ageSourceBinding, label: EmptyView()) {
                     ForEach(MeasurementSource.allCases, id: \.self) {
                         Label($0.pickerDescription, systemImage: $0.systemImage).tag($0)
                     }
@@ -115,22 +115,22 @@ struct AgeSection: View {
             } label: {
                 HStack(spacing: 5) {
                     HStack {
-                        if viewModel.ageSource == .healthApp {
+                        if model.ageSource == .healthApp {
                             appleHealthSymbol
                         } else {
-                            if let systemImage = viewModel.ageSource?.systemImage {
+                            if let systemImage = model.ageSource?.systemImage {
                                 Image(systemName: systemImage)
                                     .foregroundColor(.secondary)
                             }
                         }
-                        Text(viewModel.ageSource?.menuDescription ?? "")
+                        Text(model.ageSource?.menuDescription ?? "")
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     Image(systemName: "chevron.up.chevron.down")
                         .imageScale(.small)
                 }
                 .foregroundColor(.secondary)
-                .animation(.none, value: viewModel.ageSource)
+                .animation(.none, value: model.ageSource)
                 .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
@@ -162,7 +162,7 @@ struct AgeSection: View {
         FormStyledSection(header: header) {
             content
         }
-        .onChange(of: viewModel.ageSource, perform: ageSourceChanged)
+        .onChange(of: model.ageSource, perform: ageSourceChanged)
     }
 }
 

@@ -17,7 +17,7 @@ public struct ParentFoodForm: View {
         case save(ParentFoodFormOutput)
     }
     
-    @StateObject var viewModel: ViewModel
+    @StateObject var model: Model
     @StateObject var fields: FoodForm.Fields
 
     let actionHandler: (Action) -> ()
@@ -29,8 +29,8 @@ public struct ParentFoodForm: View {
     ) {
         self.actionHandler = actionHandler
         
-        let viewModel = ViewModel(forRecipe: forRecipe, existingFood: existingFood)
-        _viewModel = StateObject(wrappedValue: viewModel)
+        let model = Model(forRecipe: forRecipe, existingFood: existingFood)
+        _model = StateObject(wrappedValue: model)
         
         let fields = FoodForm.Fields()
         _fields = StateObject(wrappedValue: fields)
@@ -38,10 +38,10 @@ public struct ParentFoodForm: View {
     
     public var body: some View {
         content
-            .sheet(item: $viewModel.presentedSheet) { sheet(for: $0) }
-            .onChange(of: viewModel.sortOrder, perform: sortOrderChanged)
-            .onChange(of: viewModel.items, perform: itemsChanged)
-            .onChange(of: viewModel.itemsWithRecalculatedBadges, perform: itemsWithRecalculatedBadgesChanged)
+            .sheet(item: $model.presentedSheet) { sheet(for: $0) }
+            .onChange(of: model.sortOrder, perform: sortOrderChanged)
+            .onChange(of: model.items, perform: itemsChanged)
+            .onChange(of: model.itemsWithRecalculatedBadges, perform: itemsWithRecalculatedBadgesChanged)
     }
 
     var content: some View {
@@ -65,7 +65,7 @@ public struct ParentFoodForm: View {
         
         return NavigationStack {
             formContent
-                .navigationTitle(viewModel.title)
+                .navigationTitle(model.title)
                 .toolbar { navigationTrailingContent }
         }
     }
@@ -74,7 +74,7 @@ public struct ParentFoodForm: View {
     var formLayer: some View {
         FormStyledScrollView(showsIndicators: false, isLazy: false) {
             detailsSection
-            if viewModel.forRecipe {
+            if model.forRecipe {
                 servingSection
             }
             ingredientsSection
@@ -85,19 +85,19 @@ public struct ParentFoodForm: View {
     
     func itemsWithRecalculatedBadgesChanged(_ items: [IngredientItem]) {
         withAnimation(.interactiveSpring()) {
-            viewModel.items = items
+            model.items = items
         }
     }
     
     func itemsChanged(_ items: [IngredientItem]) {
         withAnimation {
-            viewModel.showingFoodLabel = !items.isEmpty
+            model.showingFoodLabel = !items.isEmpty
         }
     }
     
     func sortOrderChanged(_ newSortOrder: IngredientSortOrder) {
         withAnimation {
-            viewModel.resortItems()
+            model.resortItems()
         }
     }
     
@@ -106,26 +106,26 @@ public struct ParentFoodForm: View {
         case .saveIngredientItem(let item):
             Haptics.successFeedback()
             if forEdit {
-                viewModel.update(item)
-                viewModel.recalculateBadgeWdiths(delay: 0)
+                model.update(item)
+                model.recalculateBadgeWdiths(delay: 0)
             } else {
                 withAnimation {
-                    viewModel.add(item)
+                    model.add(item)
                 }
-                viewModel.recalculateBadgeWdiths()
+                model.recalculateBadgeWdiths()
             }
             
         case .delete:
 //            Haptics.warningFeedback()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 withAnimation(.interactiveSpring()) {
-                    viewModel.removeEditingItem()
+                    model.removeEditingItem()
                 }
-                viewModel.recalculateBadgeWdiths()
+                model.recalculateBadgeWdiths()
             }
 
         case .dismiss:
-            viewModel.presentedSheet = nil
+            model.presentedSheet = nil
             
         default:
             break
@@ -139,7 +139,7 @@ public struct ParentFoodForm: View {
         )
 
         return Group {
-            if viewModel.showingFoodLabel {
+            if model.showingFoodLabel {
                 FormStyledSection {
                     FoodLabel(data: dataBinding)
                         .transition(.move(edge: .bottom))
@@ -151,7 +151,7 @@ public struct ParentFoodForm: View {
     var ingredientsSection: some View {
         var header: some View {
             HStack {
-                Text(viewModel.ingredientsTitle)
+                Text(model.ingredientsTitle)
                 Spacer()
                 ingredientsMenu
             }
@@ -161,39 +161,39 @@ public struct ParentFoodForm: View {
             IngredientsView(
                 actionHandler: handleIngredientsAction
             )
-            .environmentObject(viewModel)
+            .environmentObject(model)
         }
     }
 
     var ingredientsMenu: some View {
         let emojisBinding = Binding<Bool>(
-            get: { viewModel.showingEmojis },
+            get: { model.showingEmojis },
             set: { newValue in
                 Haptics.feedback(style: .soft)
                 withAnimation {
-                    viewModel.showingEmojis = newValue
+                    model.showingEmojis = newValue
                     UserManager.showingIngredientsEmojis = newValue
                 }
             }
         )
 
         let detailsBinding = Binding<Bool>(
-            get: { viewModel.showingDetails },
+            get: { model.showingDetails },
             set: { newValue in
                 Haptics.feedback(style: .soft)
                 withAnimation {
-                    viewModel.showingDetails = newValue
+                    model.showingDetails = newValue
                     UserManager.showingIngredientsDetails = newValue
                 }
             }
         )
 
         let badgesBinding = Binding<Bool>(
-            get: { viewModel.showingBadges },
+            get: { model.showingBadges },
             set: { newValue in
                 Haptics.feedback(style: .soft)
                 withAnimation {
-                    viewModel.showingBadges = newValue
+                    model.showingBadges = newValue
                     UserManager.showingIngredientsBadges = newValue
                 }
             }
@@ -207,7 +207,7 @@ public struct ParentFoodForm: View {
                         Text("Hide").tag(false)
                     }
                 } label: {
-                    Label("\(viewModel.showingEmojis ? "Showing" : "Hiding") Emojis", systemImage: "face.smiling")
+                    Label("\(model.showingEmojis ? "Showing" : "Hiding") Emojis", systemImage: "face.smiling")
                 }
             }
             Picker(selection: detailsBinding, label: EmptyView()) {
@@ -217,7 +217,7 @@ public struct ParentFoodForm: View {
                         Text("Hide").tag(false)
                     }
                 } label: {
-                    Label("\(viewModel.showingDetails ? "Showing" : "Hiding") Details", systemImage: "text.redaction")
+                    Label("\(model.showingDetails ? "Showing" : "Hiding") Details", systemImage: "text.redaction")
                 }
             }
             Picker(selection: badgesBinding, label: EmptyView()) {
@@ -227,19 +227,19 @@ public struct ParentFoodForm: View {
                         Text("Hide").tag(false)
                     }
                 } label: {
-                    Label("\(viewModel.showingBadges ? "Showing" : "Hiding") Badges", systemImage: "align.horizontal.right.fill")
+                    Label("\(model.showingBadges ? "Showing" : "Hiding") Badges", systemImage: "align.horizontal.right.fill")
                 }
             }
-            Picker(selection: viewModel.sortBinding, label: EmptyView()) {
+            Picker(selection: model.sortBinding, label: EmptyView()) {
                 Menu {
-                    Picker(selection: viewModel.sortBinding, label: EmptyView()) {
+                    Picker(selection: model.sortBinding, label: EmptyView()) {
                         ForEach(IngredientSortOrder.allCases.filter { $0 != .none }, id: \.self) {
                             Label($0.description, systemImage: $0.systemImage)
                                 .tag($0)
                         }
                     }
                 } label: {
-                    Label(viewModel.sortOrderTitle, systemImage: "arrow.up.arrow.down")
+                    Label(model.sortOrderTitle, systemImage: "arrow.up.arrow.down")
                 }
             }
         } label: {
@@ -265,19 +265,19 @@ public struct ParentFoodForm: View {
     func handleIngredientsAction(_ action: IngredientsView.Action) {
         switch action {
         case .add:
-            viewModel.prepareForAdding()
-            viewModel.present(.foodSearch)
+            model.prepareForAdding()
+            model.present(.foodSearch)
             
         case .tappedItem(let ingredientItem):
-            viewModel.prepareForEditing(ingredientItem)
-            viewModel.present(.ingredientEdit)
+            model.prepareForEditing(ingredientItem)
+            model.present(.ingredientEdit)
         }
     }
     
     var detailsSection: some View {
         FormStyledSection(header: Text("Details"), largeHeading: false) {
             FoodDetailsCell(
-                foodType: viewModel.forRecipe ? .recipe : .plate,
+                foodType: model.forRecipe ? .recipe : .plate,
                 actionHandler: handleDetailAction
             )
             .environmentObject(fields)
@@ -288,13 +288,13 @@ public struct ParentFoodForm: View {
         Haptics.feedback(style: .soft)
         switch action {
         case .emoji:
-            viewModel.present(.emoji)
+            model.present(.emoji)
         case .name:
-            viewModel.present(.name)
+            model.present(.name)
         case .detail:
-            viewModel.present(.detail)
+            model.present(.detail)
         case .brand:
-            viewModel.present(.brand)
+            model.present(.brand)
         }
     }
     
@@ -364,9 +364,9 @@ public struct ParentFoodForm: View {
                         energyInKcal: 0,
                         parentFoodId: nil
                     )
-                    viewModel.add(item)
+                    model.add(item)
                 }
-                viewModel.recalculateBadgeWdiths()
+                model.recalculateBadgeWdiths()
             }
             
             Haptics.feedback(style: .rigid)
@@ -398,7 +398,7 @@ public struct ParentFoodForm: View {
         return Button {
             if fields.isDirty {
                 Haptics.warningFeedback()
-                viewModel.showingCancelConfirmation = true
+                model.showingCancelConfirmation = true
             } else {
                 dismissWithHaptics()
             }
@@ -407,7 +407,7 @@ public struct ParentFoodForm: View {
         }
         .confirmationDialog(
             "",
-            isPresented: $viewModel.showingCancelConfirmation,
+            isPresented: $model.showingCancelConfirmation,
             actions: { dismissConfirmationActions },
             message: { dismissConfirmationMessage }
         )

@@ -41,15 +41,15 @@
 //
 //    let attributesListAnimation: Animation = Bounce
 //
-//    @ObservedObject var viewModel: ScannerViewModel
+//    @ObservedObject var model: ScannerViewModel
 //
 //    let scannerDidChangeAttribute = NotificationCenter.default.publisher(for: .scannerDidChangeAttribute)
 //
 //    public init(
-//        viewModel: ScannerViewModel,
+//        model: ScannerViewModel,
 //        actionHandler: @escaping (ScannerAction) -> ()
 //    ) {
-//        self.viewModel = viewModel
+//        self.model = model
 //        self.actionHandler = actionHandler
 //    }
 //
@@ -70,18 +70,18 @@
 //        }
 //        .edgesIgnoringSafeArea(.all)
 //        .sheet(isPresented: $showingAttributePicker) { attributePickerSheet }
-//        .onChange(of: viewModel.state, perform: stateChanged)
+//        .onChange(of: model.state, perform: stateChanged)
 //    }
 //
 //    var primaryContent: some View {
 //        var background: some ShapeStyle {
 ////            .thinMaterial
-//            .thinMaterial.opacity(viewModel.state == .showingKeyboard ? 0 : 1)
+//            .thinMaterial.opacity(model.state == .showingKeyboard ? 0 : 1)
 ////            Color.green.opacity(hideBackground ? 0 : 1)
 //        }
 //
 //        return ZStack {
-//            if let description = viewModel.state.loadingDescription {
+//            if let description = model.state.loadingDescription {
 //                loadingView(description)
 //            } else {
 //                pickerView
@@ -97,7 +97,7 @@
 //
 //    func cell(for nutrient: ScannerNutrient) -> some View {
 //        var isConfirmed: Bool { nutrient.isConfirmed }
-//        var isCurrentAttribute: Bool { viewModel.currentAttribute == nutrient.attribute }
+//        var isCurrentAttribute: Bool { model.currentAttribute == nutrient.attribute }
 //        var imageName: String {
 //            isConfirmed
 ////            ? "circle.inset.filled"
@@ -171,11 +171,11 @@
 //        withAnimation {
 //            showKeyboardForCurrentAttribute()
 //        }
-//        viewModel.showTappableTextBoxesForCurrentAttribute()
+//        model.showTappableTextBoxesForCurrentAttribute()
 //    }
 //
 //    var isDeleteButton: Bool {
-//        viewModel.currentNutrient?.isConfirmed == true && viewModel.state != .showingKeyboard
+//        model.currentNutrient?.isConfirmed == true && model.state != .showingKeyboard
 //    }
 //
 //    func tappedPrimaryButton_actual() {
@@ -189,7 +189,7 @@
 //
 //    func tappedPrimaryButton() {
 ////        isFocused = true
-////        viewModel.state = .showingKeyboard
+////        model.state = .showingKeyboard
 ////
 ////        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
 //            tappedPrimaryButton_actual()
@@ -206,7 +206,7 @@
 //    }
 //
 //    func showKeyboardForCurrentAttribute() {
-//        viewModel.state = .showingKeyboard
+//        model.state = .showingKeyboard
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
 //            withAnimation {
 //                hideBackground = true
@@ -216,7 +216,7 @@
 //
 //
 //    var nutrientsPicker: some View {
-//        let shouldShowEnergy = !viewModel.scannerNutrients.contains(where: { $0.attribute == .energy })
+//        let shouldShowEnergy = !model.scannerNutrients.contains(where: { $0.attribute == .energy })
 //
 //        func hasUnusedMicros(in group: NutrientTypeGroup, matching searchString: String = "") -> Bool {
 //            group.nutrients.contains(where: {
@@ -229,24 +229,24 @@
 //        }
 //
 //        func hasMicronutrient(for nutrientType: NutrientType) -> Bool {
-//            viewModel.scannerNutrients.contains(where: { $0.attribute.nutrientType == nutrientType })
+//            model.scannerNutrients.contains(where: { $0.attribute.nutrientType == nutrientType })
 //        }
 //
 //        func shouldShowMacro(_ macro: Macro) -> Bool {
-//            !viewModel.scannerNutrients.contains(where: { $0.attribute.macro == macro })
+//            !model.scannerNutrients.contains(where: { $0.attribute.macro == macro })
 //        }
 //
 //        func didAddNutrients(energy: Bool, macros: [Macro], micros: [NutrientType]) {
 //            withAnimation {
 //                if energy {
-//                    viewModel.scannerNutrients.insert(.init(attribute: .energy), at: 0)
+//                    model.scannerNutrients.insert(.init(attribute: .energy), at: 0)
 //                }
 //                for macro in macros {
-//                    viewModel.scannerNutrients.append(.init(attribute: macro.attribute))
+//                    model.scannerNutrients.append(.init(attribute: macro.attribute))
 //                }
 //                for nutrientType in micros {
 //                    guard let attribute = nutrientType.attribute else { continue }
-//                    viewModel.scannerNutrients.append(.init(attribute: attribute))
+//                    model.scannerNutrients.append(.init(attribute: attribute))
 //                }
 //            }
 //        }
@@ -272,7 +272,7 @@
 //                Haptics.feedback(style: .soft)
 //                showingNutrientsPicker = true
 ////                withAnimation(NutrientsPickerTransitionAnimation) {
-////                    viewModel.state = .showingNutrientsPicker
+////                    model.state = .showingNutrientsPicker
 ////                }
 //            } label: {
 //                Image(systemName: "plus")
@@ -291,8 +291,8 @@
 //
 //        var addButtonRow: some View {
 //            var shouldShow: Bool {
-//                !viewModel.state.isLoading
-//                && !viewModel.state.isShowingNutrientsPicker
+//                !model.state.isLoading
+//                && !model.state.isShowingNutrientsPicker
 //            }
 //
 //            return HStack {
@@ -306,7 +306,7 @@
 //
 //        var doneButton: some View {
 //            var textColor: Color {
-//                viewModel.state == .allConfirmed
+//                model.state == .allConfirmed
 //                ? Color.white
 //                : Color(.secondaryLabel)
 //            }
@@ -316,16 +316,16 @@
 //                ZStack {
 //                    RoundedRectangle(cornerRadius: 19, style: .continuous)
 //                        .foregroundStyle(.ultraThinMaterial)
-//                        .opacity(viewModel.state == .allConfirmed ? 0 : 1)
+//                        .opacity(model.state == .allConfirmed ? 0 : 1)
 //                    RoundedRectangle(cornerRadius: 19, style: .continuous)
 //                        .foregroundStyle(Color.accentColor)
-//                        .opacity(viewModel.state == .allConfirmed ? 1 : 0)
+//                        .opacity(model.state == .allConfirmed ? 1 : 0)
 //                }
 //                .shadow(color: Color(.black).opacity(0.2), radius: 3, x: 0, y: 3)
 //            }
 //
 //            var shouldShow: Bool {
-//                !viewModel.state.isLoading
+//                !model.state.isLoading
 //            }
 //
 //            return Group {
@@ -376,10 +376,10 @@
 //                Haptics.feedback(style: .soft)
 //                resignFocusOfSearchTextField()
 //                withAnimation {
-//                    if viewModel.containsUnconfirmedAttributes {
-//                        viewModel.state = .awaitingConfirmation
+//                    if model.containsUnconfirmedAttributes {
+//                        model.state = .awaitingConfirmation
 //                    } else {
-//                        viewModel.state = .allConfirmed
+//                        model.state = .allConfirmed
 //                    }
 //                    hideBackground = false
 //                }
@@ -399,7 +399,7 @@
 //
 //        @ViewBuilder
 //        var centerButtonLayer: some View {
-//            if let currentAttribute = viewModel.currentAttribute {
+//            if let currentAttribute = model.currentAttribute {
 //                HStack {
 //                    Spacer()
 //                    Text(currentAttribute.description)
@@ -423,7 +423,7 @@
 //        }
 //
 //        var shouldShow: Bool {
-//            viewModel.state == .showingKeyboard
+//            model.state == .showingKeyboard
 //        }
 //
 //        return Group {
@@ -472,7 +472,7 @@
 //        }
 //
 //        var shouldShow: Bool {
-//            viewModel.state == .allConfirmed
+//            model.state == .allConfirmed
 //        }
 //
 //        var zstack: some View {
@@ -500,14 +500,14 @@
 //    var list: some View {
 //        ScrollViewReader { scrollProxy in
 //
-//            List($viewModel.scannerNutrients, id: \.self.hashValue, editActions: .delete) { $nutrient in
+//            List($model.scannerNutrients, id: \.self.hashValue, editActions: .delete) { $nutrient in
 //                cell(for: nutrient)
 //                    .frame(maxWidth: .infinity)
 //                    .id(nutrient.attribute)
 //            }
 //
 ////            List {
-////                ForEach(viewModel.scannerNutrients, id: \.self.id) { nutrient in
+////                ForEach(model.scannerNutrients, id: \.self.id) { nutrient in
 ////                    cell(for: nutrient)
 ////                        .frame(maxWidth: .infinity)
 ////                        .id(nutrient.attribute)
@@ -551,7 +551,7 @@
 //
 //        var statusMessage: some View {
 //            var string: String {
-//                viewModel.state == .allConfirmed
+//                model.state == .allConfirmed
 //                ? "All nutrients confirmed"
 //                : "Confirm or correct nutrients"
 //            }
@@ -569,12 +569,12 @@
 //
 //        var topButtonsRow: some View {
 //            Group {
-//                if viewModel.currentAttribute == nil {
+//                if model.currentAttribute == nil {
 //                    statusMessage
 //                        .transition(.move(edge: .trailing))
 //                } else {
 //                    HStack(spacing: TopButtonsHorizontalPadding) {
-//                        if viewModel.state == .showingKeyboard {
+//                        if model.state == .showingKeyboard {
 //                            valueTextFieldContents
 //                        } else {
 //                            attributeButton
@@ -591,10 +591,10 @@
 //            VStack(spacing: TopButtonsVerticalPadding) {
 //                topButtonsRow
 //                .padding(.horizontal, TopButtonsHorizontalPadding)
-//                if !viewModel.scannerNutrients.isEmpty {
+//                if !model.scannerNutrients.isEmpty {
 //                    list
 //                        .transition(.move(edge: .bottom))
-//                        .opacity(viewModel.state == .showingKeyboard ? 0 : 1)
+//                        .opacity(model.state == .showingKeyboard ? 0 : 1)
 //                }
 //            }
 //            .padding(.vertical, TopButtonsVerticalPadding)
@@ -604,7 +604,7 @@
 //            var backButton: some View {
 //                return Button {
 //                    withAnimation(NutrientsPickerTransitionAnimation) {
-//                        viewModel.state = .awaitingConfirmation
+//                        model.state = .awaitingConfirmation
 //                    }
 //                } label: {
 //                    Image(systemName: "chevron.left")
@@ -664,7 +664,7 @@
 //                            .padding(.horizontal, horizontalPadding)
 //                            .padding(.leading, horizontalPadding)
 //                            .lineLimit(1)
-////                                .disabled(viewModel.state == .showingNutrientsPicker)
+////                                .disabled(model.state == .showingNutrientsPicker)
 //                        Image(systemName: "magnifyingglass.circle")
 //                            .font(.system(size: 25))
 //                            .frame(width: 25, height: 25)
@@ -672,7 +672,7 @@
 //                    }
 //                    Button {
 //                        withAnimation {
-//                            viewModel.state = .showingNutrientsPickerSearch
+//                            model.state = .showingNutrientsPickerSearch
 //                        }
 //                        nutrientSearchIsFocused = true
 //                    } label: {
@@ -693,7 +693,7 @@
 //                    HStack(spacing: TopButtonsHorizontalPadding) {
 //                        valueTextFieldContents
 //                    }
-//                    if viewModel.state != .showingKeyboard {
+//                    if model.state != .showingKeyboard {
 //                        HStack(spacing: TopButtonsHorizontalPadding) {
 //                            backButton
 //                            title
@@ -710,7 +710,7 @@
 //
 //        @ViewBuilder
 //        var nutrientPicker: some View {
-//            if viewModel.state.isShowingNutrientsPicker {
+//            if model.state.isShowingNutrientsPicker {
 //                ZStack {
 //                    Color(.secondarySystemBackground)
 ////                    Color.clear
@@ -738,7 +738,7 @@
 //    var supplementaryContentLayer: some View {
 //        @ViewBuilder
 //        var attributeLayer: some View {
-//            if let currentAttribute = viewModel.currentAttribute {
+//            if let currentAttribute = model.currentAttribute {
 //                VStack {
 //                    HStack {
 //                        Text(currentAttribute.description)
@@ -767,7 +767,7 @@
 //
 //        return VStack(spacing: 0) {
 //            Spacer()
-//            if viewModel.state == .showingKeyboard {
+//            if model.state == .showingKeyboard {
 //                ZStack(alignment: .bottom) {
 //                    keyboardColor
 //                    attributeLayer
@@ -785,7 +785,7 @@
 //
 //        var valueSuggestions: [FoodLabelValue] {
 ////            [.init(amount: 320, unit: .kcal), .init(amount: 320, unit: .kj), .init(amount: 320), .init(amount: 3200, unit: .kcal), .init(amount: 3200, unit: .kj)]
-//            guard let text = viewModel.currentValueText, let attribute = viewModel.currentAttribute else {
+//            guard let text = model.currentValueText, let attribute = model.currentAttribute else {
 //                return []
 //            }
 //            return text.allDetectedFoodLabelValues(for: attribute)
@@ -823,7 +823,7 @@
 //
 //        var noTextBoxPrompt: String {
 //            "Select a text from the image to autofill its value."
-////            viewModel.textFieldAmountString.isEmpty
+////            model.textFieldAmountString.isEmpty
 ////            ? "or select a detected text from the image."
 ////            : "Select a detected text from the image."
 //        }
@@ -849,7 +849,7 @@
 //
 //    @ViewBuilder
 //    var keyboardBackground: some View {
-//        if viewModel.state == .showingKeyboard {
+//        if model.state == .showingKeyboard {
 //            Group {
 //                if colorScheme == .dark {
 //                    Rectangle()
@@ -887,7 +887,7 @@
 //
 //    var attributesList: some View {
 //        List {
-//            ForEach(viewModel.scannerNutrients, id: \.self) {
+//            ForEach(model.scannerNutrients, id: \.self) {
 //                Text($0.attribute.description)
 //            }
 //        }
@@ -995,10 +995,10 @@
 //
 //    var textField: some View {
 //        let binding = Binding<String>(
-//            get: { viewModel.textFieldAmountString },
+//            get: { model.textFieldAmountString },
 //            set: { newValue in
 //                withAnimation {
-//                    viewModel.textFieldAmountString = newValue
+//                    model.textFieldAmountString = newValue
 //                }
 //            }
 //        )
@@ -1061,9 +1061,9 @@
 //    func resignFocusOfSearchTextField() {
 //        isFocused = false
 //        withAnimation {
-//            viewModel.hideTappableTextBoxesForCurrentAttribute()
+//            model.hideTappableTextBoxesForCurrentAttribute()
 //        }
-////        viewModel.hideTappableTextBoxesForCurrentAttribute()
+////        model.hideTappableTextBoxesForCurrentAttribute()
 //    }
 //
 //    //TODO: Remove this
@@ -1158,12 +1158,12 @@
 //    }
 //
 //    var userInfoForCurrentAttributeZoom: [String: Any]? {
-//        guard let imageSize = viewModel.image?.size,
-//              let attributeText = viewModel.currentAttributeText
+//        guard let imageSize = model.image?.size,
+//              let attributeText = model.currentAttributeText
 //        else { return nil }
 //
 //        var boundingBox = attributeText.boundingBox
-//        if let valueText = viewModel.currentValueText {
+//        if let valueText = model.currentValueText {
 //            boundingBox = boundingBox.union(valueText.boundingBox)
 //        }
 //
@@ -1174,8 +1174,8 @@
 //    }
 //
 //    var userInfoForAllAttributesZoom: [String: Any]? {
-//        guard let imageSize = viewModel.image?.size,
-//              let boundingBox = viewModel.scanResult?.nutrientsBoundingBox(includeAttributes: true)
+//        guard let imageSize = model.image?.size,
+//              let boundingBox = model.scanResult?.nutrientsBoundingBox(includeAttributes: true)
 //        else { return nil }
 //        let zBox = ZBox(boundingBox: boundingBox, imageSize: imageSize)
 //        return [Notification.ZoomableScrollViewKeys.zoomBox: zBox]
@@ -1199,13 +1199,13 @@
 //            tappedValueButton()
 //        } label: {
 //            HStack(alignment: .firstTextBaseline, spacing: 2) {
-//                if viewModel.currentAmountString.isEmpty {
+//                if model.currentAmountString.isEmpty {
 //                    Image(systemName: "keyboard")
 //                } else {
-//                    Text(viewModel.currentAmountString)
+//                    Text(model.currentAmountString)
 //                        .foregroundColor(amountColor)
 //                        .matchedGeometryEffect(id: "textField", in: namespace)
-//                    Text(viewModel.currentUnitString)
+//                    Text(model.currentUnitString)
 //                        .foregroundColor(unitColor)
 //                        .font(.system(size: 18, weight: .medium, design: .default))
 //                }
@@ -1264,19 +1264,19 @@
 //
 //    var rightButton: some View {
 //        var width: CGFloat {
-////            viewModel.state == .userValidationCompleted
+////            model.state == .userValidationCompleted
 ////            ? UIScreen.main.bounds.width - (TopButtonsHorizontalPadding * 2.0)
 ////            : TopButtonWidth
 //            TopButtonWidth
 //        }
 //
 //        var shouldDisablePrimaryButton: Bool {
-//            guard let currentNutrient = viewModel.currentNutrient else { return true }
-//            if let textFieldDouble = viewModel.internalTextfieldDouble {
+//            guard let currentNutrient = model.currentNutrient else { return true }
+//            if let textFieldDouble = model.internalTextfieldDouble {
 //                if textFieldDouble != currentNutrient.value?.amount {
 //                    return false
 //                }
-//                if viewModel.pickedAttributeUnit != currentNutrient.value?.unit {
+//                if model.pickedAttributeUnit != currentNutrient.value?.unit {
 //                    return false
 //                }
 //            }
@@ -1318,7 +1318,7 @@
 ////                showingAttributePicker = true
 ////            }
 //        } label: {
-//            Text(viewModel.currentAttribute?.description ?? "")
+//            Text(model.currentAttribute?.description ?? "")
 //                .matchedGeometryEffect(id: "attributeName", in: namespace)
 ////                .font(.title3)
 //                .font(.system(size: 22, weight: .semibold, design: .default))
@@ -1345,7 +1345,7 @@
 //
 //    let delay: CGFloat = 0.5
 //    @State var selectedColumn: Int = 1
-//    @StateObject var viewModel: ScannerViewModel = ScannerViewModel()
+//    @StateObject var model: ScannerViewModel = ScannerViewModel()
 //
 //    public init() { }
 //    public var body: some View {
@@ -1357,15 +1357,15 @@
 //
 //    var overlay: some View {
 //        ScannerInput(
-//            viewModel: viewModel,
+//            model: model,
 //            actionHandler: { _ in }
 //        )
 //        .onAppear {
-////            self.viewModel.state = .showingNutrientsPickerSearch
-//            self.viewModel.state = .awaitingConfirmation
-////            self.viewModel.state = .allConfirmed
-//            self.viewModel.currentAttribute = .polyunsaturatedFat
-//            self.viewModel.scannerNutrients = [
+////            self.model.state = .showingNutrientsPickerSearch
+//            self.model.state = .awaitingConfirmation
+////            self.model.state = .allConfirmed
+//            self.model.currentAttribute = .polyunsaturatedFat
+//            self.model.scannerNutrients = [
 //                ScannerNutrient(
 //                    attribute: .energy,
 //                    isConfirmed: false,
@@ -1391,29 +1391,29 @@
 //        .task {
 //            Task {
 ////                try await sleepTask(delay)
-////                await MainActor.run { withAnimation { self.viewModel.state = .loadingImage } }
+////                await MainActor.run { withAnimation { self.model.state = .loadingImage } }
 ////
 ////                try await sleepTask(delay)
-////                await MainActor.run { withAnimation { self.viewModel.state = .recognizingTexts } }
+////                await MainActor.run { withAnimation { self.model.state = .recognizingTexts } }
 ////
 ////                try await sleepTask(delay)
-////                await MainActor.run { withAnimation { self.viewModel.state = .classifyingTexts } }
+////                await MainActor.run { withAnimation { self.model.state = .classifyingTexts } }
 ////
 //                try await sleepTask(delay)
 //                try await sleepTask(delay)
 //                try await sleepTask(delay)
 //                await MainActor.run {
 //                    withAnimation {
-////                        self.viewModel.state = .showingNutrientsPickerSearch
-////                        self.viewModel.state = .allConfirmed
-////                        self.viewModel.currentAttribute = nil
+////                        self.model.state = .showingNutrientsPickerSearch
+////                        self.model.state = .allConfirmed
+////                        self.model.currentAttribute = nil
 //                    }
 //                }
 //
 ////                try await sleepTask(delay * 3.0)
 ////                await MainActor.run {
 ////                    withAnimation {
-////                        self.viewModel.currentAttribute = .energy
+////                        self.model.currentAttribute = .energy
 ////                    }
 ////                }
 //

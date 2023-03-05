@@ -7,7 +7,7 @@ import PrepDataTypes
 extension MealForm {
     struct TimeForm: View {
 
-        @StateObject var viewModel: ViewModel
+        @StateObject var model: Model
 
         @Environment(\.dismiss) var dismiss
         @Environment(\.colorScheme) var colorScheme
@@ -25,13 +25,13 @@ extension MealForm {
 
         init(date: Date, time: Binding<Date>, existingMealTimes: Binding<[Date]>) {
             self.date = date
-            let viewModel = ViewModel(initialTime: time.wrappedValue)
-            _viewModel = StateObject(wrappedValue: viewModel)
+            let model = Model(initialTime: time.wrappedValue)
+            _model = StateObject(wrappedValue: model)
             _existingMealTimes = existingMealTimes
             _time = time
         }
         
-        class ViewModel: ObservableObject {
+        class Model: ObservableObject {
             let initialTime: Date
             @Published var internalTime: Date
 
@@ -60,7 +60,7 @@ extension MealForm.TimeForm {
         }
         .toolbar(.hidden, for: .navigationBar)
         .onChange(of: isFocused, perform: isFocusedChanged)
-        .onChange(of: viewModel.internalTime, perform: timeChanged)
+        .onChange(of: model.internalTime, perform: timeChanged)
         .presentationDetents([.height(368)])
         .presentationDragIndicator(.hidden)
     }
@@ -69,7 +69,7 @@ extension MealForm.TimeForm {
         Binding<FormConfirmableAction?>(
             get: {
                 .init(
-                    isDisabled: viewModel.shouldDisableDone,
+                    isDisabled: model.shouldDisableDone,
                     buttonImage: "checkmark") {
                         tappedDone()
                     }
@@ -78,14 +78,14 @@ extension MealForm.TimeForm {
         )
     }
     var doneButton: some View {
-        FormInlineDoneButton(disabled: viewModel.shouldDisableDone) {
+        FormInlineDoneButton(disabled: model.shouldDisableDone) {
             tappedDone()
         }
     }
     
     func tappedDone() {
         refreshDatePicker.toggle()
-        dismissAfterSetting(viewModel.internalTime)
+        dismissAfterSetting(model.internalTime)
     }
     
     var timeSection: some View {
@@ -105,13 +105,13 @@ extension MealForm.TimeForm {
     var datePicker: some View {
         DatePicker(
             "",
-            selection: $viewModel.internalTime,
+            selection: $model.internalTime,
             in: dateRangeForPicker,
             displayedComponents: [.date, .hourAndMinute]
         )
         .datePickerStyle(.compact)
         .labelsHidden()
-        .onChange(of: viewModel.internalTime, perform: onChangeOfTime)
+        .onChange(of: model.internalTime, perform: onChangeOfTime)
         .id(refreshDatePicker)
     }
     
@@ -119,7 +119,7 @@ extension MealForm.TimeForm {
         TimeSlider(
             date: self.date,
             existingTimeSlots: existingTimeSlots,
-            currentTime: $viewModel.internalTime,
+            currentTime: $model.internalTime,
             currentTimeSlot: currentTimeSlot
         )
     }
@@ -156,7 +156,7 @@ extension MealForm.TimeForm {
 //    }
     
     var currentTimeSlot: Int {
-        viewModel.internalTime.timeSlot(within: date)
+        model.internalTime.timeSlot(within: date)
     }
     
     var existingTimeSlots: [Int] {
@@ -175,10 +175,10 @@ extension MealForm.TimeForm {
                 searchingBothDirections: true
             ) else {
 //            guard let nearestAvailable = nearestAvailableTimeSlot(to: timeSlot) else {
-                viewModel.internalTime = lastTime
+                model.internalTime = lastTime
                 return
             }
-            viewModel.internalTime = date.timeForTimeSlot(nearestAvailable)
+            model.internalTime = date.timeForTimeSlot(nearestAvailable)
         }
     }
     
@@ -226,11 +226,11 @@ extension MealForm.TimeForm {
         }
 
         return Button {
-            dismissAfterSetting(viewModel.internalTime)
+            dismissAfterSetting(model.internalTime)
         } label: {
             Text("Done")
                 .bold()
-                .foregroundColor((colorScheme == .light && viewModel.shouldDisableDone) ? .black : .white)
+                .foregroundColor((colorScheme == .light && model.shouldDisableDone) ? .black : .white)
                 .frame(width: buttonWidth, height: buttonHeight)
                 .background(
                     RoundedRectangle(cornerRadius: buttonCornerRadius)
@@ -241,7 +241,7 @@ extension MealForm.TimeForm {
         }
         .buttonStyle(.borderless)
         .position(x: xPosition, y: yPosition)
-        .disabled(viewModel.shouldDisableDone)
-        .opacity(viewModel.shouldDisableDone ? (colorScheme == .light ? 0.2 : 0.2) : 1)
+        .disabled(model.shouldDisableDone)
+        .opacity(model.shouldDisableDone ? (colorScheme == .light ? 0.2 : 0.2) : 1)
     }
 }

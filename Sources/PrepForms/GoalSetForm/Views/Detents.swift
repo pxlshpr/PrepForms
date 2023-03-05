@@ -50,8 +50,8 @@ extension TDEEForm {
     func transitionToEditState() {
         Haptics.successFeedback()
         withAnimation {
-            viewModel.isEditing = true
-            viewModel.presentationDetent = .large
+            model.isEditing = true
+            model.presentationDetent = .large
         }
     }
 }
@@ -60,7 +60,7 @@ extension TDEEForm {
 
 extension TDEEForm {
     func toggleEditState_experimental_legacy() {
-        if viewModel.isEditing {
+        if model.isEditing {
             transitionToCollapsedState_experimental_legacy()
         } else {
             transitionToEditState_experimental_legacy()
@@ -71,32 +71,32 @@ extension TDEEForm {
     func transitionToCollapsedState_experimental_legacy() {
         Haptics.successFeedback()
         
-        viewModel.detents = [.custom(PrimaryDetent.self), .custom(SecondaryDetent.self)]
+        model.detents = [.custom(PrimaryDetent.self), .custom(SecondaryDetent.self)]
         
-        let onPrimaryDetent = viewModel.presentationDetent == .custom(PrimaryDetent.self)
+        let onPrimaryDetent = model.presentationDetent == .custom(PrimaryDetent.self)
         /// We could be on either detent here (expanded or expanded2—which the differences between aren't noticeable)
         if onPrimaryDetent {
-            detentHeightSecondary = viewModel.shouldShowSummary ? .collapsed : .empty
+            detentHeightSecondary = model.shouldShowSummary ? .collapsed : .empty
         } else {
-            detentHeightPrimary = viewModel.shouldShowSummary ? .collapsed : .empty
+            detentHeightPrimary = model.shouldShowSummary ? .collapsed : .empty
         }
         withAnimation {
-            viewModel.isEditing = false
+            model.isEditing = false
             
             /// Always go to the opposite one
             if onPrimaryDetent {
-                viewModel.presentationDetent = .custom(SecondaryDetent.self)
+                model.presentationDetent = .custom(SecondaryDetent.self)
             } else {
-                viewModel.presentationDetent = .custom(PrimaryDetent.self)
+                model.presentationDetent = .custom(PrimaryDetent.self)
             }
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if onPrimaryDetent {
-                detentHeightSecondary = viewModel.shouldShowSummary ? .collapsed : .empty
-                viewModel.detents = [.custom(SecondaryDetent.self)]
+                detentHeightSecondary = model.shouldShowSummary ? .collapsed : .empty
+                model.detents = [.custom(SecondaryDetent.self)]
             } else {
-                detentHeightPrimary = viewModel.shouldShowSummary ? .collapsed : .empty
-                viewModel.detents = [.custom(PrimaryDetent.self)]
+                detentHeightPrimary = model.shouldShowSummary ? .collapsed : .empty
+                model.detents = [.custom(PrimaryDetent.self)]
             }
         }
     }
@@ -104,29 +104,29 @@ extension TDEEForm {
     func transitionToEditState_experimental_legacy() {
         Haptics.feedback(style: .rigid)
 
-        viewModel.detents = [.custom(PrimaryDetent.self), .custom(SecondaryDetent.self)]
+        model.detents = [.custom(PrimaryDetent.self), .custom(SecondaryDetent.self)]
         
-        let onSecondaryDetent = viewModel.presentationDetent == .custom(SecondaryDetent.self)
+        let onSecondaryDetent = model.presentationDetent == .custom(SecondaryDetent.self)
         if onSecondaryDetent {
             detentHeightPrimary = .expanded
         } else {
             detentHeightSecondary = .expanded
         }
         withAnimation {
-            viewModel.isEditing = true
+            model.isEditing = true
             if onSecondaryDetent {
-                viewModel.presentationDetent = .custom(PrimaryDetent.self)
+                model.presentationDetent = .custom(PrimaryDetent.self)
             } else {
-                viewModel.presentationDetent = .custom(SecondaryDetent.self)
+                model.presentationDetent = .custom(SecondaryDetent.self)
             }
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             if onSecondaryDetent {
                 detentHeightSecondary = .expanded2
-                viewModel.detents = [.custom(PrimaryDetent.self)]
+                model.detents = [.custom(PrimaryDetent.self)]
             } else {
                 detentHeightPrimary = .expanded2
-                viewModel.detents = [.custom(SecondaryDetent.self)]
+                model.detents = [.custom(SecondaryDetent.self)]
             }
         }
     }

@@ -82,10 +82,10 @@ extension TimeForm {
 //            }
 //        }
 //
-//        /// Make sure we set viewModel.time manually here as well to keep it in sync
+//        /// Make sure we set model.time manually here as well to keep it in sync
 //        /// Make sure we test for recursion here
         self.time = newTime
-////        viewModel.time = newTime
+////        model.time = newTime
         pickerTime = newTime
     }
 }

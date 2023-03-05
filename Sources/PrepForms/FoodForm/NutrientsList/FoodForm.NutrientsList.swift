@@ -9,7 +9,7 @@ extension FoodForm {
         @EnvironmentObject var fields: FoodForm.Fields
         @EnvironmentObject var sources: FoodForm.Sources
 
-        @StateObject var viewModel = ViewModel()
+        @StateObject var model = Model()
         
         @State var showingMicronutrientsPicker = false
         @State var showingImages = true
@@ -18,7 +18,7 @@ extension FoodForm {
 }
 
 extension FoodForm.NutrientsList {
-    class ViewModel: ObservableObject {
+    class Model: ObservableObject {
         @Published var nutrientBeingEdited: AnyNutrient? = nil
     }
 }
@@ -57,7 +57,7 @@ extension FoodForm.NutrientsList {
     
     @ViewBuilder
     var nutrientForm: some View {
-        if let nutrient = viewModel.nutrientBeingEdited {
+        if let nutrient = model.nutrientBeingEdited {
             NutrientForm(
                 nutrient: nutrient,
                 initialValue: fields.value(for: nutrient),

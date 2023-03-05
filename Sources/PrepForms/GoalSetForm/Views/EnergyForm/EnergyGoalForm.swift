@@ -7,7 +7,7 @@ struct EnergyGoalForm: View {
     
     @Environment(\.dismiss) var dismiss
     
-    @EnvironmentObject var viewModel: GoalSetViewModel
+    @EnvironmentObject var model: GoalSetViewModel
     @ObservedObject var goal: GoalViewModel
     @State var pickedMealEnergyGoalType: MealEnergyTypeOption
     @State var pickedDietEnergyGoalType: DietEnergyTypeOption

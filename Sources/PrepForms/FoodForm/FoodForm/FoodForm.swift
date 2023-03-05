@@ -20,7 +20,7 @@ public struct FoodForm: View {
     @StateObject var fields: Fields = Fields.shared
     @StateObject var sources: Sources = Sources.shared
     @StateObject var extractor: Extractor = Extractor.shared
-    @StateObject var viewModel: ViewModel = ViewModel.shared
+    @StateObject var model: Model = Model.shared
     
     @State var showingEmojiPicker = false
 //    @State var showingDetailsForm = false
@@ -90,7 +90,7 @@ public struct FoodForm: View {
                 .toolbar { navigationTrailingContent }
                 .onAppear(perform: appeared)
                 .onChange(of: sources.selectedPhotos, perform: selectedPhotosChanged)
-                .onChange(of: viewModel.showingWizard, perform: showingWizardChanged)
+                .onChange(of: model.showingWizard, perform: showingWizardChanged)
                 .onChange(of: showingAddLinkAlert, perform: showingAddLinkAlertChanged)
                 .onChange(of: showingAddBarcodeAlert, perform: showingAddBarcodeAlertChanged)
             
@@ -151,8 +151,8 @@ public struct FoodForm: View {
     
     @ViewBuilder
     var extractorViewLayer: some View {
-        if viewModel.showingExtractorView {
-            ExtractorView(extractor: extractor, startedWithCamera: viewModel.startWithCamera)
+        if model.showingExtractorView {
+            ExtractorView(extractor: extractor, startedWithCamera: model.startWithCamera)
                 .onDisappear {
                     NotificationCenter.default.post(name: .homeButtonsShouldRefresh, object: nil)
                 }
@@ -174,10 +174,10 @@ public struct FoodForm: View {
     
     func dismissHandler() {
 //        withAnimation {
-//            viewModel.animateLabelScannerUp = false
+//            model.animateLabelScannerUp = false
 //        }
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//            viewModel.showingLabelScanner = false
+//            model.showingLabelScanner = false
 //        }
     }
     
@@ -208,8 +208,8 @@ public struct FoodForm: View {
         }
         .id(refreshBool)
         .overlay(overlay)
-        .blur(radius: viewModel.showingWizardOverlay ? 5 : 0)
-        .disabled(viewModel.formDisabled)
+        .blur(radius: model.showingWizardOverlay ? 5 : 0)
+        .disabled(model.formDisabled)
     }
     
     @ViewBuilder
@@ -252,16 +252,16 @@ public struct FoodForm: View {
     
     @ViewBuilder
     var overlay: some View {
-        if viewModel.showingWizardOverlay {
+        if model.showingWizardOverlay {
             Color(.quaternarySystemFill)
-                .opacity(viewModel.showingWizardOverlay ? 0.3 : 0)
+                .opacity(model.showingWizardOverlay ? 0.3 : 0)
         }
     }
     
     @ViewBuilder
     var wizardLayer: some View {
         Wizard(
-            isPresented: $viewModel.showingWizard,
+            isPresented: $model.showingWizard,
             tapHandler: tappedWizardButton
         )
     }
@@ -309,7 +309,7 @@ public struct FoodForm: View {
 
     func setShowingSaveButton() {
         /// Animating this doesn't work with the custom interactiveDismissal, so we're using a `.animation` modifier on the save button itself
-        self.viewModel.showingSaveButton = !(viewModel.showingWizard || showingAddLinkAlert || showingAddBarcodeAlert)
+        self.model.showingSaveButton = !(model.showingWizard || showingAddLinkAlert || showingAddBarcodeAlert)
     }
     
     var saveButtonLayer: some View {
@@ -377,8 +377,8 @@ public struct FoodForm: View {
                 }
                 .padding(.horizontal, padding)
                 .padding(.bottom, 0)
-                .offset(x: viewModel.showingSaveButton ? 0 : padding + size)
-                .animation(.interactiveSpring(), value: viewModel.showingSaveButton)
+                .offset(x: model.showingSaveButton ? 0 : padding + size)
+                .animation(.interactiveSpring(), value: model.showingSaveButton)
             }
         }
         
@@ -458,7 +458,7 @@ public struct FoodForm: View {
 //                debugFillButton
                 dismissButton
             }
-            .blur(radius: viewModel.showingWizardOverlay ? 5 : 0)
+            .blur(radius: model.showingWizardOverlay ? 5 : 0)
         }
     }
     
@@ -500,7 +500,7 @@ public struct FoodForm: View {
 
 extension FoodForm {
     var statusMessage: String? {
-        guard !(viewModel.showingWizard || fields.isInEmptyState) else {
+        guard !(model.showingWizard || fields.isInEmptyState) else {
             return nil
         }
         if let missingField = fields.missingRequiredField {
@@ -523,7 +523,7 @@ extension FoodForm {
     }
     
     var formSaveInfo: FormSaveInfo? {
-        guard !(viewModel.showingWizard || fields.isInEmptyState) else {
+        guard !(model.showingWizard || fields.isInEmptyState) else {
             return nil
         }
         

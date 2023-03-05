@@ -13,7 +13,7 @@ public class GoalSetViewModel: ObservableObject {
     let userUnits: UserOptions.Units
     @Published var bodyProfile: BodyProfile?
     
-    @Published var nutrientTDEEFormViewModel: TDEEForm.ViewModel
+    @Published var nutrientTDEEFormViewModel: TDEEForm.Model
     @Published var path: [GoalSetFormRoute] = []
     let existingGoalSet: GoalSet?
     let isDuplicating: Bool
@@ -41,7 +41,7 @@ public class GoalSetViewModel: ObservableObject {
         self.isDuplicating = isDuplicating
         self.existingGoalSet = isDuplicating ? nil : existing
 
-        self.nutrientTDEEFormViewModel = TDEEForm.ViewModel(existingProfile: bodyProfile, userUnits: userUnits)
+        self.nutrientTDEEFormViewModel = TDEEForm.Model(existingProfile: bodyProfile, userUnits: userUnits)
         self.goalViewModels = existing?.goals.goalViewModels(goalSet: self, goalSetType: type) ?? []
         self.createImplicitGoals()
     }
@@ -85,11 +85,11 @@ public class GoalSetViewModel: ObservableObject {
     }
     
     func setNutrientTDEEFormViewModel(with bodyProfile: BodyProfile?) {
-        nutrientTDEEFormViewModel = TDEEForm.ViewModel(existingProfile: bodyProfile, userUnits: userUnits)
+        nutrientTDEEFormViewModel = TDEEForm.Model(existingProfile: bodyProfile, userUnits: userUnits)
     }
     
     func setBodyProfile(_ bodyProfile: BodyProfile) {
-        /// in addition to setting the current body Profile, we also update the view model (TDEEForm.ViewModel) we have  in GoalSetViewModel (or at least the relevant fields for weight and lbm)
+        /// in addition to setting the current body Profile, we also update the view model (TDEEForm.Model) we have  in GoalSetViewModel (or at least the relevant fields for weight and lbm)
         self.bodyProfile = bodyProfile
         setNutrientTDEEFormViewModel(with: bodyProfile)
     }

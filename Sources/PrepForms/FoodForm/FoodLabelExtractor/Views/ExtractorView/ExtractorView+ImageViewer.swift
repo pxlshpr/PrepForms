@@ -31,7 +31,7 @@ extension ExtractorView {
             }
         }
         
-        return ImageViewer(viewModel: imageViewerViewModel)
+        return ImageViewer(model: imageViewerViewModel)
             .overlay(overlay)
 //            .opacity(extractor.dismissState.shouldShrinkImage ? 0 : 1)
             .offset(y: extractor.dismissState.shouldShrinkImage ? UIScreen.main.bounds.height + extractor.imageOffset : 0)

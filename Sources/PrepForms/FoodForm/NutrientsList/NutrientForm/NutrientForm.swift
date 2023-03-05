@@ -14,14 +14,14 @@ struct NutrientForm: View {
     @State var hasFocusedOnAppear: Bool = false
     @State var hasCompletedFocusedOnAppearAnimation: Bool = false
 
-    @StateObject var viewModel: NutrientFormViewModel
+    @StateObject var model: NutrientFormViewModel
     
     init(
         nutrient: AnyNutrient,
         initialValue: FoodLabelValue? = nil,
         handleNewValue: @escaping (FoodLabelValue?) -> ()
     ) {
-        _viewModel = StateObject(wrappedValue: .init(
+        _model = StateObject(wrappedValue: .init(
             nutrient: nutrient,
             initialValue: initialValue,
             handleNewValue: handleNewValue
@@ -29,12 +29,12 @@ struct NutrientForm: View {
     }
     
     var placeholder: String {
-        viewModel.isRequired ? "Required" : "Optional"
+        model.isRequired ? "Required" : "Optional"
     }
     
     var body: some View {
         NavigationStack {
-            QuickForm(title: viewModel.nutrient.description) {
+            QuickForm(title: model.nutrient.description) {
                 textFieldSection
             }
             .onChange(of: isFocused, perform: isFocusedChanged)
@@ -59,9 +59,9 @@ struct NutrientForm: View {
     }
     
     var doneButton: some View {
-        FormInlineDoneButton(disabled: viewModel.shouldDisableDone) {
+        FormInlineDoneButton(disabled: model.shouldDisableDone) {
             Haptics.successFeedback()
-            viewModel.handleNewValue(viewModel.value)
+            model.handleNewValue(model.value)
             dismiss()
         }
     }
@@ -74,10 +74,10 @@ struct NutrientForm: View {
     
     var textField: some View {
         let binding = Binding<String>(
-            get: { viewModel.textFieldAmountString },
+            get: { model.textFieldAmountString },
             set: { newValue in
                 withAnimation {
-                    viewModel.textFieldAmountString = newValue
+                    model.textFieldAmountString = newValue
                 }
             }
         )
@@ -119,7 +119,7 @@ struct NutrientForm: View {
         }
         
         var unitPickerForEnergy: some View {
-//            Picker("", selection: $viewModel.unit) {
+//            Picker("", selection: $model.unit) {
 //                ForEach(
 //                    [FoodLabelUnit.kcal, FoodLabelUnit.kj],
 //                    id: \.self
@@ -133,11 +133,11 @@ struct NutrientForm: View {
         
         func unitPicker(for nutrientType: NutrientType?) -> some View {
             let binding = Binding<FoodLabelUnit>(
-                get: { viewModel.unit },
+                get: { model.unit },
                 set: { newUnit in
                     withAnimation {
                         Haptics.feedback(style: .soft)
-                        viewModel.unit = newUnit
+                        model.unit = newUnit
                     }
                 }
             )
@@ -155,7 +155,7 @@ struct NutrientForm: View {
                 }
             } label: {
                 HStack(spacing: 2) {
-                    Text(viewModel.unit.description)
+                    Text(model.unit.description)
                         .fontWeight(.semibold)
                     Image(systemName: "chevron.up.chevron.down")
                         .imageScale(.small)
@@ -170,7 +170,7 @@ struct NutrientForm: View {
                         ))
                 )
             }
-            .animation(.none, value: viewModel.unit)
+            .animation(.none, value: model.unit)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
                 Haptics.feedback(style: .soft)
@@ -178,9 +178,9 @@ struct NutrientForm: View {
         }
         
         return Group {
-            if viewModel.nutrient.isEnergy {
+            if model.nutrient.isEnergy {
                 unitPickerForEnergy
-            } else if let nutrientType = viewModel.nutrient.nutrientType {
+            } else if let nutrientType = model.nutrient.nutrientType {
                 if nutrientType.supportedFoodLabelUnits.count > 1 {
                     unitPicker(for: nutrientType)
                 } else {

@@ -17,14 +17,14 @@ struct ServingForm: View {
     @State var hasFocusedOnAppear: Bool = false
     @State var hasCompletedFocusedOnAppearAnimation: Bool = false
 
-    @StateObject var viewModel: ServingFormViewModel
+    @StateObject var model: ServingFormViewModel
     
     init(
         isServingSize: Bool,
         initialField: Field? = nil,
         handleNewValue: @escaping ((Double, FormUnit)?) -> ()
     ) {
-        _viewModel = StateObject(wrappedValue: .init(
+        _model = StateObject(wrappedValue: .init(
             isServingSize: isServingSize,
             initialField: initialField,
             handleNewValue: handleNewValue
@@ -32,12 +32,12 @@ struct ServingForm: View {
     }
     
     var placeholder: String {
-        viewModel.isRequired ? "Required" : "Optional"
+        model.isRequired ? "Required" : "Optional"
     }
     
     var body: some View {
         NavigationStack {
-            QuickForm(title: viewModel.title) {
+            QuickForm(title: model.title) {
                 textFieldSection
             }
             .onChange(of: isFocused, perform: isFocusedChanged)
@@ -68,19 +68,19 @@ struct ServingForm: View {
     }
     
     var doneButton: some View {
-        FormInlineDoneButton(disabled: viewModel.shouldDisableDone) {
+        FormInlineDoneButton(disabled: model.shouldDisableDone) {
             Haptics.successFeedback()
-            viewModel.handleNewValue(viewModel.returnTuple)
+            model.handleNewValue(model.returnTuple)
             dismiss()
         }
     }
     
     var textField: some View {
         let binding = Binding<String>(
-            get: { viewModel.textFieldAmountString },
+            get: { model.textFieldAmountString },
             set: { newValue in
                 withAnimation {
-                    viewModel.textFieldAmountString = newValue
+                    model.textFieldAmountString = newValue
                 }
             }
         )
@@ -109,8 +109,8 @@ struct ServingForm: View {
     
     var unitPicker: some View {
         UnitPickerGridTiered(
-            pickedUnit: viewModel.unit,
-            includeServing: !viewModel.isServingSize,
+            pickedUnit: model.unit,
+            includeServing: !model.isServingSize,
             includeWeights: true,
             includeVolumes: true,
             sizes: fields.allSizes,
@@ -119,7 +119,7 @@ struct ServingForm: View {
             didPickUnit: { newUnit in
                 withAnimation {
                     Haptics.feedback(style: .soft)
-                    viewModel.unit = newUnit
+                    model.unit = newUnit
                 }
             }
         )
@@ -131,7 +131,7 @@ struct ServingForm: View {
             showingUnitPicker = true
         } label: {
             HStack(spacing: 2) {
-                Text(viewModel.unit.shortDescription)
+                Text(model.unit.shortDescription)
                     .fontWeight(.semibold)
                 Image(systemName: "chevron.up.chevron.down")
                     .imageScale(.small)
@@ -145,7 +145,7 @@ struct ServingForm: View {
                         colorScheme == .dark ? 0.1 : 0.15
                     ))
             )
-//            .animation(.none, value: viewModel.unit)
+//            .animation(.none, value: model.unit)
         }
         .contentShape(Rectangle())
     }

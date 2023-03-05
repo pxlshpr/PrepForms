@@ -5,7 +5,7 @@ import PrepDataTypes
 import SwiftHaptics
 
 extension NutrientsPerForm {
-    class ViewModel: ObservableObject {
+    class Model: ObservableObject {
         @Published var sizeFieldBeingEdited: Field? = nil
     }
 }
@@ -14,7 +14,7 @@ struct NutrientsPerForm: View {
 
     @ObservedObject var fields: FoodForm.Fields
 
-    @StateObject var viewModel = ViewModel()
+    @StateObject var model = Model()
 
     @State var shouldShowServing: Bool
     @State var shouldShowDensity: Bool
@@ -94,7 +94,7 @@ struct NutrientsPerForm: View {
     
     var addSizeButton: some View {
         Button {
-            viewModel.sizeFieldBeingEdited = nil
+            model.sizeFieldBeingEdited = nil
             showingSizeForm = true
         } label: {
             Text("Add a Size")
@@ -228,7 +228,7 @@ struct NutrientsPerForm: View {
 
     func sizeCell(for sizeField: Field) -> some View {
         Button {
-            viewModel.sizeFieldBeingEdited = sizeField
+            model.sizeFieldBeingEdited = sizeField
             showingSizeForm = true
         } label: {
             FieldCell(field: sizeField, showImage: $showingImages)
@@ -310,7 +310,7 @@ extension NutrientsPerForm {
     }
     
     var sizeForm: some View {
-        sizeForm(for: viewModel.sizeFieldBeingEdited)
+        sizeForm(for: model.sizeFieldBeingEdited)
     }
     
     func sizeForm(for sizeField: Field?) -> some View {
@@ -323,9 +323,9 @@ extension NutrientsPerForm {
     func saveSize(_ size: FormSize) {
         let field = Field.sizeField(with: size)
         withAnimation {
-            if let oldSizeField = viewModel.sizeFieldBeingEdited {
+            if let oldSizeField = model.sizeFieldBeingEdited {
                 fields.edit(oldSizeField, with: field)
-                viewModel.sizeFieldBeingEdited = nil
+                model.sizeFieldBeingEdited = nil
             } else {
                 let _ =  fields.add(sizeField: field)
             }

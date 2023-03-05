@@ -8,7 +8,7 @@ struct DetailsNameForm: View {
     @EnvironmentObject var fields: FoodForm.Fields
     
     @Binding var name: String
-    @StateObject var viewModel: ViewModel
+    @StateObject var model: Model
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
@@ -22,11 +22,11 @@ struct DetailsNameForm: View {
     init(title: String, isRequired: Bool, name: Binding<String>) {
         self.title = title
         _name = name
-        let viewModel = ViewModel(initialString: name.wrappedValue, isRequired: isRequired)
-        _viewModel = StateObject(wrappedValue: viewModel)
+        let model = Model(initialString: name.wrappedValue, isRequired: isRequired)
+        _model = StateObject(wrappedValue: model)
     }
     
-    class ViewModel: ObservableObject {
+    class Model: ObservableObject {
         let initialString: String
         let isRequird: Bool
         @Published var internalString: String = ""
@@ -62,13 +62,13 @@ struct DetailsNameForm: View {
     }
     
     var doneButton: some View {
-        FormInlineDoneButton(disabled: viewModel.shouldDisableDone) {
+        FormInlineDoneButton(disabled: model.shouldDisableDone) {
             tappedDone()
         }
     }
     
     func tappedDone() {
-        dismissAfterSetting(viewModel.internalString)
+        dismissAfterSetting(model.internalString)
     }
     
     var textFieldSection: some View {
@@ -135,15 +135,15 @@ struct DetailsNameForm: View {
 
     var textField: some View {
         let binding = Binding<String>(
-            get: { viewModel.internalString },
+            get: { model.internalString },
             set: { newValue in
                 withAnimation {
-                    viewModel.internalString = newValue
+                    model.internalString = newValue
                 }
             }
         )
 
-        return TextField(viewModel.isRequird ? "Required" : "Optional", text: binding)
+        return TextField(model.isRequird ? "Required" : "Optional", text: binding)
             .focused($isFocused)
             .multilineTextAlignment(.leading)
             .font(binding.wrappedValue.isEmpty ? .body : .largeTitle)

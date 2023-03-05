@@ -10,16 +10,16 @@
 //    
 //    @ViewBuilder
 //    var croppedImagesLayer: some View {
-//        if viewModel.showingCroppedImages {
+//        if model.showingCroppedImages {
 //            ZStack {
 //                Color.clear
 ////                Color.blue.opacity(0.3)
-//                ForEach(viewModel.images.indices, id: \.self) { i in
+//                ForEach(model.images.indices, id: \.self) { i in
 //                    croppedImage(
-//                        viewModel.images[i].0,
-//                        rect: viewModel.images[i].1,
-//                        stackedAngle: viewModel.images[i].3,
-//                        wiggleAngles: viewModel.images[i].4
+//                        model.images[i].0,
+//                        rect: model.images[i].1,
+//                        stackedAngle: model.images[i].3,
+//                        wiggleAngles: model.images[i].4
 //                    )
 //                }
 //            }
@@ -35,23 +35,23 @@
 //        wiggleAngles: (Angle, Angle, Angle, Angle)
 //    ) -> some View {
 //        var x: CGFloat {
-//            viewModel.stackedOnTop ? UIScreen.main.bounds.midX : rect.midX
+//            model.stackedOnTop ? UIScreen.main.bounds.midX : rect.midX
 //        }
 //        
 //        var y: CGFloat {
-//            viewModel.stackedOnTop ? 150 : rect.midY
+//            model.stackedOnTop ? 150 : rect.midY
 //        }
 //        
 //        var angle: Angle {
-//            if viewModel.stackedOnTop {
+//            if model.stackedOnTop {
 //                return stackedAngle
-//            } else if viewModel.animatingFirstWiggleOfCroppedImages {
+//            } else if model.animatingFirstWiggleOfCroppedImages {
 //                return wiggleAngles.0
-//            } else if viewModel.animatingSecondWiggleOfCroppedImages {
+//            } else if model.animatingSecondWiggleOfCroppedImages {
 //                return wiggleAngles.1
-//            } else if viewModel.animatingThirdWiggleOfCroppedImages {
+//            } else if model.animatingThirdWiggleOfCroppedImages {
 //                return wiggleAngles.2
-//            } else if viewModel.animatingFourthWiggleOfCroppedImages {
+//            } else if model.animatingFourthWiggleOfCroppedImages {
 //                return wiggleAngles.3
 //            } else {
 //                return .degrees(0)
@@ -59,17 +59,17 @@
 //        }
 //
 //        var scale: CGFloat {
-//            if viewModel.stackedOnTop {
+//            if model.stackedOnTop {
 //                return 2
-//            } else if viewModel.animatingFirstWiggleOfCroppedImages {
+//            } else if model.animatingFirstWiggleOfCroppedImages {
 //                return 1.1
-//            } else if viewModel.animatingSecondWiggleOfCroppedImages {
+//            } else if model.animatingSecondWiggleOfCroppedImages {
 //                return 1.15
-//            } else if viewModel.animatingThirdWiggleOfCroppedImages {
+//            } else if model.animatingThirdWiggleOfCroppedImages {
 //                return 1.2
-//            } else if viewModel.animatingFourthWiggleOfCroppedImages {
+//            } else if model.animatingFourthWiggleOfCroppedImages {
 //                return 1.25
-//            } else if viewModel.animatingLiftingUpOfCroppedImages {
+//            } else if model.animatingLiftingUpOfCroppedImages {
 //                return 1.05
 //            } else {
 //                return 1.0
@@ -78,17 +78,17 @@
 //        }
 //        
 //        var shadow: CGFloat {
-//            if viewModel.stackedOnTop {
+//            if model.stackedOnTop {
 //                return 3
-//            } else if viewModel.animatingFirstWiggleOfCroppedImages {
+//            } else if model.animatingFirstWiggleOfCroppedImages {
 //                return 7
-//            } else if viewModel.animatingSecondWiggleOfCroppedImages {
+//            } else if model.animatingSecondWiggleOfCroppedImages {
 //                return 8
-//            } else if viewModel.animatingThirdWiggleOfCroppedImages {
+//            } else if model.animatingThirdWiggleOfCroppedImages {
 //                return 9
-//            } else if viewModel.animatingFourthWiggleOfCroppedImages {
+//            } else if model.animatingFourthWiggleOfCroppedImages {
 //                return 10
-//            } else if viewModel.animatingLiftingUpOfCroppedImages {
+//            } else if model.animatingLiftingUpOfCroppedImages {
 //                return 6
 //            } else {
 //                return 5

@@ -24,8 +24,8 @@ extension TDEEForm {
             }
             
             return Group {
-                if let value = viewModel.maintenanceEnergy {
-                    filled(value: value, unit: viewModel.userEnergyUnit)
+                if let value = model.maintenanceEnergy {
+                    filled(value: value, unit: model.userEnergyUnit)
                 } else {
                     empty
                 }
@@ -52,7 +52,7 @@ extension TDEEForm {
                 }
             }
             return Group {
-                if viewModel.maintenanceEnergy == nil {
+                if model.maintenanceEnergy == nil {
                     empty
                 } else {
                     filled
@@ -78,7 +78,7 @@ extension TDEEForm {
                             .foregroundColor(Color(.secondarySystemGroupedBackground))
                             .matchedGeometryEffect(id: "maintenance-bg", in: namespace)
                     )
-//                viewModel.maintenanceEnergyFooterText
+//                model.maintenanceEnergyFooterText
 //                    .matchedGeometryEffect(id: "maintenance-footer", in: namespace)
 //                    .fixedSize(horizontal: false, vertical: false)
 //                    .foregroundColor(Color(.secondaryLabel))

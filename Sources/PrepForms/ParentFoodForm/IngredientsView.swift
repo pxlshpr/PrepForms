@@ -5,7 +5,7 @@ import SwiftHaptics
 struct IngredientsView: View {
     
     @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var viewModel: ParentFoodForm.ViewModel
+    @EnvironmentObject var model: ParentFoodForm.Model
     
     let actionHandler: (Action) -> ()
     
@@ -15,13 +15,13 @@ struct IngredientsView: View {
     
     var content: some View {
         LazyVStack(spacing: 0) {
-            ForEach(viewModel.items) { item in
+            ForEach(model.items) { item in
                 Button {
                     actionHandler(.tappedItem(item))
                 } label: {
                     Cell(item: item)
                         .transition(.move(edge: .trailing))
-                        .environmentObject(viewModel)
+                        .environmentObject(model)
                 }
             }
             addMenu
@@ -30,13 +30,13 @@ struct IngredientsView: View {
     
     var addMenu: some View {
         var legacyLabel: some View {
-            Text(viewModel.addTitle)
+            Text(model.addTitle)
         }
         
         var label: some View {
             HStack {
                 Image(systemName: "plus.circle.fill")
-                Text(viewModel.addTitle)
+                Text(model.addTitle)
                     .fontWeight(.bold)
             }
             .foregroundColor(.accentColor)
@@ -58,7 +58,7 @@ struct IngredientsView: View {
             label
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
-                .padding(.top, viewModel.isEmpty ? 0 : 12)
+                .padding(.top, model.isEmpty ? 0 : 12)
         }
     }
     

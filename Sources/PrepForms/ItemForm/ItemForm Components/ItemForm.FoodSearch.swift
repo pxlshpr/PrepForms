@@ -9,7 +9,7 @@ extension ItemForm {
         
         @Environment(\.dismiss) var dismiss
         
-        @ObservedObject var viewModel: ItemFormModel
+        @ObservedObject var model: ItemFormModel
         
         @State var foodToShowMacrosFor: Food? = nil
         @State var searchIsFocused = false
@@ -25,12 +25,12 @@ extension ItemForm {
         let id = UUID()
         
         public init(
-            viewModel: ItemFormModel,
+            model: ItemFormModel,
             isInitialFoodSearch: Bool = false,
             forIngredient: Bool = false,
             actionHandler: @escaping (ItemFormAction) -> ()
         ) {
-            self.viewModel = viewModel
+            self.model = model
             self.isInitialFoodSearch = isInitialFoodSearch
             self.forIngredient = forIngredient
             self.actionHandler = actionHandler
@@ -51,10 +51,10 @@ extension ItemForm.FoodSearch {
     }
 
     var navigationStack: some View {
-//        NavigationStack(path: $viewModel.path) {
+//        NavigationStack(path: $model.path) {
         NavigationStack {
             foodSearch
-                .navigationDestination(isPresented: $viewModel.showingItem) {
+                .navigationDestination(isPresented: $model.showingItem) {
                     itemForm
                 }
 //                .navigationDestination(for: ItemFormRoute.self) { route in
@@ -81,7 +81,7 @@ extension ItemForm.FoodSearch {
             actionHandler: handleFoodSearchAction
         )
 //        .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
-        .navigationBarBackButtonHidden(viewModel.food == nil)
+        .navigationBarBackButtonHidden(model.food == nil)
         .toolbar { trailingContent }
         .sheet(item: $presentedSheet) { sheet(for: $0) }
         .fullScreenCover(item: $presentedFullScreenSheet) { sheet(for: $0) }

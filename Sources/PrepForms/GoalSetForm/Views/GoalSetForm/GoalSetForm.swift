@@ -10,7 +10,7 @@ public struct GoalSetForm: View {
     @Environment(\.dismiss) var dismiss
     
     @StateObject var goalSetViewModel: GoalSetViewModel
-//    @StateObject var viewModel: ViewModel
+//    @StateObject var model: Model
     
     @State var showingNutrientsPicker: Bool = false
     @State var showingEmojiPicker = false
@@ -558,7 +558,7 @@ struct MacroForm_Previews: PreviewProvider {
 
 struct EnergyFormPreview: View {
     
-    @StateObject var viewModel: GoalSetViewModel
+    @StateObject var model: GoalSetViewModel
     @StateObject var goalViewModel: GoalViewModel
     
     init() {
@@ -583,7 +583,7 @@ struct EnergyFormPreview: View {
             lowerBound: 500
 //            , upperBound: 750
         )
-        _viewModel = StateObject(wrappedValue: goalSetViewModel)
+        _model = StateObject(wrappedValue: goalSetViewModel)
         _goalViewModel = StateObject(wrappedValue: goalViewModel)
     }
     
@@ -592,7 +592,7 @@ struct EnergyFormPreview: View {
             EnergyGoalForm(goal: goalViewModel, didTapDelete: { _ in
                 
             })
-            .environmentObject(viewModel)
+            .environmentObject(model)
         }
     }
 }
@@ -801,8 +801,8 @@ public enum GoalSetFormRoute: Hashable {
 }
 
 //extension GoalSetForm {
-//    public class ViewModel: ObservableObject {
-//        @Published var nutrientTDEEFormViewModel: TDEEForm.ViewModel
+//    public class Model: ObservableObject {
+//        @Published var nutrientTDEEFormViewModel: TDEEForm.Model
 //        @Published var path: [GoalSetFormRoute] = []
 //        let existingGoalSet: GoalSet?
 //
@@ -814,7 +814,7 @@ public enum GoalSetFormRoute: Hashable {
 //        ) {
 //            self.existingGoalSet = existingGoalSet
 //
-//            self.nutrientTDEEFormViewModel = TDEEForm.ViewModel(
+//            self.nutrientTDEEFormViewModel = TDEEForm.Model(
 //                existingProfile: bodyProfile,
 //                userOptions: userOptions
 //            )
@@ -832,11 +832,11 @@ public enum GoalSetFormRoute: Hashable {
 //    }
 //
 //    func setNutrientTDEEFormViewModel(with bodyProfile: BodyProfile?) {
-//        nutrientTDEEFormViewModel = TDEEForm.ViewModel(existingProfile: bodyProfile, userOptions: userOptions)
+//        nutrientTDEEFormViewModel = TDEEForm.Model(existingProfile: bodyProfile, userOptions: userOptions)
 //    }
 //
 //    func setBodyProfile(_ bodyProfile: BodyProfile) {
-//        /// in addition to setting the current body Profile, we also update the view model (TDEEForm.ViewModel) we have  in GoalSetViewModel (or at least the relevant fields for weight and lbm)
+//        /// in addition to setting the current body Profile, we also update the view model (TDEEForm.Model) we have  in GoalSetViewModel (or at least the relevant fields for weight and lbm)
 //        self.bodyProfile = bodyProfile
 //        setNutrientTDEEFormViewModel(with: bodyProfile)
 //    }

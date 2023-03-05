@@ -6,14 +6,14 @@ import SwiftUISugar
 
 struct HeightSection: View {
     
-    @EnvironmentObject var viewModel: TDEEForm.ViewModel
+    @EnvironmentObject var model: TDEEForm.Model
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
     var content: some View {
         VStack {
             Group {
-                if let source = viewModel.heightSource {
+                if let source = model.heightSource {
                     Group {
                         sourceSection
                         switch source {
@@ -32,11 +32,11 @@ struct HeightSection: View {
     }
 
     func tappedSyncWithHealth() {
-        viewModel.changeHeightSource(to: .healthApp)
+        model.changeHeightSource(to: .healthApp)
     }
     
     func tappedManualEntry() {
-        viewModel.changeHeightSource(to: .userEntered)
+        model.changeHeightSource(to: .userEntered)
         isFocused = true
     }
     
@@ -53,7 +53,7 @@ struct HeightSection: View {
 
     @ViewBuilder
     var footer: some View {
-        switch viewModel.heightSource {
+        switch model.heightSource {
         case .userEntered:
             Text("You will need to update your height manually.")
         case .healthApp:
@@ -66,28 +66,28 @@ struct HeightSection: View {
     var bottomRow: some View {
         @ViewBuilder
         var health: some View {
-            if viewModel.heightFetchStatus != .notAuthorized {
+            if model.heightFetchStatus != .notAuthorized {
                 HStack {
                     Spacer()
-                    if viewModel.heightFetchStatus == .fetching {
+                    if model.heightFetchStatus == .fetching {
                         ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
                             .frame(width: 25, height: 25)
                             .foregroundColor(.secondary)
                     } else {
-                        if let date = viewModel.heightDate {
+                        if let date = model.heightDate {
                             Text("as of \(date.tdeeFormat)")
                                 .font(.subheadline)
                                 .foregroundColor(Color(.tertiaryLabel))
                         }
-                        Text(viewModel.heightFormatted)
+                        Text(model.heightFormatted)
                             .font(.system(.title3, design: .rounded, weight: .semibold))
-                            .foregroundColor(viewModel.sexSource == .userEntered ? .primary : .secondary)
+                            .foregroundColor(model.sexSource == .userEntered ? .primary : .secondary)
                             .matchedGeometryEffect(id: "height", in: namespace)
-                            .if(!viewModel.hasHeight) { view in
+                            .if(!model.hasHeight) { view in
                                 view
                                     .redacted(reason: .placeholder)
                             }
-                        Text(viewModel.userHeightUnit.shortDescription)
+                        Text(model.userHeightUnit.shortDescription)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -99,10 +99,10 @@ struct HeightSection: View {
                 "height in"
             }
             var binding: Binding<String> {
-                viewModel.heightTextFieldStringBinding
+                model.heightTextFieldStringBinding
             }
             var unitString: String {
-                viewModel.userHeightUnit.shortDescription
+                model.userHeightUnit.shortDescription
             }
             return HStack {
                 Spacer()
@@ -118,7 +118,7 @@ struct HeightSection: View {
         }
         
         return Group {
-            switch viewModel.heightSource {
+            switch model.heightSource {
             case .healthApp:
                 health
             case .userEntered:
@@ -132,7 +132,7 @@ struct HeightSection: View {
     var sourceSection: some View {
         var sourceMenu: some View {
             Menu {
-                Picker(selection: viewModel.heightSourceBinding, label: EmptyView()) {
+                Picker(selection: model.heightSourceBinding, label: EmptyView()) {
                     ForEach(MeasurementSource.allCases, id: \.self) {
                         Label($0.pickerDescription, systemImage: $0.systemImage).tag($0)
                     }
@@ -140,22 +140,22 @@ struct HeightSection: View {
             } label: {
                 HStack(spacing: 5) {
                     HStack {
-                        if viewModel.heightSource == .healthApp {
+                        if model.heightSource == .healthApp {
                             appleHealthSymbol
                         } else {
-                            if let systemImage = viewModel.heightSource?.systemImage {
+                            if let systemImage = model.heightSource?.systemImage {
                                 Image(systemName: systemImage)
                                     .foregroundColor(.secondary)
                             }
                         }
-                        Text(viewModel.heightSource?.menuDescription ?? "")
+                        Text(model.heightSource?.menuDescription ?? "")
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     Image(systemName: "chevron.up.chevron.down")
                         .imageScale(.small)
                 }
                 .foregroundColor(.secondary)
-                .animation(.none, value: viewModel.heightSource)
+                .animation(.none, value: model.heightSource)
                 .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
@@ -187,6 +187,6 @@ struct HeightSection: View {
         FormStyledSection(header: header, footer: footer) {
             content
         }
-        .onChange(of: viewModel.heightSource, perform: heightSourceChanged)
+        .onChange(of: model.heightSource, perform: heightSourceChanged)
     }
 }

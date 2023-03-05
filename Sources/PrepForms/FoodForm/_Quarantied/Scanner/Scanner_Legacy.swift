@@ -10,7 +10,7 @@
 //public struct Scanner: View {
 //    
 //    @Binding var selectedImage: UIImage?
-//    @ObservedObject var viewModel: ScannerViewModel
+//    @ObservedObject var model: ScannerViewModel
 //
 //    /// ⌨️ Keyboard-height stuff
 ////    let keyboardDidShow = NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)
@@ -21,7 +21,7 @@
 //        image: Binding<UIImage?> = .constant(nil)
 //    ) {
 //        _selectedImage = image
-//        self.viewModel = scanner
+//        self.model = scanner
 //    }
 //    
 //    public var body: some View {
@@ -30,21 +30,21 @@
 //            guard let newValue else { return }
 //            handleCapturedImage(newValue)
 //        }
-//        .onChange(of: viewModel.showingValuePickerUI) { showingValuePickerUI in
-//            guard showingValuePickerUI, let scanResult = viewModel.scanResult
+//        .onChange(of: model.showingValuePickerUI) { showingValuePickerUI in
+//            guard showingValuePickerUI, let scanResult = model.scanResult
 //            else { return }
 //            configureValuesPickerViewModel(with: scanResult)
 //        }
-////        .onChange(of: viewModel.scanResult) { scanResult in
+////        .onChange(of: model.scanResult) { scanResult in
 ////            guard let scanResult else { return }
 ////            configureValuesPickerViewModel(with: scanResult)
 ////        }
-////        .onChange(of: viewModel.animatingCollapse) { newValue in
+////        .onChange(of: model.animatingCollapse) { newValue in
 ////            withAnimation {
 ////                self.animatingCollapse = newValue
 ////            }
 ////        }
-//        .onChange(of: viewModel.clearSelectedImage) { newValue in
+//        .onChange(of: model.clearSelectedImage) { newValue in
 //            guard newValue else { return }
 //            withAnimation {
 //                self.selectedImage = nil
@@ -79,7 +79,7 @@
 //    
 //    var contents: some View {
 //        ZStack {
-//            if viewModel.showingBlackBackground {
+//            if model.showingBlackBackground {
 //                Color(.systemBackground)
 ////                Color.black
 //                    .edgesIgnoringSafeArea(.all)
@@ -88,7 +88,7 @@
 //            cameraLayer
 //            valuesPickerLayer
 //            columnPickerLayer
-////            if !viewModel.animatingCollapse {
+////            if !model.animatingCollapse {
 ////                buttonsLayer
 ////                    .transition(.scale)
 ////            }
@@ -129,7 +129,7 @@
 //
 //    var contents_legacy: some View {
 //        ZStack {
-//            if viewModel.showingBlackBackground {
+//            if model.showingBlackBackground {
 //                Color(.systemBackground)
 ////                Color.black
 //                    .edgesIgnoringSafeArea(.all)
@@ -139,7 +139,7 @@
 //            cameraLayer
 ////            columnPickerLayer
 //            valuesPickerLayer
-////            if !viewModel.animatingCollapse {
+////            if !model.animatingCollapse {
 ////                buttonsLayer
 ////                    .transition(.scale)
 ////            }
@@ -148,8 +148,8 @@
 //    
 //    func dismiss() {
 //        Haptics.feedback(style: .soft)
-//        viewModel.cancelAllTasks()
-//        viewModel.dismissHandler?()
+//        model.cancelAllTasks()
+//        model.dismissHandler?()
 //    }
 //    
 //    var buttonsLayer: some View {
@@ -199,32 +199,32 @@
 //    
 //    var columnPickerLayer: some View {
 //        ColumnPickerOverlay(
-//            isVisibleBinding: $viewModel.showingColumnPickerUI,
-//            leftTitle: viewModel.leftColumnTitle,
-//            rightTitle: viewModel.rightColumnTitle,
-//            selectedColumn: viewModel.selectedColumnBinding,
-//            didTapDismiss: viewModel.dismissHandler,
-//            didTapAutofill: { viewModel.columnSelectionHandler() }
+//            isVisibleBinding: $model.showingColumnPickerUI,
+//            leftTitle: model.leftColumnTitle,
+//            rightTitle: model.rightColumnTitle,
+//            selectedColumn: model.selectedColumnBinding,
+//            didTapDismiss: model.dismissHandler,
+//            didTapAutofill: { model.columnSelectionHandler() }
 //        )
 //    }
 //    
 //    var valuesPickerLayer: some View {
 ////        ValuesPickerOverlay(
 //        ScannerInput(
-//            viewModel: viewModel,
+//            model: model,
 //            actionHandler: handleScannerAction
 //        )
-//        .onChange(of: viewModel.scannerNutrients, perform: scannerNutrientsChanged)
+//        .onChange(of: model.scannerNutrients, perform: scannerNutrientsChanged)
 //    }
 //    
 //    func scannerNutrientsChanged(_ newValue: [ScannerNutrient]) {
-//        cprint("🥸 scanner nutrients changed from: \(viewModel.scannerNutrients.count) to \(newValue.count)")
+//        cprint("🥸 scanner nutrients changed from: \(model.scannerNutrients.count) to \(newValue.count)")
 //    }
 //    
 //    func handleScannerAction(_ scannerAction: ScannerAction) {
 //        switch scannerAction {
 //        case .dismiss:
-//            viewModel.dismissHandler?()
+//            model.dismissHandler?()
 //        case .confirmCurrentAttribute:
 //            confirmCurrentAttribute()
 //        case .deleteCurrentAttribute:
@@ -242,59 +242,59 @@
 //extension Scanner {
 //    
 //    func showFocusedTextBox() {
-//        viewModel.setTextBoxes(
-//            attributeText: viewModel.currentAttributeText,
-//            valueText: viewModel.currentValueText
+//        model.setTextBoxes(
+//            attributeText: model.currentAttributeText,
+//            valueText: model.currentValueText
 //        )
 //    }
 //    
 //    func confirmCurrentAttribute() {
-//        viewModel.confirmCurrentAttributeAndMoveToNext()
+//        model.confirmCurrentAttributeAndMoveToNext()
 //        showFocusedTextBox()
 //    }
 //    
 //    func deleteCurrentAttribute() {
 //        withAnimation {
-//            viewModel.deleteCurrentAttribute()
+//            model.deleteCurrentAttribute()
 //        }
 //    }
 //    
 //    func moveToAttributeAndShowKeyboard(_ attribute: Attribute) {
 //        moveToAttribute(attribute)
-//        viewModel.state = .showingKeyboard
-//        viewModel.showTappableTextBoxesForCurrentAttribute()
+//        model.state = .showingKeyboard
+//        model.showTappableTextBoxesForCurrentAttribute()
 //    }
 //
 //    func moveToAttribute(_ attribute: Attribute) {
 //        Haptics.selectionFeedback()
-//        viewModel.moveToAttribute(attribute)
+//        model.moveToAttribute(attribute)
 //        withAnimation {
 //            showTextBoxes(for: attribute)
 //        }
 //    }
 //    
 //    func showTextBoxes(for attribute: Attribute) {
-//        guard let nutrient = viewModel.scannerNutrients.first(where: { $0.attribute == attribute} ) else {
+//        guard let nutrient = model.scannerNutrients.first(where: { $0.attribute == attribute} ) else {
 //            return
 //        }
-//        viewModel.setTextBoxes(
+//        model.setTextBoxes(
 //            attributeText: nutrient.attributeText,
 //            valueText: nutrient.valueText
 //        )
 //    }
 //    
 //    func toggleAttributeConfirmation(_ attribute: Attribute) {
-//        viewModel.toggleAttributeConfirmation(attribute)
+//        model.toggleAttributeConfirmation(attribute)
 //    }
 //    
 //    func configureValuesPickerViewModel(with scanResult: ScanResult) {
-//        viewModel.resetNutrients()
+//        model.resetNutrients()
 //        guard let firstAttribute = scanResult.nutrientAttributes.first else {
 //            return
 //        }
-//        let c = viewModel.columns.selectedColumnIndex
+//        let c = model.columns.selectedColumnIndex
 //        withAnimation {
-//            viewModel.scannerNutrients = scanResult.nutrients.rows.map({ row in
+//            model.scannerNutrients = scanResult.nutrients.rows.map({ row in
 //                
 //                //TODO: Correct units here
 //                var value = c == 1 ? row.valueText1?.value : row.valueText2?.value
@@ -310,8 +310,8 @@
 //            })
 //        }
 //        
-//        viewModel.currentAttribute = firstAttribute
-//        viewModel.textBoxes = []
+//        model.currentAttribute = firstAttribute
+//        model.textBoxes = []
 //        showFocusedTextBox()
 //    }
 //}

@@ -6,7 +6,7 @@ import PrepViews
 extension IngredientsView {
     struct Cell: View {
         @Environment(\.colorScheme) var colorScheme
-        @EnvironmentObject var viewModel: ParentFoodForm.ViewModel
+        @EnvironmentObject var model: ParentFoodForm.Model
         
         let item: IngredientItem
     }
@@ -23,22 +23,22 @@ extension IngredientsView.Cell {
             optionalEmojiText
 //                .padding(.leading, 10)
             nameTexts
-                .padding(.leading, viewModel.showingEmojis ? 8 : 10)
+                .padding(.leading, model.showingEmojis ? 8 : 10)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer()
-            if viewModel.showingBadges {
+            if model.showingBadges {
                 foodBadge
                     .transition(.scale)
 //                    .padding(.trailing, 10)
             }
         }
-        .padding(.top, viewModel.items.first?.id == item.id ? 0 : 12)
+        .padding(.top, model.items.first?.id == item.id ? 0 : 12)
         .padding(.bottom, 12)
     }
     
     @ViewBuilder
     var optionalEmojiText: some View {
-        if viewModel.showingEmojis {
+        if model.showingEmojis {
             Text(item.food.emoji)
                 .font(.body)
         }
@@ -49,7 +49,7 @@ extension IngredientsView.Cell {
             .font(.body)
             .fontWeight(.medium)
             .foregroundColor(.primary)
-        if viewModel.showingDetails {
+        if model.showingDetails {
             if let detail = item.food.detail, !detail.isEmpty {
                 view = view
                 + Text(", ")
@@ -105,7 +105,7 @@ extension IngredientsView.Cell {
         }
         
         var isLastCell: Bool {
-            viewModel.items.last?.id == item.id
+            model.items.last?.id == item.id
         }
         
         var divider: some View {
@@ -133,7 +133,7 @@ extension IngredientsView.Cell {
             background
             VStack {
                 Spacer()
-//                if viewModel.shouldShowDivider(for: item) {
+//                if model.shouldShowDivider(for: item) {
                     divider
                         .padding(.leading, 32)
 //                }
@@ -142,7 +142,7 @@ extension IngredientsView.Cell {
     }
 }
 
-extension ParentFoodForm.ViewModel {
+extension ParentFoodForm.Model {
     func shouldShowDivider(for item: IngredientItem) -> Bool {
         items.last?.id != item.id
     }

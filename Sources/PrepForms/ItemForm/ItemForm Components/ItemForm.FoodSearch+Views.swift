@@ -8,7 +8,7 @@ extension ItemForm.FoodSearch {
     
     var itemForm: some View {
         ItemForm(
-            viewModel: viewModel,
+            model: model,
             isEditing: false,
             actionHandler: actionHandler
         )
@@ -16,7 +16,7 @@ extension ItemForm.FoodSearch {
     
     var itemFormSearch: some View {
         ItemForm.FoodSearch(
-            viewModel: viewModel,
+            model: model,
             forIngredient: forIngredient,
             actionHandler: actionHandler
         )
@@ -31,7 +31,7 @@ extension ItemForm.FoodSearch {
                 userInfo: [Notification.Keys.dayMeal: pickedMeal]
             )
         })
-        .environmentObject(viewModel)
+        .environmentObject(model)
     }
     
     var foodForm: some View {

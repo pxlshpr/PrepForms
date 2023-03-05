@@ -9,7 +9,7 @@ extension SizeForm {
         @EnvironmentObject var fields: FoodForm.Fields
         
         @ObservedObject var sizeFormViewModel: SizeFormViewModel
-        @StateObject var viewModel: ViewModel
+        @StateObject var model: Model
 
         @Environment(\.dismiss) var dismiss
         @Environment(\.colorScheme) var colorScheme
@@ -20,11 +20,11 @@ extension SizeForm {
         
         init(sizeFormViewModel: SizeFormViewModel) {
             self.sizeFormViewModel = sizeFormViewModel
-            let viewModel = ViewModel(initialDouble: sizeFormViewModel.quantity)
-            _viewModel = StateObject(wrappedValue: viewModel)
+            let model = Model(initialDouble: sizeFormViewModel.quantity)
+            _model = StateObject(wrappedValue: model)
         }
         
-        class ViewModel: ObservableObject {
+        class Model: ObservableObject {
             let initialDouble: Double
             @Published var internalString: String = ""
             @Published var internalDouble: Double? = nil
@@ -80,9 +80,9 @@ extension SizeForm.QuantityForm {
     }
     
     var doneButton: some View {
-        FormInlineDoneButton(disabled: viewModel.shouldDisableDone) {
+        FormInlineDoneButton(disabled: model.shouldDisableDone) {
             Haptics.feedback(style: .rigid)
-            sizeFormViewModel.quantity = viewModel.internalDouble ?? 1
+            sizeFormViewModel.quantity = model.internalDouble ?? 1
             dismiss()
         }
     }
@@ -108,10 +108,10 @@ extension SizeForm.QuantityForm {
     
     var textField: some View {
         let binding = Binding<String>(
-            get: { viewModel.textFieldString },
+            get: { model.textFieldString },
             set: { newValue in
                 withAnimation {
-                    viewModel.textFieldString = newValue
+                    model.textFieldString = newValue
                 }
             }
         )

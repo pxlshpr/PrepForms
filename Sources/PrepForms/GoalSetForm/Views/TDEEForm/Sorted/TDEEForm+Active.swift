@@ -11,7 +11,7 @@ extension TDEEForm {
         var sourceSection: some View {
             var sourceMenu: some View {
                 Menu {
-                    Picker(selection: viewModel.activeEnergySourceBinding, label: EmptyView()) {
+                    Picker(selection: model.activeEnergySourceBinding, label: EmptyView()) {
                         ForEach(ActiveEnergySource.allCases, id: \.self) {
                             Label($0.menuDescription, systemImage: $0.systemImage).tag($0)
                         }
@@ -19,22 +19,22 @@ extension TDEEForm {
                 } label: {
                     HStack(spacing: 5) {
                         HStack {
-                            if viewModel.activeEnergySource == .healthApp {
+                            if model.activeEnergySource == .healthApp {
                                 appleHealthSymbol
                             } else {
-                                if let systemImage = viewModel.activeEnergySource?.systemImage {
+                                if let systemImage = model.activeEnergySource?.systemImage {
                                     Image(systemName: systemImage)
                                         .foregroundColor(.secondary)
                                 }
                             }
-                            Text(viewModel.activeEnergySource?.pickerDescription ?? "")
+                            Text(model.activeEnergySource?.pickerDescription ?? "")
                         }
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         Image(systemName: "chevron.up.chevron.down")
                             .imageScale(.small)
                     }
                     .foregroundColor(.secondary)
-                    .animation(.none, value: viewModel.activeEnergySource)
+                    .animation(.none, value: model.activeEnergySource)
                     .fixedSize(horizontal: true, vertical: false)
                 }
                 .contentShape(Rectangle())
@@ -53,62 +53,62 @@ extension TDEEForm {
         var healthPeriodContent: some View {
             var periodTypeMenu: some View {
                Menu {
-                   Picker(selection: viewModel.activeEnergyPeriodBinding, label: EmptyView()) {
+                   Picker(selection: model.activeEnergyPeriodBinding, label: EmptyView()) {
                         ForEach(HealthPeriodOption.allCases, id: \.self) {
                             Text($0.pickerDescription).tag($0)
                         }
                     }
                 } label: {
                     PickerLabel(
-                        viewModel.activeEnergyPeriod.menuDescription,
+                        model.activeEnergyPeriod.menuDescription,
                         imageColor: Color(hex: "F3DED7"),
                         backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
                         backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
                         foregroundColor: .white
                     )
-                    .animation(.none, value: viewModel.activeEnergyPeriod)
+                    .animation(.none, value: model.activeEnergyPeriod)
                     .fixedSize(horizontal: true, vertical: false)
                 }
             }
             
             var periodValueMenu: some View {
                 Menu {
-                    Picker(selection: viewModel.activeEnergyIntervalValueBinding, label: EmptyView()) {
-                        ForEach(viewModel.activeEnergyIntervalValues, id: \.self) { quantity in
+                    Picker(selection: model.activeEnergyIntervalValueBinding, label: EmptyView()) {
+                        ForEach(model.activeEnergyIntervalValues, id: \.self) { quantity in
                             Text("\(quantity)").tag(quantity)
                         }
                     }
                 } label: {
                     PickerLabel(
-                        "\(viewModel.activeEnergyIntervalValue)",
+                        "\(model.activeEnergyIntervalValue)",
                         imageColor: Color(hex: "F3DED7"),
                         backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
                         backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
                         foregroundColor: .white
                     )
-                    .animation(.none, value: viewModel.activeEnergyIntervalValue)
-                    .animation(.none, value: viewModel.activeEnergyInterval)
+                    .animation(.none, value: model.activeEnergyIntervalValue)
+                    .animation(.none, value: model.activeEnergyInterval)
                     .fixedSize(horizontal: true, vertical: false)
                 }
             }
             
             var periodIntervalMenu: some View {
                 Menu {
-                    Picker(selection: viewModel.activeEnergyIntervalBinding, label: EmptyView()) {
+                    Picker(selection: model.activeEnergyIntervalBinding, label: EmptyView()) {
                         ForEach(HealthAppInterval.allCases, id: \.self) { interval in
-                            Text("\(interval.description)\(viewModel.activeEnergyIntervalValue > 1 ? "s" : "")").tag(interval)
+                            Text("\(interval.description)\(model.activeEnergyIntervalValue > 1 ? "s" : "")").tag(interval)
                         }
                     }
                 } label: {
                     PickerLabel(
-                        "\(viewModel.activeEnergyInterval.description)\(viewModel.activeEnergyIntervalValue > 1 ? "s" : "")",
+                        "\(model.activeEnergyInterval.description)\(model.activeEnergyIntervalValue > 1 ? "s" : "")",
                         imageColor: Color(hex: "F3DED7"),
                         backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
                         backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
                         foregroundColor: .white
                     )
-                    .animation(.none, value: viewModel.activeEnergyInterval)
-                    .animation(.none, value: viewModel.activeEnergyIntervalValue)
+                    .animation(.none, value: model.activeEnergyInterval)
+                    .animation(.none, value: model.activeEnergyIntervalValue)
                     .fixedSize(horizontal: true, vertical: false)
                 }
             }
@@ -136,7 +136,7 @@ extension TDEEForm {
                     }
                     Spacer()
                 }
-                if viewModel.activeEnergyPeriod == .average {
+                if model.activeEnergyPeriod == .average {
                     intervalRow
                 }
             }
@@ -145,7 +145,7 @@ extension TDEEForm {
         
         var healthContent: some View {
             Group {
-                if viewModel.activeEnergyFetchStatus == .notAuthorized {
+                if model.activeEnergyFetchStatus == .notAuthorized {
                     permissionRequiredContent
                 } else {
                     healthPeriodContent
@@ -158,30 +158,30 @@ extension TDEEForm {
         var energyRow: some View {
             @ViewBuilder
             var health: some View {
-                if viewModel.activeEnergyFetchStatus != .notAuthorized {
+                if model.activeEnergyFetchStatus != .notAuthorized {
                     HStack {
                         Spacer()
-                        if viewModel.activeEnergyFetchStatus == .fetching {
+                        if model.activeEnergyFetchStatus == .fetching {
                             ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
                                 .frame(width: 25, height: 25)
                                 .foregroundColor(.secondary)
                         } else {
-                            if let prefix = viewModel.activeEnergyPrefix {
+                            if let prefix = model.activeEnergyPrefix {
                                 Text(prefix)
                                     .font(.subheadline)
                                     .foregroundColor(Color(.tertiaryLabel))
                             }
-                            Text(viewModel.activeEnergyFormatted)
+                            Text(model.activeEnergyFormatted)
                                 .font(.system(.title3, design: .rounded, weight: .semibold))
                                 .multilineTextAlignment(.trailing)
-                                .foregroundColor(viewModel.activeEnergySource == .userEntered ? .primary : .secondary)
+                                .foregroundColor(model.activeEnergySource == .userEntered ? .primary : .secondary)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .matchedGeometryEffect(id: "active", in: namespace)
-                                .if(!viewModel.hasActiveEnergy) { view in
+                                .if(!model.hasActiveEnergy) { view in
                                     view
                                         .redacted(reason: .placeholder)
                                 }
-                            Text(viewModel.userEnergyUnit.shortDescription)
+                            Text(model.userEnergyUnit.shortDescription)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -191,14 +191,14 @@ extension TDEEForm {
             var manualEntry: some View {
                 HStack {
                     Spacer()
-                    TextField("energy in", text: viewModel.activeEnergyTextFieldStringBinding)
+                    TextField("energy in", text: model.activeEnergyTextFieldStringBinding)
                         .keyboardType(.decimalPad)
                         .focused($activeEnergyTextFieldIsFocused)
                         .multilineTextAlignment(.trailing)
                         .font(.system(.title3, design: .rounded, weight: .semibold))
 //                        .fixedSize(horizontal: false, vertical: true)
                         .matchedGeometryEffect(id: "active", in: namespace)
-                    Text(viewModel.userEnergyUnit.shortDescription)
+                    Text(model.userEnergyUnit.shortDescription)
                         .foregroundColor(.secondary)
                 }
             }
@@ -206,23 +206,23 @@ extension TDEEForm {
             var activityLevel: some View {
                 HStack {
                     Spacer()
-                    Text(viewModel.activeEnergyFormatted)
+                    Text(model.activeEnergyFormatted)
                         .font(.system(.title3, design: .rounded, weight: .semibold))
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.trailing)
                         .fixedSize(horizontal: false, vertical: true)
                         .matchedGeometryEffect(id: "active", in: namespace)
-                        .if(!viewModel.hasActiveEnergy) { view in
+                        .if(!model.hasActiveEnergy) { view in
                             view
                                 .redacted(reason: .placeholder)
                         }
-                    Text(viewModel.userEnergyUnit.shortDescription)
+                    Text(model.userEnergyUnit.shortDescription)
                         .foregroundColor(.secondary)
                 }
             }
             
             return Group {
-                switch viewModel.activeEnergySource {
+                switch model.activeEnergySource {
                 case .healthApp:
                     health
                 case .activityLevel:
@@ -239,20 +239,20 @@ extension TDEEForm {
         var activityLevelContent: some View {
             var menu: some View {
                 Menu {
-                    Picker(selection: viewModel.activeEnergyActivityLevelBinding, label: EmptyView()) {
+                    Picker(selection: model.activeEnergyActivityLevelBinding, label: EmptyView()) {
                         ForEach(ActivityLevel.allCases, id: \.self) {
                             Text($0.description).tag($0)
                         }
                     }
                 } label: {
 //                    PickerLabel(
-//                        viewModel.activeEnergyFormula.year,
-//                        prefix: viewModel.activeEnergyFormula.menuDescription,
+//                        model.activeEnergyFormula.year,
+//                        prefix: model.activeEnergyFormula.menuDescription,
 //                        foregroundColor: .secondary,
 //                        prefixColor: .primary
 //                    )
-                    PickerLabel(viewModel.activeEnergyActivityLevel.description)
-                    .animation(.none, value: viewModel.activeEnergyActivityLevel)
+                    PickerLabel(model.activeEnergyActivityLevel.description)
+                    .animation(.none, value: model.activeEnergyActivityLevel)
                     .fixedSize(horizontal: true, vertical: false)
                 }
             }
@@ -272,7 +272,7 @@ extension TDEEForm {
         var content: some View {
             VStack {
                 Group {
-                    if let source = viewModel.activeEnergySource {
+                    if let source = model.activeEnergySource {
                         Group {
                             sourceSection
                             switch source {
@@ -293,11 +293,11 @@ extension TDEEForm {
         }
     
         func tappedActivityLevel() {
-            viewModel.changeActiveEnergySource(to: .activityLevel)
+            model.changeActiveEnergySource(to: .activityLevel)
         }
 
         func tappedManualEntry() {
-            viewModel.changeActiveEnergySource(to: .userEntered)
+            model.changeActiveEnergySource(to: .userEntered)
             activeEnergyTextFieldIsFocused = true
         }
 
@@ -306,9 +306,9 @@ extension TDEEForm {
                 do {
                     try await HealthKitManager.shared.requestPermission(for: .activeEnergyBurned)
                     withAnimation {
-                        viewModel.activeEnergySource = .healthApp
+                        model.activeEnergySource = .healthApp
                     }
-                    viewModel.fetchActiveEnergyFromHealth()
+                    model.fetchActiveEnergyFromHealth()
                 } catch {
                     cprint("Error syncing with Health: \(error)")
                 }
@@ -344,7 +344,7 @@ extension TDEEForm {
         
         @ViewBuilder
         var footer: some View {
-            if let string = viewModel.activeEnergyFooterString {
+            if let string = model.activeEnergyFooterString {
                 Text(string)
                     .fixedSize(horizontal: false, vertical: true)
                     .foregroundColor(Color(.secondaryLabel))
@@ -373,7 +373,7 @@ extension TDEEForm {
                         .matchedGeometryEffect(id: "active-bg", in: namespace)
                 )
                 .padding(.bottom, 10)
-                .if(viewModel.activeEnergyFooterString == nil) { view in
+                .if(model.activeEnergyFooterString == nil) { view in
                     view.padding(.bottom, 10)
                 }
             footer

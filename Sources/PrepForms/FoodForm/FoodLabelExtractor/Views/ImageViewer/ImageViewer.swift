@@ -3,10 +3,10 @@ import Shimmer
 
 public struct ImageViewer: View {
     
-    @ObservedObject var viewModel: ImageViewer.ViewModel
+    @ObservedObject var model: ImageViewer.Model
     
-    public init(viewModel: ImageViewer.ViewModel) {
-        self.viewModel = viewModel
+    public init(model: ImageViewer.Model) {
+        self.model = model
     }
     
     public var body: some View {
@@ -14,7 +14,7 @@ public struct ImageViewer: View {
             Color(.systemBackground)
             zoomableScrollView
         }
-        .onChange(of: viewModel.image, perform: imageChanged)
+        .onChange(of: model.image, perform: imageChanged)
     }
     
     func imageChanged(_ image: UIImage?) {
@@ -28,7 +28,7 @@ public struct ImageViewer: View {
     
     @ViewBuilder
     var zoomableScrollView: some View {
-        if let image = viewModel.image {
+        if let image = model.image {
             ZoomScrollView {
                 VStack(spacing: 0) {
                     imageView(image)
@@ -47,45 +47,45 @@ public struct ImageViewer: View {
             .resizable()
             .aspectRatio(contentMode: .fit)
             .background(.black)
-            .opacity(viewModel.imageOverlayOpacity)
-            .animation(.default, value: viewModel.showingBoxes)
+            .opacity(model.imageOverlayOpacity)
+            .animation(.default, value: model.showingBoxes)
     }
     
     var textBoxesLayer: some View {
         TextBoxesLayer(
-            textBoxes: $viewModel.textBoxes,
-            shimmering: $viewModel.isShimmering
+            textBoxes: $model.textBoxes,
+            shimmering: $model.isShimmering
         )
-        .opacity(viewModel.textBoxesOpacity)
-        .animation(.default, value: viewModel.textPickerHasAppeared)
-        .animation(.interactiveSpring(), value: viewModel.textBoxes)
-        .animation(.default, value: viewModel.showingBoxes)
-        .animation(.default, value: viewModel.isShimmering)
-        .animation(.default, value: viewModel.cutoutTextBoxes.count)
-        .shimmering(active: viewModel.isShimmering)
+        .opacity(model.textBoxesOpacity)
+        .animation(.default, value: model.textPickerHasAppeared)
+        .animation(.interactiveSpring(), value: model.textBoxes)
+        .animation(.default, value: model.showingBoxes)
+        .animation(.default, value: model.isShimmering)
+        .animation(.default, value: model.cutoutTextBoxes.count)
+        .shimmering(active: model.isShimmering)
     }
     
     var selectableTextBoxesLayer: some View {
         TextBoxesLayer(
-            textBoxes: $viewModel.selectableTextBoxes,
+            textBoxes: $model.selectableTextBoxes,
             shimmering: .constant(false)
         )
-        .opacity(viewModel.textBoxesOpacity)
-        .animation(.none, value: viewModel.textPickerHasAppeared)
-        .animation(.none, value: viewModel.selectableTextBoxes)
-        .animation(.none, value: viewModel.showingBoxes)
-        .animation(.none, value: viewModel.isShimmering)
-        .animation(.none, value: viewModel.cutoutTextBoxes.count)
+        .opacity(model.textBoxesOpacity)
+        .animation(.none, value: model.textPickerHasAppeared)
+        .animation(.none, value: model.selectableTextBoxes)
+        .animation(.none, value: model.showingBoxes)
+        .animation(.none, value: model.isShimmering)
+        .animation(.none, value: model.cutoutTextBoxes.count)
     }
     
     var scannedTextBoxesLayer: some View {
         TextBoxesLayer(
-            textBoxes: $viewModel.cutoutTextBoxes,
+            textBoxes: $model.cutoutTextBoxes,
             isCutOut: true
         )
-        .opacity(viewModel.cutoutTextBoxesOpacity)
-        .animation(.default, value: viewModel.textPickerHasAppeared)
-        .animation(.default, value: viewModel.showingBoxes)
-        .animation(.default, value: viewModel.showingCutouts)
+        .opacity(model.cutoutTextBoxesOpacity)
+        .animation(.default, value: model.textPickerHasAppeared)
+        .animation(.default, value: model.showingBoxes)
+        .animation(.default, value: model.showingCutouts)
     }
 }

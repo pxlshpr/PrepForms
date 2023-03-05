@@ -10,7 +10,7 @@ struct TimeForm: View {
     
     @Environment(\.dismiss) var dismiss
 
-    @StateObject var viewModel = ViewModel()
+    @StateObject var model = Model()
     
     @State var initialTime: Date
     let name: String
@@ -55,7 +55,7 @@ struct TimeForm: View {
                     newMeal.date = newValue
                 }
             }
-            .onChange(of: viewModel.time) { newValue in
+            .onChange(of: model.time) { newValue in
                 attemptToChangeTimeTo(newValue)
                 Haptics.feedback(style: .soft)
 //                time = newValue
@@ -145,7 +145,7 @@ struct TimeForm: View {
             }
             attemptToChangeTimeTo(time.addingTimeInterval(interval * 60))
 //            time = time.addingTimeInterval(interval * 60)
-//            viewModel.time = time
+//            model.time = time
             Haptics.feedback(style: hapticStyle)
         } label: {
             let systemName: String
@@ -221,11 +221,11 @@ extension TimeForm {
         let midPoint = ((item2.date.timeIntervalSince1970 - item1.date.timeIntervalSince1970) / 2.0) + item1.date.timeIntervalSince1970
         let midPointDate = Date(timeIntervalSince1970: midPoint)
         withAnimation {
-            viewModel.time = midPointDate
+            model.time = midPointDate
         }
     }
     
     func didTapNow() {
-        viewModel.time = Date()
+        model.time = Date()
     }
 }

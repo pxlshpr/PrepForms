@@ -15,7 +15,7 @@ extension TDEEForm {
 //            } label: {
 //                HStack(spacing: 5) {
 //                    Text(heightUnit.shortDescription)
-//                    if !viewModel.restingEnergyUsesHealthMeasurements {
+//                    if !model.restingEnergyUsesHealthMeasurements {
 //                        Image(systemName: "chevron.up.chevron.down")
 //                            .imageScale(.small)
 //                    }
@@ -27,7 +27,7 @@ extension TDEEForm {
 //            .simultaneousGesture(TapGesture().onEnded {
 //                Haptics.feedback(style: .soft)
 //            })
-//            .disabled(viewModel.restingEnergyUsesHealthMeasurements)
+//            .disabled(model.restingEnergyUsesHealthMeasurements)
 //        }
 //
 //        let heightBinding = Binding<String>(
@@ -74,14 +74,14 @@ extension TDEEForm {
 //            TextField("height in", text: heightBinding)
 //                .keyboardType(.decimalPad)
 //                .multilineTextAlignment(.trailing)
-//                .disabled(viewModel.restingEnergyUsesHealthMeasurements)
+//                .disabled(model.restingEnergyUsesHealthMeasurements)
 //        }
 //
 //        func secondaryTextField(_ placeholder: String) -> some View {
 //            TextField(placeholder, text: heightSecondaryBinding)
 //                .keyboardType(.decimalPad)
 //                .multilineTextAlignment(.trailing)
-//                .disabled(viewModel.restingEnergyUsesHealthMeasurements)
+//                .disabled(model.restingEnergyUsesHealthMeasurements)
 //                .fixedSize(horizontal: true, vertical: false)
 //        }
 //

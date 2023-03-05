@@ -7,7 +7,7 @@ import HealthKit
 
 struct WeightSection: View {
     
-    @EnvironmentObject var viewModel: TDEEForm.ViewModel
+    @EnvironmentObject var model: TDEEForm.Model
     @Namespace var namespace
     @FocusState var isFocused: Bool
     let includeHeader: Bool
@@ -19,7 +19,7 @@ struct WeightSection: View {
     var content: some View {
         VStack {
             Group {
-                if let source = viewModel.weightSource {
+                if let source = model.weightSource {
                     Group {
                         sourceSection
                         switch source {
@@ -39,11 +39,11 @@ struct WeightSection: View {
     }
 
     func tappedSyncWithHealth() {
-        viewModel.changeWeightSource(to: .healthApp)
+        model.changeWeightSource(to: .healthApp)
     }
     
     func tappedManualEntry() {
-        viewModel.changeWeightSource(to: .userEntered)
+        model.changeWeightSource(to: .userEntered)
         isFocused = true
     }
     
@@ -60,7 +60,7 @@ struct WeightSection: View {
 
     @ViewBuilder
     var footer: some View {
-        switch viewModel.weightSource {
+        switch model.weightSource {
         case .userEntered:
             Text("You will need to update your weight manually.")
         case .healthApp:
@@ -73,28 +73,28 @@ struct WeightSection: View {
     var bottomRow: some View {
         @ViewBuilder
         var health: some View {
-            if viewModel.weightFetchStatus != .notAuthorized {
+            if model.weightFetchStatus != .notAuthorized {
                 HStack {
                     Spacer()
-                    if viewModel.weightFetchStatus == .fetching {
+                    if model.weightFetchStatus == .fetching {
                         ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
                             .frame(width: 25, height: 25)
                             .foregroundColor(.secondary)
                     } else {
-                        if let date = viewModel.weightDate {
+                        if let date = model.weightDate {
                             Text("as of \(date.tdeeFormat)")
                                 .font(.subheadline)
                                 .foregroundColor(Color(.tertiaryLabel))
                         }
-                        Text(viewModel.weightFormatted)
+                        Text(model.weightFormatted)
                             .font(.system(.title3, design: .rounded, weight: .semibold))
-                            .foregroundColor(viewModel.weightSource == .userEntered ? .primary : .secondary)
+                            .foregroundColor(model.weightSource == .userEntered ? .primary : .secondary)
                             .matchedGeometryEffect(id: "weight", in: namespace)
-                            .if(!viewModel.hasWeight) { view in
+                            .if(!model.hasWeight) { view in
                                 view
                                     .redacted(reason: .placeholder)
                             }
-                        Text(viewModel.userWeightUnit.shortDescription)
+                        Text(model.userWeightUnit.shortDescription)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -106,10 +106,10 @@ struct WeightSection: View {
                 "weight in"
             }
             var binding: Binding<String> {
-                viewModel.weightTextFieldStringBinding
+                model.weightTextFieldStringBinding
             }
             var unitString: String {
-                viewModel.userWeightUnit.shortDescription
+                model.userWeightUnit.shortDescription
             }
             return HStack {
                 Spacer()
@@ -125,7 +125,7 @@ struct WeightSection: View {
         }
         
         return Group {
-            switch viewModel.weightSource {
+            switch model.weightSource {
             case .healthApp:
                 health
             case .userEntered:
@@ -139,7 +139,7 @@ struct WeightSection: View {
     var sourceSection: some View {
         var sourceMenu: some View {
             Menu {
-                Picker(selection: viewModel.weightSourceBinding, label: EmptyView()) {
+                Picker(selection: model.weightSourceBinding, label: EmptyView()) {
                     ForEach(MeasurementSource.allCases, id: \.self) {
                         Label($0.pickerDescription, systemImage: $0.systemImage).tag($0)
                     }
@@ -147,22 +147,22 @@ struct WeightSection: View {
             } label: {
                 HStack(spacing: 5) {
                     HStack {
-                        if viewModel.weightSource == .healthApp {
+                        if model.weightSource == .healthApp {
                             appleHealthSymbol
                         } else {
-                            if let systemImage = viewModel.weightSource?.systemImage {
+                            if let systemImage = model.weightSource?.systemImage {
                                 Image(systemName: systemImage)
                                     .foregroundColor(.secondary)
                             }
                         }
-                        Text(viewModel.weightSource?.menuDescription ?? "")
+                        Text(model.weightSource?.menuDescription ?? "")
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     Image(systemName: "chevron.up.chevron.down")
                         .imageScale(.small)
                 }
                 .foregroundColor(.secondary)
-                .animation(.none, value: viewModel.weightSource)
+                .animation(.none, value: model.weightSource)
                 .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
@@ -197,6 +197,6 @@ struct WeightSection: View {
         FormStyledSection(header: header, footer: footer) {
             content
         }
-        .onChange(of: viewModel.weightSource, perform: weightSourceChanged)
+        .onChange(of: model.weightSource, perform: weightSourceChanged)
     }
 }

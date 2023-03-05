@@ -5,18 +5,18 @@ import PrepDataTypes
 extension ParentFoodForm {
     var foodLabelData: FoodLabelData {
         FoodLabelData(
-            energyValue: viewModel.value(for: .energy),
-            carb: viewModel.amount(for: .carb),
-            fat: viewModel.amount(for: .fat),
-            protein: viewModel.amount(for: .protein),
-            nutrients: viewModel.microsDict,
+            energyValue: model.value(for: .energy),
+            carb: model.amount(for: .carb),
+            fat: model.amount(for: .fat),
+            protein: model.amount(for: .protein),
+            nutrients: model.microsDict,
             quantityValue: fields.amount.value.double ?? 0,
             quantityUnit: fields.amount.value.doubleValue.unitDescription
         )
     }
 }
 
-extension ParentFoodForm.ViewModel {
+extension ParentFoodForm.Model {
     
     var nutrientTypes: [NutrientType] {
         let start = CFAbsoluteTimeGetCurrent()
