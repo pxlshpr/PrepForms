@@ -38,10 +38,6 @@ public struct ParentFoodForm: View {
     @StateObject var viewModel: ViewModel
     @StateObject var fields: FoodForm.Fields
 
-    @AppStorage(UserDefaultsKeys.showingIngredientEmojis) var showingIngredientEmojis = PrepConstants.DefaultPreferences.showingIngredientEmojis
-    @AppStorage(UserDefaultsKeys.showingIngredientDetails) var showingIngredientDetails = PrepConstants.DefaultPreferences.showingIngredientDetails
-    @AppStorage(UserDefaultsKeys.showingIngredientBadges) var showingIngredientBadges = PrepConstants.DefaultPreferences.showingIngredientBadges
-
     let actionHandler: (Action) -> ()
     let nestLevel: Int
 
@@ -205,31 +201,34 @@ public struct ParentFoodForm: View {
 
     var ingredientsMenu: some View {
         let emojisBinding = Binding<Bool>(
-            get: { showingIngredientEmojis },
+            get: { viewModel.showingEmojis },
             set: { newValue in
                 Haptics.feedback(style: .soft)
                 withAnimation {
-                    showingIngredientEmojis = newValue
+                    viewModel.showingEmojis = newValue
+                    UserManager.showingIngredientsEmojis = newValue
                 }
             }
         )
 
         let detailsBinding = Binding<Bool>(
-            get: { showingIngredientDetails },
+            get: { viewModel.showingDetails },
             set: { newValue in
                 Haptics.feedback(style: .soft)
                 withAnimation {
-                    showingIngredientDetails = newValue
+                    viewModel.showingDetails = newValue
+                    UserManager.showingIngredientsDetails = newValue
                 }
             }
         )
 
         let badgesBinding = Binding<Bool>(
-            get: { showingIngredientBadges },
+            get: { viewModel.showingBadges },
             set: { newValue in
                 Haptics.feedback(style: .soft)
                 withAnimation {
-                    showingIngredientBadges = newValue
+                    viewModel.showingBadges = newValue
+                    UserManager.showingIngredientsBadges = newValue
                 }
             }
         )
@@ -242,7 +241,7 @@ public struct ParentFoodForm: View {
                         Text("Hide").tag(false)
                     }
                 } label: {
-                    Label("\(showingIngredientEmojis ? "Showing" : "Hiding") Emojis", systemImage: "face.smiling")
+                    Label("\(viewModel.showingEmojis ? "Showing" : "Hiding") Emojis", systemImage: "face.smiling")
                 }
             }
             Picker(selection: detailsBinding, label: EmptyView()) {
@@ -252,7 +251,7 @@ public struct ParentFoodForm: View {
                         Text("Hide").tag(false)
                     }
                 } label: {
-                    Label("\(showingIngredientDetails ? "Showing" : "Hiding") Details", systemImage: "text.redaction")
+                    Label("\(viewModel.showingDetails ? "Showing" : "Hiding") Details", systemImage: "text.redaction")
                 }
             }
             Picker(selection: badgesBinding, label: EmptyView()) {
@@ -262,7 +261,7 @@ public struct ParentFoodForm: View {
                         Text("Hide").tag(false)
                     }
                 } label: {
-                    Label("\(showingIngredientBadges ? "Showing" : "Hiding") Badges", systemImage: "align.horizontal.right.fill")
+                    Label("\(viewModel.showingBadges ? "Showing" : "Hiding") Badges", systemImage: "align.horizontal.right.fill")
                 }
             }
             Picker(selection: viewModel.sortBinding, label: EmptyView()) {

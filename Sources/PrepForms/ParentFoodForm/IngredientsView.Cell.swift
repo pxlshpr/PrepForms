@@ -6,11 +6,6 @@ import PrepViews
 extension IngredientsView {
     struct Cell: View {
         @Environment(\.colorScheme) var colorScheme
-        
-        @AppStorage(UserDefaultsKeys.showingIngredientEmojis) var showingIngredientEmojis = PrepConstants.DefaultPreferences.showingIngredientEmojis
-        @AppStorage(UserDefaultsKeys.showingIngredientDetails) var showingIngredientDetails = PrepConstants.DefaultPreferences.showingIngredientDetails
-        @AppStorage(UserDefaultsKeys.showingIngredientBadges) var showingIngredientBadges = PrepConstants.DefaultPreferences.showingIngredientBadges
-
         @EnvironmentObject var viewModel: ParentFoodForm.ViewModel
         
         let item: IngredientItem
@@ -28,10 +23,10 @@ extension IngredientsView.Cell {
             optionalEmojiText
 //                .padding(.leading, 10)
             nameTexts
-                .padding(.leading, showingIngredientEmojis ? 8 : 10)
+                .padding(.leading, viewModel.showingEmojis ? 8 : 10)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer()
-            if showingIngredientBadges {
+            if viewModel.showingBadges {
                 foodBadge
                     .transition(.scale)
 //                    .padding(.trailing, 10)
@@ -43,7 +38,7 @@ extension IngredientsView.Cell {
     
     @ViewBuilder
     var optionalEmojiText: some View {
-        if showingIngredientEmojis {
+        if viewModel.showingEmojis {
             Text(item.food.emoji)
                 .font(.body)
         }
@@ -54,7 +49,7 @@ extension IngredientsView.Cell {
             .font(.body)
             .fontWeight(.medium)
             .foregroundColor(.primary)
-        if showingIngredientDetails {
+        if viewModel.showingDetails {
             if let detail = item.food.detail, !detail.isEmpty {
                 view = view
                 + Text(", ")

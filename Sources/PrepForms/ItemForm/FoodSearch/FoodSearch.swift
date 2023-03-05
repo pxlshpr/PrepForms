@@ -49,6 +49,8 @@ public struct FoodSearch: View {
     
     @State var initialSearchIsFocusedChangeIgnored: Bool = false
     
+    @State var showingEmojis: Bool
+    
     @Binding var searchIsFocused: Bool
 
     let actionHandler: (Action) -> ()
@@ -57,7 +59,8 @@ public struct FoodSearch: View {
     let isRootInNavigationStack: Bool
     
     let didAddFood = NotificationCenter.default.publisher(for: .didAddFood)
-    
+    let didUpdateUser = NotificationCenter.default.publisher(for: .didUpdateUser)
+
     let shouldShowPlatesInFilter: Bool
     
     let id: UUID
@@ -72,6 +75,8 @@ public struct FoodSearch: View {
         searchIsFocused: Binding<Bool>,
         actionHandler: @escaping (Action) -> ()
     ) {
+        _showingEmojis = State(initialValue: UserManager.showingLogEmojis)
+        
         self.id = id
 
         self.isRootInNavigationStack = isRootInNavigationStack
@@ -109,6 +114,7 @@ public struct FoodSearch: View {
             .onChange(of: searchViewModel.searchText, perform: searchTextChanged)
             .onChange(of: searchIsFocused, perform: searchIsFocusedChanged)
             .onReceive(didAddFood, perform: didAddFood)
+            .onReceive(didUpdateUser, perform: didUpdateUser)
             .sheet(isPresented: $showingBarcodeScanner) { barcodeScanner }
             .sheet(isPresented: $showingFilters) { filtersSheet }
             .onChange(of: isComparing, perform: isComparingChanged)

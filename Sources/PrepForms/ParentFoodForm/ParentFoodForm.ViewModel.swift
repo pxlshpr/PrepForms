@@ -2,6 +2,7 @@ import SwiftUI
 import PrepDataTypes
 import SwiftHaptics
 import SwiftSugar
+import PrepCoreDataStack
 
 extension ParentFoodForm {
     class ViewModel: ObservableObject {
@@ -18,6 +19,11 @@ extension ParentFoodForm {
         @Published var showingFoodLabel: Bool
         @Published var showingCancelConfirmation = false
         @Published var showingSaveSheet = false
+
+        
+        @Published var showingBadges: Bool
+        @Published var showingEmojis: Bool
+        @Published var showingDetails: Bool
 
         init(
             forRecipe: Bool,
@@ -36,6 +42,12 @@ extension ParentFoodForm {
             } else {
                 showingFoodLabel = false
             }
+
+            showingBadges = UserManager.showingIngredientsBadges
+            showingEmojis = UserManager.showingIngredientsEmojis
+            showingDetails = UserManager.showingIngredientsDetails
+            
+            NotificationCenter.default.addObserver(self, selector: #selector(didUpdateUser), name: .didUpdateUser, object: nil)
         }
     }
 }
@@ -67,6 +79,14 @@ extension ParentFoodForm.ViewModel {
 }
 
 extension ParentFoodForm.ViewModel {
+    
+    @objc func didUpdateUser(_ notification: Notification) {
+        withAnimation {
+            showingBadges = UserManager.showingIngredientsBadges
+            showingEmojis = UserManager.showingIngredientsEmojis
+            showingDetails = UserManager.showingIngredientsDetails
+        }
+    }
     
     func add(_ item: IngredientItem) {
         var item = item

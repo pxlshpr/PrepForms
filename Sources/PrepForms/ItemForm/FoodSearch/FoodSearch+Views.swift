@@ -106,16 +106,12 @@ extension FoodSearch {
     }
     
     func foodButton(for food: Food) -> some View {
-        let showEmojiBinding = Binding<Bool>(
-            get: { UserManager.showLogEmojis },
-            set: { _ in }
-        )
-        return Button {
+        Button {
             tappedFood(food)
         } label: {
             FoodCell(
                 food: food,
-                showEmoji: showEmojiBinding,
+                showEmoji: $showingEmojis,
                 isSelectable: $isComparing,
                 didTapMacrosIndicator: {
                     actionHandler(.tappedFoodBadge(food))

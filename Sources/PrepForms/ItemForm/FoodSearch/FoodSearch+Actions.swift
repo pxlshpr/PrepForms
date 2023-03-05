@@ -1,6 +1,7 @@
 import SwiftUI
 import PrepDataTypes
 import SwiftHaptics
+import PrepCoreDataStack
 
 extension FoodSearch {
 
@@ -48,6 +49,12 @@ extension FoodSearch {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             actionHandler(.tappedFood(food))
+        }
+    }
+    
+    func didUpdateUser(_ notification: Notification) {
+        withAnimation {
+            showingEmojis = UserManager.showingLogEmojis
         }
     }
     
