@@ -24,11 +24,11 @@ struct IngredientsView: View {
                         .environmentObject(model)
                 }
             }
-            addMenu
+            addButton
         }
     }
     
-    var addMenu: some View {
+    var addButton: some View {
         var legacyLabel: some View {
             Text(model.addTitle)
         }
@@ -45,9 +45,7 @@ struct IngredientsView: View {
             
             .background(
                 RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(Color.accentColor.opacity(
-                        colorScheme == .dark ? 0.1 : 0.15
-                    ))
+                    .fill(Color.accentColor.opacity(colorScheme == .dark ? 0.1 : 0.15))
             )
         }
         
