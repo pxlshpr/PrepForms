@@ -42,7 +42,6 @@ struct IngredientsView: View {
             .foregroundColor(.accentColor)
             .padding(.horizontal)
             .padding(.vertical, 12)
-            
             .background(
                 RoundedRectangle(cornerRadius: 7, style: .continuous)
                     .fill(Color.accentColor.opacity(colorScheme == .dark ? 0.1 : 0.15))
