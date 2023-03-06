@@ -291,7 +291,8 @@ extension ItemFormModel {
         case .recipe:
             return "Ingredient"
         default:
-            return "Entry"
+//            return "Entry"
+            return "Food"
         }
     }
     

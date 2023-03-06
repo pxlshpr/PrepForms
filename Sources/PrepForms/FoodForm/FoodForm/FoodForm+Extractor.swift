@@ -48,6 +48,11 @@ extension FoodForm {
         Task(priority: .low) {
             guard let image = try await loadImage(pickerItem: item) else { return }
             
+            print("Picked image")
+            print(" - type: \(image.typeIdentifier ?? "nil")")
+            print(" - size: \(image.size)")
+            print(" - hasAlpha: \(image.hasAlpha)")
+            
             await MainActor.run {
                 self.extractor.image = image
             }
@@ -72,5 +77,19 @@ extension FoodForm {
         }
         return image
     }
-    
+}
+
+extension UIImage {
+    var typeIdentifier: String? {
+        cgImage?.utType as String?
+    }
+}
+
+extension UIImage {
+    var hasAlpha: Bool {
+        guard let alphaInfo = self.cgImage?.alphaInfo else {return false}
+        return alphaInfo != CGImageAlphaInfo.none &&
+            alphaInfo != CGImageAlphaInfo.noneSkipFirst &&
+            alphaInfo != CGImageAlphaInfo.noneSkipLast
+    }
 }

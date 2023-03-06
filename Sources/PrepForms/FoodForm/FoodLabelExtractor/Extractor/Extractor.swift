@@ -117,6 +117,7 @@ extension Extractor {
         attributesToIgnore: [Attribute] = []
 //        didDismiss: @escaping ((ExtractorOutput?) -> Void)
     ) {
+        ImageViewer.Model.shared.reset()
         isUsingCamera = forCamera
         self.attributesToIgnore = attributesToIgnore
 
