@@ -196,6 +196,10 @@ struct NutrientGoalForm: View {
         } label: {
             Image(systemName: "ellipsis")
         }
+        .contentShape(Rectangle())
+        .simultaneousGesture(TapGesture().onEnded {
+            Haptics.feedback(style: .soft)
+        })
     }
     
     @ViewBuilder
@@ -445,6 +449,7 @@ struct NutrientGoalForm: View {
             )
         }
         .animation(.none, value: pickedMealNutrientGoal)
+        .contentShape(Rectangle())
         .simultaneousGesture(TapGesture().onEnded {
             Haptics.feedback(style: .soft)
         })
@@ -491,6 +496,7 @@ struct NutrientGoalForm: View {
             }
         }
         .animation(.none, value: pickedDietNutrientGoal)
+        .contentShape(Rectangle())
         .simultaneousGesture(TapGesture().onEnded {
             Haptics.feedback(style: .soft)
         })
@@ -525,6 +531,7 @@ struct NutrientGoalForm: View {
                     )
                 }
                 .animation(.none, value: pickedBodyMassType)
+                .contentShape(Rectangle())
                 .simultaneousGesture(TapGesture().onEnded {
                     Haptics.feedback(style: .soft)
                 })
@@ -557,6 +564,7 @@ struct NutrientGoalForm: View {
                     )
                 }
                 .animation(.none, value: pickedWorkoutDurationUnit)
+                .contentShape(Rectangle())
                 .simultaneousGesture(TapGesture().onEnded {
                     Haptics.feedback(style: .soft)
                 })
@@ -591,6 +599,7 @@ struct NutrientGoalForm: View {
                     )
                 }
                 .animation(.none, value: pickedBodyMassUnit)
+                .contentShape(Rectangle())
                 .simultaneousGesture(TapGesture().onEnded {
                     Haptics.feedback(style: .soft)
                 })

@@ -69,6 +69,10 @@ extension TDEEForm {
                     .animation(.none, value: model.activeEnergyPeriod)
                     .fixedSize(horizontal: true, vertical: false)
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
             }
             
             var periodValueMenu: some View {
@@ -90,6 +94,10 @@ extension TDEEForm {
                     .animation(.none, value: model.activeEnergyInterval)
                     .fixedSize(horizontal: true, vertical: false)
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
             }
             
             var periodIntervalMenu: some View {
@@ -111,6 +119,10 @@ extension TDEEForm {
                     .animation(.none, value: model.activeEnergyIntervalValue)
                     .fixedSize(horizontal: true, vertical: false)
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
             }
             
             var intervalRow: some View {
@@ -255,6 +267,10 @@ extension TDEEForm {
                     .animation(.none, value: model.activeEnergyActivityLevel)
                     .fixedSize(horizontal: true, vertical: false)
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
             }
             return HStack {
                 HStack {
@@ -326,10 +342,13 @@ extension TDEEForm {
 //                emptyButton2("Activity Level", systemImage: "dial.medium.fill")
 //                emptyButton2("Enter", systemImage: "keyboard")
 //            }
-            FlowView(alignment: .leading, spacing: 10, padding: 37) {
-                emptyButton2("Activity Level", systemImage: "dial.medium.fill", action: tappedActivityLevel)
-                emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
-                emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+            FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 37) {
+//                emptyButton2("Activity Level", systemImage: "dial.medium.fill", action: tappedActivityLevel)
+//                emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
+//                emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+                BiometricButton("Activity Level", systemImage: "dial.medium.fill", action: tappedActivityLevel)
+                BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
+                BiometricHealthButton("Sync", action: tappedSyncWithHealth)
             }
             .padding(.horizontal, 15)
         }

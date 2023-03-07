@@ -49,6 +49,10 @@ extension EnergyGoalForm {
         } label: {
             Image(systemName: "ellipsis")
         }
+        .contentShape(Rectangle())
+        .simultaneousGesture(TapGesture().onEnded {
+            Haptics.feedback(style: .soft)
+        })
     }
     
     @ViewBuilder

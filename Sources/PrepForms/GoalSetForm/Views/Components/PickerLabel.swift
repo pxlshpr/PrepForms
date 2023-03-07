@@ -56,10 +56,22 @@ struct PickerLabel: View {
             }
     }
     
+    var textColor: Color {
+        if isForAppleHealth, let backgroundGradientTop {
+            return backgroundGradientTop
+        } else {
+            return backgroundColor
+        }
+    }
+    
+    var isForAppleHealth: Bool {
+        backgroundGradientTop != nil && backgroundGradientBottom != nil
+    }
+    
     var content: some View {
         var capsuleLayer: some View {
             RoundedRectangle(cornerRadius: 7, style: .continuous)
-                .if(backgroundGradientTop != nil && backgroundGradientBottom != nil, transform: { view in
+                .if(isForAppleHealth, transform: { view in
                     view
                         .foregroundStyle(
                             .linearGradient(
@@ -73,7 +85,7 @@ struct PickerLabel: View {
                             .opacity(colorScheme == .dark ? 0.1 : 0.15)
                         )
                 })
-                .if(backgroundGradientTop == nil && backgroundGradientBottom == nil, transform: { view in
+                .if(!isForAppleHealth, transform: { view in
                     view
                         .foregroundColor(
                             backgroundColor
@@ -89,18 +101,21 @@ struct PickerLabel: View {
 //                        .fontWeight(.bold)
 //                        .foregroundColor(.white)
 //                        .colorMultiply(prefixColor)
-                        .foregroundColor(backgroundColor)
+//                        .foregroundColor(backgroundColor)
+                        .foregroundColor(textColor)
                 }
                 Text(string)
                     .fontWeight(.bold)
 //                    .foregroundColor(.white)
 //                    .colorMultiply(foregroundColor)
-                    .foregroundColor(backgroundColor)
+//                    .foregroundColor(backgroundColor)
+                    .foregroundColor(textColor)
                 if let systemImage {
                     Image(systemName: systemImage)
 //                        .foregroundColor(imageColor)
                         .imageScale(imageScale)
-                        .foregroundColor(backgroundColor)
+//                        .foregroundColor(backgroundColor)
+                        .foregroundColor(textColor)
                 }
             }
             .frame(height: 25)

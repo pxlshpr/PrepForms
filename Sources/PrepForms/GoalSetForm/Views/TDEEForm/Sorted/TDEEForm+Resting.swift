@@ -203,6 +203,10 @@ extension TDEEForm {
                     .animation(.none, value: model.restingEnergyFormula)
                     .fixedSize(horizontal: true, vertical: false)
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
             }
             return HStack {
                 HStack {
@@ -375,10 +379,13 @@ extension TDEEForm {
 //                emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
 //                Spacer()
 //            }
-            FlowView(alignment: .leading, spacing: 10, padding: 17) {
-                emptyButton2("Calculate", systemImage: "function", action: tappedFormula)
-                emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
-                emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+            FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 17) {
+//                emptyButton2("Calculate", systemImage: "function", action: tappedFormula)
+//                emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
+//                emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+                BiometricButton("Calculate", systemImage: "function", action: tappedFormula)
+                BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
+                BiometricHealthButton("Sync", action: tappedSyncWithHealth)
             }
             .padding(.horizontal, 15)
         }
@@ -494,6 +501,11 @@ extension TDEEForm {
                     .animation(.none, value: model.restingEnergyPeriod)
                     .fixedSize(horizontal: true, vertical: false)
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
+
             }
             
             var periodValueMenu: some View {
@@ -515,6 +527,11 @@ extension TDEEForm {
                     .animation(.none, value: model.restingEnergyInterval)
                     .fixedSize(horizontal: true, vertical: false)
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
+
             }
             
             var periodIntervalMenu: some View {
@@ -536,6 +553,11 @@ extension TDEEForm {
                     .animation(.none, value: model.restingEnergyIntervalValue)
                     .fixedSize(horizontal: true, vertical: false)
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
+
             }
             
             var intervalRow: some View {
@@ -649,18 +671,19 @@ var permissionRequiredContent: some View  {
         Button {
             UIApplication.shared.open(URL(string: "App-prefs:Privacy&path=HEALTH")!)
         } label: {
-            HStack {
-                Image(systemName: "gear")
-                Text("Go to Settings")
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-            .foregroundColor(.white)
-            .padding(.horizontal)
-            .padding(.vertical, 12)
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .foregroundColor(Color.accentColor)
-            )
+            ButtonLabel(title: "Go to Settings", systemImage: "gear")
+//            HStack {
+//                Image(systemName: "gear")
+//                Text("Go to Settings")
+//                    .fixedSize(horizontal: true, vertical: false)
+//            }
+//            .foregroundColor(.white)
+//            .padding(.horizontal)
+//            .padding(.vertical, 12)
+//            .background(
+//                RoundedRectangle(cornerRadius: 20, style: .continuous)
+//                    .foregroundColor(Color.accentColor)
+//            )
         }
         .buttonStyle(.borderless)
         .padding(.top, 5)

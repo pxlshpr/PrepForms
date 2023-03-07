@@ -46,9 +46,11 @@ struct AgeSection: View {
 //            emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
 //            emptyButton("Let me type it in", systemImage: "keyboard", action: tappedManualEntry)
 //        }
-        FlowView(alignment: .leading, spacing: 10, padding: 37) {
-            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
-            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
+        FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 37) {
+//            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+//            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
+            BiometricHealthButton("Sync", action: tappedSyncWithHealth)
+            BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
         }
     }
 
@@ -166,41 +168,110 @@ struct AgeSection: View {
     }
 }
 
-func emptyButton2(_ title: String, systemImage: String? = nil, showHealthAppIcon: Bool = false, action: (() -> ())? = nil) -> some View {
+let BiometricButtonsAlignment: Alignment = .leading
+
+struct BiometricHealthButton: View {
+    let title: String
+    let action: () -> ()
+    
+    init(_ title: String, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
+    }
+    
+    var body: some View {
+        BiometricBaseButton(title, style: .health, action: action)
+    }
+}
+
+struct BiometricButton: View {
+    let title: String
+    let systemImage: String?
+    let action: () -> ()
+    
+    init(_ title: String, systemImage: String? = nil, action: @escaping () -> Void) {
+        self.title = title
+        self.systemImage = systemImage
+        self.action = action
+    }
+    
+    var body: some View {
+        BiometricBaseButton(title, systemImage: systemImage, style: .plain, action: action)
+    }
+}
+
+struct BiometricBaseButton: View {
+    
+    enum Style {
+        case plain
+        case health
+    }
+    
+    let title: String
+    let systemImage: String? = nil
+    let style: Style
+    let action: () -> ()
+    
+    init(_ title: String, systemImage: String? = nil, style: Style = .plain, action: @escaping () -> Void) {
+        self.title = title
+        self.style = style
+        self.action = action
+    }
+
+    var body: some View {
+        Button {
+            action()
+        } label: {
+            label
+        }
+    }
     
     @ViewBuilder
     var label: some View {
-        if showHealthAppIcon {
-            AppleHealthButtonLabel(title: title)
-        } else {
+        switch style {
+        case .plain:
             ButtonLabel(title: title, systemImage: systemImage)
+        case .health:
+            AppleHealthButtonLabel(title: title)
         }
-    }
-    
-    var label_legacy: some View {
-        HStack(spacing: 5) {
-            if let systemImage {
-                Image(systemName: systemImage)
-                    .foregroundColor(Color(.tertiaryLabel))
-            } else if showHealthAppIcon {
-                appleHealthSymbol
-            }
-            Text(title)
-                .fixedSize(horizontal: false, vertical: true)
-                .foregroundColor(.secondary)
-        }
-        .frame(minHeight: 30)
-        .padding(.horizontal, 15)
-        .padding(.vertical, 5)
-        .background (
-            Capsule(style: .continuous)
-                .foregroundColor(Color(.secondarySystemFill))
-        )
-    }
-    
-    return Button {
-        action?()
-    } label: {
-        label
     }
 }
+
+//func emptyButton2(_ title: String, systemImage: String? = nil, showHealthAppIcon: Bool = false, action: (() -> ())? = nil) -> some View {
+//
+//    @ViewBuilder
+//    var label: some View {
+//        if showHealthAppIcon {
+//            AppleHealthButtonLabel(title: title)
+//        } else {
+//            ButtonLabel(title: title, systemImage: systemImage)
+//        }
+//    }
+//
+//    var label_legacy: some View {
+//        HStack(spacing: 5) {
+//            if let systemImage {
+//                Image(systemName: systemImage)
+//                    .foregroundColor(Color(.tertiaryLabel))
+//            } else if showHealthAppIcon {
+//                appleHealthSymbol
+//            }
+//            Text(title)
+//                .fixedSize(horizontal: false, vertical: true)
+//                .foregroundColor(.secondary)
+//        }
+//        .frame(minHeight: 30)
+//        .padding(.horizontal, 15)
+//        .padding(.vertical, 5)
+//        .background (
+//            Capsule(style: .continuous)
+//                .foregroundColor(Color(.secondarySystemFill))
+//        )
+//    }
+//
+//    return Button {
+//        action?()
+//    } label: {
+//        label
+//    }
+//}

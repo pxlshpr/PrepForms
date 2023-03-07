@@ -45,9 +45,11 @@ struct HeightSection: View {
 //            emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
 //            emptyButton("Let me type it in", systemImage: "keyboard", action: tappedManualEntry)
 //        }
-        FlowView(alignment: .leading, spacing: 10, padding: 37) {
-            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
-            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
+        FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 37) {
+//            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+//            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
+            BiometricHealthButton("Sync", action: tappedSyncWithHealth)
+            BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
         }
     }
 

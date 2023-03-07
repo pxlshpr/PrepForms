@@ -158,6 +158,10 @@ extension TDEEForm {
                 } label: {
                     label("sex", "male")
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
                 Button {
                     model.path.append(.leanBodyMassForm)
                 } label: {

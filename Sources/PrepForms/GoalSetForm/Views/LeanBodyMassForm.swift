@@ -55,6 +55,11 @@ struct LeanBodyMassForm: View {
                     .animation(.none, value: model.lbmFormula)
                     .fixedSize(horizontal: true, vertical: false)
                 }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
+
             }
             return HStack {
                 HStack {
@@ -99,11 +104,15 @@ struct LeanBodyMassForm: View {
 //            emptyButton("Convert Fat Percentage", systemImage: "percent", action: tappedFatPercentage)
 //            emptyButton("Let me type it in", systemImage: "keyboard", action: tappedManualEntry)
 //        }
-        FlowView(alignment: .leading, spacing: 10, padding: 37) {
-            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
-            emptyButton2("Calculate", systemImage: "function", action: tappedFormula)
-            emptyButton2("Use Fat %", systemImage: "function", action: tappedFatPercentage)
-            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
+        FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 37) {
+//            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+//            emptyButton2("Calculate", systemImage: "function", action: tappedFormula)
+//            emptyButton2("Use Fat %", systemImage: "function", action: tappedFatPercentage)
+//            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
+            BiometricHealthButton("Sync", action: tappedSyncWithHealth)
+            BiometricButton("Calculate", systemImage: "function", action: tappedFormula)
+            BiometricButton("Use Fat %", systemImage: "function", action: tappedFatPercentage)
+            BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
         }
     }
 
