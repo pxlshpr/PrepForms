@@ -78,7 +78,7 @@ extension TDEEForm {
                             .foregroundColor(Color(.secondarySystemGroupedBackground))
                             .matchedGeometryEffect(id: "maintenance-bg", in: namespace)
                     )
-//                model.maintenanceEnergyFooterText
+//                model.tdeeDescriptionText
 //                    .matchedGeometryEffect(id: "maintenance-footer", in: namespace)
 //                    .fixedSize(horizontal: false, vertical: false)
 //                    .foregroundColor(Color(.secondaryLabel))

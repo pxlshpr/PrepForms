@@ -36,7 +36,7 @@ extension HeightUnit {
     }
 }
 
-extension TDEEForm.Model {
+extension BodyProfileModel {
     var maintenanceEnergy: Double? {
         guard let activeEnergyValue, let restingEnergyValue else {
             return nil
@@ -61,7 +61,7 @@ extension TDEEForm.Model {
 }
 
 //MARK: - Biological Sex
-extension TDEEForm.Model {
+extension BodyProfileModel {
     var sexSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.sexSource ?? .userEntered },
@@ -143,7 +143,7 @@ extension TDEEForm.Model {
 
 //MARK: - Age
 
-extension TDEEForm.Model {
+extension BodyProfileModel {
     var ageSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.ageSource ?? .userEntered },
@@ -224,7 +224,7 @@ extension TDEEForm.Model {
 }
 
 //MARK: - Height
-extension TDEEForm.Model {
+extension BodyProfileModel {
     var heightSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.heightSource ?? .userEntered },
@@ -308,7 +308,7 @@ extension TDEEForm.Model {
 }
 
 //MARK: - Weight
-extension TDEEForm.Model {
+extension BodyProfileModel {
     var weightSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.weightSource ?? .userEntered },
@@ -399,7 +399,7 @@ extension TDEEForm.Model {
 }
 
 //MARK: - LBM
-extension TDEEForm.Model {
+extension BodyProfileModel {
     var lbmSourceBinding: Binding<LeanBodyMassSource> {
         Binding<LeanBodyMassSource>(
             get: { self.lbmSource ?? .userEntered },
@@ -579,7 +579,7 @@ extension TDEEForm.Model {
 }
 
 //MARK: - LBM Form
-extension TDEEForm.Model {
+extension BodyProfileModel {
     
     var shouldShowSyncAllForLBMForm: Bool {
         guard lbmSource == .formula else { return false }
@@ -619,7 +619,7 @@ extension TDEEForm.Model {
 }
 
 //MARK: - Profile Form
-extension TDEEForm.Model {
+extension BodyProfileModel {
     
     var hasProfile: Bool {
         let hasCore = (sex == .male || sex == .female)
@@ -685,7 +685,7 @@ extension TDEEForm.Model {
 
 //MARK: - Resting Energy
 
-extension TDEEForm.Model {
+extension BodyProfileModel {
     
     var restingEnergyIsDynamic: Bool {
         switch restingEnergySource {
@@ -970,7 +970,7 @@ extension TDEEForm.Model {
 
 //MARK: - Active Energy
 
-extension TDEEForm.Model {
+extension BodyProfileModel {
 
     var activeEnergyIsDynamic: Bool {
         switch activeEnergySource {
@@ -1214,9 +1214,9 @@ extension TDEEForm.Model {
 }
 
 //MARK: - UI Helpers
-extension TDEEForm.Model {
+extension BodyProfileModel {
     
-    var maintenanceEnergyFooterText: Text {
+    var tdeeDescriptionText: Text {
         let energy = userEnergyUnit == .kcal ? "calories" : "kiljoules"
         return Text("This is an estimate of how many \(energy) you would have to consume to *maintain* your current weight.")
     }
@@ -1255,7 +1255,7 @@ extension TDEEForm.Model {
         restingEnergyIsDynamic || activeEnergyIsDynamic
     }
 }
-extension TDEEForm.Model {
+extension BodyProfileModel {
  
     
     //MARK: - Profile
@@ -1318,104 +1318,100 @@ extension TDEEForm.Model {
 
 //MARK: - Definition
 
-extension TDEEForm {
-    class Model: ObservableObject {
-        let userEnergyUnit: EnergyUnit
-        let userWeightUnit: WeightUnit
-        let userHeightUnit: HeightUnit
+class BodyProfileModel: ObservableObject {
+    let userEnergyUnit: EnergyUnit
+    let userWeightUnit: WeightUnit
+    let userHeightUnit: HeightUnit
 
-        @Published var path: [TDEEFormRoute] = []
-        @Published var isEditing = false
+    @Published var path: [TDEEFormRoute] = []
+    @Published var isEditing = false
 
-        @Published var presentationDetent: PresentationDetent
-        @Published var detents: Set<PresentationDetent>
-        
-        @Published var hasAppeared = false
+    @Published var presentationDetent: PresentationDetent
+    @Published var detents: Set<PresentationDetent>
+    
+    @Published var hasAppeared = false
 
-        @Published var restingEnergySource: RestingEnergySource? = nil
-        @Published var restingEnergyFormula: RestingEnergyFormula = .katchMcardle
-        @Published var restingEnergy: Double? = nil
-        @Published var restingEnergyTextFieldString: String = ""
-        @Published var restingEnergyPeriod: HealthPeriodOption = .average
-        @Published var restingEnergyIntervalValue: Int = 1
-        @Published var restingEnergyInterval: HealthAppInterval = .week
-        @Published var restingEnergyFetchStatus: HealthKitFetchStatus = .notFetched
+    @Published var restingEnergySource: RestingEnergySource? = nil
+    @Published var restingEnergyFormula: RestingEnergyFormula = .katchMcardle
+    @Published var restingEnergy: Double? = nil
+    @Published var restingEnergyTextFieldString: String = ""
+    @Published var restingEnergyPeriod: HealthPeriodOption = .average
+    @Published var restingEnergyIntervalValue: Int = 1
+    @Published var restingEnergyInterval: HealthAppInterval = .week
+    @Published var restingEnergyFetchStatus: HealthKitFetchStatus = .notFetched
 
-        @Published var activeEnergySource: ActiveEnergySource? = nil
-        @Published var activeEnergyActivityLevel: ActivityLevel = .moderatelyActive
-        @Published var activeEnergy: Double? = nil
-        @Published var activeEnergyTextFieldString: String = ""
-        @Published var activeEnergyPeriod: HealthPeriodOption = .previousDay
-        @Published var activeEnergyIntervalValue: Int = 1
-        @Published var activeEnergyInterval: HealthAppInterval = .day
-        @Published var activeEnergyFetchStatus: HealthKitFetchStatus = .notFetched
+    @Published var activeEnergySource: ActiveEnergySource? = nil
+    @Published var activeEnergyActivityLevel: ActivityLevel = .moderatelyActive
+    @Published var activeEnergy: Double? = nil
+    @Published var activeEnergyTextFieldString: String = ""
+    @Published var activeEnergyPeriod: HealthPeriodOption = .previousDay
+    @Published var activeEnergyIntervalValue: Int = 1
+    @Published var activeEnergyInterval: HealthAppInterval = .day
+    @Published var activeEnergyFetchStatus: HealthKitFetchStatus = .notFetched
 
-        
-        @Published var lbmSource: LeanBodyMassSource? = nil
-        @Published var lbmFormula: LeanBodyMassFormula = .boer
-        @Published var lbmFetchStatus: HealthKitFetchStatus = .notFetched
-        @Published var lbm: Double? = nil
-        @Published var lbmTextFieldString: String = ""
-        @Published var lbmDate: Date? = nil
+    @Published var lbmSource: LeanBodyMassSource? = nil
+    @Published var lbmFormula: LeanBodyMassFormula = .boer
+    @Published var lbmFetchStatus: HealthKitFetchStatus = .notFetched
+    @Published var lbm: Double? = nil
+    @Published var lbmTextFieldString: String = ""
+    @Published var lbmDate: Date? = nil
 
-        @Published var weightSource: MeasurementSource? = nil
-        @Published var weightFetchStatus: HealthKitFetchStatus = .notFetched
-        @Published var weight: Double? = nil
-        @Published var weightTextFieldString: String = ""
-        @Published var weightDate: Date? = nil
+    @Published var weightSource: MeasurementSource? = nil
+    @Published var weightFetchStatus: HealthKitFetchStatus = .notFetched
+    @Published var weight: Double? = nil
+    @Published var weightTextFieldString: String = ""
+    @Published var weightDate: Date? = nil
 
-        @Published var heightSource: MeasurementSource? = nil
-        @Published var heightFetchStatus: HealthKitFetchStatus = .notFetched
-        @Published var height: Double? = nil
-        @Published var heightTextFieldString: String = ""
-        @Published var heightDate: Date? = nil
+    @Published var heightSource: MeasurementSource? = nil
+    @Published var heightFetchStatus: HealthKitFetchStatus = .notFetched
+    @Published var height: Double? = nil
+    @Published var heightTextFieldString: String = ""
+    @Published var heightDate: Date? = nil
 
-        @Published var sexSource: MeasurementSource? = nil
-        @Published var sexFetchStatus: HealthKitFetchStatus = .notFetched
-        @Published var sex: HKBiologicalSex? = nil
+    @Published var sexSource: MeasurementSource? = nil
+    @Published var sexFetchStatus: HealthKitFetchStatus = .notFetched
+    @Published var sex: HKBiologicalSex? = nil
 
-        @Published var ageSource: MeasurementSource? = nil
-        @Published var dobFetchStatus: HealthKitFetchStatus = .notFetched
-        @Published var dob: DateComponents? = nil
-        @Published var age: Int? = nil
-        @Published var ageTextFieldString: String = ""
+    @Published var ageSource: MeasurementSource? = nil
+    @Published var dobFetchStatus: HealthKitFetchStatus = .notFetched
+    @Published var dob: DateComponents? = nil
+    @Published var age: Int? = nil
+    @Published var ageTextFieldString: String = ""
 
-        /// These were used when trying to force the detents to switch
+    /// These were used when trying to force the detents to switch
 //        @Published var presentationDetent: PresentationDetent = .custom(PrimaryDetent.self)
 //        @Published var detents: Set<PresentationDetent> = [.custom(PrimaryDetent.self), .custom(SecondaryDetent.self)]
 
-        let existingProfile: BodyProfile?
+    let existingProfile: BodyProfile?
+    
+    init(
+        existingProfile: BodyProfile?,
+        userUnits: UserOptions.Units
+    ) {
+        self.userEnergyUnit = userUnits.energy
+        self.userWeightUnit = userUnits.weight
+        self.userHeightUnit = userUnits.height
         
-        init(
-            existingProfile: BodyProfile?,
-            userUnits: UserOptions.Units
-        ) {
-            self.userEnergyUnit = userUnits.energy
-            self.userWeightUnit = userUnits.weight
-            self.userHeightUnit = userUnits.height
-            
-            self.existingProfile = existingProfile
-                        
-            if let existingProfile, existingProfile.hasTDEE {
-                if existingProfile.hasDynamicTDEE {
-                    detents = [.medium, .large]
-                    presentationDetent = .medium
-                } else {
-                    detents = [.height(400), .large]
-                    presentationDetent = .height(400)
-                }
+        self.existingProfile = existingProfile
+                    
+        if let existingProfile, existingProfile.hasTDEE {
+            if existingProfile.hasDynamicTDEE {
+                detents = [.medium, .large]
+                presentationDetent = .medium
             } else {
-                detents = [.height(270), .large]
-                presentationDetent = .height(270)
+                detents = [.height(400), .large]
+                presentationDetent = .height(400)
             }
-            
-            if let existingProfile {
-                self.load(existingProfile)
-            }
+        } else {
+            detents = [.height(270), .large]
+            presentationDetent = .height(270)
+        }
+        
+        if let existingProfile {
+            self.load(existingProfile)
         }
     }
 }
-
 struct TDEEForm_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

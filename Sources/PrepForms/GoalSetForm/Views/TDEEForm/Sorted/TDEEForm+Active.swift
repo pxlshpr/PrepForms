@@ -326,11 +326,12 @@ extension TDEEForm {
 //                emptyButton2("Activity Level", systemImage: "dial.medium.fill")
 //                emptyButton2("Enter", systemImage: "keyboard")
 //            }
-            FlowView(alignment: .center, spacing: 10, padding: 37) {
-                emptyButton2("Sync with Health App", showHealthAppIcon: true, action: tappedSyncWithHealth)
+            FlowView(alignment: .leading, spacing: 10, padding: 37) {
                 emptyButton2("Activity Level", systemImage: "dial.medium.fill", action: tappedActivityLevel)
-                emptyButton2("Enter Manually", systemImage: "keyboard", action: tappedManualEntry)
+                emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
+                emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
             }
+            .padding(.horizontal, 15)
         }
         
         var activeHeader: some View {

@@ -6,7 +6,7 @@ import SwiftUISugar
 
 struct ProfileForm: View {
     
-    @EnvironmentObject var model: TDEEForm.Model
+    @EnvironmentObject var model: BodyProfileModel
     @Namespace var namespace
 
     var infoSection: some View {
@@ -22,10 +22,11 @@ struct ProfileForm: View {
                 Button {
                     model.tappedSyncAllOnProfileForm()
                 } label: {
-                    HStack {
-                        appleHealthSymbol
-                        Text("Sync All")
-                    }
+                    AppleHealthButtonLabel(title: "Sync All", forNavigationBar: true)
+//                    HStack {
+//                        appleHealthSymbol
+//                        Text("Sync All")
+//                    }
                 }
             }
         }
@@ -42,7 +43,7 @@ struct ProfileForm: View {
             }
         }
 //        .navigationTitle(model.restingEnergyFormula.menuDescription + " Formula")
-        .navigationTitle("Body Profile")
+        .navigationTitle("Biometrics")
         .toolbar { trailingContent }
     }
 }

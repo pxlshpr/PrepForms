@@ -7,7 +7,7 @@ import HealthKit
 
 struct WeightSection: View {
     
-    @EnvironmentObject var model: TDEEForm.Model
+    @EnvironmentObject var model: BodyProfileModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
     let includeHeader: Bool
@@ -52,9 +52,9 @@ struct WeightSection: View {
 //            emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
 //            emptyButton("Let me type it in", systemImage: "keyboard", action: tappedManualEntry)
 //        }
-        FlowView(alignment: .center, spacing: 10, padding: 37) {
-            emptyButton2("Sync with Health App", showHealthAppIcon: true, action: tappedSyncWithHealth)
-            emptyButton2("Enter manually", systemImage: "keyboard", action: tappedManualEntry)
+        FlowView(alignment: .leading, spacing: 10, padding: 37) {
+            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
         }
     }
 

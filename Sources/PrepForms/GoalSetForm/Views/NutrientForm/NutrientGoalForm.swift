@@ -253,7 +253,7 @@ struct NutrientGoalForm: View {
         }, didTapClose: {
             goalSet.resetNutrientTDEEFormModel()
         })
-        .environmentObject(goalSet.nutrientTDEEFormModel)
+        .environmentObject(goalSet.bodyProfileModel)
     }
     
     var leanMassForm: some View {
@@ -262,7 +262,7 @@ struct NutrientGoalForm: View {
         }, didTapClose: {
             goalSet.resetNutrientTDEEFormModel()
         })
-        .environmentObject(goalSet.nutrientTDEEFormModel)
+        .environmentObject(goalSet.bodyProfileModel)
     }
 
     //MARK: - Convenience

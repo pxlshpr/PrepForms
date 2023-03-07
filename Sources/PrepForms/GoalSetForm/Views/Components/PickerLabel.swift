@@ -2,6 +2,8 @@ import SwiftUI
 
 struct PickerLabel: View {
     
+    @Environment(\.colorScheme) var colorScheme
+    
     let string: String
     let prefix: String?
     let systemImage: String?
@@ -22,7 +24,8 @@ struct PickerLabel: View {
         prefix: String? = nil,
         systemImage: String? = "chevron.up.chevron.down",
         imageColor: Color = Color(.tertiaryLabel),
-        backgroundColor: Color = Color(.secondarySystemFill),
+//        backgroundColor: Color = Color(.secondarySystemFill),
+        backgroundColor: Color = Color(.secondaryLabel),
         backgroundGradientTop: Color? = nil,
         backgroundGradientBottom: Color? = nil,
         foregroundColor: Color = Color(.label),
@@ -45,7 +48,75 @@ struct PickerLabel: View {
     }
     
     var body: some View {
-        ZStack {
+//        legacyContent
+        content
+            .fixedSize(horizontal: true, vertical: true)
+            .if(infiniteMaxHeight) {
+                $0.frame(maxHeight: .infinity)
+            }
+    }
+    
+    var content: some View {
+        var capsuleLayer: some View {
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .if(backgroundGradientTop != nil && backgroundGradientBottom != nil, transform: { view in
+                    view
+                        .foregroundStyle(
+                            .linearGradient(
+                                colors: [
+                                    backgroundGradientTop!,
+                                    backgroundGradientBottom!
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .opacity(colorScheme == .dark ? 0.1 : 0.15)
+                        )
+                })
+                .if(backgroundGradientTop == nil && backgroundGradientBottom == nil, transform: { view in
+                    view
+                        .foregroundColor(
+                            backgroundColor
+                                .opacity(colorScheme == .dark ? 0.1 : 0.15)
+                        )
+                })
+        }
+        
+        var contentsLayer: some View {
+            HStack(spacing: 5) {
+                if let prefix {
+                    Text(prefix)
+//                        .fontWeight(.bold)
+//                        .foregroundColor(.white)
+//                        .colorMultiply(prefixColor)
+                        .foregroundColor(backgroundColor)
+                }
+                Text(string)
+                    .fontWeight(.bold)
+//                    .foregroundColor(.white)
+//                    .colorMultiply(foregroundColor)
+                    .foregroundColor(backgroundColor)
+                if let systemImage {
+                    Image(systemName: systemImage)
+//                        .foregroundColor(imageColor)
+                        .imageScale(imageScale)
+                        .foregroundColor(backgroundColor)
+                }
+            }
+            .frame(height: 25)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+        }
+        
+        return ZStack {
+            capsuleLayer
+            contentsLayer
+        }
+    }
+    
+    var legacyContent: some View {
+        
+        var capsuleLayer: some View {
             Capsule(style: .continuous)
                 .if(backgroundGradientTop != nil && backgroundGradientBottom != nil, transform: { view in
                     view
@@ -59,36 +130,37 @@ struct PickerLabel: View {
                                 endPoint: .bottom
                             )
                         )
-                }
-                )
-                    .if(backgroundGradientTop == nil && backgroundGradientBottom == nil, transform: { view in
-                        view
-                            .foregroundColor(backgroundColor)
-                    })
-                    //                .foregroundColor(.white)
-                    //                .colorMultiply(backgroundColor)
-                    HStack(spacing: 5) {
-                    if let prefix {
-                        Text(prefix)
-                            .foregroundColor(.white)
-                            .colorMultiply(prefixColor)
-                    }
-                    Text(string)
-                        .foregroundColor(.white)
-                        .colorMultiply(foregroundColor)
-                    if let systemImage {
-                        Image(systemName: systemImage)
-                            .foregroundColor(imageColor)
-                            .imageScale(imageScale)
-                    }
-                }
-                .frame(height: 25)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 5)
+                })
+                .if(backgroundGradientTop == nil && backgroundGradientBottom == nil, transform: { view in
+                    view
+                        .foregroundColor(backgroundColor)
+                })
         }
-        .fixedSize(horizontal: true, vertical: true)
-        .if(infiniteMaxHeight) {
-            $0.frame(maxHeight: .infinity)
+        
+        var contentsLayer: some View {
+            HStack(spacing: 5) {
+                if let prefix {
+                    Text(prefix)
+                        .foregroundColor(.white)
+                        .colorMultiply(prefixColor)
+                }
+                Text(string)
+                    .foregroundColor(.white)
+                    .colorMultiply(foregroundColor)
+                if let systemImage {
+                    Image(systemName: systemImage)
+                        .foregroundColor(imageColor)
+                        .imageScale(imageScale)
+                }
+            }
+            .frame(height: 25)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+        }
+        
+        return ZStack {
+            capsuleLayer
+            contentsLayer
         }
     }
 }
@@ -130,7 +202,9 @@ struct ProfileLabel: View {
                     pair(Int(height), heightUnit.shortDescription)
                 }
                 Text(sex.description.lowercased())
-                    .foregroundColor(primaryColor)
+                    .fontWeight(.bold)
+                    .foregroundColor(Color(hex: AppleHealthTopColorHex))
+//                    .foregroundColor(primaryColor)
             }
             .fixedSize(horizontal: true, vertical: false)
             .frame(height: 25)
@@ -150,10 +224,13 @@ struct ProfileLabel: View {
     func pair(_ value: Int, _ unit: String) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 2) {
             Text("\(value)")
-                .foregroundColor(primaryColor)
+//                .foregroundColor(primaryColor)
+                .fontWeight(.bold)
+                .foregroundColor(Color(hex: AppleHealthTopColorHex))
             Text(unit)
                 .font(.footnote)
-                .foregroundColor(secondaryColor)
+//                .foregroundColor(secondaryColor)
+                .foregroundColor(Color(hex: AppleHealthTopColorHex))
         }
     }
     
@@ -161,7 +238,8 @@ struct ProfileLabel: View {
         var color: Color {
             colorScheme == .light ? Color(hex: "e8e9ea") : Color(hex: "434447")
         }
-        return Capsule(style: .continuous)
+//        return Capsule(style: .continuous)
+        return RoundedRectangle(cornerRadius: 7, style: .continuous)
             .if(isSynced, transform: { view in
                 view
                     .foregroundStyle(
@@ -173,11 +251,15 @@ struct ProfileLabel: View {
                             startPoint: .top,
                             endPoint: .bottom
                         )
+                        .opacity(colorScheme == .dark ? 0.1 : 0.15)
                     )
             })
                 .if(!isSynced, transform: { view in
                     view
-                        .foregroundColor(color)
+                        .foregroundColor(
+                            color
+                                .opacity(colorScheme == .dark ? 0.1 : 0.15)
+                        )
                 })
     }
 }

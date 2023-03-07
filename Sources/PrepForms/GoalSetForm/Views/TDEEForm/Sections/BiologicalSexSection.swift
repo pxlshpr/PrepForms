@@ -7,7 +7,7 @@ import HealthKit
 
 struct BiologicalSexSection: View {
     
-    @EnvironmentObject var model: TDEEForm.Model
+    @EnvironmentObject var model: BodyProfileModel
     @Namespace var namespace
     
     var content: some View {
@@ -44,8 +44,8 @@ struct BiologicalSexSection: View {
 //            emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
 //            emptyButton("Let me specify it", systemImage: "hand.tap", action: tappedManualEntry)
 //        }
-        FlowView(alignment: .center, spacing: 10, padding: 37) {
-            emptyButton2("Import from Health App", showHealthAppIcon: true, action: tappedSyncWithHealth)
+        FlowView(alignment: .leading, spacing: 10, padding: 37) {
+            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
             emptyButton2("Choose", systemImage: "hand.tap", action: tappedManualEntry)
         }
     }

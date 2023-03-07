@@ -7,7 +7,7 @@ import HealthKit
 
 struct AgeSection: View {
     
-    @EnvironmentObject var model: TDEEForm.Model
+    @EnvironmentObject var model: BodyProfileModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
@@ -46,9 +46,9 @@ struct AgeSection: View {
 //            emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
 //            emptyButton("Let me type it in", systemImage: "keyboard", action: tappedManualEntry)
 //        }
-        FlowView(alignment: .center, spacing: 10, padding: 37) {
-            emptyButton2("Import from Health App", showHealthAppIcon: true, action: tappedSyncWithHealth)
-            emptyButton2("Enter manually", systemImage: "keyboard", action: tappedManualEntry)
+        FlowView(alignment: .leading, spacing: 10, padding: 37) {
+            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
         }
     }
 
@@ -166,10 +166,18 @@ struct AgeSection: View {
     }
 }
 
-func emptyButton2(_ string: String, systemImage: String? = nil, showHealthAppIcon: Bool = false, action: (() -> ())? = nil) -> some View {
-    Button {
-        action?()
-    } label: {
+func emptyButton2(_ title: String, systemImage: String? = nil, showHealthAppIcon: Bool = false, action: (() -> ())? = nil) -> some View {
+    
+    @ViewBuilder
+    var label: some View {
+        if showHealthAppIcon {
+            AppleHealthButtonLabel(title: title)
+        } else {
+            ButtonLabel(title: title, systemImage: systemImage)
+        }
+    }
+    
+    var label_legacy: some View {
         HStack(spacing: 5) {
             if let systemImage {
                 Image(systemName: systemImage)
@@ -177,17 +185,22 @@ func emptyButton2(_ string: String, systemImage: String? = nil, showHealthAppIco
             } else if showHealthAppIcon {
                 appleHealthSymbol
             }
-            Text(string)
+            Text(title)
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(.secondary)
         }
         .frame(minHeight: 30)
-//        .frame(maxWidth: .infinity)
         .padding(.horizontal, 15)
         .padding(.vertical, 5)
         .background (
             Capsule(style: .continuous)
                 .foregroundColor(Color(.secondarySystemFill))
         )
+    }
+    
+    return Button {
+        action?()
+    } label: {
+        label
     }
 }

@@ -10,7 +10,7 @@ public struct TDEEForm: View {
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
-    @StateObject var model: Model
+    @StateObject var model: BodyProfileModel
     
     @FocusState var restingEnergyTextFieldIsFocused: Bool
     @FocusState var activeEnergyTextFieldIsFocused: Bool
@@ -26,7 +26,7 @@ public struct TDEEForm: View {
         userUnits: UserOptions.Units,
         didTapSave: @escaping (BodyProfile) -> ()
     ) {
-        let model = Model(
+        let model = BodyProfileModel(
             existingProfile: existingProfile,
             userUnits: userUnits
         )

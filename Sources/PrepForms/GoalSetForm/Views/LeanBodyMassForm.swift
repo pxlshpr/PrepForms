@@ -6,7 +6,7 @@ import SwiftUISugar
 
 struct LeanBodyMassForm: View {
     
-    @EnvironmentObject var model: TDEEForm.Model
+    @EnvironmentObject var model: BodyProfileModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
@@ -99,11 +99,11 @@ struct LeanBodyMassForm: View {
 //            emptyButton("Convert Fat Percentage", systemImage: "percent", action: tappedFatPercentage)
 //            emptyButton("Let me type it in", systemImage: "keyboard", action: tappedManualEntry)
 //        }
-        FlowView(alignment: .center, spacing: 10, padding: 37) {
-            emptyButton2("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
+        FlowView(alignment: .leading, spacing: 10, padding: 37) {
+            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
             emptyButton2("Calculate", systemImage: "function", action: tappedFormula)
-            emptyButton2("Fat Percentage", systemImage: "percent", action: tappedFatPercentage)
-            emptyButton2("Enter Manually", systemImage: "keyboard", action: tappedManualEntry)
+            emptyButton2("Use Fat %", systemImage: "function", action: tappedFatPercentage)
+            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
         }
     }
 
@@ -321,10 +321,11 @@ struct LeanBodyMassForm: View {
                 Button {
                     model.tappedSyncAllOnLBMForm()
                 } label: {
-                    HStack {
-                        appleHealthSymbol
-                        Text("Sync All")
-                    }
+                    AppleHealthButtonLabel(title: "Sync All", forNavigationBar: true)
+//                    HStack {
+//                        appleHealthSymbol
+//                        Text("Sync All")
+//                    }
                 }
             }
         }

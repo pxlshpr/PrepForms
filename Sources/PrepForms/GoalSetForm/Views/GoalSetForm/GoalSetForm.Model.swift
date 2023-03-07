@@ -14,7 +14,7 @@ extension GoalSetForm {
         let userUnits: UserOptions.Units
         @Published var bodyProfile: BodyProfile?
         
-        @Published var nutrientTDEEFormModel: TDEEForm.Model
+        @Published var bodyProfileModel: BodyProfileModel
         
         @Published var singleGoalModelToPushTo: GoalModel? = nil
         @Published var implicitGoals: [GoalModel] = []
@@ -49,7 +49,7 @@ extension GoalSetForm {
             self.isDuplicating = isDuplicating
             self.existingGoalSet = isDuplicating ? nil : existing
             
-            self.nutrientTDEEFormModel = TDEEForm.Model(existingProfile: bodyProfile, userUnits: userUnits)
+            self.bodyProfileModel = BodyProfileModel(existingProfile: bodyProfile, userUnits: userUnits)
             self.goalModels = existing?.goals.goalModels(goalSet: self, goalSetType: type) ?? []
             self.createImplicitGoals()
         }
@@ -97,11 +97,11 @@ extension GoalSetForm.Model {
     }
     
     func setNutrientTDEEFormModel(with bodyProfile: BodyProfile?) {
-        nutrientTDEEFormModel = TDEEForm.Model(existingProfile: bodyProfile, userUnits: userUnits)
+        bodyProfileModel = BodyProfileModel(existingProfile: bodyProfile, userUnits: userUnits)
     }
     
     func setBodyProfile(_ bodyProfile: BodyProfile) {
-        /// in addition to setting the current body Profile, we also update the view model (TDEEForm.Model) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
+        /// in addition to setting the current body Profile, we also update the view model (BodyProfileModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
         self.bodyProfile = bodyProfile
         setNutrientTDEEFormModel(with: bodyProfile)
     }

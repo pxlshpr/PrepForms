@@ -1,7 +1,7 @@
 import Foundation
 import PrepDataTypes
 
-extension TDEEForm.Model {
+extension BodyProfileModel {
     func load(_ profile: BodyProfile) {
         
         self.restingEnergySource = profile.restingEnergySource

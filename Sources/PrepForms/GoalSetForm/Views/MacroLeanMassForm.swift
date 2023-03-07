@@ -5,7 +5,7 @@ import PrepDataTypes
 public struct NutrientLeanBodyMassForm: View {
 
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var model: TDEEForm.Model
+    @EnvironmentObject var model: BodyProfileModel
     
     @State var showingSaveButton: Bool = false
     
