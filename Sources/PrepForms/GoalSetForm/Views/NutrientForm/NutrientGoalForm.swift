@@ -232,7 +232,7 @@ struct NutrientGoalForm: View {
                 case .quantityPerBodyMass:
                     EmptyView()
                 case .quantityPerWorkoutDuration(_):
-                    Text("Your planned workout duration will be used to calculate this goal. You can specify it when creating a meal with this type.")
+                    Text("Your planned workout duration will be used to calculate this goal. You can specify it when setting this type on a meal.")
                     /**
                      Text("Use this when you want to create a dynamic goal based on how long you workout for.")
                      Text("For e.g., you could create an \"intra-workout\" meal type that has a 0.5g/min carb goal.")
