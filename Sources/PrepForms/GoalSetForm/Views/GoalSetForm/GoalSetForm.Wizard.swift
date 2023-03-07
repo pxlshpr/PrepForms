@@ -184,23 +184,38 @@ extension GoalSetForm.Wizard {
 }
 
 var TemplateDiets: [GoalSet] {
-    let maintenance = GoalSet(
-        type: .day,
-        name: "Maintenance",
-        emoji: "➡️",
-        goals: []
-    )
+    
     let cutting = GoalSet(
         type: .day,
         name: "Cutting",
         emoji: "⬇️",
-        goals: []
+        goals: [
+            Goal(type: .energy(.fromMaintenance(.kcal, .deficit)),
+                 lowerBound: 500, upperBound: 750
+            ),
+            Goal(type: .macro(.quantityPerBodyMass(.weight, .kg), .protein),
+                 lowerBound: 2.2, upperBound: 3
+            ),
+            Goal(type: .macro(.percentageOfEnergy, .fat),
+                 lowerBound: 20, upperBound: 30
+            ),
+        ]
     )
     let bulking = GoalSet(
         type: .day,
         name: "Bulking",
         emoji: "⬆️",
-        goals: []
+        goals: [
+            Goal(type: .energy(.percentFromMaintenance(.surplus)),
+                 lowerBound: 10, upperBound: 20
+            ),
+            Goal(type: .macro(.quantityPerBodyMass(.weight, .kg), .protein),
+                 lowerBound: 2, upperBound: 2.5
+            ),
+            Goal(type: .macro(.quantityPerBodyMass(.weight, .kg), .fat),
+                 lowerBound: 0.5, upperBound: 2
+            ),
+        ]
     )
     let keto = GoalSet(
         type: .day,
