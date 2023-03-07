@@ -1,6 +1,16 @@
 import SwiftUI
 import SwiftUISugar
 
+struct DiarySeparatorLineColor {
+    static var light = "B3B3B6"
+    static var dark = "424242"
+}
+
+struct DiaryDividerLineColor {
+    static var light = "D6D6D7"
+    static var dark = "3a3a3a"  //"333333"
+}
+
 extension FoodForm {
     enum WizardButton {
         case background
@@ -15,16 +25,6 @@ extension FoodForm {
         @Binding var isPresented: Bool
         var tapHandler: ((WizardButton) -> Void)
     }
-}
-
-struct DiarySeparatorLineColor {
-    static var light = "B3B3B6"
-    static var dark = "424242"
-}
-
-struct DiaryDividerLineColor {
-    static var light = "D6D6D7"
-    static var dark = "3a3a3a"  //"333333"
 }
 
 extension FoodForm.Wizard {

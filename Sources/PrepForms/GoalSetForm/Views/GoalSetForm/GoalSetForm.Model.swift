@@ -1,50 +1,62 @@
 import SwiftUI
 import PrepDataTypes
 
-public class GoalSetModel: ObservableObject {
-    
-    let id: UUID
-    @Published var name: String
-    @Published var emoji: String
-    @Published var goalModels: [GoalModel] = []
-    @Published var type: GoalSetType = .day
-    
-    /// Used to calculate equivalent values
-    let userUnits: UserOptions.Units
-    @Published var bodyProfile: BodyProfile?
-    
-    @Published var nutrientTDEEFormModel: TDEEForm.Model
-    @Published var path: [GoalSetFormRoute] = []
-    let existingGoalSet: GoalSet?
-    let isDuplicating: Bool
-    
-    @Published var singleGoalModelToPushTo: GoalModel? = nil
-    
-    init(
-        userUnits: UserOptions.Units,
-        type: GoalSetType,
-        existingGoalSet existing: GoalSet?,
-        isDuplicating: Bool = false,
-        bodyProfile: BodyProfile? = nil
-    ) {
-        /// Always generate a new `UUID`, even if we're duplicating or editing (as we soft-delete the previous ones)
-//        self.id = existing?.id ?? UUID()
-        self.id = UUID()
+extension GoalSetForm {
+    public class Model: ObservableObject {
         
-        self.name = existing?.name ?? ""
-        self.emoji = existing?.emoji ?? randomEmoji(forGoalSetType: type)
-        self.type = type
+        let id: UUID
+        @Published var name: String
+        @Published var emoji: String
+        @Published var goalModels: [GoalModel] = []
+        @Published var type: GoalSetType = .day
+        
+        /// Used to calculate equivalent values
+        let userUnits: UserOptions.Units
+        @Published var bodyProfile: BodyProfile?
+        
+        @Published var nutrientTDEEFormModel: TDEEForm.Model
+        
+        @Published var singleGoalModelToPushTo: GoalModel? = nil
+        @Published var implicitGoals: [GoalModel] = []
+        
+        @Published var path: [GoalSetFormRoute] = []
+        let existingGoalSet: GoalSet?
+        let isDuplicating: Bool
+        
+        @Published var shouldShowWizard: Bool = true
+        @Published var showingWizardOverlay: Bool  = true
+        @Published var showingWizard: Bool  = true
+        @Published var formDisabled = false
 
-        self.userUnits = userUnits
-        self.bodyProfile = bodyProfile
-
-        self.isDuplicating = isDuplicating
-        self.existingGoalSet = isDuplicating ? nil : existing
-
-        self.nutrientTDEEFormModel = TDEEForm.Model(existingProfile: bodyProfile, userUnits: userUnits)
-        self.goalModels = existing?.goals.goalModels(goalSet: self, goalSetType: type) ?? []
-        self.createImplicitGoals()
+        init(
+            userUnits: UserOptions.Units,
+            type: GoalSetType,
+            existingGoalSet existing: GoalSet?,
+            isDuplicating: Bool = false,
+            bodyProfile: BodyProfile? = nil
+        ) {
+            /// Always generate a new `UUID`, even if we're duplicating or editing (as we soft-delete the previous ones)
+//            self.id = existing?.id ?? UUID()
+            self.id = UUID()
+            
+            self.name = existing?.name ?? ""
+            self.emoji = existing?.emoji ?? randomEmoji(forGoalSetType: type)
+            self.type = type
+            
+            self.userUnits = userUnits
+            self.bodyProfile = bodyProfile
+            
+            self.isDuplicating = isDuplicating
+            self.existingGoalSet = isDuplicating ? nil : existing
+            
+            self.nutrientTDEEFormModel = TDEEForm.Model(existingProfile: bodyProfile, userUnits: userUnits)
+            self.goalModels = existing?.goals.goalModels(goalSet: self, goalSetType: type) ?? []
+            self.createImplicitGoals()
+        }
     }
+}
+
+extension GoalSetForm.Model {
     
     var isEditing: Bool {
         existingGoalSet != nil && !isDuplicating
@@ -89,7 +101,7 @@ public class GoalSetModel: ObservableObject {
     }
     
     func setBodyProfile(_ bodyProfile: BodyProfile) {
-        /// in addition to setting the current body Profile, we also update the view model (TDEEForm.Model) we have  in GoalSetModel (or at least the relevant fields for weight and lbm)
+        /// in addition to setting the current body Profile, we also update the view model (TDEEForm.Model) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
         self.bodyProfile = bodyProfile
         setNutrientTDEEFormModel(with: bodyProfile)
     }
@@ -190,8 +202,6 @@ public class GoalSetModel: ObservableObject {
         )
     }
     
-    @Published var implicitGoals: [GoalModel] = []
-
     var implicitEnergyGoalIndex: Int? {
         implicitGoals.firstIndex(where: { $0.type == implicitEnergyType })
     }

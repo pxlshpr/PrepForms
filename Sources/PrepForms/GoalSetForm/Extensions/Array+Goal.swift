@@ -1,7 +1,7 @@
 import PrepDataTypes
 
 public extension Array where Element == Goal {
-    func goalModels(goalSet: GoalSetModel, goalSetType: GoalSetType) -> [GoalModel] {
+    func goalModels(goalSet: GoalSetForm.Model, goalSetType: GoalSetType) -> [GoalModel] {
         map {
             GoalModel(
                 goalSet: goalSet,

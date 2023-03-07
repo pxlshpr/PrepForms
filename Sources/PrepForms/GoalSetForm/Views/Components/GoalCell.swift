@@ -218,7 +218,8 @@ struct GoalCell: View {
                     amountAndUnitTexts(lowerBound, upperBound == nil ? unitString : nil)
                 }
                 if let upperBound {
-                    accessoryText(lowerBound == nil ? "below" : "to")
+//                    accessoryText(lowerBound == nil ? "below" : "to")
+                    accessoryText(lowerBound == nil ? "at most" : "to")
                     amountAndUnitTexts(upperBound, unitString)
                 }
             }
@@ -262,7 +263,8 @@ struct GoalCell: View {
                     amountAndUnitTexts(lowerBound, upperBound == nil ? unitString : nil)
                 }
                 if let upperBound {
-                    accessoryText(lowerBound == nil ? "below" : "to")
+//                    accessoryText(lowerBound == nil ? "below" : "to")
+                    accessoryText(lowerBound == nil ? "at most" : "to")
                     amountAndUnitTexts(upperBound, unitString)
                 }
             }

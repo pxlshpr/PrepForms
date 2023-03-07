@@ -7,7 +7,7 @@ struct NutrientGoalForm: View {
     
     @Environment(\.dismiss) var dismiss
     
-    @EnvironmentObject var goalSet: GoalSetModel
+    @EnvironmentObject var goalSet: GoalSetForm.Model
     @ObservedObject var goal: GoalModel
 
     let nutrientUnit: NutrientUnit

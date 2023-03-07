@@ -8,11 +8,11 @@ import SwiftUISugar
 extension GoalSetForm {
     
     var shouldShowEnergyInPicker: Bool {
-        !goalSetModel.goalModels.containsEnergy
+        !model.goalModels.containsEnergy
     }
     
     func shouldShowMacroInPicker(_ macro: Macro) -> Bool {
-        !goalSetModel.containsMacro(macro)
+        !model.containsMacro(macro)
     }
 
     var nutrientsPicker: some View {
@@ -23,7 +23,7 @@ extension GoalSetForm {
 //            shouldDisableLastMacroOrEnergy: true,
             hasUnusedMicros: hasUnusedMicros,
             hasMicronutrient: hasMicronutrient,
-            didAddNutrients: goalSetModel.didAddNutrients
+            didAddNutrients: model.didAddNutrients
         )
     }
     
@@ -33,7 +33,7 @@ extension GoalSetForm {
             includeCancelButton: true) { emoji in
                 Haptics.successFeedback()
                 showingEmojiPicker = false
-                goalSetModel.emoji = emoji
+                model.emoji = emoji
             }
     }
     
@@ -41,23 +41,23 @@ extension GoalSetForm {
     func goalForm(for goal: GoalModel) -> some View {
         if goal.type.isEnergy {
             EnergyGoalForm(goal: goal, didTapDelete: didTapDeleteOnGoal)
-                .environmentObject(goalSetModel)
+                .environmentObject(model)
 //                .onDisappear {
 //                    isFocused = false
 //                }
         } else if goal.type.isMacro {
             NutrientGoalForm(goal: goal, didTapDelete: didTapDeleteOnGoal)
-                .environmentObject(goalSetModel)
+                .environmentObject(model)
         } else {
             NutrientGoalForm(goal: goal, didTapDelete: didTapDeleteOnGoal)
-                .environmentObject(goalSetModel)
+                .environmentObject(model)
         }
     }
     
     func didTapDeleteOnGoal(_ goal: GoalModel) {
-        goalSetModel.path = []
+        model.path = []
         withAnimation {
-            goalSetModel.goalModels.removeAll(where: { $0.type.identifyingHashValue == goal.type.identifyingHashValue })
+            model.goalModels.removeAll(where: { $0.type.identifyingHashValue == goal.type.identifyingHashValue })
         }
     }
     
@@ -65,6 +65,7 @@ extension GoalSetForm {
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             closeButton
+                .blur(radius: model.showingWizardOverlay ? 5 : 0)
         }
     }
     
@@ -91,7 +92,7 @@ extension GoalSetForm {
     
     @ViewBuilder
     var addButton: some View {
-        if !goalSetModel.goalModels.isEmpty {
+        if !model.goalModels.isEmpty {
             Button {
                 presentNutrientsPicker()
             } label: {
@@ -102,7 +103,7 @@ extension GoalSetForm {
 
     @ViewBuilder
     var addCell: some View {
-        if !goalSetModel.goalModels.isEmpty {
+        if !model.goalModels.isEmpty {
             addGoalsButton
         }
     }
@@ -110,7 +111,7 @@ extension GoalSetForm {
     
     @ViewBuilder
     var emptyContent: some View {
-        if goalSetModel.goalModels.isEmpty {
+        if model.goalModels.isEmpty {
             emptyPrompt
         }
     }
