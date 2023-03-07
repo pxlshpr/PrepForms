@@ -203,8 +203,7 @@ struct ProfileLabel: View {
                 }
                 Text(sex.description.lowercased())
                     .fontWeight(.bold)
-                    .foregroundColor(Color(hex: AppleHealthTopColorHex))
-//                    .foregroundColor(primaryColor)
+                    .foregroundColor(primaryColor)
             }
             .fixedSize(horizontal: true, vertical: false)
             .frame(height: 25)
@@ -214,7 +213,10 @@ struct ProfileLabel: View {
     }
     
     var primaryColor: Color {
-        isSynced ? .white : .primary
+//        isSynced ? .white : .primary
+        isSynced
+        ? Color(hex: AppleHealthTopColorHex)
+        : Color(.secondaryLabel)
     }
     
     var secondaryColor: Color {
@@ -224,13 +226,13 @@ struct ProfileLabel: View {
     func pair(_ value: Int, _ unit: String) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 2) {
             Text("\(value)")
-//                .foregroundColor(primaryColor)
+                .foregroundColor(primaryColor)
                 .fontWeight(.bold)
-                .foregroundColor(Color(hex: AppleHealthTopColorHex))
+//                .foregroundColor(Color(hex: AppleHealthTopColorHex))
             Text(unit)
                 .font(.footnote)
 //                .foregroundColor(secondaryColor)
-                .foregroundColor(Color(hex: AppleHealthTopColorHex))
+                .foregroundColor(primaryColor)
         }
     }
     
@@ -257,7 +259,8 @@ struct ProfileLabel: View {
                 .if(!isSynced, transform: { view in
                     view
                         .foregroundColor(
-                            color
+                            Color(.secondaryLabel)
+//                            color
                                 .opacity(colorScheme == .dark ? 0.1 : 0.15)
                         )
                 })
