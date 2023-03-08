@@ -15,6 +15,15 @@ enum BiometricType {
     case fatPercentage
     case height
     
+    var usesPrecision: Bool {
+        switch self {
+        case .weight, .leanBodyMass, .fatPercentage, .height:
+            return true
+        default:
+            return false
+        }
+    }
+    
     var description: String {
         switch self {
         case .restingEnergy:
@@ -146,6 +155,12 @@ struct BiometricValueForm: View {
         
         init(type: BiometricType, initialValue: BiometricValue?, handleNewValue: @escaping (BiometricValue?) -> Void) {
             self.type = type
+            
+            var initialValue = initialValue
+            if !type.usesPrecision, let preciseValue = initialValue {
+                initialValue?.amount = preciseValue.amount.rounded()
+            }
+            
             self.initialValue = initialValue
             self.handleNewValue = handleNewValue
             

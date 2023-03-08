@@ -314,11 +314,16 @@ struct NutrientGoalForm: View {
         guard let biometrics = goalSet.biometrics else { return "" }
         switch pickedBodyMassType {
         case .weight:
-            guard let weight = biometrics.weight else { return "" }
-            return weight.rounded(toPlaces: 1).cleanAmount + " \(biometrics.weightUnit.shortDescription)"
+            guard let amount = biometrics.weight?.amount,
+                  let unit = biometrics.weight?.unit
+            else { return "" }
+            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
+            
         case .leanMass:
-            guard let lbm = biometrics.lbm else { return "" }
-            return lbm.rounded(toPlaces: 1).cleanAmount + " \(biometrics.weightUnit.shortDescription)"
+            guard let amount = biometrics.leanBodyMass?.amount,
+                  let unit = biometrics.leanBodyMass?.unit
+            else { return "" }
+            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
         }
     }
     
@@ -663,32 +668,4 @@ func equivalentValueText(_ string: String) -> some View {
 //        .foregroundColor(.secondary)
         .font(.system(.title2, design: .rounded, weight: .regular))
         .foregroundColor(.secondary)
-}
-
-
-extension Biometrics {
-    static func mock(
-        restingEnergy: Double? = nil,
-        restingEnergySource: RestingEnergySource = .userEntered,
-        restingEnergyFormula: RestingEnergyFormula? = nil,
-        activeEnergy: Double? = nil,
-        activeEnergySource: ActiveEnergySource = .userEntered,
-        weight: Double? = nil,
-        lbm: Double? = nil
-    ) -> Biometrics {
-        Biometrics(
-            energyUnit: .kcal,
-            weightUnit: .kg,
-            heightUnit: .cm,
-            restingEnergy: restingEnergy,
-            restingEnergySource: restingEnergySource,
-            restingEnergyFormula: restingEnergyFormula,
-            activeEnergy: activeEnergy,
-            activeEnergySource: activeEnergySource,
-            lbm: lbm,
-            lbmSource: .userEntered,
-            weight: weight,
-            weightSource: .userEntered
-        )
-    }
 }

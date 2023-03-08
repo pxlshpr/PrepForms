@@ -115,16 +115,15 @@ extension NutrientWeightForm {
 
 extension Biometrics {
     var hasWeight: Bool {
-        weight != nil && weightSource != nil
+        weight?.amount != nil && weight?.source != nil
     }
     
     var weightUpdatesWithHealth: Bool {
-        weightSource == .healthApp
+        weight?.source == .healthApp
     }
     
     var lbmUpdatesWithHealth: Bool {
-        guard let lbmSource else { return false }
-        switch lbmSource {
+        switch leanBodyMass?.source {
         case .healthApp:
             return true
         case .fatPercentage, .formula:

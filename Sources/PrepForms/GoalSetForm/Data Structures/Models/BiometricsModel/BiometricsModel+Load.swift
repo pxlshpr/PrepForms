@@ -4,56 +4,56 @@ import PrepDataTypes
 extension BiometricsModel {
     func load(_ profile: Biometrics) {
         
-        self.restingEnergySource = profile.restingEnergySource
-        self.restingEnergyFormula = profile.restingEnergyFormula ?? .katchMcardle
-        self.restingEnergy = profile.restingEnergy
-        self.restingEnergyTextFieldString = profile.restingEnergy?.cleanAmount ?? ""
-        self.restingEnergyPeriod = profile.restingEnergyPeriod ?? .average
-        self.restingEnergyIntervalValue = profile.restingEnergyIntervalValue ?? 1
-        self.restingEnergyInterval = profile.restingEnergyInterval ?? .week
+        self.restingEnergySource = profile.restingEnergy?.source
+        self.restingEnergyFormula = profile.restingEnergy?.formula ?? .katchMcardle
+        self.restingEnergy = profile.restingEnergy?.amount
+        self.restingEnergyTextFieldString = profile.restingEnergy?.amount?.cleanAmount ?? ""
+        self.restingEnergyPeriod = profile.restingEnergy?.period ?? .average
+        self.restingEnergyIntervalValue = profile.restingEnergy?.intervalValue ?? 1
+        self.restingEnergyInterval = profile.restingEnergy?.interval ?? .week
 
-        self.activeEnergySource = profile.activeEnergySource
-        self.activeEnergyActivityLevel = profile.activeEnergyActivityLevel ?? .moderatelyActive
-        self.activeEnergy = profile.activeEnergy
-        self.activeEnergyTextFieldString = profile.activeEnergy?.cleanAmount ?? ""
-        self.activeEnergyPeriod = profile.activeEnergyPeriod ?? .previousDay
-        self.activeEnergyIntervalValue = profile.activeEnergyIntervalValue ?? 1
-        self.activeEnergyInterval = profile.activeEnergyInterval ?? .day
+        self.activeEnergySource = profile.activeEnergy?.source
+        self.activeEnergyActivityLevel = profile.activeEnergy?.activityLevel ?? .moderatelyActive
+        self.activeEnergy = profile.activeEnergy?.amount
+        self.activeEnergyTextFieldString = profile.activeEnergy?.amount?.cleanAmount ?? ""
+        self.activeEnergyPeriod = profile.activeEnergy?.period ?? .previousDay
+        self.activeEnergyIntervalValue = profile.activeEnergy?.intervalValue ?? 1
+        self.activeEnergyInterval = profile.activeEnergy?.interval ?? .day
 
-        self.lbmSource = profile.lbmSource
-        self.lbmFormula = profile.lbmFormula ?? .boer
-        self.lbmDate = profile.lbmDate
+        self.lbmSource = profile.leanBodyMass?.source
+        self.lbmFormula = profile.leanBodyMass?.formula ?? .boer
+        self.lbmDate = profile.leanBodyMass?.date
         
         if self.lbmSource == .fatPercentage {
             self.lbm = profile.fatPercentage
         } else {
-            self.lbm = profile.lbm
+            self.lbm = profile.leanBodyMass?.amount
         }
         self.lbmTextFieldString = self.lbm?.cleanAmount ?? ""
         
-        self.weightSource = profile.weightSource
-        self.weight = profile.weight
-        self.weightTextFieldString = profile.weight?.cleanAmount ?? ""
-        self.weightDate = profile.weightDate
+        self.weightSource = profile.weight?.source
+        self.weight = profile.weight?.amount
+        self.weightTextFieldString = profile.weight?.amount?.cleanAmount ?? ""
+        self.weightDate = profile.weight?.date
 
-        self.heightSource = profile.heightSource
-        self.height = profile.height
-        self.heightTextFieldString = profile.height?.cleanAmount ?? ""
-        self.heightDate = profile.heightDate
+        self.heightSource = profile.height?.source
+        self.height = profile.height?.amount
+        self.heightTextFieldString = profile.height?.amount?.cleanAmount ?? ""
+        self.heightDate = profile.height?.date
 
-        self.sexSource = profile.sexSource
-        if let sexIsFemale = profile.sexIsFemale {
-            self.sex = sexIsFemale ? .female : .male
+        self.sexSource = profile.sex?.source
+        if let sexValue = profile.sex?.value {
+            self.sex = sexValue == .female ? .female : .male
         }
 
-        self.ageSource = profile.ageSource
+        self.ageSource = profile.age?.source
         self.dob = DateComponents(
-            year: profile.dobYear,
-            month: profile.dobMonth,
-            day: profile.dobDay
+            year: profile.age?.dobYear,
+            month: profile.age?.dobMonth,
+            day: profile.age?.dobDay
         )
-        self.age = profile.age
-        if let age = profile.age {
+        self.age = profile.age?.value
+        if let age = profile.age?.value {
             self.ageTextFieldString = "\(age)"
         }
 

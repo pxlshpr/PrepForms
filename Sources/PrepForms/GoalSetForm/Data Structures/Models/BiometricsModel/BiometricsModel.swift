@@ -161,41 +161,91 @@ extension BiometricsModel {
         
         var weightDate: Date? { weightSource == .healthApp ? self.weightDate : nil }
         var heightDate: Date? { heightSource == .healthApp ? self.heightDate : nil }
+                
+        var restingEnergyData: Biometrics.RestingEnergy {
+            .init(
+                amount: restingEnergyValue,
+                unit: userEnergyUnit, //TODO: Change this
+                source: restingEnergySource,
+                formula: restingEnergyFormula,
+                period: restingEnergyPeriod,
+                intervalValue: restingEnergyIntervalValue,
+                interval: restingEnergyInterval
+            )
+        }
+
+        var activeEnergyData: Biometrics.ActiveEnergy {
+            .init(
+                amount: activeEnergyValue,
+                unit: userEnergyUnit, //TODO: Change this
+                source: activeEnergySource,
+                activityLevel: activeEnergyActivityLevel,
+                period: activeEnergyPeriod,
+                intervalValue: activeEnergyIntervalValue,
+                interval: activeEnergyInterval
+            )
+        }
         
+        var leanBodyMassData: Biometrics.LeanBodyMass {
+            .init(
+                amount: lbmValue, /// We don't use `lbm` here because it may be the actual percentage
+                unit: userWeightUnit, //TODO: Change this
+                source: lbmSource,
+                formula: lbmFormula,
+                date: lbmDate
+            )
+        }
+        
+        var weightData: Biometrics.Weight {
+            .init(
+                amount: weight,
+                unit: userWeightUnit, //TODO: Change this
+                source: weightSource,
+                date: weightDate
+            )
+        }
+
+        var heightData: Biometrics.Height {
+            .init(
+                amount: height,
+                unit: userHeightUnit, //TODO: Change this
+                source: heightSource,
+                date: heightDate
+            )
+        }
+        
+        var sexData: Biometrics.Sex {
+            let biometricSex: BiometricSex?
+            if let sexIsFemale {
+                biometricSex = sexIsFemale ? .female : .male
+            } else {
+                biometricSex = nil
+            }
+            return .init(
+                value: biometricSex,
+                source: sexSource
+            )
+        }
+        
+        var ageData: Biometrics.Age {
+            .init(
+                value: age,
+                dobDay: dob?.day,
+                dobMonth: dob?.month,
+                dobYear: dob?.year,
+                source: ageSource
+            )
+        }
+
         return Biometrics(
-            energyUnit: userEnergyUnit,
-            weightUnit: userWeightUnit,
-            heightUnit: userHeightUnit,
-            restingEnergy: restingEnergyValue,
-            restingEnergySource: restingEnergySource,
-            restingEnergyFormula: restingEnergyFormula,
-            restingEnergyPeriod: restingEnergyPeriod,
-            restingEnergyIntervalValue: restingEnergyIntervalValue,
-            restingEnergyInterval: restingEnergyInterval,
-            activeEnergy: activeEnergyValue,
-            activeEnergySource: activeEnergySource,
-            activeEnergyActivityLevel: activeEnergyActivityLevel,
-            activeEnergyPeriod: activeEnergyPeriod,
-            activeEnergyIntervalValue: activeEnergyIntervalValue,
-            activeEnergyInterval: activeEnergyInterval,
+            restingEnergy: restingEnergyData,
+            activeEnergy: activeEnergyData,
             fatPercentage: fatPercentage,
-            lbm: lbmValue, /// We don't use `lbm` here because it may be the actual percentage
-            lbmSource: lbmSource,
-            lbmFormula: lbmFormula,
-            lbmDate: lbmDate,
-            weight: weight,
-            weightSource: weightSource,
-            weightDate: weightDate,
-            height: height,
-            heightSource: heightSource,
-            heightDate: heightDate,
-            sexIsFemale: sexIsFemale,
-            sexSource: sexSource,
-            age: age,
-            dobDay: dob?.day,
-            dobMonth: dob?.month,
-            dobYear: dob?.year,
-            ageSource: ageSource
+            leanBodyMass: leanBodyMassData,
+            weight: weightData,
+            height: heightData,
+            sex: sexData,
+            age: ageData
         )
     }
 }
