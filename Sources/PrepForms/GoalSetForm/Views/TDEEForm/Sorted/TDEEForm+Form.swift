@@ -36,7 +36,7 @@ extension TDEEForm {
     var saveButton: some View {
         var saveButton: some View {
             FormPrimaryButton(title: "Save") {
-                didTapSave(model.bodyProfile)
+                didTapSave(model.biometrics)
                 dismiss()
             }
         }

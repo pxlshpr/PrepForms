@@ -7,7 +7,7 @@ extension TDEEForm {
             var label: some View {
                 ButtonLabel(
                     title: "Setup Maintenance Calories",
-                    systemImage: "flame.fill",
+                    leadingSystemImage: "flame.fill",
                     namespace: namespace,
                     titleMatchedGeometryId: "maintenance-header-title",
                     imageMatchedGeometryId: "maintenance-header-icon"
@@ -116,7 +116,7 @@ extension TDEEForm {
     }
     
     var canBeSaved: Bool {
-        model.shouldShowSaveButton && model.bodyProfile.hasTDEE
+        model.shouldShowSaveButton && model.biometrics.hasTDEE
     }
     
     var trailingContent: some ToolbarContent {

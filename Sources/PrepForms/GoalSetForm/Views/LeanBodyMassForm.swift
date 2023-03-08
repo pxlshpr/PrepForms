@@ -6,7 +6,7 @@ import SwiftUISugar
 
 struct LeanBodyMassForm: View {
     
-    @EnvironmentObject var model: BodyProfileModel
+    @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
@@ -224,26 +224,10 @@ struct LeanBodyMassForm: View {
                     }
                 }
             } label: {
-                HStack(spacing: 5) {
-                    HStack {
-                        if model.lbmSource == .healthApp {
-                            appleHealthSymbol
-                        } else {
-                            if let systemImage = model.lbmSource?.systemImage {
-                                Image(systemName: systemImage)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        Text(model.lbmSource?.menuDescription ?? "")
-                    }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .imageScale(.small)
-                }
-                .foregroundColor(.secondary)
-                .animation(.none, value: model.lbmSource)
-                .fixedSize(horizontal: true, vertical: false)
+                BiometricSourcePickerLabel(source: model.lbmSourceBinding.wrappedValue)
             }
+            .animation(.none, value: model.lbmSource)
+            .fixedSize(horizontal: true, vertical: false)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
                 Haptics.feedback(style: .light)
@@ -330,7 +314,7 @@ struct LeanBodyMassForm: View {
                 Button {
                     model.tappedSyncAllOnLBMForm()
                 } label: {
-                    AppleHealthButtonLabel(title: "Sync All", forNavigationBar: true)
+                    AppleHealthButtonLabel(title: "Sync All", isCompact: true)
 //                    HStack {
 //                        appleHealthSymbol
 //                        Text("Sync All")

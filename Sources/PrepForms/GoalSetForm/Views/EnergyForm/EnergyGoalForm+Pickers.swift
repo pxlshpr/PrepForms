@@ -18,7 +18,7 @@ extension EnergyGoalForm {
             pickedMealEnergyGoalType.description(userEnergyUnit: model.userUnits.energy),
             systemImage: nil
         )
-            .animation(.none, value: pickedMealEnergyGoalType)
+        .animation(.none, value: pickedMealEnergyGoalType)
 //        Menu {
 //            Picker(selection: $pickedMealEnergyGoalType, label: EmptyView()) {
 //                ForEach(MealEnergyTypeOption.allCases, id: \.self) {
@@ -53,8 +53,8 @@ extension EnergyGoalForm {
             }
         } label: {
             PickerLabel(pickedDietEnergyGoalType.shortDescription(userEnergyUnit: model.userUnits.energy))
-                .animation(.none, value: pickedDietEnergyGoalType)
         }
+        .animation(.none, value: pickedDietEnergyGoalType)
         .contentShape(Rectangle())
         .simultaneousGesture(TapGesture().onEnded {
             Haptics.feedback(style: .soft)
@@ -73,8 +73,8 @@ extension EnergyGoalForm {
                     }
                 } label: {
                     PickerLabel(pickedDelta.description)
-                        .animation(.none, value: pickedDelta)
                 }
+                .animation(.none, value: pickedDelta)
                 .contentShape(Rectangle())
                 .simultaneousGesture(TapGesture().onEnded {
                     Haptics.feedback(style: .soft)

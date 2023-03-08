@@ -336,16 +336,16 @@ public class GoalModel: ObservableObject {
     }
     
     var bodyMassIsSyncedWithHealth: Bool {
-        guard let bodyProfile = goalSetModel.bodyProfile,
+        guard let biometrics = goalSetModel.biometrics,
               let nutrientGoalType, nutrientGoalType.isQuantityPerBodyMass,
               let bodyMassType
         else { return false }
         
         switch bodyMassType {
         case .weight:
-            return bodyProfile.weightUpdatesWithHealth == true
+            return biometrics.weightUpdatesWithHealth == true
         case .leanMass:
-            return bodyProfile.lbmUpdatesWithHealth == true
+            return biometrics.lbmUpdatesWithHealth == true
         }
     }
     
@@ -357,7 +357,7 @@ public class GoalModel: ObservableObject {
         guard let energyGoalType else { return false }
         switch energyGoalType {
         case .fromMaintenance, .percentFromMaintenance:
-            return goalSetModel.bodyProfile?.hasDynamicTDEE ?? false
+            return goalSetModel.biometrics?.hasDynamicTDEE ?? false
         default:
             return false
         }
@@ -447,7 +447,7 @@ extension GoalModel {
     }
 
     func validateNoBoundResultingInLessThan500(unit: EnergyUnit) {
-        guard let profile = goalSetModel.bodyProfile,
+        guard let profile = goalSetModel.biometrics,
               let tdee = profile.tdee(in: unit)?.rounded()
         else { return }
         
@@ -465,7 +465,7 @@ extension GoalModel {
     }
     
     func validateNoPercentageBoundResultingInLessThan500() {
-        guard let profile = goalSetModel.bodyProfile,
+        guard let profile = goalSetModel.biometrics,
               let tdee = profile.tdeeInUnit?.rounded()
         else { return }
         
@@ -703,7 +703,7 @@ extension GoalModel {
         goalSetModel.goalCalcParams(includeEnergyGoal: !type.isEnergy)
 //        GoalCalculationParameters(
 //            userOptions: goalSet.userOptions,
-//            bodyProfile: goalSet.bodyProfile,
+//            biometrics: goalSet.biometrics,
 //            energyGoal: energyGoalForCalculation
 //        )
     }
@@ -716,7 +716,7 @@ extension GoalModel {
 //            return calculateEnergyValue(
 //                from: lowerBound,
 //                deficitBound: largerBound ?? lowerBound,
-//                tdee: goalSet.bodyProfile?.tdeeInUnit
+//                tdee: goalSet.biometrics?.tdeeInUnit
 //            )
 //        case .macro:
 //            return calculateMacroValue(
@@ -740,7 +740,7 @@ extension GoalModel {
 //            return calculateEnergyValue(
 //                from: upperBound,
 //                deficitBound: smallerBound ?? upperBound,
-//                tdee: goalSet.bodyProfile?.tdeeInUnit
+//                tdee: goalSet.biometrics?.tdeeInUnit
 //            )
 //        case .macro:
 //            return calculateMacroValue(
@@ -797,12 +797,12 @@ extension GoalModel {
 //        case .quantityPerBodyMass(let bodyMass, let weightUnit):
 //            switch bodyMass {
 //            case .weight:
-//                guard let weight = goalSet.bodyProfile?.weight(in: weightUnit)
+//                guard let weight = goalSet.biometrics?.weight(in: weightUnit)
 //                else { return nil }
 //                return value * weight
 //
 //            case .leanMass:
-//                guard let lbm = goalSet.bodyProfile?.lbm(in: weightUnit)
+//                guard let lbm = goalSet.biometrics?.lbm(in: weightUnit)
 //                else { return nil}
 //                return value * lbm
 //
@@ -855,7 +855,7 @@ extension GoalModel {
 //    //MARK: Helpers
 //    func convertEnergyToKcal(_ energy: Double?) -> Double? {
 //        guard let energy else { return nil }
-//        let energyUnit = goalSet.bodyProfile?.parameters.energyUnit ?? self.goalSet.userOptions.energy
+//        let energyUnit = goalSet.biometrics?.parameters.energyUnit ?? self.goalSet.userOptions.energy
 //        return energyUnit == .kcal ? energy : energy * KcalsPerKilojule
 //    }
 }

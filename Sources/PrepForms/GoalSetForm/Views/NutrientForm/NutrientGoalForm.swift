@@ -252,21 +252,21 @@ struct NutrientGoalForm: View {
     //MARK: - Sheets
     
     var weightForm: some View {
-        NutrientWeightForm(existingProfile: goalSet.bodyProfile, didTapSave: { bodyProfile in
-            goalSet.setBodyProfile(bodyProfile)
+        NutrientWeightForm(existingProfile: goalSet.biometrics, didTapSave: { biometrics in
+            goalSet.setBIometrics(biometrics)
         }, didTapClose: {
             goalSet.resetNutrientTDEEFormModel()
         })
-        .environmentObject(goalSet.bodyProfileModel)
+        .environmentObject(goalSet.biometricsModel)
     }
     
     var leanMassForm: some View {
-        NutrientLeanBodyMassForm(existingProfile: goalSet.bodyProfile, didTapSave: { bodyProfile in
-            goalSet.setBodyProfile(bodyProfile)
+        NutrientLeanBodyMassForm(existingProfile: goalSet.biometrics, didTapSave: { biometrics in
+            goalSet.setBIometrics(biometrics)
         }, didTapClose: {
             goalSet.resetNutrientTDEEFormModel()
         })
-        .environmentObject(goalSet.bodyProfileModel)
+        .environmentObject(goalSet.biometricsModel)
     }
 
     //MARK: - Convenience
@@ -300,9 +300,9 @@ struct NutrientGoalForm: View {
     var haveBodyMass: Bool {
         switch pickedBodyMassType {
         case .weight:
-            return goalSet.bodyProfile?.hasWeight == true
+            return goalSet.biometrics?.hasWeight == true
         case .leanMass:
-            return goalSet.bodyProfile?.hasLBM == true
+            return goalSet.biometrics?.hasLBM == true
         }
     }
     
@@ -311,14 +311,14 @@ struct NutrientGoalForm: View {
     }
 
     var bodyMassFormattedWithUnit: String {
-        guard let bodyProfile = goalSet.bodyProfile else { return "" }
+        guard let biometrics = goalSet.biometrics else { return "" }
         switch pickedBodyMassType {
         case .weight:
-            guard let weight = bodyProfile.weight else { return "" }
-            return weight.rounded(toPlaces: 1).cleanAmount + " \(bodyProfile.weightUnit.shortDescription)"
+            guard let weight = biometrics.weight else { return "" }
+            return weight.rounded(toPlaces: 1).cleanAmount + " \(biometrics.weightUnit.shortDescription)"
         case .leanMass:
-            guard let lbm = bodyProfile.lbm else { return "" }
-            return lbm.rounded(toPlaces: 1).cleanAmount + " \(bodyProfile.weightUnit.shortDescription)"
+            guard let lbm = biometrics.lbm else { return "" }
+            return lbm.rounded(toPlaces: 1).cleanAmount + " \(biometrics.weightUnit.shortDescription)"
         }
     }
     
@@ -666,7 +666,7 @@ func equivalentValueText(_ string: String) -> some View {
 }
 
 
-extension BodyProfile {
+extension Biometrics {
     static func mock(
         restingEnergy: Double? = nil,
         restingEnergySource: RestingEnergySource = .userEntered,
@@ -675,8 +675,8 @@ extension BodyProfile {
         activeEnergySource: ActiveEnergySource = .userEntered,
         weight: Double? = nil,
         lbm: Double? = nil
-    ) -> BodyProfile {
-        BodyProfile(
+    ) -> Biometrics {
+        Biometrics(
             energyUnit: .kcal,
             weightUnit: .kg,
             heightUnit: .cm,

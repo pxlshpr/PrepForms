@@ -1,8 +1,8 @@
 import Foundation
 import PrepDataTypes
 
-extension BodyProfileModel {
-    func load(_ profile: BodyProfile) {
+extension BiometricsModel {
+    func load(_ profile: Biometrics) {
         
         self.restingEnergySource = profile.restingEnergySource
         self.restingEnergyFormula = profile.restingEnergyFormula ?? .katchMcardle

@@ -33,10 +33,24 @@ struct MeasurementLabel: View {
     let useHealthAppData: Bool
     
     var body: some View {
+        ButtonLabel(
+            title: string,
+            prefix: prefix,
+            style: style,
+            trailingSystemImage: systemImage,
+            trailingImageScale: .small
+        )
+    }
+    
+    var systemImage: String? {
+        useHealthAppData ? nil : "chevron.right"
+    }
+    
+    var body_legacy: some View {
         PickerLabel(
             string,
             prefix: prefix,
-            systemImage: useHealthAppData ? nil : "chevron.right",
+            systemImage: systemImage,
             imageColor: imageColor,
             backgroundColor: backgroundColor,
             backgroundGradientTop: backgroundGradientTop,
@@ -46,6 +60,14 @@ struct MeasurementLabel: View {
             infiniteMaxHeight: false
         )
     }
+    
+    var style: ButtonLabel.Style {
+        if useHealthAppData {
+            return .health
+        }
+        return valueString.isEmpty ? .accent : .plain
+    }
+    
     var backgroundGradientTop: Color? {
         guard useHealthAppData else {
             return nil
@@ -138,26 +160,10 @@ extension TDEEForm {
                         }
                     }
                 } label: {
-                    HStack(spacing: 5) {
-                        HStack {
-                            if model.restingEnergySource == .healthApp {
-                                appleHealthSymbol
-                            } else {
-                                if let systemImage = model.restingEnergySource?.systemImage {
-                                    Image(systemName: systemImage)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            Text(model.restingEnergySource?.pickerDescription ?? "")
-                        }
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        Image(systemName: "chevron.up.chevron.down")
-                            .imageScale(.small)
-                    }
-                    .foregroundColor(.secondary)
-                    .animation(.none, value: model.restingEnergySource)
-                    .fixedSize(horizontal: true, vertical: false)
+                    BiometricSourcePickerLabel(source: model.restingEnergySourceBinding.wrappedValue)
                 }
+                .animation(.none, value: model.restingEnergySource)
+                .fixedSize(horizontal: true, vertical: false)
                 .contentShape(Rectangle())
                 .simultaneousGesture(TapGesture().onEnded {
                     Haptics.feedback(style: .light)
@@ -199,9 +205,10 @@ extension TDEEForm {
 //                        foregroundColor: .secondary,
 //                        prefixColor: .primary
 //                    )
-                    PickerLabel(model.restingEnergyFormula.menuDescription)
-                    .animation(.none, value: model.restingEnergyFormula)
-                    .fixedSize(horizontal: true, vertical: false)
+//                    PickerLabel(model.restingEnergyFormula.menuDescription)
+                    BiometricPickerLabel(model.restingEnergyFormula.menuDescription)
+                        .animation(.none, value: model.restingEnergyFormula)
+                        .fixedSize(horizontal: true, vertical: false)
                 }
                 .contentShape(Rectangle())
                 .simultaneousGesture(TapGesture().onEnded {
@@ -671,7 +678,7 @@ var permissionRequiredContent: some View  {
         Button {
             UIApplication.shared.open(URL(string: "App-prefs:Privacy&path=HEALTH")!)
         } label: {
-            ButtonLabel(title: "Go to Settings", systemImage: "gear")
+            ButtonLabel(title: "Go to Settings", leadingSystemImage: "gear")
 //            HStack {
 //                Image(systemName: "gear")
 //                Text("Go to Settings")

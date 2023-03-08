@@ -12,9 +12,9 @@ extension GoalSetForm {
         
         /// Used to calculate equivalent values
         let userUnits: UserOptions.Units
-        @Published var bodyProfile: BodyProfile?
+        @Published var biometrics: Biometrics?
         
-        @Published var bodyProfileModel: BodyProfileModel
+        @Published var biometricsModel: BiometricsModel
         
         @Published var singleGoalModelToPushTo: GoalModel? = nil
         @Published var implicitGoals: [GoalModel] = []
@@ -33,7 +33,7 @@ extension GoalSetForm {
             type: GoalSetType,
             existingGoalSet existing: GoalSet?,
             isDuplicating: Bool = false,
-            bodyProfile: BodyProfile? = nil
+            biometrics: Biometrics? = nil
         ) {
             /// Always generate a new `UUID`, even if we're duplicating or editing (as we soft-delete the previous ones)
 //            self.id = existing?.id ?? UUID()
@@ -44,12 +44,12 @@ extension GoalSetForm {
             self.type = type
             
             self.userUnits = userUnits
-            self.bodyProfile = bodyProfile
+            self.biometrics = biometrics
             
             self.isDuplicating = isDuplicating
             self.existingGoalSet = isDuplicating ? nil : existing
             
-            self.bodyProfileModel = BodyProfileModel(existingProfile: bodyProfile, userUnits: userUnits)
+            self.biometricsModel = BiometricsModel(existingProfile: biometrics, userUnits: userUnits)
             self.goalModels = existing?.goals.goalModels(goalSet: self, goalSetType: type) ?? []
             self.createImplicitGoals()
         }
@@ -93,17 +93,17 @@ extension GoalSetForm.Model {
     }
 
     func resetNutrientTDEEFormModel() {
-        setNutrientTDEEFormModel(with: bodyProfile)
+        setNutrientTDEEFormModel(with: biometrics)
     }
     
-    func setNutrientTDEEFormModel(with bodyProfile: BodyProfile?) {
-        bodyProfileModel = BodyProfileModel(existingProfile: bodyProfile, userUnits: userUnits)
+    func setNutrientTDEEFormModel(with biometrics: Biometrics?) {
+        biometricsModel = BiometricsModel(existingProfile: biometrics, userUnits: userUnits)
     }
     
-    func setBodyProfile(_ bodyProfile: BodyProfile) {
-        /// in addition to setting the current body Profile, we also update the view model (BodyProfileModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
-        self.bodyProfile = bodyProfile
-        setNutrientTDEEFormModel(with: bodyProfile)
+    func setBIometrics(_ biometrics: Biometrics) {
+        /// in addition to setting the current body Profile, we also update the view model (BIometricsModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
+        self.biometrics = biometrics
+        setNutrientTDEEFormModel(with: biometrics)
     }
     
     func didAddNutrients(pickedEnergy: Bool, pickedMacros: [Macro], pickedMicros: [NutrientType]) {
@@ -171,14 +171,14 @@ extension GoalSetForm.Model {
     }
     
     var hasTDEE: Bool {
-        bodyProfile?.hasTDEE ?? false
+        biometrics?.hasTDEE ?? false
     }
     
     var hasWeight: Bool {
-        bodyProfile?.hasWeight ?? false
+        biometrics?.hasWeight ?? false
     }
     var hasLBM: Bool {
-        bodyProfile?.hasLBM ?? false
+        biometrics?.hasLBM ?? false
     }
 
     var energyGoal: GoalModel? {
@@ -197,7 +197,7 @@ extension GoalSetForm.Model {
     func goalCalcParams(includeEnergyGoal: Bool = true) -> GoalCalcParams {
         GoalCalcParams(
             userUnits: userUnits,
-            bodyProfile: bodyProfile,
+            biometrics: biometrics,
             energyGoal: includeEnergyGoal ? energyGoal?.goal : nil
         )
     }

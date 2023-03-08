@@ -6,7 +6,7 @@ import SwiftUISugar
 
 struct ProfileForm: View {
     
-    @EnvironmentObject var model: BodyProfileModel
+    @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
 
     var infoSection: some View {
@@ -22,7 +22,7 @@ struct ProfileForm: View {
                 Button {
                     model.tappedSyncAllOnProfileForm()
                 } label: {
-                    AppleHealthButtonLabel(title: "Sync All", forNavigationBar: true)
+                    AppleHealthButtonLabel(title: "Sync All", isCompact: true)
 //                    HStack {
 //                        appleHealthSymbol
 //                        Text("Sync All")

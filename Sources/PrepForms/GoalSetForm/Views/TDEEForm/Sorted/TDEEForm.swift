@@ -10,23 +10,23 @@ public struct TDEEForm: View {
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
-    @StateObject var model: BodyProfileModel
+    @StateObject var model: BiometricsModel
     
     @FocusState var restingEnergyTextFieldIsFocused: Bool
     @FocusState var activeEnergyTextFieldIsFocused: Bool
     
-    let didTapSave: (BodyProfile) -> ()
+    let didTapSave: (Biometrics) -> ()
     
     let didEnterForeground = NotificationCenter.default.publisher(for: .didEnterForeground)
     
     @State var showingSaveButton: Bool = false
     
     public init(
-        existingProfile: BodyProfile? = nil,
+        existingProfile: Biometrics? = nil,
         userUnits: UserOptions.Units,
-        didTapSave: @escaping (BodyProfile) -> ()
+        didTapSave: @escaping (Biometrics) -> ()
     ) {
-        let model = BodyProfileModel(
+        let model = BiometricsModel(
             existingProfile: existingProfile,
             userUnits: userUnits
         )

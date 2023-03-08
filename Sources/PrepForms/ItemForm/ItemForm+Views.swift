@@ -209,8 +209,8 @@ extension ItemForm {
                 day: $model.day,
                 lastUsedGoalSet: lastUsedGoalSetBinding,
                 userUnits: UserManager.units,
-//                bodyProfile: model.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
-                bodyProfile: UserManager.bodyProfile,
+//                biometrics: model.day?.biometrics //TODO: We need to load the Day's biometrics here once supported
+                biometrics: UserManager.biometrics,
                 didTapGoalSetButton: didTapGoalSetButton
             )
         }
@@ -224,7 +224,7 @@ extension ItemForm {
                 ingredientItem: itemBinding,
                 lastUsedGoalSet: lastUsedGoalSetBinding,
                 userUnits: UserManager.units,
-                bodyProfile: UserManager.bodyProfile,
+                biometrics: UserManager.biometrics,
                 didTapGoalSetButton: didTapGoalSetButton
             )
         }

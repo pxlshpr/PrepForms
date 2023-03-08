@@ -17,26 +17,10 @@ extension TDEEForm {
                         }
                     }
                 } label: {
-                    HStack(spacing: 5) {
-                        HStack {
-                            if model.activeEnergySource == .healthApp {
-                                appleHealthSymbol
-                            } else {
-                                if let systemImage = model.activeEnergySource?.systemImage {
-                                    Image(systemName: systemImage)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            Text(model.activeEnergySource?.pickerDescription ?? "")
-                        }
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        Image(systemName: "chevron.up.chevron.down")
-                            .imageScale(.small)
-                    }
-                    .foregroundColor(.secondary)
-                    .animation(.none, value: model.activeEnergySource)
-                    .fixedSize(horizontal: true, vertical: false)
+                    BiometricSourcePickerLabel(source: model.activeEnergySourceBinding.wrappedValue)
                 }
+                .animation(.none, value: model.activeEnergySource)
+                .fixedSize(horizontal: true, vertical: false)
                 .contentShape(Rectangle())
                 .simultaneousGesture(TapGesture().onEnded {
                     Haptics.feedback(style: .light)

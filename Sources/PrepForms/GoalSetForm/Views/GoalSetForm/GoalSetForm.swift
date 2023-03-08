@@ -22,7 +22,7 @@ public struct GoalSetForm: View {
     
     @State var showingSaveButton: Bool
 
-    let didTapSave: (GoalSet, BodyProfile?, Bool) -> ()
+    let didTapSave: (GoalSet, Biometrics?, Bool) -> ()
 
     @State var showingNameForm: Bool = false
     
@@ -36,15 +36,15 @@ public struct GoalSetForm: View {
         existingGoalSet: GoalSet? = nil,
         isDuplicating: Bool = false,
         userUnits: UserOptions.Units,
-        bodyProfile: BodyProfile? = nil,
-        didTapSave: @escaping (GoalSet, BodyProfile?, Bool) -> ()
+        biometrics: Biometrics? = nil,
+        didTapSave: @escaping (GoalSet, Biometrics?, Bool) -> ()
     ) {
         let model = Model(
             userUnits: userUnits,
             type: type,
             existingGoalSet: existingGoalSet,
             isDuplicating: isDuplicating,
-            bodyProfile: bodyProfile
+            biometrics: biometrics
         )
         _model = StateObject(wrappedValue: model)
         _showingEquivalentValuesToggle = State(initialValue: model.containsGoalWithEquivalentValues)
@@ -332,7 +332,7 @@ public struct GoalSetForm: View {
     }
     
     func saveAndDismiss(overwritingPreviousUses: Bool = false) {
-        didTapSave(model.goalSet, model.bodyProfile, overwritingPreviousUses)
+        didTapSave(model.goalSet, model.biometrics, overwritingPreviousUses)
         dismiss()
     }
 
@@ -644,7 +644,7 @@ struct EnergyFormPreview: View {
             userUnits: UserOptions.defaultOptions.units,
             type: .day,
             existingGoalSet: nil,
-            bodyProfile: BodyProfile(
+            biometrics: Biometrics(
                 energyUnit: .kcal,
                 weightUnit: .kg,
                 heightUnit: .cm,
@@ -693,7 +693,7 @@ struct MacroFormPreview: View {
                     Goal(type: .energy(.fromMaintenance(.kcal, .surplus)), lowerBound: 500, upperBound: 1500)
                 ]
             ),
-            bodyProfile: .mock(
+            biometrics: .mock(
                 restingEnergy: 1000,
                 lbm: 77
             )
@@ -808,8 +808,8 @@ public struct DietPreview: View {
             type: .day,
             existingGoalSet: Self.goalSet,
             userUnits: UserOptions.defaultOptions.units,
-            bodyProfile: BodyProfile.mockBodyProfile
-        ) { goalSet, bodyProfile, overwritingPastUses in
+            biometrics: Biometrics.mockBIometrics
+        ) { goalSet, biometrics, overwritingPastUses in
             
         }
     }
@@ -858,15 +858,15 @@ public struct MealTypePreview: View {
             type: .meal,
             existingGoalSet: Self.goalSet,
             userUnits: UserOptions.defaultOptions.units,
-            bodyProfile: BodyProfile.mockBodyProfile
-        ) { goalSet, bodyProfile, overwritingPastUses in
+            biometrics: Biometrics.mockBIometrics
+        ) { goalSet, biometrics, overwritingPastUses in
             
         }
     }
 }
 
-extension BodyProfile {
-    static let mockBodyProfile = BodyProfile.mock(
+extension Biometrics {
+    static let mockBIometrics = Biometrics.mock(
         restingEnergy: 2000,
         activeEnergy: 1000,
         weight: 98,
@@ -880,20 +880,20 @@ public enum GoalSetFormRoute: Hashable {
 
 //extension GoalSetForm {
 //    public class Model: ObservableObject {
-//        @Published var nutrientTDEEFormModel: BodyProfileModel
+//        @Published var nutrientTDEEFormModel: BIometricsModel
 //        @Published var path: [GoalSetFormRoute] = []
 //        let existingGoalSet: GoalSet?
 //
 //        init(
 //            userOptions: UserUnits,
-//            bodyProfile: BodyProfile?,
+//            biometrics: Biometrics?,
 //            presentedGoalId: UUID? = nil,
 //            existingGoalSet: GoalSet?
 //        ) {
 //            self.existingGoalSet = existingGoalSet
 //
-//            self.nutrientTDEEFormModel = BodyProfileModel(
-//                existingProfile: bodyProfile,
+//            self.nutrientTDEEFormModel = BIometricsModel(
+//                existingProfile: biometrics,
 //                userOptions: userOptions
 //            )
 //
@@ -906,17 +906,17 @@ public enum GoalSetFormRoute: Hashable {
 //    }
 //
 //    func resetNutrientTDEEFormModel() {
-//        setNutrientTDEEFormModel(with: bodyProfile)
+//        setNutrientTDEEFormModel(with: biometrics)
 //    }
 //
-//    func setNutrientTDEEFormModel(with bodyProfile: BodyProfile?) {
-//        nutrientTDEEFormModel = BodyProfileModel(existingProfile: bodyProfile, userOptions: userOptions)
+//    func setNutrientTDEEFormModel(with biometrics: Biometrics?) {
+//        nutrientTDEEFormModel = BIometricsModel(existingProfile: biometrics, userOptions: userOptions)
 //    }
 //
-//    func setBodyProfile(_ bodyProfile: BodyProfile) {
-//        /// in addition to setting the current body Profile, we also update the view model (BodyProfileModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
-//        self.bodyProfile = bodyProfile
-//        setNutrientTDEEFormModel(with: bodyProfile)
+//    func setBIometrics(_ biometrics: Biometrics) {
+//        /// in addition to setting the current body Profile, we also update the view model (BIometricsModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
+//        self.biometrics = biometrics
+//        setNutrientTDEEFormModel(with: biometrics)
 //    }
 //}
 

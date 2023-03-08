@@ -3,17 +3,17 @@ import SwiftUISugar
 import PrepDataTypes
 import PrepCoreDataStack
 
-public struct BodyProfileForm: View {
+public struct BIometricsForm: View {
     
     @Namespace var namespace
     
-    @StateObject var model: BodyProfileModel
+    @StateObject var model: BiometricsModel
     
     public init() {
         let user = DataManager.shared.user
-        let bodyProfile = user?.bodyProfile
+        let biometrics = user?.biometrics
         let units = user?.options.units ?? .defaultUnits
-        let model = BodyProfileModel(existingProfile: bodyProfile, userUnits: units)
+        let model = BiometricsModel(existingProfile: biometrics, userUnits: units)
         _model = StateObject(wrappedValue: model)
     }
     
@@ -81,27 +81,85 @@ public struct BodyProfileForm: View {
 
 }
 
+struct BiometricPickerLabel: View {
+    
+    let title: String
+    
+    init(_ title: String) {
+        self.title = title
+    }
+    
+    var body: some View {
+        ButtonLabel(
+            title: title,
+            style: .plain,
+            trailingSystemImage: "chevron.up.chevron.down",
+            trailingImageScale: .small
+        )
+    }
+}
+
+struct BiometricSourcePickerLabel: View {
+    let source: BiometricSource
+    
+    var body: some View {
+        ButtonLabel(
+            title: source.menuDescription,
+            style: source.fromHealthApp ? .plainHealth : .plain,
+            isCompact: true,
+            leadingSystemImage: source.fromHealthApp ? nil : source.systemImage,
+            leadingImageScale: .medium,
+            trailingSystemImage: "chevron.up.chevron.down",
+            trailingImageScale: .small
+        )
+    }
+}
 struct ButtonLabel: View {
     
     @Environment(\.colorScheme) var colorScheme
     @Namespace var localNamespace
     
+    enum Style {
+        case plain
+        case accent
+        case health
+        case plainHealth
+    }
+
+    let style: Style
+    let isCompact: Bool
     let title: String
-    let systemImage: String?
-    
+    let prefix: String?
+    let leadingSystemImage: String?
+    let leadingImageScale: Image.Scale
+    let trailingSystemImage: String?
+    let trailingImageScale: Image.Scale
+
     let namespace: Namespace.ID?
     let titleMatchedGeometryId: String
     let imageMatchedGeometryId: String
-
+    
     init(
         title: String,
-        systemImage: String? = nil,
+        prefix: String? = nil,
+        style: Style = .accent,
+        isCompact: Bool = false,
+        leadingSystemImage: String? = nil,
+        leadingImageScale: Image.Scale = .medium,
+        trailingSystemImage: String? = nil,
+        trailingImageScale: Image.Scale = .medium,
         namespace: Namespace.ID? = nil,
         titleMatchedGeometryId: String? = nil,
         imageMatchedGeometryId: String? = nil
     ) {
-        self.systemImage = systemImage
+        self.style = style
+        self.isCompact = isCompact
+        self.leadingSystemImage = leadingSystemImage
+        self.leadingImageScale = leadingImageScale
+        self.trailingSystemImage = trailingSystemImage
+        self.trailingImageScale = trailingImageScale
         self.title = title
+        self.prefix = prefix
         self.namespace = namespace
         self.titleMatchedGeometryId = titleMatchedGeometryId ?? UUID().uuidString
         self.imageMatchedGeometryId = imageMatchedGeometryId ?? UUID().uuidString
@@ -109,24 +167,114 @@ struct ButtonLabel: View {
     
     var body: some View {
         HStack {
-            if let systemImage {
-                Image(systemName: systemImage)
-                    .matchedGeometryEffect(id: imageMatchedGeometryId, in: namespace ?? localNamespace)
+            optionalLeadingImage
+            titleStack
+            optionalTrailingImage
+        }
+        .font(font)
+        .padding(.horizontal, hPadding)
+        .padding(.vertical, vPadding)
+        .background(background)
+    }
+    
+    @ViewBuilder
+    var optionalLeadingImage: some View {
+        if let leadingSystemImage {
+            Image(systemName: leadingSystemImage)
+                .imageScale(leadingImageScale)
+                .foregroundColor(foregroundColor)
+                .matchedGeometryEffect(id: imageMatchedGeometryId, in: namespace ?? localNamespace)
+        } else if style == .health || style == .plainHealth {
+            appleHealthSymbol
+        }
+    }
+    
+    
+    @ViewBuilder
+    var optionalTrailingImage: some View {
+        if let trailingSystemImage {
+            Image(systemName: trailingSystemImage)
+                .imageScale(trailingImageScale)
+                .foregroundColor(foregroundColor)
+        }
+    }
+    
+    var foregroundColor: Color {
+        switch style {
+        case .accent:
+            return .accentColor
+        case .plain, .plainHealth:
+            return .secondary
+        case .health:
+            return Color(hex: AppleHealthTopColorHex)
+        }
+    }
+    
+    var hSpacing: CGFloat {
+        isCompact ? 2 : 3
+    }
+
+    var hPadding: CGFloat {
+        isCompact ? 8 : 15
+    }
+    
+    var vPadding: CGFloat {
+        isCompact ? 8 : 12
+    }
+
+    var font: Font {
+        isCompact ? .footnote : .body
+    }
+
+    var titleStack: some View {
+        HStack(spacing: 5) {
+            if let prefix {
+                Text(prefix)
             }
             Text(title)
                 .fontWeight(.bold)
                 .matchedGeometryEffect(id: titleMatchedGeometryId, in: namespace ?? localNamespace)
         }
-        .foregroundColor(.accentColor)
-        .padding(.horizontal)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 7, style: .continuous)
-                .fill(
-                    Color.accentColor
-//                    Color.accentColor.gradient
-                        .opacity(colorScheme == .dark ? 0.1 : 0.15))
-        )
+        .foregroundColor(foregroundColor)
+    }
+    
+    var background: some View {
+
+        var backgroundShapeStyle: some ShapeStyle {
+            
+            var topColor: Color {
+                switch style {
+                case .plain, .plainHealth:
+                    return Color(.secondaryLabel)
+                case .health:
+                    return Color(hex: AppleHealthTopColorHex)
+                case .accent:
+                    return Color.accentColor
+                }
+            }
+            
+            var bottomColor: Color {
+                switch style {
+                case .plain, .plainHealth:
+                    return Color(.secondaryLabel)
+                case .health:
+                    return Color(hex: AppleHealthBottomColorHex)
+                case .accent:
+                    return Color.accentColor
+                }
+            }
+            
+            return LinearGradient.linearGradient(
+                colors: [topColor, bottomColor],
+                startPoint: .top, endPoint: .bottom
+            )
+        }
+        
+        return RoundedRectangle(cornerRadius: 7, style: .continuous)
+            .fill(
+                backgroundShapeStyle
+                    .opacity(colorScheme == .dark ? 0.1 : 0.15)
+            )
     }
 }
 
@@ -135,14 +283,18 @@ struct AppleHealthButtonLabel: View {
     @Environment(\.colorScheme) var colorScheme
     
     let title: String
-    let forNavigationBar: Bool
+    let isCompact: Bool
     
-    init(title: String, forNavigationBar: Bool = false) {
+    init(title: String, isCompact: Bool = false) {
         self.title = title
-        self.forNavigationBar = forNavigationBar
+        self.isCompact = isCompact
     }
     
     var body: some View {
+        ButtonLabel(title: title, style: .health, isCompact: isCompact)
+    }
+    
+    var body_legacy: some View {
         HStack(spacing: hSpacing) {
             appleHealthSymbol
             Text(title)
@@ -173,26 +325,26 @@ struct AppleHealthButtonLabel: View {
     }
     
     var hSpacing: CGFloat {
-        forNavigationBar ? 2 : 3
+        isCompact ? 2 : 3
     }
 
     var hPadding: CGFloat {
-        forNavigationBar ? 8 : 10
+        isCompact ? 8 : 10
     }
     
     var vPadding: CGFloat {
-        forNavigationBar ? 8 : 12
+        isCompact ? 8 : 12
     }
 
     var font: Font {
-        forNavigationBar ? .footnote : .body
+        isCompact ? .footnote : .body
     }
 }
 
 struct TDEESection: View {
     
     @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var model: BodyProfileModel
+    @EnvironmentObject var model: BiometricsModel
     
     let namespace: Namespace.ID
     let action: () -> ()
@@ -206,7 +358,7 @@ struct TDEESection: View {
             var label: some View {
                 ButtonLabel(
                     title: "Setup Maintenance \(UserManager.energyDescription)",
-                    systemImage: "flame.fill",
+                    leadingSystemImage: "flame.fill",
                     namespace: namespace,
                     titleMatchedGeometryId: "maintenance-header-title",
                     imageMatchedGeometryId: "maintenance-header-icon"

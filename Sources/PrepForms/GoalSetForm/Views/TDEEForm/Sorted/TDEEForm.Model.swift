@@ -36,7 +36,7 @@ extension HeightUnit {
     }
 }
 
-extension BodyProfileModel {
+extension BiometricsModel {
     var maintenanceEnergy: Double? {
         guard let activeEnergyValue, let restingEnergyValue else {
             return nil
@@ -61,7 +61,7 @@ extension BodyProfileModel {
 }
 
 //MARK: - Biological Sex
-extension BodyProfileModel {
+extension BiometricsModel {
     var sexSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.sexSource ?? .userEntered },
@@ -143,7 +143,7 @@ extension BodyProfileModel {
 
 //MARK: - Age
 
-extension BodyProfileModel {
+extension BiometricsModel {
     var ageSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.ageSource ?? .userEntered },
@@ -224,7 +224,7 @@ extension BodyProfileModel {
 }
 
 //MARK: - Height
-extension BodyProfileModel {
+extension BiometricsModel {
     var heightSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.heightSource ?? .userEntered },
@@ -308,7 +308,7 @@ extension BodyProfileModel {
 }
 
 //MARK: - Weight
-extension BodyProfileModel {
+extension BiometricsModel {
     var weightSourceBinding: Binding<MeasurementSource> {
         Binding<MeasurementSource>(
             get: { self.weightSource ?? .userEntered },
@@ -399,7 +399,7 @@ extension BodyProfileModel {
 }
 
 //MARK: - LBM
-extension BodyProfileModel {
+extension BiometricsModel {
     var lbmSourceBinding: Binding<LeanBodyMassSource> {
         Binding<LeanBodyMassSource>(
             get: { self.lbmSource ?? .userEntered },
@@ -579,7 +579,7 @@ extension BodyProfileModel {
 }
 
 //MARK: - LBM Form
-extension BodyProfileModel {
+extension BiometricsModel {
     
     var shouldShowSyncAllForLBMForm: Bool {
         guard lbmSource == .formula else { return false }
@@ -619,7 +619,7 @@ extension BodyProfileModel {
 }
 
 //MARK: - Profile Form
-extension BodyProfileModel {
+extension BiometricsModel {
     
     var hasProfile: Bool {
         let hasCore = (sex == .male || sex == .female)
@@ -685,7 +685,7 @@ extension BodyProfileModel {
 
 //MARK: - Resting Energy
 
-extension BodyProfileModel {
+extension BiometricsModel {
     
     var restingEnergyIsDynamic: Bool {
         switch restingEnergySource {
@@ -970,7 +970,7 @@ extension BodyProfileModel {
 
 //MARK: - Active Energy
 
-extension BodyProfileModel {
+extension BiometricsModel {
 
     var activeEnergyIsDynamic: Bool {
         switch activeEnergySource {
@@ -1214,7 +1214,7 @@ extension BodyProfileModel {
 }
 
 //MARK: - UI Helpers
-extension BodyProfileModel {
+extension BiometricsModel {
     
     var tdeeDescriptionText: Text {
         let energy = userEnergyUnit == .kcal ? "calories" : "kiljoules"
@@ -1229,10 +1229,10 @@ extension BodyProfileModel {
     }
 
     var shouldShowSaveButton: Bool {
-        guard isEditing, bodyProfile.hasTDEE else { return false }
+        guard isEditing, biometrics.hasTDEE else { return false }
         if let existingProfile {
             /// We're only checking the parameters as the `updatedAt` flag, `syncStatus` might differ.
-            return existingProfile != bodyProfile
+            return existingProfile != biometrics
         }
         return true
     }
@@ -1248,19 +1248,19 @@ extension BodyProfileModel {
     }
     
     var shouldShowSummary: Bool {
-        bodyProfile.hasTDEE
+        biometrics.hasTDEE
     }
     
     var isDynamic: Bool {
         restingEnergyIsDynamic || activeEnergyIsDynamic
     }
 }
-extension BodyProfileModel {
+extension BiometricsModel {
  
     
     //MARK: - Profile
     
-    var bodyProfile: BodyProfile {
+    var biometrics: Biometrics {
         
         var restingEnergyFormula: RestingEnergyFormula? { restingEnergySource == .formula ? self.restingEnergyFormula : nil }
         var restingEnergyPeriod: HealthPeriodOption? { restingEnergySource == .healthApp ? self.restingEnergyPeriod : nil }
@@ -1278,7 +1278,7 @@ extension BodyProfileModel {
         var weightDate: Date? { weightSource == .healthApp ? self.weightDate : nil }
         var heightDate: Date? { heightSource == .healthApp ? self.heightDate : nil }
         
-        return BodyProfile(
+        return Biometrics(
             energyUnit: userEnergyUnit,
             weightUnit: userWeightUnit,
             heightUnit: userHeightUnit,
@@ -1318,7 +1318,7 @@ extension BodyProfileModel {
 
 //MARK: - Definition
 
-class BodyProfileModel: ObservableObject {
+class BiometricsModel: ObservableObject {
     let userEnergyUnit: EnergyUnit
     let userWeightUnit: WeightUnit
     let userHeightUnit: HeightUnit
@@ -1382,10 +1382,10 @@ class BodyProfileModel: ObservableObject {
 //        @Published var presentationDetent: PresentationDetent = .custom(PrimaryDetent.self)
 //        @Published var detents: Set<PresentationDetent> = [.custom(PrimaryDetent.self), .custom(SecondaryDetent.self)]
 
-    let existingProfile: BodyProfile?
+    let existingProfile: Biometrics?
     
     init(
-        existingProfile: BodyProfile?,
+        existingProfile: Biometrics?,
         userUnits: UserOptions.Units
     ) {
         self.userEnergyUnit = userUnits.energy

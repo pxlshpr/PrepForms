@@ -5,18 +5,18 @@ import PrepDataTypes
 public struct NutrientLeanBodyMassForm: View {
 
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var model: BodyProfileModel
+    @EnvironmentObject var model: BiometricsModel
     
     @State var showingSaveButton: Bool = false
     
-    let didTapSave: (BodyProfile) -> ()
+    let didTapSave: (Biometrics) -> ()
     let didTapClose: () -> ()
 
-    let existingProfile: BodyProfile?
+    let existingProfile: Biometrics?
     
     init(
-        existingProfile: BodyProfile?,
-        didTapSave: @escaping ((BodyProfile) -> ()),
+        existingProfile: Biometrics?,
+        didTapSave: @escaping ((Biometrics) -> ()),
         didTapClose: @escaping (() -> ())
     ) {
         self.existingProfile = existingProfile
@@ -81,7 +81,7 @@ public struct NutrientLeanBodyMassForm: View {
     var saveButton: some View {
         var saveButton: some View {
             FormPrimaryButton(title: "Save") {
-                didTapSave(model.bodyProfile)
+                didTapSave(model.biometrics)
                 dismiss()
             }
         }
@@ -101,16 +101,16 @@ extension NutrientLeanBodyMassForm {
     var canBeSaved:Bool {
         /// If we have an existing profile—return false if the parameters are exactly the same
         if let existingProfile {
-            guard existingProfile != model.bodyProfile else {
+            guard existingProfile != model.biometrics else {
                 return false
             }
         }
         /// In either case, return true only if there is a valid lean body mass value
-        return model.bodyProfile.hasLBM
+        return model.biometrics.hasLBM
     }
 }
 
-extension BodyProfile {
+extension Biometrics {
     var hasLBM: Bool {
         lbm != nil && lbmSource != nil
     }

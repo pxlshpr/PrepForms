@@ -72,8 +72,8 @@
 //            meal: $model.dayMeal,
 //            day: model.day, //TODO: Get
 //            userOptions: DataManager.shared.user?.units ?? .standard,
-////            bodyProfile: model.day?.bodyProfile //TODO: We need to load the Day's bodyProfile here once supported
-//            bodyProfile: DataManager.shared.user?.bodyProfile,
+////            biometrics: model.day?.biometrics //TODO: We need to load the Day's biometrics here once supported
+//            biometrics: DataManager.shared.user?.biometrics,
 //            didTapGoalSetButton: { forMeal in
 //                
 //            }

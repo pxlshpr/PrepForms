@@ -6,7 +6,7 @@ import SwiftUISugar
 
 struct HeightSection: View {
     
-    @EnvironmentObject var model: BodyProfileModel
+    @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
@@ -140,26 +140,10 @@ struct HeightSection: View {
                     }
                 }
             } label: {
-                HStack(spacing: 5) {
-                    HStack {
-                        if model.heightSource == .healthApp {
-                            appleHealthSymbol
-                        } else {
-                            if let systemImage = model.heightSource?.systemImage {
-                                Image(systemName: systemImage)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        Text(model.heightSource?.menuDescription ?? "")
-                    }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .imageScale(.small)
-                }
-                .foregroundColor(.secondary)
-                .animation(.none, value: model.heightSource)
-                .fixedSize(horizontal: true, vertical: false)
+                BiometricSourcePickerLabel(source: model.heightSourceBinding.wrappedValue)
             }
+            .animation(.none, value: model.heightSource)
+            .fixedSize(horizontal: true, vertical: false)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
                 Haptics.feedback(style: .light)

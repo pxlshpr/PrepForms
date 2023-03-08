@@ -7,7 +7,7 @@ import HealthKit
 
 struct BiologicalSexSection: View {
     
-    @EnvironmentObject var model: BodyProfileModel
+    @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     
     var content: some View {
@@ -94,6 +94,7 @@ struct BiologicalSexSection: View {
                     }
                 }
             }
+            .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
                 if model.sexSource == .userEntered {
                     Haptics.feedback(style: .soft)
@@ -116,26 +117,10 @@ struct BiologicalSexSection: View {
                     }
                 }
             } label: {
-                HStack(spacing: 5) {
-                    HStack {
-                        if model.sexSource == .healthApp {
-                            appleHealthSymbol
-                        } else {
-                            if let systemImage = model.sexSource?.systemImage {
-                                Image(systemName: systemImage)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        Text(model.sexSource?.menuDescription ?? "")
-                    }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .imageScale(.small)
-                }
-                .foregroundColor(.secondary)
-                .animation(.none, value: model.sexSource)
-                .fixedSize(horizontal: true, vertical: false)
+                BiometricSourcePickerLabel(source: model.sexSourceBinding.wrappedValue)
             }
+            .animation(.none, value: model.sexSource)
+            .fixedSize(horizontal: true, vertical: false)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
                 Haptics.feedback(style: .light)

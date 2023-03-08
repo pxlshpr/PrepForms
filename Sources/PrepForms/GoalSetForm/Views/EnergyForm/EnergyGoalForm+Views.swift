@@ -111,10 +111,10 @@ extension EnergyGoalForm {
     
     var tdeeForm: some View {
         TDEEForm(
-            existingProfile: model.bodyProfile,
+            existingProfile: model.biometrics,
             userUnits: model.userUnits)
         { profile in
-            model.setBodyProfile(profile)
+            model.setBIometrics(profile)
         }
     }
     
@@ -126,7 +126,7 @@ extension EnergyGoalForm {
                 Haptics.feedback(style: .soft)
                 showingTDEEForm = true
             } label: {
-                if let profile = model.bodyProfile, let formattedTDEE = profile.formattedTDEEWithUnit {
+                if let profile = model.biometrics, let formattedTDEE = profile.formattedTDEEWithUnit {
                     if profile.hasDynamicTDEE {
                         PickerLabel(
                             formattedTDEE,

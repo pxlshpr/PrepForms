@@ -7,7 +7,7 @@ import HealthKit
 
 struct AgeSection: View {
     
-    @EnvironmentObject var model: BodyProfileModel
+    @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
@@ -115,26 +115,10 @@ struct AgeSection: View {
                     }
                 }
             } label: {
-                HStack(spacing: 5) {
-                    HStack {
-                        if model.ageSource == .healthApp {
-                            appleHealthSymbol
-                        } else {
-                            if let systemImage = model.ageSource?.systemImage {
-                                Image(systemName: systemImage)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        Text(model.ageSource?.menuDescription ?? "")
-                    }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .imageScale(.small)
-                }
-                .foregroundColor(.secondary)
-                .animation(.none, value: model.ageSource)
-                .fixedSize(horizontal: true, vertical: false)
+                BiometricSourcePickerLabel(source: model.ageSourceBinding.wrappedValue)
             }
+            .animation(.none, value: model.ageSource)
+            .fixedSize(horizontal: true, vertical: false)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
                 Haptics.feedback(style: .light)
@@ -208,12 +192,15 @@ struct BiometricBaseButton: View {
     }
     
     let title: String
-    let systemImage: String? = nil
+    let prefix: String?
+    let systemImage: String?
     let style: Style
     let action: () -> ()
     
-    init(_ title: String, systemImage: String? = nil, style: Style = .plain, action: @escaping () -> Void) {
+    init(_ title: String, prefix: String? = nil, systemImage: String? = nil, style: Style = .plain, action: @escaping () -> Void) {
+        self.prefix = prefix
         self.title = title
+        self.systemImage = systemImage
         self.style = style
         self.action = action
     }
@@ -230,7 +217,7 @@ struct BiometricBaseButton: View {
     var label: some View {
         switch style {
         case .plain:
-            ButtonLabel(title: title, systemImage: systemImage)
+            ButtonLabel(title: title, leadingSystemImage: systemImage)
         case .health:
             AppleHealthButtonLabel(title: title)
         }

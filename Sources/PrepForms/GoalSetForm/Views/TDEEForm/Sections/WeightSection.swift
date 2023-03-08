@@ -7,7 +7,7 @@ import HealthKit
 
 struct WeightSection: View {
     
-    @EnvironmentObject var model: BodyProfileModel
+    @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
     let includeHeader: Bool
@@ -147,26 +147,10 @@ struct WeightSection: View {
                     }
                 }
             } label: {
-                HStack(spacing: 5) {
-                    HStack {
-                        if model.weightSource == .healthApp {
-                            appleHealthSymbol
-                        } else {
-                            if let systemImage = model.weightSource?.systemImage {
-                                Image(systemName: systemImage)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        Text(model.weightSource?.menuDescription ?? "")
-                    }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    Image(systemName: "chevron.up.chevron.down")
-                        .imageScale(.small)
-                }
-                .foregroundColor(.secondary)
-                .animation(.none, value: model.weightSource)
-                .fixedSize(horizontal: true, vertical: false)
+                BiometricSourcePickerLabel(source: model.weightSourceBinding.wrappedValue)
             }
+            .animation(.none, value: model.weightSource)
+            .fixedSize(horizontal: true, vertical: false)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
                 Haptics.feedback(style: .light)
