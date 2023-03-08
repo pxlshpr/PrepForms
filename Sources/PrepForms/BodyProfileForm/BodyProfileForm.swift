@@ -89,6 +89,9 @@ struct BiometricValueRow: View {
     @Environment(\.colorScheme) var colorScheme
     
     struct Params {
+        
+        //TODO: Give in a BiometricValue and BiometricType here instead
+        
         let valueString: String
         let unitString: String
         let prefix: String?
@@ -98,6 +101,8 @@ struct BiometricValueRow: View {
     }
     
     @Binding var params: Params
+    @State var showingForm: Bool
+    
     let matchedGeometryId: String?
     let matchedGeometryNamespace: Namespace.ID?
     
@@ -109,14 +114,14 @@ struct BiometricValueRow: View {
         _params = params
         self.matchedGeometryId = matchedGeometryId
         self.matchedGeometryNamespace = matchedGeometryNamespace
+        print("Initializing BiometricValueRow with isUserEntered: \(params.wrappedValue.isUserEntered)")
+        _showingForm = State(initialValue: params.wrappedValue.isUserEntered)
     }
     
     enum Style {
         case calculated
         case userEntered
     }
-    
-    @State var showingForm = false
     
     var body: some View {
         HStack {
