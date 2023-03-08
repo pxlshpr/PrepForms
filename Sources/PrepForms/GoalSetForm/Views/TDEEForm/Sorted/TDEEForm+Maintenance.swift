@@ -104,6 +104,19 @@ struct MaintenanceEnergyView: View {
     let namespace: Namespace.ID
     
     var body: some View {
+        content
+    }
+    
+    var content: some View {
+        Color.clear
+            .animatedMaintenanceEnergyModifier(
+                value: value,
+                energyUnit: unit,
+                namespace: namespace
+            )
+    }
+    
+    var content_legacy: some View {
         VStack {
             ZStack {
                 Text(value.formattedEnergy)
@@ -152,8 +165,49 @@ struct MaintenanceEnergyView: View {
     }
 }
 
-//struct FilledPreviews: PreviewProvider {
-//    static var previews: some View {
-//        MaintenanceEnergyView(value: 12304, unit: .kJ)
-//    }
-//}
+struct AnimatableMaintenanceEnergyModifier: AnimatableModifier {
+    
+    @Environment(\.colorScheme) var colorScheme
+    @State var size: CGSize = .zero
+
+    var value: Double
+    var energyUnit: EnergyUnit
+    var namespace: Namespace.ID
+    
+    var animatableData: Double {
+        get { value }
+        set { value = newValue }
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .frame(width: size.width, height: size.height)
+            .overlay(
+                animatedLabel
+                    .readSize { size in
+                        self.size = size
+                    }
+            )
+    }
+    
+    var animatedLabel: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 2) {
+            Text(value.formattedEnergy)
+                .matchedGeometryEffect(id: "maintenance", in: namespace)
+                .font(.system(.largeTitle, design: .rounded, weight: .semibold))
+                .foregroundColor(.primary)
+            Text(energyUnit.shortDescription)
+                .foregroundColor(.secondary)
+                .font(.system(.body, design: .rounded, weight: .semibold))
+        }
+        .frame(maxWidth: .infinity)
+        .multilineTextAlignment(.trailing)
+        .fixedSize(horizontal: true, vertical: false)
+    }
+}
+
+public extension View {
+    func animatedMaintenanceEnergyModifier(value: Double, energyUnit: EnergyUnit, namespace: Namespace.ID) -> some View {
+        modifier(AnimatableMaintenanceEnergyModifier(value: value, energyUnit: energyUnit, namespace: namespace))
+    }
+}

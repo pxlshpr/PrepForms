@@ -62,7 +62,7 @@ public struct TDEEForm: View {
         NavigationView {
             ZStack {
                 form
-                buttonLayer
+//                buttonLayer
             }
             .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Maintenance Calories")

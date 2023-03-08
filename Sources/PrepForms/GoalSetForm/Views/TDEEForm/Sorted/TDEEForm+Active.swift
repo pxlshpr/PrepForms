@@ -140,17 +140,21 @@ extension TDEEForm {
         
         
         var healthContent: some View {
-            Group {
-                switch model.activeEnergyFetchStatus {
-                case .noData:
-                    Text("No Data")
-                case .noDataOrNotAuthorized:
-                    Text("No Data or Not Authorized")
-//                    permissionRequiredContent
-                case .notFetched, .fetching, .fetched:
-                    healthPeriodContent
-                }
-            }
+//            Group {
+//                switch model.activeEnergyFetchStatus {
+//                case .noData:
+//                    healthPeriodContent
+//                case .noDataOrNotAuthorized:
+////                    Text("No Data or Not Authorized")
+//                    healthPeriodContent
+////                    permissionRequiredContent
+//                case .notFetched, .fetching:
+//                    EmptyView()
+//                case .fetched:
+//                    healthPeriodContent
+//                }
+//            }
+            healthPeriodContent
             .padding()
             .padding(.horizontal)
         }
@@ -239,22 +243,25 @@ extension TDEEForm {
 //                }
 //            }
             
-            let params = Binding<BiometricValueRow.Params>(
+            let valueBinding = Binding<BiometricValue?>(
                 get: {
-                    BiometricValueRow.Params(
-                        valueString: model.activeEnergyFormatted,
-                        unitString: model.userEnergyUnit.shortDescription,
-                        prefix: model.activeEnergyPrefix,
-                        fetchStatus: model.activeEnergyFetchStatus,
-                        isRedacted: !model.hasActiveEnergy,
-                        isUserEntered: model.activeEnergySource == .userEntered
-                    )
+                    model.activeEnergyBiometricValue
                 },
-                set: { _ in }
+                set: { newValue in
+                    model.activeEnergy = newValue?.amount
+                    if let _ = newValue?.unit?.energyUnit {
+                        //TODO: We need variables for units within the bodyProfile
+//                        model.userEnergyUnit = newEnergyUnit
+                    }
+                }
             )
             
             return BiometricValueRow(
-                params: params,
+                value: valueBinding,
+                type: .activeEnergy,
+                source: model.activeEnergySource ?? .userEntered,
+                fetchStatus: model.activeEnergyFetchStatus,
+                prefix: model.activeEnergyPrefix,
                 matchedGeometryId: "active",
                 matchedGeometryNamespace: namespace
             )

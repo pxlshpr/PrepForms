@@ -367,6 +367,11 @@ extension BiometricsModel {
         }
     }
     
+    var activeEnergyBiometricValue: BiometricValue? {
+        guard let activeEnergyValue else { return nil }
+        return .init(amount: activeEnergyValue, unit: .energy(userEnergyUnit))
+    }
+    
     var hasActiveEnergy: Bool {
         switch activeEnergySource {
         case .activityLevel:

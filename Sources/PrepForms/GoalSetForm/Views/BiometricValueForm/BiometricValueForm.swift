@@ -104,6 +104,24 @@ enum BiometricUnit {
 struct BiometricValue {
     var amount: Double
     var unit: BiometricUnit?
+    
+    var description: String {
+        guard let unit else {
+            return amount.cleanAmount
+        }
+        switch unit {
+        case .energy:
+            return amount.formattedEnergy
+        case .height:
+            return amount.cleanAmount
+        case .weight:
+            return amount.cleanAmount
+        }
+    }
+    
+    var unitDescription: String? {
+        unit?.description
+    }
 }
 
 struct BiometricValueForm: View {
@@ -314,14 +332,6 @@ struct BiometricValueForm: View {
                 }
             )
 
-            var energyPicker: some View {
-                Picker(selection: energyUnitBinding, label: EmptyView()) {
-                    ForEach(EnergyUnit.allCases, id: \.self) {
-                        Text($0.description).tag($0)
-                    }
-                }
-            }
-
             let weightUnitBinding = Binding<WeightUnit>(
                 get: { model.unit?.weightUnit ?? .kg },
                 set: { newUnit in
@@ -332,10 +342,18 @@ struct BiometricValueForm: View {
                 }
             )
 
+            var energyPicker: some View {
+                Picker(selection: energyUnitBinding, label: EmptyView()) {
+                    ForEach(EnergyUnit.allCases, id: \.self) {
+                        Text($0.shortDescription).tag($0)
+                    }
+                }
+            }
+
             var weightPicker: some View {
                 Picker(selection: weightUnitBinding, label: EmptyView()) {
                     ForEach(WeightUnit.allCases, id: \.self) {
-                        Text($0.description).tag($0)
+                        Text($0.shortDescription).tag($0)
                     }
                 }
             }
@@ -343,7 +361,7 @@ struct BiometricValueForm: View {
             var heightPicker: some View {
                 Picker(selection: heightUnitBinding, label: EmptyView()) {
                     ForEach(HeightUnit.allCases, id: \.self) {
-                        Text($0.description).tag($0)
+                        Text($0.shortDescription).tag($0)
                     }
                 }
             }
