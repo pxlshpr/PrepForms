@@ -18,9 +18,9 @@ struct ProfileForm: View {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            if model.shouldShowSyncAllForProfileForm {
+            if model.shouldShowSyncAllForMeasurementsForm {
                 Button {
-                    model.tappedSyncAllOnProfileForm()
+                    model.tappedSyncAllOnMeasurementsForm()
                 } label: {
                     AppleHealthButtonLabel(title: "Sync All", isCompact: true)
 //                    HStack {

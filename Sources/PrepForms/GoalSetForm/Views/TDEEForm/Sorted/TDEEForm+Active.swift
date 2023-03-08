@@ -141,9 +141,13 @@ extension TDEEForm {
         
         var healthContent: some View {
             Group {
-                if model.activeEnergyFetchStatus == .notAuthorized {
-                    permissionRequiredContent
-                } else {
+                switch model.activeEnergyFetchStatus {
+                case .noData:
+                    Text("No Data")
+                case .noDataOrNotAuthorized:
+                    Text("No Data or Not Authorized")
+//                    permissionRequiredContent
+                case .notFetched, .fetching, .fetched:
                     healthPeriodContent
                 }
             }
@@ -152,83 +156,108 @@ extension TDEEForm {
         }
         
         var energyRow: some View {
-            @ViewBuilder
-            var health: some View {
-                if model.activeEnergyFetchStatus != .notAuthorized {
-                    HStack {
-                        Spacer()
-                        if model.activeEnergyFetchStatus == .fetching {
-                            ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
-                                .frame(width: 25, height: 25)
-                                .foregroundColor(.secondary)
-                        } else {
-                            if let prefix = model.activeEnergyPrefix {
-                                Text(prefix)
-                                    .font(.subheadline)
-                                    .foregroundColor(Color(.tertiaryLabel))
-                            }
-                            Text(model.activeEnergyFormatted)
-                                .font(.system(.title3, design: .rounded, weight: .semibold))
-                                .multilineTextAlignment(.trailing)
-                                .foregroundColor(model.activeEnergySource == .userEntered ? .primary : .secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .matchedGeometryEffect(id: "active", in: namespace)
-                                .if(!model.hasActiveEnergy) { view in
-                                    view
-                                        .redacted(reason: .placeholder)
-                                }
-                            Text(model.userEnergyUnit.shortDescription)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-            }
-            
-            var manualEntry: some View {
-                HStack {
-                    Spacer()
-                    TextField("energy in", text: model.activeEnergyTextFieldStringBinding)
-                        .keyboardType(.decimalPad)
-                        .focused($activeEnergyTextFieldIsFocused)
-                        .multilineTextAlignment(.trailing)
-                        .font(.system(.title3, design: .rounded, weight: .semibold))
+//            @ViewBuilder
+//            var healthContent: some View {
+//                switch model.activeEnergyFetchStatus {
+//                case .noData:
+//                    Text("No Data")
+//                case .noDataOrNotAuthorized:
+//                    Text("No Data or Not Authorized")
+//                case .notFetched, .fetching, .fetched:
+//                    HStack {
+//                        Spacer()
+//                        if model.activeEnergyFetchStatus == .fetching {
+//                            ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
+//                                .frame(width: 25, height: 25)
+//                                .foregroundColor(.secondary)
+//                        } else {
+//                            if let prefix = model.activeEnergyPrefix {
+//                                Text(prefix)
+//                                    .font(.subheadline)
+//                                    .foregroundColor(Color(.tertiaryLabel))
+//                            }
+//                            Text(model.activeEnergyFormatted)
+//                                .font(.system(.title3, design: .rounded, weight: .semibold))
+//                                .multilineTextAlignment(.trailing)
+//                                .foregroundColor(model.activeEnergySource == .userEntered ? .primary : .secondary)
+//                                .fixedSize(horizontal: false, vertical: true)
+//                                .matchedGeometryEffect(id: "active", in: namespace)
+//                                .if(!model.hasActiveEnergy) { view in
+//                                    view
+//                                        .redacted(reason: .placeholder)
+//                                }
+//                            Text(model.userEnergyUnit.shortDescription)
+//                                .foregroundColor(.secondary)
+//                        }
+//                    }
+//                }
+//            }
+//
+//            var manualEntry: some View {
+//                HStack {
+//                    Spacer()
+//                    TextField("energy in", text: model.activeEnergyTextFieldStringBinding)
+//                        .keyboardType(.decimalPad)
+//                        .focused($activeEnergyTextFieldIsFocused)
+//                        .multilineTextAlignment(.trailing)
+//                        .font(.system(.title3, design: .rounded, weight: .semibold))
+////                        .fixedSize(horizontal: false, vertical: true)
+//                        .matchedGeometryEffect(id: "active", in: namespace)
+//                    Text(model.userEnergyUnit.shortDescription)
+//                        .foregroundColor(.secondary)
+//                }
+//            }
+//
+//            var activityLevel: some View {
+//                HStack {
+//                    Spacer()
+//                    Text(model.activeEnergyFormatted)
+//                        .font(.system(.title3, design: .rounded, weight: .semibold))
+//                        .foregroundColor(.secondary)
+//                        .multilineTextAlignment(.trailing)
 //                        .fixedSize(horizontal: false, vertical: true)
-                        .matchedGeometryEffect(id: "active", in: namespace)
-                    Text(model.userEnergyUnit.shortDescription)
-                        .foregroundColor(.secondary)
-                }
-            }
+//                        .matchedGeometryEffect(id: "active", in: namespace)
+//                        .if(!model.hasActiveEnergy) { view in
+//                            view
+//                                .redacted(reason: .placeholder)
+//                        }
+//                    Text(model.userEnergyUnit.shortDescription)
+//                        .foregroundColor(.secondary)
+//                }
+//            }
+//
+//            return Group {
+//                switch model.activeEnergySource {
+//                case .healthApp:
+//                    healthContent
+//                case .activityLevel:
+//                    activityLevel
+//                case .userEntered:
+//                    manualEntry
+//                default:
+//                    EmptyView()
+//                }
+//            }
             
-            var activityLevel: some View {
-                HStack {
-                    Spacer()
-                    Text(model.activeEnergyFormatted)
-                        .font(.system(.title3, design: .rounded, weight: .semibold))
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.trailing)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .matchedGeometryEffect(id: "active", in: namespace)
-                        .if(!model.hasActiveEnergy) { view in
-                            view
-                                .redacted(reason: .placeholder)
-                        }
-                    Text(model.userEnergyUnit.shortDescription)
-                        .foregroundColor(.secondary)
-                }
-            }
+            let params = Binding<BiometricValueRow.Params>(
+                get: {
+                    BiometricValueRow.Params(
+                        valueString: model.activeEnergyFormatted,
+                        unitString: model.userEnergyUnit.shortDescription,
+                        prefix: model.activeEnergyPrefix,
+                        fetchStatus: model.activeEnergyFetchStatus,
+                        isRedacted: !model.hasActiveEnergy,
+                        isUserEntered: model.activeEnergySource == .userEntered
+                    )
+                },
+                set: { _ in }
+            )
             
-            return Group {
-                switch model.activeEnergySource {
-                case .healthApp:
-                    health
-                case .activityLevel:
-                    activityLevel
-                case .userEntered:
-                    manualEntry
-                default:
-                    EmptyView()
-                }
-            }
+            return BiometricValueRow(
+                params: params,
+                matchedGeometryId: "active",
+                matchedGeometryNamespace: namespace
+            )
             .padding(.trailing)
         }
         

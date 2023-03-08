@@ -127,7 +127,12 @@ struct LeanBodyMassForm: View {
     var bottomRow: some View {
         @ViewBuilder
         var health: some View {
-            if model.lbmFetchStatus != .notAuthorized {
+            switch model.lbmFetchStatus {
+            case .noData:
+                Text("No Data")
+            case .noDataOrNotAuthorized:
+                Text("No Data or Not Authorized")
+            case .notFetched, .fetching, .fetched:
                 HStack {
                     Spacer()
                     if model.lbmFetchStatus == .fetching {

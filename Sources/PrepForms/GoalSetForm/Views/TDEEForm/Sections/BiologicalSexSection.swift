@@ -67,7 +67,12 @@ struct BiologicalSexSection: View {
                     }
                 }
             } label: {
-                if model.sexFetchStatus != .notAuthorized {
+                switch model.sexFetchStatus {
+                case .noData:
+                    Text("No Data")
+                case .noDataOrNotAuthorized:
+                    Text("No Data or Not Authorized")
+                case .notFetched, .fetching, .fetched:
                     HStack(spacing: 5) {
                         if model.sexFetchStatus == .fetching {
                             ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())

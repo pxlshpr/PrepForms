@@ -234,7 +234,7 @@ extension HealthKitManager {
         }
     }
     
-    func averageSumOfRestingEnergy(using energyUnit: EnergyUnit, overPast value: Int, interval: HealthAppInterval) async throws -> Double? {
+    func averageSumOfRestingEnergy(using energyUnit: EnergyUnit, overPast value: Int, interval: HealthAppInterval) async throws -> Double {
         try await HealthKitManager.shared.requestPermission(for: .basalEnergyBurned)
         return try await averageSum(
             for: .basalEnergyBurned,
@@ -245,7 +245,7 @@ extension HealthKitManager {
         )
     }
 
-    func averageSumOfActiveEnergy(using energyUnit: EnergyUnit, overPast value: Int, interval: HealthAppInterval) async throws -> Double? {
+    func averageSumOfActiveEnergy(using energyUnit: EnergyUnit, overPast value: Int, interval: HealthAppInterval) async throws -> Double {
         try await averageSum(
             for: .activeEnergyBurned,
             using: energyUnit.healthKitUnit,
@@ -255,7 +255,7 @@ extension HealthKitManager {
         )
     }
 
-    func averageSum(for typeIdentifier: HKQuantityTypeIdentifier, using unit: HKUnit, overPast value: Int, interval: HealthAppInterval, considerEmptyDaysAsZero: Bool = true) async throws -> Double? {
+    func averageSum(for typeIdentifier: HKQuantityTypeIdentifier, using unit: HKUnit, overPast value: Int, interval: HealthAppInterval, considerEmptyDaysAsZero: Bool = true) async throws -> Double {
         /// Get the date range
         guard let dateRange = interval.dateRangeOfPast(value) else {
             throw HealthKitManagerError.dateCreationError
@@ -264,7 +264,7 @@ extension HealthKitManager {
         return try await averageSumUsingIntervals(for: typeIdentifier, using: unit, in: dateRange, considerEmptyDaysAsZero: considerEmptyDaysAsZero)
     }
 
-    func averageSumUsingIntervals(for typeIdentifier: HKQuantityTypeIdentifier, using unit: HKUnit, in dateRange: ClosedRange<Date>, considerEmptyDaysAsZero: Bool) async throws -> Double? {
+    func averageSumUsingIntervals(for typeIdentifier: HKQuantityTypeIdentifier, using unit: HKUnit, in dateRange: ClosedRange<Date>, considerEmptyDaysAsZero: Bool) async throws -> Double {
         /// Always get samples up to the start of tomorrow, so that we get all of today's results too in case we need it
         let endDate = Date().startOfDay.moveDayBy(1)
         
@@ -298,7 +298,8 @@ extension HealthKitManager {
         }
         
         guard !sumQuantities.isEmpty else {
-            return nil
+            throw HealthKitManagerError.noData
+//            return nil
         }
         
         let sum = sumQuantities
@@ -325,7 +326,15 @@ extension HealthKitManager {
         
         let result = try await asyncQuery.result(for: store)
         guard let sum = result?.sumQuantity()?.doubleValue(for: .kilocalorie()) else {
-            throw HealthKitManagerError.couldNotGetSumQuantity
+            
+            /// Check if we have any data
+            if let _ = await getLatestQuantity(for: typeIdentifier, using: unit) {
+                /// If we we do, then we simply have no value for the range provided
+                throw HealthKitManagerError.noData
+            } else {
+                /// If we don't then it's either a permissions issue or user has absolutely no data
+                throw HealthKitManagerError.noDataOrNotAuthorized
+            }
         }
         return sum/Double(upper.numberOfDaysFrom(lower))
     }
@@ -349,8 +358,10 @@ enum HealthKitManagerError: Error {
     case permissionsError(Error)
     case couldNotGetSample
     case couldNotGetStatistics
-    case couldNotGetSumQuantity
     case dateCreationError
+    
+    case noData
+    case noDataOrNotAuthorized
 }
 
 public extension Date {

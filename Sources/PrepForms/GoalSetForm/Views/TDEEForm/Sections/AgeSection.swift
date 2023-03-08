@@ -56,8 +56,13 @@ struct AgeSection: View {
 
     var bottomRow: some View {
         @ViewBuilder
-        var health: some View {
-            if model.dobFetchStatus != .notAuthorized {
+        var healthContent: some View {
+            switch model.dobFetchStatus {
+            case .noData:
+                Text("No Data")
+            case .noDataOrNotAuthorized:
+                Text("No Data or Not Authorized")
+            case .notFetched, .fetched, .fetching:
                 HStack {
                     Spacer()
                     if model.dobFetchStatus == .fetching {
@@ -97,7 +102,7 @@ struct AgeSection: View {
         return Group {
             switch model.ageSource {
             case .healthApp:
-                health
+                healthContent
             case .userEntered:
                 manualEntry
             default:

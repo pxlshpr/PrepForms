@@ -68,7 +68,12 @@ struct HeightSection: View {
     var bottomRow: some View {
         @ViewBuilder
         var health: some View {
-            if model.heightFetchStatus != .notAuthorized {
+            switch model.heightFetchStatus {
+            case .noData:
+                Text("No Data")
+            case .noDataOrNotAuthorized:
+                Text("No Data or Not Authorized")
+            case .notFetched, .fetching, .fetched:
                 HStack {
                     Spacer()
                     if model.heightFetchStatus == .fetching {

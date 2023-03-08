@@ -260,7 +260,7 @@ extension TDEEForm {
                         ProfileForm()
                             .environmentObject(model)
                     } label: {
-                        if model.hasProfile,
+                        if model.hasMeasurements,
                            let age = model.age,
                            let sex = model.sex,
                            let weight = model.weight
@@ -272,7 +272,7 @@ extension TDEEForm {
                                 height: model.height,
                                 weightUnit: model.userWeightUnit,
                                 heightUnit: model.userHeightUnit,
-                                isSynced: model.profileIsSynced
+                                isSynced: model.measurementsAreSynced
                             )
                         } else {
                             MeasurementLabel(
@@ -399,9 +399,13 @@ extension TDEEForm {
         
         var healthContent: some View {
             Group {
-                if model.restingEnergyFetchStatus == .notAuthorized {
-                    permissionRequiredContent
-                } else {
+                switch model.restingEnergyFetchStatus {
+                case .noData:
+                    Text("No Data")
+                case .noDataOrNotAuthorized:
+                    Text("No Data or Not Authorized")
+//                    permissionRequiredContent
+                case .notFetched, .fetching, .fetched:
                     healthPeriodContent
                 }
             }
@@ -412,7 +416,12 @@ extension TDEEForm {
         var energyRow: some View {
             @ViewBuilder
             var health: some View {
-                if model.restingEnergyFetchStatus != .notAuthorized {
+                switch model.restingEnergyFetchStatus {
+                case .noData:
+                    Text("No Data")
+                case .noDataOrNotAuthorized:
+                    Text("No Data or Not Authorized")
+                case .notFetched, .fetching, .fetched:
                     HStack {
                         Spacer()
                         if model.restingEnergyFetchStatus == .fetching {

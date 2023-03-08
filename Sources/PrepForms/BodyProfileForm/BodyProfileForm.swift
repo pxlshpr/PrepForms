@@ -2,8 +2,9 @@ import SwiftUI
 import SwiftUISugar
 import PrepDataTypes
 import PrepCoreDataStack
+import SwiftHaptics
 
-public struct BIometricsForm: View {
+public struct BiometricsForm: View {
     
     @Namespace var namespace
     
@@ -79,6 +80,179 @@ public struct BIometricsForm: View {
             .environmentObject(model)
     }
 
+}
+
+import ActivityIndicatorView
+
+struct BiometricValueRow: View {
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    struct Params {
+        let valueString: String
+        let unitString: String
+        let prefix: String?
+        let fetchStatus: HealthKitFetchStatus
+        let isRedacted: Bool
+        let isUserEntered: Bool
+    }
+    
+    @Binding var params: Params
+    let matchedGeometryId: String?
+    let matchedGeometryNamespace: Namespace.ID?
+    
+    init(
+        params: Binding<Params>,
+        matchedGeometryId: String? = nil,
+        matchedGeometryNamespace: Namespace.ID? = nil
+    ) {
+        _params = params
+        self.matchedGeometryId = matchedGeometryId
+        self.matchedGeometryNamespace = matchedGeometryNamespace
+    }
+    
+    enum Style {
+        case calculated
+        case userEntered
+    }
+    
+    @State var showingForm = false
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            content
+        }
+        .sheet(isPresented: $showingForm) { form }
+    }
+    
+    var form: some View {
+        func handleNewValue(_ value: BiometricValue?) {
+            
+        }
+        
+        return BiometricValueForm(
+            type: .activeEnergy,
+            initialValue: nil,
+            handleNewValue: handleNewValue
+        )
+    }
+    
+    @ViewBuilder
+    var content: some View {
+        if params.isUserEntered {
+            valueTexts
+        } else {
+            switch params.fetchStatus {
+            case .fetching, .notFetched:
+                ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
+                    .frame(width: 25, height: 25)
+                    .foregroundColor(.secondary)
+            case .fetched:
+                valueTexts
+            case .noData, .noDataOrNotAuthorized:
+                Text("no data")
+                    .font(font)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    var valueTexts: some View {
+        if params.isUserEntered {
+            button
+        } else {
+            texts
+        }
+    }
+
+    var valueString: String {
+        if params.valueString.isEmpty {
+            if params.isUserEntered {
+                return "required"
+            } else {
+                return "0"
+            }
+        } else {
+            return params.valueString
+        }
+    }
+    
+    var unitString: String? {
+        if params.valueString.isEmpty, params.isUserEntered {
+            return nil
+        } else {
+            return params.unitString
+        }
+    }
+    
+    var font: Font {
+        var fontWeight: Font.Weight {
+            if params.isUserEntered, params.valueString.isEmpty {
+                return .thin
+            } else {
+                return .semibold
+            }
+        }
+        return .system(.title3, design: .rounded, weight: .semibold)
+    }
+    
+    var textColor: Color {
+        if params.isUserEntered {
+            return .accentColor
+        } else {
+            return .secondary
+        }
+    }
+    
+    var texts: some View {
+        HStack {
+            if let prefix = params.prefix {
+                Text(prefix)
+                    .font(.subheadline)
+                    .foregroundColor(Color(.tertiaryLabel))
+            }
+            Text(valueString)
+                .font(font)
+                .multilineTextAlignment(.trailing)
+                .foregroundColor(textColor)
+                .fixedSize(horizontal: false, vertical: true)
+                .if(matchedGeometryId != nil && matchedGeometryNamespace != nil) {
+                    $0.matchedGeometryEffect(
+                        id: matchedGeometryId!,
+                        in: matchedGeometryNamespace!
+                    )
+                }
+                .if(params.isRedacted && !params.isUserEntered) { view in
+                    view
+                        .redacted(reason: .placeholder)
+                }
+            if let unitString {
+                Text(unitString)
+                    .foregroundColor(textColor)
+            }
+        }
+    }
+    
+    var button: some View {
+        Button {
+            Haptics.feedback(style: .soft)
+            showingForm = true
+        } label: {
+            texts
+                .padding(.vertical, 8)
+                .padding(.horizontal, 15)
+                .background(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(
+                            Color.accentColor
+                                .opacity(colorScheme == .dark ? 0.1 : 0.15)
+                        )
+                )
+
+        }
+    }
 }
 
 struct BiometricPickerLabel: View {
@@ -278,6 +452,7 @@ struct ButtonLabel: View {
     }
 }
 
+//TODO: Use ButtonLabel instead of this
 struct AppleHealthButtonLabel: View {
     
     @Environment(\.colorScheme) var colorScheme

@@ -4,5 +4,6 @@ enum HealthKitFetchStatus {
     case notFetched
     case fetching
     case fetched
-    case notAuthorized
+    case noData
+    case noDataOrNotAuthorized
 }
