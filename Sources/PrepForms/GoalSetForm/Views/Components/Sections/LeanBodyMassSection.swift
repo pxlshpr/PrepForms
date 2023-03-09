@@ -6,6 +6,7 @@ import SwiftUISugar
 
 struct LeanBodyMassSection: View {
     
+    let largeTitle: Bool
     let includeHeader: Bool
     @Binding var footerString: String
     @EnvironmentObject var model: BiometricsModel
@@ -13,7 +14,8 @@ struct LeanBodyMassSection: View {
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
-    init(includeHeader: Bool = true, footerString: Binding<String> = .constant("")) {
+    init(largeTitle: Bool = false, includeHeader: Bool = true, footerString: Binding<String> = .constant("")) {
+        self.largeTitle = largeTitle
         self.includeHeader = includeHeader
         _footerString = footerString
     }
@@ -28,7 +30,7 @@ struct LeanBodyMassSection: View {
     @ViewBuilder
     var header: some View {
         if includeHeader {
-            Text("Lean Body Mass")
+            biometricHeaderView("Lean Body Mass", largeTitle: largeTitle)
         }
     }
     

@@ -6,9 +6,14 @@ import SwiftUISugar
 
 struct HeightSection: View {
     
+    let largetTitle: Bool
     @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
+    
+    init(largeTitle: Bool = false) {
+        self.largetTitle = largeTitle
+    }
     
     var content: some View {
         VStack {
@@ -165,7 +170,7 @@ struct HeightSection: View {
     }
  
     var header: some View {
-        Text("Height")
+        biometricHeaderView("Height", largeTitle: largetTitle)
     }
     
     var body: some View {

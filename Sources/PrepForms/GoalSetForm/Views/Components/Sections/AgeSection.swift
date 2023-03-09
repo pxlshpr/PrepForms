@@ -7,9 +7,14 @@ import HealthKit
 
 struct AgeSection: View {
     
+    let largeTitle: Bool
     @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
+    
+    init(largeTitle: Bool = false) {
+        self.largeTitle = largeTitle
+    }
     
     var body: some View {
         FormStyledSection(header: header) {
@@ -147,6 +152,6 @@ struct AgeSection: View {
     }
  
     var header: some View {
-        Text("Age")
+        biometricHeaderView("Age", largeTitle: largeTitle)
     }
 }

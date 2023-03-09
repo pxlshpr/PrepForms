@@ -7,12 +7,15 @@ import HealthKit
 
 struct WeightSection: View {
     
+    let largeTitle: Bool
+    let includeHeader: Bool
+    
     @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
-    let includeHeader: Bool
     
-    init(includeHeader: Bool = true) {
+    init(largeTitle: Bool = false, includeHeader: Bool = true) {
+        self.largeTitle = largeTitle
         self.includeHeader = includeHeader
     }
     
@@ -174,7 +177,7 @@ struct WeightSection: View {
     @ViewBuilder
     var header: some View {
         if includeHeader {
-            Text("Weight")
+            biometricHeaderView("Weight", largeTitle: largeTitle)
         }
     }
     

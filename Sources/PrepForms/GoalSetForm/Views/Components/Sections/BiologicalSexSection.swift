@@ -7,12 +7,14 @@ import HealthKit
 
 struct BiologicalSexSection: View {
     
+    let largeTitle: Bool
     let includeFooter: Bool
     @EnvironmentObject var model: BiometricsModel
     
     @Namespace var namespace
     
-    init(includeFooter: Bool = false) {
+    init(largeTitle: Bool = false, includeFooter: Bool = false) {
+        self.largeTitle = largeTitle
         self.includeFooter = includeFooter
     }
     
@@ -61,7 +63,9 @@ struct BiologicalSexSection: View {
 
     @ViewBuilder
     var footer: some View {
-        Text("This is the biological sex used in the formula.")
+        if includeFooter {
+            Text("This is the biological sex used in the formula.")
+        }
     }
     
     var bottomRow: some View {
@@ -155,6 +159,24 @@ struct BiologicalSexSection: View {
     }
  
     var header: some View {
-        Text("Biological Sex")
+        biometricHeaderView("Biological Sex", largeTitle: largeTitle)
+    }
+}
+
+let BiometricSectionHeaderFont: Font = .system(.title2, design: .rounded, weight: .semibold)
+
+func biometricHeaderView(_ title: String, largeTitle: Bool) -> some View {
+    var titleView: some View {
+        Text(title)
+    }
+    return Group {
+        if largeTitle {
+            titleView
+                .textCase(.none)
+                .font(BiometricSectionHeaderFont)
+                .foregroundColor(.primary)
+        } else {
+            titleView
+        }
     }
 }

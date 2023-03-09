@@ -6,9 +6,10 @@ import SwiftHaptics
 
 public struct BiometricsForm: View {
     
-    @Namespace var namespace
-    
     @StateObject var model: BiometricsModel
+    
+    @Namespace var namespace
+    @Environment(\.colorScheme) var colorScheme
     
     public init() {
         let user = DataManager.shared.user
@@ -27,8 +28,7 @@ public struct BiometricsForm: View {
     
     var content: some View {
         FormStyledScrollView {
-            titleCell("Maintenance Energy")
-                .padding(.horizontal, 20)
+            infoSection
             maintenanceEnergySection
             weightSection
             leanBodyMassSection
@@ -38,51 +38,58 @@ public struct BiometricsForm: View {
         }
     }
     
-    func titleCell(_ title: String) -> some View {
-        Group {
-            Spacer().frame(height: 15)
-            HStack {
-                Spacer().frame(width: 3)
-                Text(title)
-                    .font(.title2)
-                    .bold()
-                    .foregroundColor(.primary)
-                Spacer()
-            }
-            Spacer().frame(height: 7)
-        }
+    var infoText: some View {
+        let energyUnit = UserManager.energyUnit
+        let energyDescription = energyUnit == .kcal ? "Calories" : "Energy"
+        return Text("These are used to calculate and create goals based on your **Maintenance \(energyDescription)**, which is an estimate of how much you would have to consume to *maintain* your current weight.")
     }
-
+    
+    var infoSection: some View {
+        infoText
+            .multilineTextAlignment(.leading)
+            .foregroundColor(.secondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 30)
+            .padding(.horizontal, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .foregroundColor(
+                        Color(.quaternarySystemFill)
+                            .opacity(colorScheme == .dark ? 0.5 : 1)
+                    )
+            )
+            .cornerRadius(10)
+            .padding(.bottom, 10)
+            .padding(.horizontal, 17)
+    }
+    
     var maintenanceEnergySection: some View {
-        TDEESection(
-            namespace: namespace,
-            action: {}
-        )
-        .environmentObject(model)
+        TDEESection(includeHeader: true, largeTitle: true)
+            .environmentObject(model)
     }
     
     var weightSection: some View {
-        WeightSection(includeHeader: true)
+        WeightSection(largeTitle: true)
             .environmentObject(model)
     }
 
     var heightSection: some View {
-        HeightSection()
+        HeightSection(largeTitle: true)
             .environmentObject(model)
     }
 
     var biologicalSexSection: some View {
-        BiologicalSexSection()
+        BiologicalSexSection(largeTitle: true)
             .environmentObject(model)
     }
     
     var ageSection: some View {
-        AgeSection()
+        AgeSection(largeTitle: true)
             .environmentObject(model)
     }
     
     var leanBodyMassSection: some View {
-        LeanBodyMassSection()
+        LeanBodyMassSection(largeTitle: true)
             .environmentObject(model)
     }
 
@@ -346,60 +353,5 @@ struct AppleHealthButtonLabel: View {
 
     var font: Font {
         isCompact ? .footnote : .body
-    }
-}
-
-struct TDEESection: View {
-    
-    @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var model: BiometricsModel
-    
-    let namespace: Namespace.ID
-    let action: () -> ()
-    
-    var body: some View {
-        emptyContent
-    }
-    
-    var emptyContent: some View {
-        var setupButton: some View {
-            var label: some View {
-                ButtonLabel(
-                    title: "Setup Maintenance \(UserManager.energyDescription)",
-                    leadingSystemImage: "flame.fill",
-                    namespace: namespace,
-                    titleMatchedGeometryId: "maintenance-header-title",
-                    imageMatchedGeometryId: "maintenance-header-icon"
-                )
-            }
-            
-            return Button {
-                action()
-            } label: {
-                label
-            }
-        }
-        
-        return VStack {
-            model.tdeeDescriptionText
-                .matchedGeometryEffect(id: "maintenance-footer", in: namespace)
-                .multilineTextAlignment(.leading)
-                .foregroundColor(Color(.secondaryLabel))
-            if model.shouldShowInitialSetupButton {
-                setupButton
-                .buttonStyle(.borderless)
-                .padding(.top, 5)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 30)
-        .padding(.horizontal, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .foregroundColor(Color(.quaternarySystemFill))
-        )
-        .cornerRadius(10)
-        .padding(.bottom, 10)
-        .padding(.horizontal, 17)
     }
 }
