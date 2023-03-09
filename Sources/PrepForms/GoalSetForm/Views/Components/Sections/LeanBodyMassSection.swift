@@ -4,12 +4,41 @@ import PrepDataTypes
 import ActivityIndicatorView
 import SwiftUISugar
 
-struct LeanBodyMassForm: View {
+struct LeanBodyMassSection: View {
     
+    let includeHeader: Bool
+    @Binding var footerString: String
     @EnvironmentObject var model: BiometricsModel
+
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
+    init(includeHeader: Bool = true, footerString: Binding<String> = .constant("")) {
+        self.includeHeader = includeHeader
+        _footerString = footerString
+    }
+    
+    var body: some View {
+        FormStyledSection(header: header, footer: footer) {
+            content
+        }
+        .onChange(of: model.lbmSource, perform: lbmSourceChanged)
+    }
+    
+    @ViewBuilder
+    var header: some View {
+        if includeHeader {
+            Text("Lean Body Mass")
+        }
+    }
+    
+    @ViewBuilder
+    var footer: some View {
+        if !footerString.isEmpty {
+            Text(footerString)
+        }
+    }
+
     var content: some View {
         VStack {
             Group {
@@ -98,32 +127,18 @@ struct LeanBodyMassForm: View {
     }
     
     var emptyContent: some View {
-//        VStack(spacing: 10) {
-//            emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//            emptyButton("Calculate using a Formula", systemImage: "function", action: tappedFormula)
-//            emptyButton("Convert Fat Percentage", systemImage: "percent", action: tappedFatPercentage)
-//            emptyButton("Let me type it in", systemImage: "keyboard", action: tappedManualEntry)
-//        }
-        FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 37) {
-//            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//            emptyButton2("Calculate", systemImage: "function", action: tappedFormula)
-//            emptyButton2("Use Fat %", systemImage: "function", action: tappedFatPercentage)
-//            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
-            BiometricHealthButton("Sync", action: tappedSyncWithHealth)
-            BiometricButton("Calculate", systemImage: "function", action: tappedFormula)
-            BiometricButton("Use Fat %", systemImage: "function", action: tappedFatPercentage)
-            BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
+        VStack {
+            HStack {
+                BiometricButton(healthTitle: "Sync", action: tappedSyncWithHealth)
+                BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
+            }
+            HStack {
+                BiometricButton("Calculate", systemImage: "function", action: tappedFormula)
+                BiometricButton("Use Fat %", systemImage: "function", action: tappedFatPercentage)
+            }
         }
     }
 
-    var infoSection: some View {
-        FormStyledSection {
-            Text("Lean body mass is the weight of your body minus your body fat (adipose tissue).")
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-    
     var bottomRow: some View {
         @ViewBuilder
         var health: some View {
@@ -253,93 +268,5 @@ struct LeanBodyMassForm: View {
         default:
             break
         }
-    }
-    
-    var footer: some View {
-        var string: String {
-            switch model.lbmSource {
-            case .userEntered:
-                return "You will need to ensure your lean body mass is kept up to date for an accurate calculation."
-            case .healthApp:
-                return "Your lean body mass will be kept in sync with the Health App."
-            case .formula:
-                return "Use a formula to calculate your lean body mass."
-            case .fatPercentage:
-                return "Enter your fat percentage to calculate your lean body mass."
-            default:
-                return "Choose how you want to enter your lean body mass."
-            }
-        }
-        return Text(string)
-    }
-    
-    var percentageSupplementaryContent: some View {
-        Group {
-            Text("of")
-                .font(.title)
-                .foregroundColor(Color(.quaternaryLabel))
-            WeightSection()
-//            Text("=")
-//                .font(.title)
-//                .foregroundColor(Color(.quaternaryLabel))
-//            calculatedSection
-        }
-    }
-    
-    var formulaSupplementaryContent: some View {
-        Group {
-            Text("with")
-                .font(.title)
-                .foregroundColor(Color(.quaternaryLabel))
-            BiologicalSexSection()
-            WeightSection()
-            HeightSection()
-//            Text("=")
-//                .font(.title)
-//                .foregroundColor(Color(.quaternaryLabel))
-//            calculatedSection
-        }
-    }
-    
-    @ViewBuilder
-    var supplementaryContent: some View {
-        switch model.lbmSource {
-        case .fatPercentage:
-            percentageSupplementaryContent
-        case .formula:
-            formulaSupplementaryContent
-        default:
-            EmptyView()
-        }
-    }
-    
-    var trailingContent: some ToolbarContent {
-        ToolbarItemGroup(placement: .navigationBarTrailing) {
-            if model.shouldShowSyncAllForLBMForm {
-                Button {
-                    model.tappedSyncAllOnLBMForm()
-                } label: {
-                    AppleHealthButtonLabel(title: "Sync All", isCompact: true)
-//                    HStack {
-//                        appleHealthSymbol
-//                        Text("Sync All")
-//                    }
-                }
-            }
-        }
-    }
-    var body: some View {
-        FormStyledScrollView {
-            infoSection
-            FormStyledSection(footer: footer) {
-                content
-            }
-            supplementaryContent
-        }
-        .scrollDismissesKeyboard(.interactively)
-        .interactiveDismissDisabled(model.isEditing)
-        .navigationTitle("Lean Body Mass")
-        .toolbar { trailingContent }
-        .onChange(of: model.lbmSource, perform: lbmSourceChanged)
     }
 }

@@ -1,35 +1,25 @@
 import SwiftUI
 
-let AppleHealthBottomColorHex = "fc2e1d"
-let AppleHealthTopColorHex = "fe5fab"
+let HealthBottomColorHex = "fc2e1d"
+let HealthTopColorHex = "fe5fab"
 
-//TODO: Modularize the linear gradient in both of these
+let HealthTopColor = Color(hex: HealthTopColorHex)
+let HealthBottomColor = Color(hex: HealthBottomColorHex)
+
+let HealthGradient = LinearGradient(
+    colors: [HealthTopColor, HealthBottomColor],
+    startPoint: .top,
+    endPoint: .bottom
+)
+
 var appleHealthSymbol: some View {
     Image(systemName: "heart.fill")
         .symbolRenderingMode(.palette)
-        .foregroundStyle(
-            .linearGradient(
-                colors: [
-                    Color(hex: AppleHealthTopColorHex),
-                    Color(hex: AppleHealthBottomColorHex)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
+        .foregroundStyle(HealthGradient)
 }
 
 var appleHealthBolt: some View {
     Image(systemName: "bolt.horizontal.fill")
         .symbolRenderingMode(.palette)
-        .foregroundStyle(
-            .linearGradient(
-                colors: [
-                    Color(hex: AppleHealthTopColorHex),
-                    Color(hex: AppleHealthBottomColorHex)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
+        .foregroundStyle(HealthGradient)
 }

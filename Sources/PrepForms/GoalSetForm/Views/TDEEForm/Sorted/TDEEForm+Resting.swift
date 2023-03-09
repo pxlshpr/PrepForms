@@ -7,8 +7,8 @@ import HealthKit
 
 //func label(_ label: String, _ valueString: String) -> some View {
 
-//let AppleHealthBottomColorHex = "fc2e1d"
-//let AppleHealthTopColorHex = "fe5fab"
+//let HealthBottomColorHex = "fc2e1d"
+//let HealthTopColorHex = "fe5fab"
 
 //var appleHealthSymbol: some View {
 //    Image(systemName: "heart.fill")
@@ -16,8 +16,8 @@ import HealthKit
 //        .foregroundStyle(
 //            .linearGradient(
 //                colors: [
-//                    Color(hex: AppleHealthTopColorHex),
-//                    Color(hex: AppleHealthBottomColorHex)
+//                    HealthTopColor,
+//                    HealthBottomColor
 //                ],
 //                startPoint: .top,
 //                endPoint: .bottom
@@ -72,13 +72,13 @@ struct MeasurementLabel: View {
         guard useHealthAppData else {
             return nil
         }
-        return Color(hex: AppleHealthTopColorHex)
+        return HealthTopColor
     }
     var backgroundGradientBottom: Color? {
         guard useHealthAppData else {
             return nil
         }
-        return Color(hex: AppleHealthBottomColorHex)
+        return HealthBottomColor
     }
 
     var backgroundColor: Color {
@@ -372,27 +372,10 @@ extension TDEEForm {
         }
 
         var emptyContent: some View {
-//            VStack(spacing: 10) {
-//                emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//                emptyButton("Calculate using a Formula", systemImage: "function", action: tappedFormula)
-//                emptyButton("Let me type it in", systemImage: "keyboard", action: tappedManualEntry)
-//            }
-//            HStack {
-//                Spacer()
-//                emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//                Spacer()
-//                emptyButton2("Calculate", systemImage: "function", action: tappedFormula)
-//                Spacer()
-//                emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
-//                Spacer()
-//            }
-            FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 17) {
-//                emptyButton2("Calculate", systemImage: "function", action: tappedFormula)
-//                emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
-//                emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
+            HStack {
+                BiometricButton(healthTitle: "Sync", action: tappedSyncWithHealth)
                 BiometricButton("Calculate", systemImage: "function", action: tappedFormula)
                 BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
-                BiometricHealthButton("Sync", action: tappedSyncWithHealth)
             }
             .padding(.horizontal, 15)
         }
@@ -510,8 +493,8 @@ extension TDEEForm {
                     PickerLabel(
                         model.restingEnergyPeriod.menuDescription,
                         imageColor: Color(hex: "F3DED7"),
-                        backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
-                        backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
+                        backgroundGradientTop: HealthTopColor,
+                        backgroundGradientBottom: HealthBottomColor,
                         foregroundColor: .white
                     )
                     .animation(.none, value: model.restingEnergyPeriod)
@@ -535,8 +518,8 @@ extension TDEEForm {
                     PickerLabel(
                         "\(model.restingEnergyIntervalValue)",
                         imageColor: Color(hex: "F3DED7"),
-                        backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
-                        backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
+                        backgroundGradientTop: HealthTopColor,
+                        backgroundGradientBottom: HealthBottomColor,
                         foregroundColor: .white
                     )
                     .animation(.none, value: model.restingEnergyIntervalValue)
@@ -561,8 +544,8 @@ extension TDEEForm {
                     PickerLabel(
                         "\(model.restingEnergyInterval.description)\(model.restingEnergyIntervalValue > 1 ? "s" : "")",
                         imageColor: Color(hex: "F3DED7"),
-                        backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
-                        backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
+                        backgroundGradientTop: HealthTopColor,
+                        backgroundGradientBottom: HealthBottomColor,
                         foregroundColor: .white
                     )
                     .animation(.none, value: model.restingEnergyInterval)

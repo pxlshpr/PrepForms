@@ -7,9 +7,22 @@ import HealthKit
 
 struct BiologicalSexSection: View {
     
+    let includeFooter: Bool
     @EnvironmentObject var model: BiometricsModel
+    
     @Namespace var namespace
     
+    init(includeFooter: Bool = false) {
+        self.includeFooter = includeFooter
+    }
+    
+    var body: some View {
+        FormStyledSection(header: header, footer: footer) {
+            content
+        }
+        .onChange(of: model.sexSource, perform: sexSourceChanged)
+    }
+
     var content: some View {
         VStack {
             Group {
@@ -40,21 +53,15 @@ struct BiologicalSexSection: View {
     }
     
     var emptyContent: some View {
-//        VStack(spacing: 10) {
-//            emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//            emptyButton("Let me specify it", systemImage: "hand.tap", action: tappedManualEntry)
-//        }
-        FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 37) {
-//            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//            emptyButton2("Choose", systemImage: "hand.tap", action: tappedManualEntry)
-            BiometricHealthButton("Sync", action: tappedSyncWithHealth)
+        HStack {
+            BiometricButton(healthTitle: "Sync", action: tappedSyncWithHealth)
             BiometricButton("Choose", systemImage: "hand.tap", action: tappedManualEntry)
         }
     }
 
     @ViewBuilder
     var footer: some View {
-        Text("This is the biological sex you would like to use in the formula.")
+        Text("This is the biological sex used in the formula.")
     }
     
     var bottomRow: some View {
@@ -149,12 +156,5 @@ struct BiologicalSexSection: View {
  
     var header: some View {
         Text("Biological Sex")
-    }
-    
-    var body: some View {
-        FormStyledSection(header: header, footer: footer) {
-            content
-        }
-        .onChange(of: model.sexSource, perform: sexSourceChanged)
     }
 }

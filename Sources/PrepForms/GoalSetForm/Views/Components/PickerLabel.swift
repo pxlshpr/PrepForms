@@ -230,7 +230,7 @@ struct ProfileLabel: View {
     var primaryColor: Color {
 //        isSynced ? .white : .primary
         isSynced
-        ? Color(hex: AppleHealthTopColorHex)
+        ? HealthTopColor
         : Color(.secondaryLabel)
     }
     
@@ -243,7 +243,7 @@ struct ProfileLabel: View {
             Text("\(value)")
                 .foregroundColor(primaryColor)
                 .fontWeight(.bold)
-//                .foregroundColor(Color(hex: AppleHealthTopColorHex))
+//                .foregroundColor(HealthTopColor)
             Text(unit)
                 .font(.footnote)
 //                .foregroundColor(secondaryColor)
@@ -262,8 +262,8 @@ struct ProfileLabel: View {
                     .foregroundStyle(
                         .linearGradient(
                             colors: [
-                                Color(hex: AppleHealthTopColorHex),
-                                Color(hex: AppleHealthBottomColorHex)
+                                HealthTopColor,
+                                HealthBottomColor
                             ],
                             startPoint: .top,
                             endPoint: .bottom

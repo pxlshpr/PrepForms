@@ -46,8 +46,8 @@ extension TDEEForm {
                     PickerLabel(
                         model.activeEnergyPeriod.menuDescription,
                         imageColor: Color(hex: "F3DED7"),
-                        backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
-                        backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
+                        backgroundGradientTop: HealthTopColor,
+                        backgroundGradientBottom: HealthBottomColor,
                         foregroundColor: .white
                     )
                     .animation(.none, value: model.activeEnergyPeriod)
@@ -70,8 +70,8 @@ extension TDEEForm {
                     PickerLabel(
                         "\(model.activeEnergyIntervalValue)",
                         imageColor: Color(hex: "F3DED7"),
-                        backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
-                        backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
+                        backgroundGradientTop: HealthTopColor,
+                        backgroundGradientBottom: HealthBottomColor,
                         foregroundColor: .white
                     )
                     .animation(.none, value: model.activeEnergyIntervalValue)
@@ -95,8 +95,8 @@ extension TDEEForm {
                     PickerLabel(
                         "\(model.activeEnergyInterval.description)\(model.activeEnergyIntervalValue > 1 ? "s" : "")",
                         imageColor: Color(hex: "F3DED7"),
-                        backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
-                        backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
+                        backgroundGradientTop: HealthTopColor,
+                        backgroundGradientBottom: HealthBottomColor,
                         foregroundColor: .white
                     )
                     .animation(.none, value: model.activeEnergyInterval)
@@ -283,9 +283,10 @@ extension TDEEForm {
 //                        foregroundColor: .secondary,
 //                        prefixColor: .primary
 //                    )
-                    PickerLabel(model.activeEnergyActivityLevel.description)
-                    .animation(.none, value: model.activeEnergyActivityLevel)
-                    .fixedSize(horizontal: true, vertical: false)
+                    BiometricPickerLabel(model.activeEnergyActivityLevel.description)
+                        .animation(.none, value: model.activeEnergyActivityLevel)
+                        .fixedSize(horizontal: true, vertical: false)
+//                    PickerLabel(model.activeEnergyActivityLevel.description)
                 }
                 .contentShape(Rectangle())
                 .simultaneousGesture(TapGesture().onEnded {
@@ -352,23 +353,10 @@ extension TDEEForm {
         }
         
         var emptyContent: some View {
-//            VStack(spacing: 10) {
-//                emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//                emptyButton("Apply Activity Multiplier", systemImage: "dial.medium.fill")
-//                emptyButton("Let me type it in", systemImage: "keyboard")
-//            }
-//            HStack {
-//                emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//                emptyButton2("Activity Level", systemImage: "dial.medium.fill")
-//                emptyButton2("Enter", systemImage: "keyboard")
-//            }
-            FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 37) {
-//                emptyButton2("Activity Level", systemImage: "dial.medium.fill", action: tappedActivityLevel)
-//                emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
-//                emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
-                BiometricButton("Activity Level", systemImage: "dial.medium.fill", action: tappedActivityLevel)
+            HStack {
+                BiometricButton(healthTitle: "Sync", action: tappedSyncWithHealth)
+                BiometricButton("Activity", systemImage: "dial.medium.fill", action: tappedActivityLevel)
                 BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
-                BiometricHealthButton("Sync", action: tappedSyncWithHealth)
             }
             .padding(.horizontal, 15)
         }

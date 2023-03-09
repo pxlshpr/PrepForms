@@ -132,8 +132,8 @@ extension EnergyGoalForm {
                             formattedTDEE,
                             systemImage: "flame.fill",
                             imageColor: Color(hex: "F3DED7"),
-                            backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
-                            backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
+                            backgroundGradientTop: HealthTopColor,
+                            backgroundGradientBottom: HealthBottomColor,
                             foregroundColor: .white,
                             imageScale: .small
                         )

@@ -364,8 +364,8 @@ struct NutrientGoalForm: View {
                         prefix: "\(pickedBodyMassType.description)",
                         systemImage: "figure.arms.open",
                         imageColor: Color(hex: "F3DED7"),
-                        backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
-                        backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
+                        backgroundGradientTop: HealthTopColor,
+                        backgroundGradientBottom: HealthBottomColor,
                         foregroundColor: .white,
                         prefixColor: Color(hex: "F3DED7"),
                         imageScale: .medium
@@ -484,8 +484,8 @@ struct NutrientGoalForm: View {
                         pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit),
                         systemImage: "flame.fill",
                         imageColor: Color(hex: "F3DED7"),
-                        backgroundGradientTop: Color(hex: AppleHealthTopColorHex),
-                        backgroundGradientBottom: Color(hex: AppleHealthBottomColorHex),
+                        backgroundGradientTop: HealthTopColor,
+                        backgroundGradientBottom: HealthBottomColor,
                         foregroundColor: .white,
                         imageScale: .small
                     )

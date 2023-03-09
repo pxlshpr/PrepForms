@@ -31,6 +31,7 @@ public struct BiometricsForm: View {
                 .padding(.horizontal, 20)
             maintenanceEnergySection
             weightSection
+            leanBodyMassSection
             heightSection
             biologicalSexSection
             ageSection
@@ -77,6 +78,11 @@ public struct BiometricsForm: View {
     
     var ageSection: some View {
         AgeSection()
+            .environmentObject(model)
+    }
+    
+    var leanBodyMassSection: some View {
+        LeanBodyMassSection()
             .environmentObject(model)
     }
 
@@ -207,7 +213,7 @@ struct ButtonLabel: View {
         case .plain, .plainHealth:
             return .secondary
         case .health:
-            return Color(hex: AppleHealthTopColorHex)
+            return HealthTopColor
         }
     }
     
@@ -248,7 +254,7 @@ struct ButtonLabel: View {
                 case .plain, .plainHealth:
                     return Color(.secondaryLabel)
                 case .health:
-                    return Color(hex: AppleHealthTopColorHex)
+                    return HealthTopColor
                 case .accent:
                     return Color.accentColor
                 }
@@ -259,7 +265,7 @@ struct ButtonLabel: View {
                 case .plain, .plainHealth:
                     return Color(.secondaryLabel)
                 case .health:
-                    return Color(hex: AppleHealthBottomColorHex)
+                    return HealthBottomColor
                 case .accent:
                     return Color.accentColor
                 }
@@ -303,7 +309,7 @@ struct AppleHealthButtonLabel: View {
                 .fontWeight(.bold)
         }
         .font(font)
-        .foregroundColor(Color(hex: AppleHealthTopColorHex))
+        .foregroundColor(HealthTopColor)
         .padding(.horizontal, hPadding)
         .padding(.vertical, vPadding)
         .background(background)
@@ -314,13 +320,13 @@ struct AppleHealthButtonLabel: View {
             .fill(
                 .linearGradient(
                     colors: [
-                        Color(hex: AppleHealthTopColorHex),
-                        Color(hex: AppleHealthBottomColorHex)
+                        HealthTopColor,
+                        HealthBottomColor
                     ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
-//                Color(hex: AppleHealthTopColorHex)
+//                HealthTopColor
                 .opacity(colorScheme == .dark ? 0.1 : 0.15)
             )
 //            .fill(Color.accentColor.opacity(colorScheme == .dark ? 0.1 : 0.15))

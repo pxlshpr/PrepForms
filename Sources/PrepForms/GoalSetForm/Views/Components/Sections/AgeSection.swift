@@ -3,17 +3,25 @@ import SwiftHaptics
 import PrepDataTypes
 import ActivityIndicatorView
 import SwiftUISugar
+import HealthKit
 
-struct HeightSection: View {
+struct AgeSection: View {
     
     @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
     
+    var body: some View {
+        FormStyledSection(header: header) {
+            content
+        }
+        .onChange(of: model.ageSource, perform: ageSourceChanged)
+    }
+
     var content: some View {
         VStack {
             Group {
-                if let source = model.heightSource {
+                if let source = model.ageSource {
                     Group {
                         sourceSection
                         switch source {
@@ -32,69 +40,46 @@ struct HeightSection: View {
     }
 
     func tappedSyncWithHealth() {
-        model.changeHeightSource(to: .healthApp)
+        model.changeAgeSource(to: .healthApp)
     }
     
     func tappedManualEntry() {
-        model.changeHeightSource(to: .userEntered)
+        model.changeAgeSource(to: .userEntered)
         isFocused = true
     }
     
     var emptyContent: some View {
-//        VStack(spacing: 10) {
-//            emptyButton("Sync with Health app", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//            emptyButton("Let me type it in", systemImage: "keyboard", action: tappedManualEntry)
-//        }
-        FlowView(alignment: BiometricButtonsAlignment, spacing: 10, padding: 37) {
-//            emptyButton2("Sync", showHealthAppIcon: true, action: tappedSyncWithHealth)
-//            emptyButton2("Enter", systemImage: "keyboard", action: tappedManualEntry)
-            BiometricHealthButton("Sync", action: tappedSyncWithHealth)
+        HStack {
+            BiometricButton(healthTitle: "Sync", action: tappedSyncWithHealth)
             BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
         }
     }
 
-    @ViewBuilder
-    var footer: some View {
-        switch model.heightSource {
-        case .userEntered:
-            Text("You will need to update your height manually.")
-        case .healthApp:
-            Text("Your height will be kept in sync with the Health App.")
-        default:
-            EmptyView()
-        }
-    }
-    
     var bottomRow: some View {
         @ViewBuilder
-        var health: some View {
-            switch model.heightFetchStatus {
+        var healthContent: some View {
+            switch model.dobFetchStatus {
             case .noData:
                 Text("No Data")
             case .noDataOrNotAuthorized:
                 Text("No Data or Not Authorized")
-            case .notFetched, .fetching, .fetched:
+            case .notFetched, .fetched, .fetching:
                 HStack {
                     Spacer()
-                    if model.heightFetchStatus == .fetching {
+                    if model.dobFetchStatus == .fetching {
                         ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
                             .frame(width: 25, height: 25)
                             .foregroundColor(.secondary)
                     } else {
-                        if let date = model.heightDate {
-                            Text("as of \(date.tdeeFormat)")
-                                .font(.subheadline)
-                                .foregroundColor(Color(.tertiaryLabel))
-                        }
-                        Text(model.heightFormatted)
+                        Text(model.ageFormatted)
                             .font(.system(.title3, design: .rounded, weight: .semibold))
                             .foregroundColor(model.sexSource == .userEntered ? .primary : .secondary)
-                            .matchedGeometryEffect(id: "height", in: namespace)
-                            .if(!model.hasHeight) { view in
+                            .matchedGeometryEffect(id: "age", in: namespace)
+                            .if(!model.hasAge) { view in
                                 view
                                     .redacted(reason: .placeholder)
                             }
-                        Text(model.userHeightUnit.shortDescription)
+                        Text("years")
                             .foregroundColor(.secondary)
                     }
                 }
@@ -102,32 +87,23 @@ struct HeightSection: View {
         }
         
         var manualEntry: some View {
-            var prompt: String {
-                "height in"
-            }
-            var binding: Binding<String> {
-                model.heightTextFieldStringBinding
-            }
-            var unitString: String {
-                model.userHeightUnit.shortDescription
-            }
-            return HStack {
+            HStack {
                 Spacer()
-                TextField(prompt, text: binding)
+                TextField("age", text: model.ageTextFieldStringBinding)
                     .keyboardType(.decimalPad)
                     .focused($isFocused)
                     .multilineTextAlignment(.trailing)
                     .font(.system(.title3, design: .rounded, weight: .semibold))
-                    .matchedGeometryEffect(id: "height", in: namespace)
-                Text(unitString)
+                    .matchedGeometryEffect(id: "age", in: namespace)
+                Text("years")
                     .foregroundColor(.secondary)
             }
         }
         
         return Group {
-            switch model.heightSource {
+            switch model.ageSource {
             case .healthApp:
-                health
+                healthContent
             case .userEntered:
                 manualEntry
             default:
@@ -139,15 +115,15 @@ struct HeightSection: View {
     var sourceSection: some View {
         var sourceMenu: some View {
             Menu {
-                Picker(selection: model.heightSourceBinding, label: EmptyView()) {
+                Picker(selection: model.ageSourceBinding, label: EmptyView()) {
                     ForEach(MeasurementSource.allCases, id: \.self) {
                         Label($0.pickerDescription, systemImage: $0.systemImage).tag($0)
                     }
                 }
             } label: {
-                BiometricSourcePickerLabel(source: model.heightSourceBinding.wrappedValue)
+                BiometricSourcePickerLabel(source: model.ageSourceBinding.wrappedValue)
             }
-            .animation(.none, value: model.heightSource)
+            .animation(.none, value: model.ageSource)
             .fixedSize(horizontal: true, vertical: false)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
@@ -161,7 +137,7 @@ struct HeightSection: View {
         }
     }
     
-    func heightSourceChanged(to newSource: MeasurementSource?) {
+    func ageSourceChanged(to newSource: MeasurementSource?) {
         switch newSource {
         case .userEntered:
             isFocused = true
@@ -171,13 +147,6 @@ struct HeightSection: View {
     }
  
     var header: some View {
-        Text("Height")
-    }
-    
-    var body: some View {
-        FormStyledSection(header: header, footer: footer) {
-            content
-        }
-        .onChange(of: model.heightSource, perform: heightSourceChanged)
+        Text("Age")
     }
 }

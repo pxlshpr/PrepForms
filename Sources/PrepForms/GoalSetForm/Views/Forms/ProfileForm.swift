@@ -36,7 +36,7 @@ struct ProfileForm: View {
         FormStyledScrollView {
             infoSection
             AgeSection()
-            BiologicalSexSection()
+            BiologicalSexSection(includeFooter: true)
             WeightSection()
             if model.restingEnergyFormula.requiresHeight {
                 HeightSection()
