@@ -39,9 +39,8 @@ public struct BiometricsForm: View {
     }
     
     var infoText: some View {
-        let energyUnit = UserManager.energyUnit
-        let energyDescription = energyUnit == .kcal ? "Calories" : "Energy"
-        return Text("These are used to calculate and create goals based on your **Maintenance \(energyDescription)**, which is an estimate of how much you would have to consume to *maintain* your current weight.")
+//        Text("These are used to create goals based on your **\(UserManager.tdeeDescription)**, which is an estimate of how much you would have to consume to *maintain* your current weight.")
+        Text("Your biometric data is used to create goals based on your **Maintenance Calories**, which estimates what you need to consume to *maintain* your current weight.")
     }
     
     var infoSection: some View {

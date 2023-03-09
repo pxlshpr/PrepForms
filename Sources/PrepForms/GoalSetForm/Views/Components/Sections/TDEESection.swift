@@ -29,7 +29,7 @@ struct TDEESection: View {
     @ViewBuilder
     var header: some View {
         if includeHeader {
-            biometricHeaderView("Maintenance Energy", largeTitle: largeTitle)
+            biometricHeaderView(UserManager.tdeeDescription, largeTitle: largeTitle)
         }
     }
 
