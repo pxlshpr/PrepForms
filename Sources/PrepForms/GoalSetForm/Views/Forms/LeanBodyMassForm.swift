@@ -95,11 +95,8 @@ struct LeanBodyMassForm: View {
                 Button {
                     model.tappedSyncAllOnLBMForm()
                 } label: {
-                    AppleHealthButtonLabel(title: "Sync All", isCompact: true)
-//                    HStack {
-//                        appleHealthSymbol
-//                        Text("Sync All")
-//                    }
+                    ButtonLabel(title: "Sync All", style: .healthAccented, isCompact: true)
+//                    AppleHealthButtonLabel(title: "Sync All", isCompact: true)
                 }
             }
         }

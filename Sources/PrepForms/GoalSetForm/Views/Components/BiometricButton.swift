@@ -1,54 +1,6 @@
 import SwiftUI
 import SwiftHaptics
 
-let BiometricButtonsAlignment: Alignment = .leading
-
-//struct BiometricButton: View {
-//
-//    enum Style {
-//        case plain
-//        case health
-//    }
-//
-//    let title: String
-//    let systemImage: String?
-//    let style: Style
-//    let action: () -> ()
-//
-//    init(_ title: String, systemImage: String? = nil, action: @escaping () -> Void) {
-//        self.title = title
-//        self.systemImage = systemImage
-//        self.style = .plain
-//        self.action = action
-//    }
-//
-//    init(healthTitle title: String, action: @escaping () -> Void) {
-//        self.title = title
-//        self.systemImage = nil
-//        self.style = .health
-//        self.action = action
-//    }
-//
-//    var body: some View {
-//        Button {
-//            Haptics.feedback(style: .soft)
-//            action()
-//        } label: {
-//            label
-//        }
-//    }
-//
-//    @ViewBuilder
-//    var label: some View {
-//        switch style {
-//        case .plain:
-//            ButtonLabel(title: title, leadingSystemImage: systemImage)
-//        case .health:
-//            AppleHealthButtonLabel(title: title)
-//        }
-//    }
-//}
-
 struct BiometricButton: View {
     
     @Environment(\.colorScheme) var colorScheme

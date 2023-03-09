@@ -253,7 +253,7 @@ struct NutrientGoalForm: View {
     
     var weightForm: some View {
         NutrientWeightForm(existingProfile: goalSet.biometrics, didTapSave: { biometrics in
-            goalSet.setBIometrics(biometrics)
+            goalSet.setBiometrics(biometrics)
         }, didTapClose: {
             goalSet.resetNutrientTDEEFormModel()
         })
@@ -262,7 +262,7 @@ struct NutrientGoalForm: View {
     
     var leanMassForm: some View {
         NutrientLeanBodyMassForm(existingProfile: goalSet.biometrics, didTapSave: { biometrics in
-            goalSet.setBIometrics(biometrics)
+            goalSet.setBiometrics(biometrics)
         }, didTapClose: {
             goalSet.resetNutrientTDEEFormModel()
         })
@@ -311,20 +311,22 @@ struct NutrientGoalForm: View {
     }
 
     var bodyMassFormattedWithUnit: String {
-        guard let biometrics = goalSet.biometrics else { return "" }
-        switch pickedBodyMassType {
-        case .weight:
-            guard let amount = biometrics.weight?.amount,
-                  let unit = biometrics.weight?.unit
-            else { return "" }
-            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
-            
-        case .leanMass:
-            guard let amount = biometrics.leanBodyMass?.amount,
-                  let unit = biometrics.leanBodyMass?.unit
-            else { return "" }
-            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
-        }
+        //TODO: Biometrics
+        return ""
+//        guard let biometrics = goalSet.biometrics else { return "" }
+//        switch pickedBodyMassType {
+//        case .weight:
+//            guard let amount = biometrics.weight?.amount,
+//                  let unit = biometrics.weight?.unit
+//            else { return "" }
+//            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
+//
+//        case .leanMass:
+//            guard let amount = biometrics.leanBodyMass?.amount,
+//                  let unit = biometrics.leanBodyMass?.unit
+//            else { return "" }
+//            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
+//        }
     }
     
     //MARK: - Buttons

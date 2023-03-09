@@ -100,8 +100,8 @@ extension GoalSetForm.Model {
         biometricsModel = BiometricsModel(existingProfile: biometrics, userUnits: userUnits)
     }
     
-    func setBIometrics(_ biometrics: Biometrics) {
-        /// in addition to setting the current body Profile, we also update the view model (BIometricsModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
+    func setBiometrics(_ biometrics: Biometrics) {
+        /// in addition to setting the current body Profile, we also update the view model (BiometricsModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
         self.biometrics = biometrics
         setNutrientTDEEFormModel(with: biometrics)
     }

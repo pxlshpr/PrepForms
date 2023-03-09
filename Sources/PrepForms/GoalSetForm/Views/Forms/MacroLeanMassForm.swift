@@ -112,6 +112,8 @@ extension NutrientLeanBodyMassForm {
 
 extension Biometrics {
     var hasLBM: Bool {
-        leanBodyMass?.amount != nil && leanBodyMass?.source != nil
+        //TODO: Biometrics
+        true
+//        leanBodyMass?.amount != nil && leanBodyMass?.source != nil
     }
 }

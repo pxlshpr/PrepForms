@@ -607,7 +607,7 @@ public enum GoalSetFormRoute: Hashable {
 
 //extension GoalSetForm {
 //    public class Model: ObservableObject {
-//        @Published var nutrientTDEEFormModel: BIometricsModel
+//        @Published var nutrientTDEEFormModel: BiometricsModel
 //        @Published var path: [GoalSetFormRoute] = []
 //        let existingGoalSet: GoalSet?
 //
@@ -619,7 +619,7 @@ public enum GoalSetFormRoute: Hashable {
 //        ) {
 //            self.existingGoalSet = existingGoalSet
 //
-//            self.nutrientTDEEFormModel = BIometricsModel(
+//            self.nutrientTDEEFormModel = BiometricsModel(
 //                existingProfile: biometrics,
 //                userOptions: userOptions
 //            )
@@ -637,11 +637,11 @@ public enum GoalSetFormRoute: Hashable {
 //    }
 //
 //    func setNutrientTDEEFormModel(with biometrics: Biometrics?) {
-//        nutrientTDEEFormModel = BIometricsModel(existingProfile: biometrics, userOptions: userOptions)
+//        nutrientTDEEFormModel = BiometricsModel(existingProfile: biometrics, userOptions: userOptions)
 //    }
 //
-//    func setBIometrics(_ biometrics: Biometrics) {
-//        /// in addition to setting the current body Profile, we also update the view model (BIometricsModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
+//    func setBiometrics(_ biometrics: Biometrics) {
+//        /// in addition to setting the current body Profile, we also update the view model (BiometricsModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
 //        self.biometrics = biometrics
 //        setNutrientTDEEFormModel(with: biometrics)
 //    }

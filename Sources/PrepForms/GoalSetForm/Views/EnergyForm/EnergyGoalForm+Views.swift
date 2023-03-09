@@ -114,7 +114,7 @@ extension EnergyGoalForm {
             existingProfile: model.biometrics,
             userUnits: model.userUnits)
         { profile in
-            model.setBIometrics(profile)
+            model.setBiometrics(profile)
         }
     }
     

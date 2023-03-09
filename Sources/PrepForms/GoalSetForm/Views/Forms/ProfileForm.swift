@@ -22,11 +22,8 @@ struct ProfileForm: View {
                 Button {
                     model.tappedSyncAllOnMeasurementsForm()
                 } label: {
-                    AppleHealthButtonLabel(title: "Sync All", isCompact: true)
-//                    HStack {
-//                        appleHealthSymbol
-//                        Text("Sync All")
-//                    }
+                    ButtonLabel(title: "Sync All", style: .healthAccented, isCompact: true)
+//                    AppleHealthButtonLabel(title: "Sync All", isCompact: true)
                 }
             }
         }
