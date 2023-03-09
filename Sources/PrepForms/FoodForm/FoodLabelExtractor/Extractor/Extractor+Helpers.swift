@@ -10,7 +10,7 @@ extension Extractor {
         withAnimation {
             presentationState = .offScreen
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             NotificationCenter.default.post(name: .didDismissExtractor, object: nil)
 //            self?.didDismiss?(nil)
         }

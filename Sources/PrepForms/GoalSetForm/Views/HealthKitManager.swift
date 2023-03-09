@@ -1,17 +1,6 @@
 import HealthKit
 import PrepDataTypes
 
-extension EnergyUnit {
-    var healthKitUnit: HKUnit {
-        switch self {
-        case .kcal:
-            return .kilocalorie()
-        case .kJ:
-            return .jouleUnit(with: .kilo)
-        }
-    }
-}
-
 class HealthKitManager: ObservableObject {
 
     static let shared = HealthKitManager()
@@ -132,23 +121,6 @@ class HealthKitManager: ObservableObject {
 //
 //       return true
 //   }
-}
-
-extension WeightUnit {
-    var healthKitUnit: HKUnit {
-        switch self {
-        case .g:
-            return .gram()
-        case .kg:
-            return .gramUnit(with: .kilo)
-        case .oz:
-            return .ounce()
-        case .lb:
-            return .pound()
-        case .mg:
-            return .gramUnit(with: .milli)
-        }
-    }
 }
 
 extension HealthKitManager {
@@ -362,12 +334,4 @@ enum HealthKitManagerError: Error {
     
     case noData
     case noDataOrNotAuthorized
-}
-
-public extension Date {
-    func moveHoursBy(_ hourIncrement: Int) -> Date {
-        var components = DateComponents()
-        components.hour = hourIncrement
-        return Calendar.current.date(byAdding: components, to: self)!
-    }
 }

@@ -116,26 +116,26 @@ extension NutrientWeightForm {
 extension Biometrics {
     var hasWeight: Bool {
         //TODO: Biometrics
-        true
-//        weight?.amount != nil && weight?.source != nil
+//        true
+        weight?.amount != nil && weight?.source != nil
     }
     
     var weightUpdatesWithHealth: Bool {
         //TODO: Biometrics
-        true
-//        weight?.source == .healthApp
+//        true
+        weight?.source == .healthApp
     }
     
     var lbmUpdatesWithHealth: Bool {
         //TODO: Biometrics
-        true
-//        switch leanBodyMass?.source {
-//        case .healthApp:
-//            return true
-//        case .fatPercentage, .formula:
-//            return weightUpdatesWithHealth
-//        default:
-//            return false
-//        }
+//        true
+        switch leanBodyMass?.source {
+        case .healthApp:
+            return true
+        case .fatPercentage, .formula:
+            return weightUpdatesWithHealth
+        default:
+            return false
+        }
     }
 }

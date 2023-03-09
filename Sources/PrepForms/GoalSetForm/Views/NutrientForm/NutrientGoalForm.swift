@@ -312,21 +312,21 @@ struct NutrientGoalForm: View {
 
     var bodyMassFormattedWithUnit: String {
         //TODO: Biometrics
-        return ""
-//        guard let biometrics = goalSet.biometrics else { return "" }
-//        switch pickedBodyMassType {
-//        case .weight:
-//            guard let amount = biometrics.weight?.amount,
-//                  let unit = biometrics.weight?.unit
-//            else { return "" }
-//            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
-//
-//        case .leanMass:
-//            guard let amount = biometrics.leanBodyMass?.amount,
-//                  let unit = biometrics.leanBodyMass?.unit
-//            else { return "" }
-//            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
-//        }
+//        return ""
+        guard let biometrics = goalSet.biometrics else { return "" }
+        switch pickedBodyMassType {
+        case .weight:
+            guard let amount = biometrics.weight?.amount,
+                  let unit = biometrics.weight?.unit
+            else { return "" }
+            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
+
+        case .leanMass:
+            guard let amount = biometrics.leanBodyMass?.amount,
+                  let unit = biometrics.leanBodyMass?.unit
+            else { return "" }
+            return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
+        }
     }
     
     //MARK: - Buttons

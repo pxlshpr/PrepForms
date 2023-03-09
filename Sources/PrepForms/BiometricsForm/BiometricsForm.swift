@@ -32,7 +32,7 @@ public struct BiometricsForm: View {
             Button {
                 model.tappedSyncAll()
             } label: {
-                ButtonLabel(title: "Sync All", style: .healthAccented, isCompact: true)
+                ButtonLabel(title: "Sync All", style: .health, isCompact: true)
             }
         }
     }
