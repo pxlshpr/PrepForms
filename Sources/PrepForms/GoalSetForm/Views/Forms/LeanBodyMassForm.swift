@@ -35,7 +35,7 @@ struct LeanBodyMassForm: View {
                 switch model.lbmSource {
                 case .userEntered:
                     return "You will need to ensure your lean body mass is kept up to date for an accurate calculation."
-                case .healthApp:
+                case .health:
                     return "Your lean body mass will be kept in sync with the Health App."
                 case .formula:
                     return "Use a formula to calculate your lean body mass."

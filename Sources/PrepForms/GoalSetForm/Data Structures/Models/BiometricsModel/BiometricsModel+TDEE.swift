@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 import PrepDataTypes
 import SwiftHaptics
+import PrepCoreDataStack
 
 extension BiometricsModel {
     var maintenanceEnergy: Double? {
@@ -34,7 +35,7 @@ extension BiometricsModel {
     
     var restingEnergyIsDynamic: Bool {
         switch restingEnergySource {
-        case .healthApp:
+        case .health:
             return true
         case .formula:
             return restingEnergyFormulaUsingSyncedHealthData
@@ -46,12 +47,12 @@ extension BiometricsModel {
     var restingEnergyFormulaUsingSyncedHealthData: Bool {
         if restingEnergyFormula.usesLeanBodyMass {
             switch lbmSource {
-            case .healthApp:
+            case .health:
                 return true
             case .fatPercentage:
-                return weightSource == .healthApp
+                return weightSource == .health
             case .formula:
-                return weightSource == .healthApp
+                return weightSource == .health
             default:
                 return false
             }
@@ -112,7 +113,7 @@ extension BiometricsModel {
         switch restingEnergySource {
         case .formula:
             return calculatedRestingEnergy != nil
-        case .healthApp, .userEntered:
+        case .health, .userEntered:
             return restingEnergy != nil
         default:
             return false
@@ -121,7 +122,7 @@ extension BiometricsModel {
     
     var restingEnergyPrefix: String? {
         switch restingEnergySource {
-        case .healthApp:
+        case .health:
             return restingEnergyPeriod.energyPrefix
         case .formula:
             return restingEnergyFormulaUsingSyncedHealthData ? "currently" : nil
@@ -166,7 +167,7 @@ extension BiometricsModel {
             restingEnergySource = newSource
         }
         switch restingEnergySource {
-        case .healthApp:
+        case .health:
             fetchRestingEnergyFromHealth()
         case .formula:
             break
@@ -265,7 +266,7 @@ extension BiometricsModel {
     
     var restingEnergyFooterString: String? {
         let prefix = "This is an estimate of the energy your body uses each day while minimally active."
-        if restingEnergySource == .healthApp {
+        if restingEnergySource == .health {
             return prefix + " This will sync with your Health data and update daily."
         }
         return prefix
@@ -312,7 +313,7 @@ extension BiometricsModel {
     
     var activeEnergyIsDynamic: Bool {
         switch activeEnergySource {
-        case .healthApp:
+        case .health:
             return true
         default:
             return false
@@ -375,7 +376,7 @@ extension BiometricsModel {
         switch activeEnergySource {
         case .activityLevel:
             return calculatedActiveEnergy != nil
-        case .healthApp, .userEntered:
+        case .health, .userEntered:
             return activeEnergy != nil
         default:
             return false
@@ -384,7 +385,7 @@ extension BiometricsModel {
     
     var activeEnergyPrefix: String? {
         switch activeEnergySource {
-        case .healthApp:
+        case .health:
             return activeEnergyPeriod.energyPrefix
         default:
             return nil
@@ -427,7 +428,7 @@ extension BiometricsModel {
             activeEnergySource = newSource
         }
         switch activeEnergySource {
-        case .healthApp:
+        case .health:
             fetchActiveEnergyFromHealth()
         default:
             break
@@ -543,7 +544,7 @@ extension BiometricsModel {
     
     var activeEnergyFooterString: String? {
         let prefix = "This is an estimate of energy burnt over and above your Resting Energy use."
-        if activeEnergySource == .healthApp {
+        if activeEnergySource == .health {
             return prefix + " This will sync with your Health data and update daily."
         }
         return prefix

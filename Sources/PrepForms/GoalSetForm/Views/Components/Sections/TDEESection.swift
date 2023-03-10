@@ -46,7 +46,7 @@ struct TDEESection: View {
     
     func tappedSync() {
         Haptics.feedback(style: .soft)
-//        model.changeWeightSource(to: .healthApp)
+//        model.changeWeightSource(to: .health)
     }
     
     func tappedSetup() {

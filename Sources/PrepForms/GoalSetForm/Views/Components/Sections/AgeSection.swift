@@ -30,7 +30,7 @@ struct AgeSection: View {
                     Group {
                         sourceSection
                         switch source {
-                        case .healthApp:
+                        case .health:
                             EmptyView()
                         case .userEntered:
                             EmptyView()
@@ -45,7 +45,7 @@ struct AgeSection: View {
     }
 
     func tappedSyncWithHealth() {
-        model.changeAgeSource(to: .healthApp)
+        model.changeAgeSource(to: .health)
     }
     
     func tappedManualEntry() {
@@ -107,7 +107,7 @@ struct AgeSection: View {
         
         return Group {
             switch model.ageSource {
-            case .healthApp:
+            case .health:
                 healthContent
             case .userEntered:
                 manualEntry

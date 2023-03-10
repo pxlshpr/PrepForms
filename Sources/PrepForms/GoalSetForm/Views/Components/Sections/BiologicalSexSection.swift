@@ -32,7 +32,7 @@ struct BiologicalSexSection: View {
                     Group {
                         sourceSection
                         switch source {
-                        case .healthApp:
+                        case .health:
                             EmptyView()
                         case .userEntered:
                             EmptyView()
@@ -47,7 +47,7 @@ struct BiologicalSexSection: View {
     }
 
     func tappedSyncWithHealth() {
-        model.changeSexSource(to: .healthApp)
+        model.changeSexSource(to: .health)
     }
     
     func tappedManualEntry() {

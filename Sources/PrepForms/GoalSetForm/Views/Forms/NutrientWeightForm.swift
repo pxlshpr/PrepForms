@@ -123,14 +123,14 @@ extension Biometrics {
     var weightUpdatesWithHealth: Bool {
         //TODO: Biometrics
 //        true
-        weight?.source == .healthApp
+        weight?.source == .health
     }
     
     var lbmUpdatesWithHealth: Bool {
         //TODO: Biometrics
 //        true
         switch leanBodyMass?.source {
-        case .healthApp:
+        case .health:
             return true
         case .fatPercentage, .formula:
             return weightUpdatesWithHealth

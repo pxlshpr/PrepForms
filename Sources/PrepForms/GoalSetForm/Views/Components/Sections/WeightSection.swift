@@ -26,7 +26,7 @@ struct WeightSection: View {
                     Group {
                         sourceSection
                         switch source {
-                        case .healthApp:
+                        case .health:
 //                            healthContent
                             EmptyView()
                         case .userEntered:
@@ -42,7 +42,7 @@ struct WeightSection: View {
     }
 
     func tappedSyncWithHealth() {
-        model.changeWeightSource(to: .healthApp)
+        model.changeWeightSource(to: .health)
     }
     
     func tappedManualEntry() {
@@ -62,7 +62,7 @@ struct WeightSection: View {
         switch model.weightSource {
         case .userEntered:
             Text("You will need to update your weight manually.")
-        case .healthApp:
+        case .health:
             Text("Your weight will be kept in sync with the Health App.")
         default:
             EmptyView()
@@ -130,7 +130,7 @@ struct WeightSection: View {
         
         return Group {
             switch model.weightSource {
-            case .healthApp:
+            case .health:
                 health
             case .userEntered:
                 manualEntry

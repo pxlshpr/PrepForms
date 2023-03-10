@@ -3,6 +3,7 @@ import SwiftUISugar
 import SwiftHaptics
 import PrepDataTypes
 import ActivityIndicatorView
+import PrepCoreDataStack
 
 extension TDEEForm {
     
@@ -232,7 +233,7 @@ extension TDEEForm {
 //
 //            return Group {
 //                switch model.activeEnergySource {
-//                case .healthApp:
+//                case .health:
 //                    healthContent
 //                case .activityLevel:
 //                    activityLevel
@@ -313,7 +314,7 @@ extension TDEEForm {
                         Group {
                             sourceSection
                             switch source {
-                            case .healthApp:
+                            case .health:
                                 healthContent
                             case .activityLevel:
                                 activityLevelContent
@@ -343,7 +344,7 @@ extension TDEEForm {
                 do {
                     try await HealthKitManager.shared.requestPermission(for: .activeEnergyBurned)
                     withAnimation {
-                        model.activeEnergySource = .healthApp
+                        model.activeEnergySource = .health
                     }
                     model.fetchActiveEnergyFromHealth()
                 } catch {

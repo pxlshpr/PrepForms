@@ -4,6 +4,7 @@ import PrepDataTypes
 import ActivityIndicatorView
 import SwiftUISugar
 import HealthKit
+import PrepCoreDataStack
 
 //func label(_ label: String, _ valueString: String) -> some View {
 
@@ -325,7 +326,7 @@ extension TDEEForm {
                         Group {
                             sourceSection
                             switch source {
-                            case .healthApp:
+                            case .health:
                                 healthContent
                             case .userEntered:
                                 EmptyView()
@@ -358,7 +359,7 @@ extension TDEEForm {
                 do {
                     try await HealthKitManager.shared.requestPermission(for: .basalEnergyBurned)
                     withAnimation {
-                        model.restingEnergySource = .healthApp
+                        model.restingEnergySource = .health
                     }
                     model.fetchRestingEnergyFromHealth()
                 } catch {
@@ -468,7 +469,7 @@ extension TDEEForm {
             
             return Group {
                 switch model.restingEnergySource {
-                case .healthApp:
+                case .health:
                     health
                 case .formula:
                     formula

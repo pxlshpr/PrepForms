@@ -22,7 +22,7 @@ struct HeightSection: View {
                     Group {
                         sourceSection
                         switch source {
-                        case .healthApp:
+                        case .health:
                             EmptyView()
                         case .userEntered:
                             EmptyView()
@@ -37,7 +37,7 @@ struct HeightSection: View {
     }
 
     func tappedSyncWithHealth() {
-        model.changeHeightSource(to: .healthApp)
+        model.changeHeightSource(to: .health)
     }
     
     func tappedManualEntry() {
@@ -57,7 +57,7 @@ struct HeightSection: View {
         switch model.heightSource {
         case .userEntered:
             Text("You will need to update your height manually.")
-        case .healthApp:
+        case .health:
             Text("Your height will be kept in sync with the Health App.")
         default:
             EmptyView()
@@ -125,7 +125,7 @@ struct HeightSection: View {
         
         return Group {
             switch model.heightSource {
-            case .healthApp:
+            case .health:
                 health
             case .userEntered:
                 manualEntry

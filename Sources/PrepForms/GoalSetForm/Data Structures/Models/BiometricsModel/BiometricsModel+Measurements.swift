@@ -2,6 +2,7 @@ import SwiftUI
 import PrepDataTypes
 import HealthKit
 import SwiftHaptics
+import PrepCoreDataStack
 
 extension BiometricsModel {
     
@@ -14,16 +15,16 @@ extension BiometricsModel {
     
     var measurementsAreSynced: Bool {
         hasMeasurements
-        && (weightSource == .healthApp || heightSource == .healthApp)
+        && (weightSource == .health || heightSource == .health)
     }
     
     var shouldShowSyncAllForMeasurementsForm: Bool {
         var countNotSynced = 0
-        if sexSource != .healthApp { countNotSynced += 1 }
-        if weightSource != .healthApp { countNotSynced += 1 }
-        if ageSource != .healthApp { countNotSynced += 1 }
+        if sexSource != .health { countNotSynced += 1 }
+        if weightSource != .health { countNotSynced += 1 }
+        if ageSource != .health { countNotSynced += 1 }
         if restingEnergyFormula.requiresHeight {
-            if heightSource != .healthApp { countNotSynced += 1 }
+            if heightSource != .health { countNotSynced += 1 }
         }
         return countNotSynced > 1
     }
@@ -57,7 +58,7 @@ extension BiometricsModel {
         withAnimation {
             sexSource = newSource
         }
-        if newSource == .healthApp {
+        if newSource == .health {
             fetchSexFromHealth()
         }
     }
@@ -95,7 +96,7 @@ extension BiometricsModel {
     }
     
     var hasDynamicSex: Bool {
-        sexSource == .healthApp
+        sexSource == .health
     }
     
     var sexIsFemale: Bool? {
@@ -127,7 +128,7 @@ extension BiometricsModel {
         withAnimation {
             ageSource = newSource
         }
-        if newSource == .healthApp {
+        if newSource == .health {
             fetchDOBFromHealth()
         }
     }
@@ -188,7 +189,7 @@ extension BiometricsModel {
     }
     
     var hasDynamicAge: Bool {
-        ageSource == .healthApp
+        ageSource == .health
     }
 }
 
@@ -208,7 +209,7 @@ extension BiometricsModel {
         withAnimation {
             heightSource = newSource
         }
-        if newSource == .healthApp {
+        if newSource == .health {
             fetchHeightFromHealth()
         }
     }
@@ -289,7 +290,7 @@ extension BiometricsModel {
         withAnimation {
             weightSource = newSource
         }
-        if newSource == .healthApp {
+        if newSource == .health {
             fetchWeightFromHealth()
         }
     }
@@ -360,7 +361,7 @@ extension BiometricsModel {
     }
     
     var syncsWeight: Bool {
-        weightSource == .healthApp
+        weightSource == .health
     }
 }
 
@@ -380,7 +381,7 @@ extension BiometricsModel {
         withAnimation {
             lbmSource = newSource
         }
-        if newSource == .healthApp {
+        if newSource == .health {
             Task {
                 await fetchLBMFromHealth()
             }
@@ -516,7 +517,7 @@ extension BiometricsModel {
         switch lbmSource {
         case .fatPercentage, .formula:
             return calculatedLeanBodyMass != nil
-        case .healthApp, .userEntered:
+        case .health, .userEntered:
             return lbm != nil
         default:
             return false
@@ -550,9 +551,9 @@ extension BiometricsModel {
     var shouldShowSyncAllForLBMForm: Bool {
         guard lbmSource == .formula else { return false }
         var countNotSynced = 0
-        if sexSource != .healthApp { countNotSynced += 1 }
-        if weightSource != .healthApp { countNotSynced += 1 }
-        if heightSource != .healthApp { countNotSynced += 1 }
+        if sexSource != .health { countNotSynced += 1 }
+        if weightSource != .health { countNotSynced += 1 }
+        if heightSource != .health { countNotSynced += 1 }
         /// return true if the user has picked `.formula` as the source and we have at least two parameters not synced
         return countNotSynced > 1
     }

@@ -108,7 +108,7 @@ extension BiometricsModel {
     }
     
     func updateHealthAppDataIfNeeded() {
-        if restingEnergySource == .healthApp {
+        if restingEnergySource == .health {
             fetchRestingEnergyFromHealth()
         }
         //TODO: We need to fetch other HealthApp synced data here too
@@ -147,20 +147,20 @@ extension BiometricsModel {
     var biometrics: Biometrics {
         
         var restingEnergyFormula: RestingEnergyFormula? { restingEnergySource == .formula ? self.restingEnergyFormula : nil }
-        var restingEnergyPeriod: HealthPeriodOption? { restingEnergySource == .healthApp ? self.restingEnergyPeriod : nil }
-        var restingEnergyIntervalValue: Int? { restingEnergySource == .healthApp ? self.restingEnergyIntervalValue : nil }
-        var restingEnergyInterval: HealthAppInterval? { restingEnergySource == .healthApp ? self.restingEnergyInterval : nil }
+        var restingEnergyPeriod: HealthPeriodOption? { restingEnergySource == .health ? self.restingEnergyPeriod : nil }
+        var restingEnergyIntervalValue: Int? { restingEnergySource == .health ? self.restingEnergyIntervalValue : nil }
+        var restingEnergyInterval: HealthAppInterval? { restingEnergySource == .health ? self.restingEnergyInterval : nil }
         
-        var activeEnergyPeriod: HealthPeriodOption? { activeEnergySource == .healthApp ? self.activeEnergyPeriod : nil }
+        var activeEnergyPeriod: HealthPeriodOption? { activeEnergySource == .health ? self.activeEnergyPeriod : nil }
         var activeEnergyActivityLevel: ActivityLevel? { activeEnergySource == .activityLevel ? self.activeEnergyActivityLevel : nil }
-        var activeEnergyIntervalValue: Int? { activeEnergySource == .healthApp ? self.activeEnergyIntervalValue : nil }
-        var activeEnergyInterval: HealthAppInterval? { activeEnergySource == .healthApp ? self.activeEnergyInterval : nil }
+        var activeEnergyIntervalValue: Int? { activeEnergySource == .health ? self.activeEnergyIntervalValue : nil }
+        var activeEnergyInterval: HealthAppInterval? { activeEnergySource == .health ? self.activeEnergyInterval : nil }
         
         var lbmFormula: LeanBodyMassFormula? { lbmSource == .formula ? self.lbmFormula : nil }
-        var lbmDate: Date? { lbmSource == .healthApp ? self.lbmDate : nil }
+        var lbmDate: Date? { lbmSource == .health ? self.lbmDate : nil }
         
-        var weightDate: Date? { weightSource == .healthApp ? self.weightDate : nil }
-        var heightDate: Date? { heightSource == .healthApp ? self.heightDate : nil }
+        var weightDate: Date? { weightSource == .health ? self.weightDate : nil }
+        var heightDate: Date? { heightSource == .health ? self.heightDate : nil }
                 
         var restingEnergyData: Biometrics.RestingEnergy {
             .init(

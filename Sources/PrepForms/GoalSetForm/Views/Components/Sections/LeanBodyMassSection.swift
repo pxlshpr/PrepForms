@@ -48,7 +48,7 @@ struct LeanBodyMassSection: View {
                     Group {
                         sourceSection
                         switch source {
-                        case .healthApp:
+                        case .health:
 //                            healthContent
                             EmptyView()
                         case .userEntered:
@@ -111,7 +111,7 @@ struct LeanBodyMassSection: View {
     }
     
     func tappedSyncWithHealth() {
-        model.changeLBMSource(to: .healthApp)
+        model.changeLBMSource(to: .health)
     }
     
     func tappedFormula() {
@@ -222,7 +222,7 @@ struct LeanBodyMassSection: View {
      
         return Group {
             switch model.lbmSource {
-            case .healthApp:
+            case .health:
                 health
             case .formula:
                 calculatedLBMRow

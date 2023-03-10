@@ -1,5 +1,6 @@
 import SwiftUI
 import HealthKit
+import PrepCoreDataStack
 
 extension BiometricsModel {
  
@@ -19,9 +20,9 @@ extension BiometricsModel {
                     quantityTypes: [.bodyMass, .height]
                 )
                 await MainActor.run {
-                    changeSexSource(to: .healthApp)
-                    changeWeightSource(to: .healthApp)
-                    changeHeightSource(to: .healthApp)
+                    changeSexSource(to: .health)
+                    changeWeightSource(to: .health)
+                    changeHeightSource(to: .health)
                 }
             } catch {
                 //TODO: Handle error
@@ -55,11 +56,11 @@ extension BiometricsModel {
                     quantityTypes: quantityTypes
                 )
                 await MainActor.run {
-                    changeSexSource(to: .healthApp)
-                    changeWeightSource(to: .healthApp)
-                    changeAgeSource(to: .healthApp)
+                    changeSexSource(to: .health)
+                    changeWeightSource(to: .health)
+                    changeAgeSource(to: .health)
                     if restingEnergyFormula.requiresHeight {
-                        changeHeightSource(to: .healthApp)
+                        changeHeightSource(to: .health)
                     }
                 }
             } catch {
@@ -96,17 +97,17 @@ extension BiometricsModel {
                     ]
                 )
                 await MainActor.run {
-                    changeActiveEnergySource(to: .healthApp)
-                    changeRestingEnergySource(to: .healthApp)
-                    changeLBMSource(to: .healthApp)
-                    changeSexSource(to: .healthApp)
-                    changeWeightSource(to: .healthApp)
-                    changeHeightSource(to: .healthApp)
-                    changeAgeSource(to: .healthApp)
+                    changeActiveEnergySource(to: .health)
+                    changeRestingEnergySource(to: .health)
+                    changeLBMSource(to: .health)
+                    changeSexSource(to: .health)
+                    changeWeightSource(to: .health)
+                    changeHeightSource(to: .health)
+                    changeAgeSource(to: .health)
                     
-                    //TODO: Do properly after all values have been fetched and not with a delay
+                    //TODO: Do this correctly after all values have been fetched and not with an artificial delay
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        self.save()
+                        self.saveBiometrics()
                     }
                 }
             } catch {
