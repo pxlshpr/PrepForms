@@ -271,9 +271,6 @@ extension BiometricsModel {
         height != nil
     }
     
-    var hasDynamicHeight: Bool {
-        heightSource == .healthApp
-    }
 }
 
 //MARK: - Weight
@@ -362,7 +359,7 @@ extension BiometricsModel {
         weight != nil
     }
     
-    var hasDynamicWeight: Bool {
+    var syncsWeight: Bool {
         weightSource == .healthApp
     }
 }

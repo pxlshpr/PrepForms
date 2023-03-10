@@ -302,7 +302,6 @@ extension BiometricsModel {
             } catch {
                 
             }
-            /// [ ] Make sure we persist this to the backend once the user saves it
         }
     }
 }
