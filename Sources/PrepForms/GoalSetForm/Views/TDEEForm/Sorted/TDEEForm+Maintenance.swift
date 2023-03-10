@@ -114,6 +114,7 @@ struct MaintenanceEnergyView: View {
                 energyUnit: unit,
                 namespace: namespace
             )
+            .frame(maxWidth: .infinity, alignment: .center)
     }
     
     var content_legacy: some View {
