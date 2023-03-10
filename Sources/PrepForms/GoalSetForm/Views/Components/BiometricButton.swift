@@ -113,7 +113,7 @@ struct BiometricButton: View {
         return VStack(spacing: 5) {
             image
             Text(title)
-                .fontWeight(.medium)
+                .fontWeight(.bold)
         }
         .foregroundColor(textColor)
         .frame(maxWidth: .infinity)

@@ -279,7 +279,7 @@ extension BiometricsModel {
         
         Task {
             do {
-                let average = try await HealthKitManager.shared.averageSumOfRestingEnergy(
+                let average = try await HealthKitManager.shared.restingEnergy(
                     using: userEnergyUnit,
                     overPast: restingEnergyIntervalValue,
                     interval: restingEnergyInterval
@@ -514,7 +514,7 @@ extension BiometricsModel {
         
         Task {
             do {
-                let average = try await HealthKitManager.shared.averageSumOfActiveEnergy(
+                let average = try await HealthKitManager.shared.activeEnergy(
                     using: userEnergyUnit,
                     overPast: activeEnergyIntervalValue,
                     interval: activeEnergyInterval
