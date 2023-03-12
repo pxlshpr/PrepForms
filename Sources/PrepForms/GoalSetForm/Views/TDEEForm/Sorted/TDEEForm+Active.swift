@@ -6,8 +6,13 @@ import ActivityIndicatorView
 import PrepCoreDataStack
 
 extension TDEEForm {
-    
+
     var activeEnergySection: some View {
+        ActiveEnergySection()
+            .environmentObject(model)
+    }
+    
+    var activeEnergySection_legacy: some View {
         
         var sourceSection: some View {
             var sourceMenu: some View {
@@ -249,10 +254,16 @@ extension TDEEForm {
                     model.activeEnergyBiometricValue
                 },
                 set: { newValue in
-                    model.activeEnergy = newValue?.amount
-                    if let _ = newValue?.unit?.energyUnit {
-                        //TODO: We need variables for units within the bodyProfile
-//                        model.userEnergyUnit = newEnergyUnit
+                    model.activeEnergy = newValue?.double
+                    
+                    if let energyUnit = newValue?.unit?.energyUnit {
+                        
+                        /// Convert other energy based values in `BiometricModel` before setting the unit
+                        if let restingEnergy = model.restingEnergy {
+                            model.restingEnergy = model.userEnergyUnit.convert(restingEnergy, to: energyUnit)
+                        }
+                        model.userEnergyUnit = energyUnit
+                        UserManager.energyUnit = energyUnit
                     }
                 }
             )

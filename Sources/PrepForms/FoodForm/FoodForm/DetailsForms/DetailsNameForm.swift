@@ -28,11 +28,11 @@ struct DetailsNameForm: View {
     
     class Model: ObservableObject {
         let initialString: String
-        let isRequird: Bool
+        let isRequired: Bool
         @Published var internalString: String = ""
 
         init(initialString: String, isRequired: Bool) {
-            self.isRequird = isRequired
+            self.isRequired = isRequired
             self.initialString = initialString
             self.internalString = initialString
         }
@@ -42,7 +42,7 @@ struct DetailsNameForm: View {
                 return true
             }
 
-            if isRequird && internalString.isEmpty {
+            if isRequired && internalString.isEmpty {
                 return true
             }
             return false
@@ -143,7 +143,7 @@ struct DetailsNameForm: View {
             }
         )
 
-        return TextField(model.isRequird ? "Required" : "Optional", text: binding)
+        return TextField(model.isRequired ? "Required" : "Optional", text: binding)
             .focused($isFocused)
             .multilineTextAlignment(.leading)
             .font(binding.wrappedValue.isEmpty ? .body : .largeTitle)

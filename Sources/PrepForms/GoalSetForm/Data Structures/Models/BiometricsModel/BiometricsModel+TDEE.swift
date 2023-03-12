@@ -369,9 +369,39 @@ extension BiometricsModel {
     
     var activeEnergyBiometricValue: BiometricValue? {
         guard let activeEnergyValue else { return nil }
-        return .init(amount: activeEnergyValue, unit: .energy(userEnergyUnit))
+        return .activeEnergy(activeEnergyValue, userEnergyUnit)
     }
-    
+
+    var ageBiometricValue: BiometricValue? {
+        guard let age else { return nil }
+        return .age(age)
+    }
+
+    var sexBiometricValue: BiometricValue? {
+        guard let sex else { return nil }
+        return .sex(sex.biometricSex)
+    }
+
+    var heightBiometricValue: BiometricValue? {
+        guard let height else { return nil }
+        return .height(height, userHeightUnit)
+    }
+
+    var weightBiometricValue: BiometricValue? {
+        guard let weight else { return nil }
+        return .weight(weight, userBodyMassUnit)
+    }
+
+    var leanBodyMassBiometricValue: BiometricValue? {
+        guard let lbm else { return nil }
+        return .leanBodyMass(lbm, userBodyMassUnit)
+    }
+
+    var restingEnergyBiometricValue: BiometricValue? {
+        guard let restingEnergyValue else { return nil }
+        return .restingEnergy(restingEnergyValue, userEnergyUnit)
+    }
+
     var hasActiveEnergy: Bool {
         switch activeEnergySource {
         case .activityLevel:

@@ -192,17 +192,17 @@ struct ProfileLabel: View {
     let sex: HKBiologicalSex
     let weight: Double
     let height: Double?
-    let weightUnit: WeightUnit
+    let bodyMassUnit: BodyMassUnit
     let heightUnit: HeightUnit
     
     let isSynced: Bool
     
-    init(age: Int, sex: HKBiologicalSex, weight: Double, height: Double? = nil, weightUnit: WeightUnit, heightUnit: HeightUnit, isSynced: Bool) {
+    init(age: Int, sex: HKBiologicalSex, weight: Double, height: Double? = nil, bodyMassUnit: BodyMassUnit, heightUnit: HeightUnit, isSynced: Bool) {
         self.age = age
         self.sex = sex
         self.weight = weight
         self.height = height
-        self.weightUnit = weightUnit
+        self.bodyMassUnit = bodyMassUnit
         self.heightUnit = heightUnit
         self.isSynced = isSynced
     }
@@ -212,7 +212,7 @@ struct ProfileLabel: View {
             background
             HStack {
                 pair(age, "yo")
-                pair(Int(weight), weightUnit.shortDescription)
+                pair(Int(weight), bodyMassUnit.shortDescription)
                 if let height {
                     pair(Int(height), heightUnit.shortDescription)
                 }
@@ -291,7 +291,7 @@ struct ProfileLabel_Previews: PreviewProvider {
                 sex: .male,
                 weight: 95.6,
                 height: 177.04,
-                weightUnit: .kg,
+                bodyMassUnit: .kg,
                 heightUnit: .cm,
                 isSynced: false
             )

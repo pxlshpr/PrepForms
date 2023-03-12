@@ -297,13 +297,13 @@ extension BiometricsModel {
     
     var weightInKg: Double? {
         guard let weight else { return nil }
-        switch userWeightUnit {
+        switch userBodyMassUnit {
         case .kg:
             return weight
         case .lb:
-            return (WeightUnit.lb.g/WeightUnit.kg.g) * weight
-        default:
-            return nil
+            return (BodyMassUnit.lb.g/BodyMassUnit.kg.g) * weight
+        case .st:
+            return (BodyMassUnit.st.g/BodyMassUnit.kg.g) * weight
         }
     }
     
@@ -333,7 +333,7 @@ extension BiometricsModel {
         }
         
         Task {
-            guard let (weight, date) = await HealthKitManager.shared.latestWeight(unit: userWeightUnit) else {
+            guard let (weight, date) = await HealthKitManager.shared.latestWeight(unit: userBodyMassUnit) else {
                 return
             }
             await MainActor.run {
@@ -353,7 +353,7 @@ extension BiometricsModel {
 
     var weightFormattedWithUnit: String {
         guard let weight else { return "" }
-        return weight.cleanAmount + " " + userWeightUnit.shortDescription
+        return weight.cleanAmount + " " + userBodyMassUnit.shortDescription
     }
 
     var hasWeight: Bool {
@@ -416,13 +416,13 @@ extension BiometricsModel {
     
     var lbmInKg: Double? {
         guard let lbmValue else { return nil }
-        switch userWeightUnit {
+        switch userBodyMassUnit {
         case .kg:
             return lbmValue
         case .lb:
-            return (WeightUnit.lb.g/WeightUnit.kg.g) * lbmValue
-        default:
-            return nil
+            return (BodyMassUnit.lb.g/BodyMassUnit.kg.g) * lbmValue
+        case .st:
+            return (BodyMassUnit.st.g/BodyMassUnit.kg.g) * lbmValue
         }
     }
     
@@ -475,7 +475,7 @@ extension BiometricsModel {
             }
         }
         
-        guard let (lbm, date) = await HealthKitManager.shared.latestLeanBodyMass(unit: userWeightUnit) else {
+        guard let (lbm, date) = await HealthKitManager.shared.latestLeanBodyMass(unit: userBodyMassUnit) else {
             return
         }
         await MainActor.run {
@@ -510,7 +510,7 @@ extension BiometricsModel {
             value = lbm
         }
         guard let value else { return "" }
-        return value.rounded(toPlaces: 1).cleanAmount + " " + userWeightUnit.shortDescription
+        return value.rounded(toPlaces: 1).cleanAmount + " " + userBodyMassUnit.shortDescription
     }
 
     var hasLeanBodyMass: Bool {

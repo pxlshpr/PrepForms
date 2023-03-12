@@ -4,9 +4,9 @@ import SwiftHaptics
 import HealthKit
 
 class BiometricsModel: ObservableObject {
-    let userEnergyUnit: EnergyUnit
-    let userWeightUnit: WeightUnit
-    let userHeightUnit: HeightUnit
+    var userEnergyUnit: EnergyUnit
+    var userBodyMassUnit: BodyMassUnit
+    var userHeightUnit: HeightUnit
     
     @Published var path: [TDEEFormRoute] = []
     @Published var isEditing = false
@@ -74,7 +74,7 @@ class BiometricsModel: ObservableObject {
         userUnits: UserOptions.Units
     ) {
         self.userEnergyUnit = userUnits.energy
-        self.userWeightUnit = userUnits.weight
+        self.userBodyMassUnit = userUnits.bodyMass
         self.userHeightUnit = userUnits.height
         
         self.existingProfile = existingProfile
@@ -189,7 +189,7 @@ extension BiometricsModel {
         var leanBodyMassData: Biometrics.LeanBodyMass {
             .init(
                 amount: lbmValue, /// We don't use `lbm` here because it may be the actual percentage
-                unit: userWeightUnit, //TODO: Change this
+                unit: userBodyMassUnit, //TODO: Change this
                 source: lbmSource,
                 formula: lbmFormula,
                 date: lbmDate
@@ -199,7 +199,7 @@ extension BiometricsModel {
         var weightData: Biometrics.Weight {
             .init(
                 amount: weight,
-                unit: userWeightUnit, //TODO: Change this
+                unit: userBodyMassUnit, //TODO: Change this
                 source: weightSource,
                 date: weightDate
             )

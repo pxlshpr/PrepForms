@@ -69,58 +69,76 @@ struct BiologicalSexSection: View {
     }
     
     var bottomRow: some View {
-        var picker: some View {
-            Menu {
-                if model.sexSource == .userEntered {
-                    Picker(selection: model.sexPickerBinding, label: EmptyView()) {
-                        Text("female").tag(HKBiologicalSex.female)
-                        Text("male").tag(HKBiologicalSex.male)
-                    }
-                }
-            } label: {
-                switch model.sexFetchStatus {
-                case .noData:
-                    Text("No Data")
-                case .noDataOrNotAuthorized:
-                    Text("No Data or Not Authorized")
-                case .notFetched, .fetching, .fetched:
-                    HStack(spacing: 5) {
-                        if model.sexFetchStatus == .fetching {
-                            ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
-                                .frame(width: 25, height: 25)
-                                .foregroundColor(.secondary)
-                        } else {
-                            Text(model.sexFormatted ?? "not specified")
-                                .font(.system(.title3, design: .rounded, weight: .semibold))
-                                .foregroundColor(model.sexSource == .userEntered ? .primary : .secondary)
-                                .foregroundColor(.primary)
-                                .animation(.none, value: model.sex)
-                                .animation(.none, value: model.sexSource)
-                                .fixedSize(horizontal: true, vertical: true)
-                                .if(!model.hasSex && model.sexSource != .userEntered) { view in
-                                    view
-                                        .redacted(reason: .placeholder)
-                                }
-                            if model.sexSource == .userEntered {
-                                Image(systemName: "chevron.up.chevron.down")
-                                    .imageScale(.small)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    }
-                }
+//        var picker: some View {
+//            Menu {
+//                if model.sexSource == .userEntered {
+//                    Picker(selection: model.sexPickerBinding, label: EmptyView()) {
+//                        Text("female").tag(HKBiologicalSex.female)
+//                        Text("male").tag(HKBiologicalSex.male)
+//                    }
+//                }
+//            } label: {
+//                switch model.sexFetchStatus {
+//                case .noData:
+//                    Text("No Data")
+//                case .noDataOrNotAuthorized:
+//                    Text("No Data or Not Authorized")
+//                case .notFetched, .fetching, .fetched:
+//                    HStack(spacing: 5) {
+//                        if model.sexFetchStatus == .fetching {
+//                            ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
+//                                .frame(width: 25, height: 25)
+//                                .foregroundColor(.secondary)
+//                        } else {
+//                            Text(model.sexFormatted ?? "not specified")
+//                                .font(.system(.title3, design: .rounded, weight: .semibold))
+//                                .foregroundColor(model.sexSource == .userEntered ? .primary : .secondary)
+//                                .foregroundColor(.primary)
+//                                .animation(.none, value: model.sex)
+//                                .animation(.none, value: model.sexSource)
+//                                .fixedSize(horizontal: true, vertical: true)
+//                                .if(!model.hasSex && model.sexSource != .userEntered) { view in
+//                                    view
+//                                        .redacted(reason: .placeholder)
+//                                }
+//                            if model.sexSource == .userEntered {
+//                                Image(systemName: "chevron.up.chevron.down")
+//                                    .imageScale(.small)
+//                                    .foregroundColor(.secondary)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            .contentShape(Rectangle())
+//            .simultaneousGesture(TapGesture().onEnded {
+//                if model.sexSource == .userEntered {
+//                    Haptics.feedback(style: .soft)
+//                }
+//            })
+//        }
+//
+//        return HStack {
+//            Spacer()
+//            picker
+//        }
+        
+        let valueBinding = Binding<BiometricValue?>(
+            get: { model.sexBiometricValue },
+            set: { newValue in
+                model.sex = newValue?.sex?.hkBiologicalSex
+                model.saveBiometrics()
             }
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
-                if model.sexSource == .userEntered {
-                    Haptics.feedback(style: .soft)
-                }
-            })
-        }
+        )
         
         return HStack {
-            Spacer()
-            picker
+            BiometricValueRow(
+                value: valueBinding,
+                type: .sex,
+                source: model.sexSource ?? .userEntered,
+                fetchStatus: model.sexFetchStatus,
+                prefix: nil
+            )
         }
     }
     

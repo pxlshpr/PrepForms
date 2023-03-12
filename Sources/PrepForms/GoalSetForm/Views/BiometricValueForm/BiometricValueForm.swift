@@ -10,71 +10,11 @@ struct BiometricValueForm: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @FocusState var isFocused: Bool
-    
+    @FocusState var isSecondaryFocused: Bool
+
     @StateObject var model: Model
     @State var hasFocusedOnAppear: Bool = false
     @State var hasCompletedFocusedOnAppearAnimation: Bool = false
-
-    class Model: ObservableObject {
-        
-        let type: BiometricType
-        let initialValue: BiometricValue?
-        let handleNewValue: (BiometricValue?) -> ()
-        
-        @Published var unit: BiometricUnit?
-        @Published var internalTextfieldString: String = ""
-        @Published var internalTextfieldDouble: Double? = nil
-        
-        init(type: BiometricType, initialValue: BiometricValue?, handleNewValue: @escaping (BiometricValue?) -> Void) {
-            self.type = type
-            
-            var initialValue = initialValue
-            if !type.usesPrecision, let preciseValue = initialValue {
-                initialValue?.amount = preciseValue.amount.rounded()
-            }
-            
-            self.initialValue = initialValue
-            self.handleNewValue = handleNewValue
-            
-            if let initialValue {
-                internalTextfieldDouble = initialValue.amount
-                internalTextfieldString = initialValue.amount.cleanWithoutRounding
-            }
-            self.unit = initialValue?.unit ?? type.defaultUnit
-
-        }
-        
-        var title: String {
-            type.description
-        }
-        
-        var shouldDisableDone: Bool {
-            //TODO: Check validity, isDirty etc
-            false
-        }
-        
-        var value: BiometricValue? {
-            guard let internalTextfieldDouble else { return nil }
-            return BiometricValue(amount: internalTextfieldDouble, unit: unit)
-        }
-        
-        var textFieldAmountString: String {
-            //TODO: Force integer for age
-            get { internalTextfieldString }
-            set {
-                guard !newValue.isEmpty else {
-                    internalTextfieldDouble = nil
-                    internalTextfieldString = newValue
-                    return
-                }
-                guard let double = Double(newValue) else {
-                    return
-                }
-                self.internalTextfieldDouble = double
-                self.internalTextfieldString = newValue
-            }
-        }
-    }
     
     init(
         type: BiometricType,
@@ -90,7 +30,8 @@ struct BiometricValueForm: View {
     }
     
     var placeholder: String {
-        "Required"
+        ""
+//        "Required"
     }
     
     var body: some View {
@@ -98,7 +39,8 @@ struct BiometricValueForm: View {
             QuickForm(title: model.title) {
                 textFieldSection
             }
-            .onChange(of: isFocused, perform: isFocusedChanged)
+            .onChange(of: isFocused, perform: focusChanged)
+            .onChange(of: isSecondaryFocused, perform: focusChanged)
         }
         .presentationDetents([.height(140)])
         .presentationDragIndicator(.hidden)
@@ -110,12 +52,24 @@ struct BiometricValueForm: View {
                 HStack {
                     textField
                     unitPickerButton
+                        .layoutPriority(model.usesSecondaryUnit ? 1 : 0)
+                    optionalSecondaryField
                 }
                 .frame(maxHeight: 50)
             }
             .padding(.leading, 20)
             doneButton
                 .padding(.horizontal, 20)
+        }
+    }
+    
+    @ViewBuilder
+    var optionalSecondaryField: some View {
+        if model.usesSecondaryUnit {
+            Group {
+                secondaryTextField
+                secondaryUnitPickerButton
+            }
         }
     }
     
@@ -127,18 +81,37 @@ struct BiometricValueForm: View {
         }
     }
     
-    func isFocusedChanged(_ newValue: Bool) {
-        if !isFocused {
+    func focusChanged(_ newValue: Bool) {
+        if !isFocused && !isSecondaryFocused {
             dismiss()
         }
     }
     
-    var textField: some View {
+    var secondaryTextField: some View {
         let binding = Binding<String>(
-            get: { model.textFieldAmountString },
+            get: { model.secondaryTextFieldString },
             set: { newValue in
                 withAnimation {
-                    model.textFieldAmountString = newValue
+                    model.secondaryTextFieldString = newValue
+                }
+            }
+        )
+
+        return TextField(placeholder, text: binding)
+            .focused($isSecondaryFocused)
+            .multilineTextAlignment(.leading)
+            .font(binding.wrappedValue.isEmpty ? .body : .title3)
+            .keyboardType(.decimalPad)
+            .frame(height: 50)
+            .scrollDismissesKeyboard(.never)
+    }
+    
+    var textField: some View {
+        let binding = Binding<String>(
+            get: { model.textFieldString },
+            set: { newValue in
+                withAnimation {
+                    model.textFieldString = newValue
                 }
             }
         )
@@ -147,7 +120,7 @@ struct BiometricValueForm: View {
             .focused($isFocused)
             .multilineTextAlignment(.leading)
             .font(binding.wrappedValue.isEmpty ? .body : .largeTitle)
-            .keyboardType(.decimalPad)
+            .keyboardType(model.keyboardType)
             .frame(height: 50)
             .scrollDismissesKeyboard(.never)
             .introspectTextField { uiTextField in
@@ -164,20 +137,22 @@ struct BiometricValueForm: View {
                 }
             }
     }
+
+    var secondaryUnitPickerButton: some View {
+        HStack(spacing: 2) {
+            Text(model.secondaryUnitString ?? "")
+                .fontWeight(.semibold)
+        }
+        .foregroundColor(.secondary)
+        .padding(.horizontal, 15)
+        .frame(height: 40)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(Color(.tertiarySystemFill))
+        )
+    }
     
     var unitPickerButton: some View {
-        
-        func unitText(_ string: String) -> some View {
-            Text(string)
-                .fontWeight(.semibold)
-                .foregroundColor(.secondary)
-                .padding(.horizontal, 15)
-                .frame(height: 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(Color(.tertiarySystemFill))
-                )
-        }
         
         func unitPicker(for type: BiometricType) -> some View {
             
@@ -219,17 +194,17 @@ struct BiometricValueForm: View {
                 }
             )
 
-            let weightUnitBinding = Binding<WeightUnit>(
-                get: { model.unit?.weightUnit ?? .kg },
+            let bodyMassUnitBinding = Binding<BodyMassUnit>(
+                get: { model.unit?.bodyMassUnit ?? .kg },
                 set: { newUnit in
                     withAnimation {
                         Haptics.feedback(style: .soft)
-                        model.unit = .weight(newUnit)
+                        model.unit = .bodyMass(newUnit)
                     }
                 }
             )
 
-            var energyPicker: some View {
+            var energyUnitPicker: some View {
                 Picker(selection: energyUnitBinding, label: EmptyView()) {
                     ForEach(EnergyUnit.allCases, id: \.self) {
                         Text($0.shortDescription).tag($0)
@@ -237,15 +212,15 @@ struct BiometricValueForm: View {
                 }
             }
 
-            var weightPicker: some View {
-                Picker(selection: weightUnitBinding, label: EmptyView()) {
-                    ForEach(WeightUnit.allCases, id: \.self) {
+            var bodyMassUnitPicker: some View {
+                Picker(selection: bodyMassUnitBinding, label: EmptyView()) {
+                    ForEach(BodyMassUnit.allCases, id: \.self) {
                         Text($0.shortDescription).tag($0)
                     }
                 }
             }
 
-            var heightPicker: some View {
+            var heightUnitPicker: some View {
                 Picker(selection: heightUnitBinding, label: EmptyView()) {
                     ForEach(HeightUnit.allCases, id: \.self) {
                         Text($0.shortDescription).tag($0)
@@ -257,11 +232,11 @@ struct BiometricValueForm: View {
             var unitPicker: some View {
                 switch type {
                 case .restingEnergy, .activeEnergy:
-                    energyPicker
+                    energyUnitPicker
                 case .weight, .leanBodyMass:
-                    weightPicker
+                    bodyMassUnitPicker
                 case .height:
-                    heightPicker
+                    heightUnitPicker
                 default:
                     EmptyView()
                 }
@@ -274,7 +249,7 @@ struct BiometricValueForm: View {
             }
             .animation(.none, value: heightUnitBinding.wrappedValue)
             .animation(.none, value: energyUnitBinding.wrappedValue)
-            .animation(.none, value: weightUnitBinding.wrappedValue)
+            .animation(.none, value: bodyMassUnitBinding.wrappedValue)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
                 Haptics.feedback(style: .soft)
@@ -287,6 +262,26 @@ struct BiometricValueForm: View {
             } else {
                 EmptyView()
             }
+        }
+    }
+}
+
+public struct BiometricValueFormPreview: View {
+    
+    @State var showingForm = false
+    
+    public init() { }
+    
+    public var body: some View {
+        Button("Present") {
+            showingForm = true
+        }
+        .sheet(isPresented: $showingForm) { valueForm }
+    }
+    
+    var valueForm: some View {
+        BiometricValueForm(type: .weight) { _ in
+            
         }
     }
 }

@@ -3,6 +3,7 @@ import SwiftHaptics
 import PrepDataTypes
 import ActivityIndicatorView
 import SwiftUISugar
+import PrepCoreDataStack
 
 struct LeanBodyMassSection: View {
     
@@ -136,104 +137,134 @@ struct LeanBodyMassSection: View {
             }
             HStack {
                 BiometricButton("Calculate", systemImage: "function", action: tappedFormula)
-                BiometricButton("Use Fat %", systemImage: "function", action: tappedFatPercentage)
+                BiometricButton("Enter Fat %", systemImage: "function", action: tappedFatPercentage)
             }
         }
     }
 
     var bottomRow: some View {
-        @ViewBuilder
-        var health: some View {
-            switch model.lbmFetchStatus {
-            case .noData:
-                Text("No Data")
-            case .noDataOrNotAuthorized:
-                Text("No Data or Not Authorized")
-            case .notFetched, .fetching, .fetched:
-                HStack {
-                    Spacer()
-                    if model.lbmFetchStatus == .fetching {
-                        ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
-                            .frame(width: 25, height: 25)
-                            .foregroundColor(.secondary)
-                    } else {
-                        if let date = model.lbmDate {
-                            Text("as of \(date.tdeeFormat)")
-                                .font(.subheadline)
-                                .foregroundColor(Color(.tertiaryLabel))
-                        }
-                        Text(model.lbmFormatted)
-                            .font(.system(.title3, design: .rounded, weight: .semibold))
-                            .foregroundColor(model.lbmSource == .userEntered ? .primary : .secondary)
-                            .matchedGeometryEffect(id: "lbm", in: namespace)
-                            .if(!model.hasLeanBodyMass) { view in
-                                view
-                                    .redacted(reason: .placeholder)
-                            }
-                        Text(model.userWeightUnit.shortDescription)
-                            .foregroundColor(.secondary)
-                    }
+//        @ViewBuilder
+//        var health: some View {
+//            switch model.lbmFetchStatus {
+//            case .noData:
+//                Text("No Data")
+//            case .noDataOrNotAuthorized:
+//                Text("No Data or Not Authorized")
+//            case .notFetched, .fetching, .fetched:
+//                HStack {
+//                    Spacer()
+//                    if model.lbmFetchStatus == .fetching {
+//                        ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
+//                            .frame(width: 25, height: 25)
+//                            .foregroundColor(.secondary)
+//                    } else {
+//                        if let date = model.lbmDate {
+//                            Text("as of \(date.tdeeFormat)")
+//                                .font(.subheadline)
+//                                .foregroundColor(Color(.tertiaryLabel))
+//                        }
+//                        Text(model.lbmFormatted)
+//                            .font(.system(.title3, design: .rounded, weight: .semibold))
+//                            .foregroundColor(model.lbmSource == .userEntered ? .primary : .secondary)
+//                            .matchedGeometryEffect(id: "lbm", in: namespace)
+//                            .if(!model.hasLeanBodyMass) { view in
+//                                view
+//                                    .redacted(reason: .placeholder)
+//                            }
+//                        Text(model.userBodyMassUnit.shortDescription)
+//                            .foregroundColor(.secondary)
+//                    }
+//                }
+//            }
+//        }
+//
+//        var manualEntry: some View {
+//            var prompt: String {
+//                model.lbmSource == .userEntered ? "lean body mass in" : "fat percent"
+//            }
+//            var binding: Binding<String> {
+//                model.lbmTextFieldStringBinding
+//            }
+//            var unitString: String {
+//                model.lbmSource == .fatPercentage ? "%" : model.userBodyMassUnit.shortDescription
+//            }
+//            return HStack {
+//                Spacer()
+//                TextField(prompt, text: binding)
+//                    .keyboardType(.decimalPad)
+//                    .focused($isFocused)
+//                    .multilineTextAlignment(.trailing)
+//                    .font(.system(.title3, design: .rounded, weight: .semibold))
+//                    .matchedGeometryEffect(id: "lbm", in: namespace)
+//                Text(unitString)
+//                    .foregroundColor(.secondary)
+//            }
+//        }
+//
+//        var calculatedLBMRow: some View {
+//            HStack {
+//                Spacer()
+//                if model.lbmSource == .fatPercentage {
+//                    Text("lean body mass")
+//                        .font(.subheadline)
+//                        .foregroundColor(Color(.tertiaryLabel))
+//                }
+//                Text(model.calculatedLBMFormatted)
+//                    .font(.system(.title3, design: .rounded, weight: .semibold))
+//                    .foregroundColor(.secondary)
+//                    .if(!model.hasLeanBodyMass) { view in
+//                        view
+//                            .redacted(reason: .placeholder)
+//                    }
+//                Text(model.userBodyMassUnit.shortDescription)
+//                    .foregroundColor(.secondary)
+//            }
+//        }
+//
+//        return Group {
+//            switch model.lbmSource {
+//            case .health:
+//                health
+//            case .formula:
+//                calculatedLBMRow
+//            case .userEntered:
+//                manualEntry
+//            case .fatPercentage:
+//                manualEntry
+//                calculatedLBMRow
+//            default:
+//                EmptyView()
+//            }
+//        }
+        let valueBinding = Binding<BiometricValue?>(
+            get: { model.leanBodyMassBiometricValue },
+            set: { newValue in
+                guard let bodyMassUnit = newValue?.unit?.bodyMassUnit else { return }
+                
+                model.lbm = newValue?.double
+                    
+                /// Convert other body mass based values in `BiometricModel` before setting the unit
+                if let weight = model.weight {
+                    model.weight = model.userBodyMassUnit.convert(weight, to: bodyMassUnit)
                 }
+                
+                model.userBodyMassUnit = bodyMassUnit
+                UserManager.bodyMassUnit = bodyMassUnit
+                
+                /// Delay this by a second so that the core-data persistence doesn't interfere with
+                /// the change of energy unit
+                model.saveBiometrics(afterDelay: true)
             }
-        }
+        )
         
-        var manualEntry: some View {
-            var prompt: String {
-                model.lbmSource == .userEntered ? "lean body mass in" : "fat percent"
-            }
-            var binding: Binding<String> {
-                model.lbmTextFieldStringBinding
-            }
-            var unitString: String {
-                model.lbmSource == .fatPercentage ? "%" : model.userWeightUnit.shortDescription
-            }
-            return HStack {
-                Spacer()
-                TextField(prompt, text: binding)
-                    .keyboardType(.decimalPad)
-                    .focused($isFocused)
-                    .multilineTextAlignment(.trailing)
-                    .font(.system(.title3, design: .rounded, weight: .semibold))
-                    .matchedGeometryEffect(id: "lbm", in: namespace)
-                Text(unitString)
-                    .foregroundColor(.secondary)
-            }
-        }
-        
-        var calculatedLBMRow: some View {
-            HStack {
-                Spacer()
-                if model.lbmSource == .fatPercentage {
-                    Text("lean body mass")
-                        .font(.subheadline)
-                        .foregroundColor(Color(.tertiaryLabel))
-                }
-                Text(model.calculatedLBMFormatted)
-                    .font(.system(.title3, design: .rounded, weight: .semibold))
-                    .foregroundColor(.secondary)
-                    .if(!model.hasLeanBodyMass) { view in
-                        view
-                            .redacted(reason: .placeholder)
-                    }
-                Text(model.userWeightUnit.shortDescription)
-                    .foregroundColor(.secondary)
-            }
-        }
-     
-        return Group {
-            switch model.lbmSource {
-            case .health:
-                health
-            case .formula:
-                calculatedLBMRow
-            case .userEntered:
-                manualEntry
-            case .fatPercentage:
-                manualEntry
-                calculatedLBMRow
-            default:
-                EmptyView()
-            }
+        return HStack {
+            BiometricValueRow(
+                value: valueBinding,
+                type: .leanBodyMass,
+                source: model.lbmSource ?? .userEntered,
+                fetchStatus: model.lbmFetchStatus,
+                prefix: nil
+            )
         }
     }
     

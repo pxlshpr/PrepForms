@@ -38,7 +38,8 @@ struct BiometricValueRow: View {
         self.matchedGeometryId = matchedGeometryId
         self.matchedGeometryNamespace = matchedGeometryNamespace
         
-        _showFormOnAppear = State(initialValue: source.isUserEntered)
+//        _showFormOnAppear = State(initialValue: source.isUserEntered)
+        _showFormOnAppear = State(initialValue: false)
     }
     
     enum Style {
@@ -73,7 +74,7 @@ struct BiometricValueRow: View {
         }
         
         return BiometricValueForm(
-            type: .activeEnergy,
+            type: type,
             initialValue: value,
             handleNewValue: handleNewValue
         )
@@ -144,12 +145,17 @@ struct BiometricValueRow: View {
     
     var valueString: String {
         //TODO: Pass this in?
-        let string = value?.description ?? ""
+        let string = value?.valueDescription ?? ""
         if string.isEmpty {
             if isUserEntered {
                 return "required"
             } else {
-                return "needs resting energy"
+                switch type {
+                case .activeEnergy:
+                    return "needs resting energy"
+                default:
+                    return "no data"
+                }
             }
         } else {
             return string
@@ -193,6 +199,7 @@ struct BiometricValueRow: View {
                     .font(font)
                     .multilineTextAlignment(.trailing)
                     .foregroundColor(textColor)
+                    .opacity(0.5)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -233,7 +240,7 @@ struct AnimatableBiometricsValueModifier: AnimatableModifier {
     
     @Environment(\.colorScheme) var colorScheme
     @State var size: CGSize = .zero
-
+    
     var value: BiometricValue
     let type: BiometricType
     let textColor: Color
@@ -241,8 +248,8 @@ struct AnimatableBiometricsValueModifier: AnimatableModifier {
     let namespace: Namespace.ID?
     
     var animatableData: Double {
-        get { value.amount }
-        set { value.amount = newValue }
+        get { value.double ?? 0 }
+        set { value.double = newValue }
     }
     
     func body(content: Content) -> some View {
@@ -257,12 +264,15 @@ struct AnimatableBiometricsValueModifier: AnimatableModifier {
     }
     
     var valueString: String {
-        switch type {
-        case .weight, .leanBodyMass, .fatPercentage, .height:
-            return value.amount.cleanAmount
-        default:
-            return value.amount.formattedEnergy
-        }
+        value.valueDescription
+    }
+    
+    var secondaryValueString: String? {
+        value.secondaryValueDescription
+    }
+    
+    var secondaryUnitString: String? {
+        value.secondaryUnitDescription
     }
     
     var animatedLabel: some View {
@@ -274,8 +284,16 @@ struct AnimatableBiometricsValueModifier: AnimatableModifier {
                     $0.matchedGeometryEffect(id: matchedGeometryId!, in: namespace!)
                 }
 
-            if let unit = value.unit {
-                Text(unit.description)
+            if let unit = value.unitDescription {
+                Text(unit)
+                    .foregroundColor(textColor)
+                    .font(.system(.body, design: .rounded, weight: .regular))
+            }
+            if let secondaryValueString, let secondaryUnitString {
+                Text(secondaryValueString)
+                    .font(.system(.title3, design: .rounded, weight: .semibold))
+                    .foregroundColor(textColor)
+                Text(secondaryUnitString)
                     .foregroundColor(textColor)
                     .font(.system(.body, design: .rounded, weight: .regular))
             }

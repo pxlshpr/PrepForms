@@ -15,7 +15,7 @@ struct NutrientGoalForm: View {
     @State var pickedMealNutrientGoal: MealNutrientGoal
     @State var pickedDietNutrientGoal: DietNutrientGoal
     @State var pickedBodyMassType: NutrientGoalBodyMassType
-    @State var pickedBodyMassUnit: WeightUnit
+    @State var pickedBodyMassUnit: BodyMassUnit
     
     @State var energyValue: Double = 1000
     @State var pickedEnergyUnit: EnergyUnit = .kcal
@@ -582,7 +582,7 @@ struct NutrientGoalForm: View {
     }
     
     var bodyMassUnitPicker: some View {
-        let binding = Binding<WeightUnit>(
+        let binding = Binding<BodyMassUnit>(
             get: { pickedBodyMassUnit },
             set: { newWeightUnit in
                 withAnimation {
@@ -595,7 +595,7 @@ struct NutrientGoalForm: View {
             if isQuantityPerBodyMass {
                 Menu {
                     Picker(selection: binding, label: EmptyView()) {
-                        ForEach([WeightUnit.kg, WeightUnit.lb], id: \.self) {
+                        ForEach(BodyMassUnit.allCases, id: \.self) {
                             Text($0.menuDescription).tag($0)
                         }
                     }

@@ -10,7 +10,8 @@ public struct BiometricsForm: View {
     
     @Namespace var namespace
     @Environment(\.colorScheme) var colorScheme
-    
+    @Environment(\.dismiss) var dismiss
+
     public init() {
         let user = DataManager.shared.user
         let biometrics = user?.biometrics
@@ -24,11 +25,12 @@ public struct BiometricsForm: View {
             content
                 .navigationTitle("Biometrics")
                 .toolbar { trailingContent }
+                .toolbar { leadingContent }
         }
     }
     
-    var trailingContent: some ToolbarContent {
-        ToolbarItemGroup(placement: .navigationBarTrailing) {
+    var leadingContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarLeading) {
             Button {
                 model.tappedSyncAll()
             } label: {
@@ -37,13 +39,31 @@ public struct BiometricsForm: View {
         }
     }
     
+    var trailingContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            closeButton
+        }
+    }
+    
+    var closeButton: some View {
+        Button {
+            Haptics.feedback(style: .soft)
+            dismiss()
+        } label: {
+            CloseButtonLabel(forNavigationBar: true)
+        }
+    }
+
+    
     var content: some View {
         FormStyledScrollView {
             infoSection
-            maintenanceEnergySection
+//            maintenanceEnergySection
+            restingEnergySection
+            activeEnergySection
             weightSection
             leanBodyMassSection
-            heightSection
+//            heightSection
             biologicalSexSection
             ageSection
         }
@@ -79,28 +99,39 @@ public struct BiometricsForm: View {
             .environmentObject(model)
     }
     
+    var restingEnergySection: some View {
+        RestingEnergySection()
+            .environmentObject(model)
+    }
+
+    var activeEnergySection: some View {
+        ActiveEnergySection()
+            .environmentObject(model)
+    }
+
     var weightSection: some View {
-        WeightSection(largeTitle: true)
+        WeightSection()
             .environmentObject(model)
     }
 
     var heightSection: some View {
-        HeightSection(largeTitle: true)
+        HeightSection()
             .environmentObject(model)
     }
 
     var biologicalSexSection: some View {
-        BiologicalSexSection(largeTitle: true)
+        BiologicalSexSection()
             .environmentObject(model)
     }
     
     var ageSection: some View {
-        AgeSection(largeTitle: true)
+        AgeSection()
             .environmentObject(model)
     }
     
     var leanBodyMassSection: some View {
-        LeanBodyMassSection(largeTitle: true)
+        LeanBodyMassSection()
             .environmentObject(model)
     }
 }
+

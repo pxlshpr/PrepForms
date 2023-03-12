@@ -13,6 +13,7 @@ extension TDEEForm {
                     unit: unit,
                     namespace: namespace
                 )
+                .fixedSize(horizontal: true, vertical: false)
             }
             
             var empty: some View {
@@ -114,6 +115,7 @@ struct MaintenanceEnergyView: View {
                 energyUnit: unit,
                 namespace: namespace
             )
+            .fixedSize(horizontal: true, vertical: false)
             .frame(maxWidth: .infinity, alignment: .center)
     }
     
@@ -195,6 +197,7 @@ struct AnimatableMaintenanceEnergyModifier: AnimatableModifier {
         HStack(alignment: .firstTextBaseline, spacing: 2) {
             Text(value.formattedEnergy)
                 .matchedGeometryEffect(id: "maintenance", in: namespace)
+                .fixedSize(horizontal: true, vertical: false)
                 .font(.system(.largeTitle, design: .rounded, weight: .semibold))
                 .foregroundColor(.primary)
             Text(energyUnit.shortDescription)

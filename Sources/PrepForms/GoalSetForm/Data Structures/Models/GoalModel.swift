@@ -172,7 +172,7 @@ public class GoalModel: ObservableObject {
 //        get {
 //            switch type {
 //            case .macro(let type, _):
-//                return type.bodyMassWeightUnit
+//                return type.bodyMassUnit
 //            default:
 //                return nil
 //            }
@@ -182,7 +182,7 @@ public class GoalModel: ObservableObject {
 //            switch type {
 //            case .macro(let macroGoalType, let macro):
 //                var new = macroGoalType
-//                new.bodyMassWeightUnit = newValue
+//                new.bodyMassUnit = newValue
 //                self.type = .macro(new, macro)
 //            default:
 //                break
@@ -190,11 +190,11 @@ public class GoalModel: ObservableObject {
 //        }
 //    }
 
-    var bodyMassUnit: WeightUnit? {
+    var bodyMassUnit: BodyMassUnit? {
         guard let nutrientGoalType else { return nil }
         switch nutrientGoalType {
-        case .quantityPerBodyMass(_, let weightUnit):
-            return weightUnit
+        case .quantityPerBodyMass(_, let bodyMassUnit):
+            return bodyMassUnit
         default:
             return nil
         }
