@@ -14,7 +14,8 @@ struct WeightSection: View {
     @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
-    
+    @State var showFormOnAppear = false
+
     init(largeTitle: Bool = false, includeHeader: Bool = true) {
         self.largeTitle = largeTitle
         self.includeHeader = includeHeader
@@ -47,6 +48,7 @@ struct WeightSection: View {
     }
     
     func tappedManualEntry() {
+        showFormOnAppear = true
         model.changeWeightSource(to: .userEntered)
         isFocused = true
     }
@@ -165,7 +167,8 @@ struct WeightSection: View {
                 type: .weight,
                 source: model.weightSource ?? .userEntered,
                 fetchStatus: model.weightFetchStatus,
-                prefix: nil
+                prefix: nil,
+                showFormOnAppear: $showFormOnAppear
             )
         }
     }

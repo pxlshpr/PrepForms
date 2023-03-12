@@ -11,7 +11,8 @@ struct HeightSection: View {
     @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
-    
+    @State var showFormOnAppear = false
+
     init(largeTitle: Bool = false) {
         self.largetTitle = largeTitle
     }
@@ -42,6 +43,7 @@ struct HeightSection: View {
     }
     
     func tappedManualEntry() {
+        showFormOnAppear = true
         model.changeHeightSource(to: .userEntered)
         isFocused = true
     }
@@ -155,7 +157,8 @@ struct HeightSection: View {
                 type: .height,
                 source: model.heightSource ?? .userEntered,
                 fetchStatus: model.heightFetchStatus,
-                prefix: nil
+                prefix: nil,
+                showFormOnAppear: $showFormOnAppear
             )
         }
     }

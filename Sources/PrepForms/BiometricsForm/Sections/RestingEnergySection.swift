@@ -12,42 +12,77 @@ struct RestingEnergySection: View {
     
     @Namespace var namespace
     @FocusState var restingEnergyTextFieldIsFocused: Bool
+    @State var showFormOnAppear = false
 
     var body: some View {
         VStack(spacing: 7) {
-            restingHeader
-                .textCase(.uppercase)
-                .fixedSize(horizontal: false, vertical: true)
-                .foregroundColor(Color(.secondaryLabel))
-                .font(.footnote)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
-            content
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 0)
-            .padding(.vertical, 15)
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(Color(.secondarySystemGroupedBackground))
-                    .matchedGeometryEffect(id: "resting-bg", in: namespace)
-            )
-            .if(model.restingEnergyFooterString == nil) { view in
-                view.padding(.bottom, 10)
-            }
+            header
+            contentRow
             footer
         }
         .padding(.horizontal, 20)
         .padding(.top, 10)
     }
     
-    var restingHeader: some View {
+    var header: some View {
         HStack {
             Image(systemName: EnergyComponent.resting.systemImage)
                 .matchedGeometryEffect(id: "resting-header-icon", in: namespace)
             Text("Resting Energy")
         }
+        .textCase(.uppercase)
+        .fixedSize(horizontal: false, vertical: true)
+        .foregroundColor(Color(.secondaryLabel))
+        .font(.footnote)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 20)
+    }
+    
+    var contentRow: some View {
+        content
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 0)
+        .padding(.vertical, 15)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .foregroundColor(Color(.secondarySystemGroupedBackground))
+                .matchedGeometryEffect(id: "resting-bg", in: namespace)
+        )
+        .if(model.restingEnergyFooterString == nil) { view in
+            view.padding(.bottom, 10)
+        }
+    }
+    
+    
+    @ViewBuilder
+    var content: some View {
+        VStack {
+            Group {
+                if let source = model.restingEnergySource {
+                    filledContent(source)
+                } else {
+                    emptyContent
+                }
+            }
+        }
+    }
+    
+    func filledContent(_ source: RestingEnergySource) -> some View {
+        Group {
+            sourceSection
+            switch source {
+            case .health:
+                healthContent
+            case .userEntered:
+                EmptyView()
+            case .formula:
+                formulaContent
+            }
+            energyRow
+        }
     }
 
+    
     var sourceSection: some View {
         var sourceMenu: some View {
             Menu {
@@ -79,7 +114,7 @@ struct RestingEnergySection: View {
     var formulaContent: some View {
         VStack {
             formulaRow
-            flowView
+            parametersRow
         }
     }
     
@@ -112,6 +147,7 @@ struct RestingEnergySection: View {
                 Haptics.feedback(style: .soft)
             })
         }
+        
         return HStack {
             HStack {
                 Text("using")
@@ -124,128 +160,95 @@ struct RestingEnergySection: View {
         .padding(.top, 8)
     }
     
-    var flowView: some View {
+    var parametersRow: some View {
         
-        return FlowView(alignment: .center, spacing: 10, padding: 17) {
-            ZStack {
-                Capsule(style: .continuous)
-                    .foregroundColor(Color(.clear))
-                Text(model.restingEnergyFormula == .katchMcardle ? "with" : "as")
-                    .foregroundColor(Color(.tertiaryLabel))
-                .frame(height: 25)
-                .padding(.vertical, 5)
-                .padding(.bottom, 2)
+        var lbmFormLink: some View {
+            NavigationLink {
+                LeanBodyMassForm()
+                    .environmentObject(model)
+            } label: {
+                MeasurementLabel(
+                    label: model.hasLeanBodyMass ? "lean body mass" : "set lean body mass",
+                    valueString: model.lbmFormattedWithUnit,
+                    useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
+                )
             }
-            .fixedSize(horizontal: true, vertical: true)
-            if model.restingEnergyFormula.usesLeanBodyMass {
-//                    Button {
-//                        model.path.append(.leanBodyMassForm)
-                NavigationLink {
-                    LeanBodyMassForm()
-                        .environmentObject(model)
-                } label: {
+        }
+        
+        var parametersFormLink: some View {
+            NavigationLink {
+                ProfileForm()
+                    .environmentObject(model)
+            } label: {
+                if model.hasMeasurements,
+                   let age = model.age,
+                   let sex = model.sex,
+                   let weight = model.weight
+                {
+                    ProfileLabel(
+                        age: age,
+                        sex: sex,
+                        weight: weight,
+                        height: model.height,
+                        bodyMassUnit: model.userBodyMassUnit,
+                        heightUnit: model.userHeightUnit,
+                        isSynced: model.measurementsAreSynced
+                    )
+                } else {
                     MeasurementLabel(
-                        label: model.hasLeanBodyMass ? "lean body mass" : "set lean body mass",
-                        valueString: model.lbmFormattedWithUnit,
-                        useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
+                        label: "set parameters",
+                        valueString: "",
+                        useHealthAppData: false
                     )
                 }
+            }
+        }
+        
+        var prefixString: some View {
+            Text(model.restingEnergyFormula == .katchMcardle ? "with" : "as")
+                .foregroundColor(Color(.tertiaryLabel))
+//                .frame(height: 25)
+//                .frame(maxHeight: .infinity)
+                .padding(.vertical, 5)
+                .padding(.bottom, 2)
+
+        }
+        
+        @ViewBuilder
+        var link: some View {
+            if model.restingEnergyFormula.usesLeanBodyMass {
+                lbmFormLink
             } else {
-//                    Button {
-//                        model.path.append(.profileForm)
-                NavigationLink {
-                    ProfileForm()
-                        .environmentObject(model)
-                } label: {
-                    if model.hasMeasurements,
-                       let age = model.age,
-                       let sex = model.sex,
-                       let weight = model.weight
-                    {
-                        ProfileLabel(
-                            age: age,
-                            sex: sex,
-                            weight: weight,
-                            height: model.height,
-                            bodyMassUnit: model.userBodyMassUnit,
-                            heightUnit: model.userHeightUnit,
-                            isSynced: model.measurementsAreSynced
-                        )
-                    } else {
-                        MeasurementLabel(
-                            label: "set biometrics",
-                            valueString: "",
-                            useHealthAppData: false
-                        )
-                    }
-                }
-//                    Menu {
-//                        Picker(selection: .constant(true), label: EmptyView()) {
-//                            Text("Male").tag(true)
-//                            Text("Female").tag(false)
-//                        }
-//                    } label: {
-//                        MeasurementLabel(
-//                            label: "sex",
-//                            valueString: "male",
-//                            useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
-//                        )
-//                    }
-//                    Button {
-//                        model.path.append(.weightForm)
-//                    } label: {
-//                        MeasurementLabel(
-//                            label: "weight",
-//                            valueString: "93.6 kg",
-//                            useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
-//                        )
-//                    }
-//                    Button {
-//                        model.path.append(.heightForm)
-//                    } label: {
-//                        MeasurementLabel(
-//                            label: "height",
-//                            valueString: "177 cm",
-//                            useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
-//                        )
-//                    }
+                parametersFormLink
             }
         }
-        .padding(.bottom, 5)
-    }
-    
-    @ViewBuilder
-    var content: some View {
-        VStack {
-            Group {
-                if let source = model.restingEnergySource {
-                    Group {
-                        sourceSection
-                        switch source {
-                        case .health:
-                            healthContent
-                        case .userEntered:
-                            EmptyView()
-                        case .formula:
-                            formulaContent
-                        }
-                        energyRow
-                    }
-                } else {
-                    emptyContent
+        
+        var flowView: some View {
+            return FlowView(alignment: .center, spacing: 10, padding: 17) {
+                ZStack {
+                    Capsule(style: .continuous)
+                        .foregroundColor(Color(.clear))
+                    prefixString
                 }
+                .fixedSize(horizontal: true, vertical: true)
+                link
+            }
+            .padding(.bottom, 5)
+        }
+        
+        var hStack: some View {
+            HStack {
+                prefixString
+                link
             }
         }
+        
+//        return flowView
+        return hStack
     }
-    
-//        var manualEntryContent: some View {
-//            VStack {
-//                sourceSection
-//                energyRow
-//            }
-//        }
     
     func tappedManualEntry() {
+        showFormOnAppear = true
         model.changeRestingEnergySource(to: .userEntered)
         restingEnergyTextFieldIsFocused = true
     }
@@ -404,6 +407,7 @@ struct RestingEnergySection: View {
             source: model.restingEnergySource ?? .userEntered,
             fetchStatus: model.restingEnergyFetchStatus,
             prefix: model.restingEnergyPrefix,
+            showFormOnAppear: $showFormOnAppear,
             matchedGeometryId: "resting",
             matchedGeometryNamespace: namespace
         )

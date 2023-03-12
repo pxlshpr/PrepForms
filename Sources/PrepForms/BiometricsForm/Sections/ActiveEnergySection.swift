@@ -10,6 +10,7 @@ struct ActiveEnergySection: View {
     
     @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
+    @State var showFormOnAppear = false
 
     var body: some View {
         VStack(spacing: 7) {
@@ -301,6 +302,7 @@ struct ActiveEnergySection: View {
             source: model.activeEnergySource ?? .userEntered,
             fetchStatus: model.activeEnergyFetchStatus,
             prefix: model.activeEnergyPrefix,
+            showFormOnAppear: $showFormOnAppear,
             matchedGeometryId: "active",
             matchedGeometryNamespace: namespace
         )
@@ -373,6 +375,7 @@ struct ActiveEnergySection: View {
     }
 
     func tappedManualEntry() {
+        showFormOnAppear = true
         model.changeActiveEnergySource(to: .userEntered)
     }
 

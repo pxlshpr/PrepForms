@@ -40,7 +40,7 @@ struct ProfileForm: View {
             }
         }
 //        .navigationTitle(model.restingEnergyFormula.menuDescription + " Formula")
-        .navigationTitle("Biometrics")
+        .navigationTitle("Parameters")
         .toolbar { trailingContent }
     }
 }

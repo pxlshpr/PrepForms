@@ -62,8 +62,10 @@ struct ButtonLabel: View {
         .padding(.horizontal, hPadding)
         .padding(.vertical, vPadding)
         .background(background)
+        .fixedSize(horizontal: true, vertical: false)
+        .animation(.none, value: style)
     }
-    
+
     @ViewBuilder
     var optionalLeadingImage: some View {
         if let leadingSystemImage {

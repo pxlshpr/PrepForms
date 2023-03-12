@@ -70,10 +70,16 @@ extension BiometricsModel {
         
         Task {
             guard let sex = await HealthKitManager.shared.currentBiologicalSex() else {
+                self.sexFetchStatus = .noData
                 return
             }
             await MainActor.run {
                 withAnimation {
+                    guard sex == .male || sex == .female else {
+                        self.sexFetchStatus = .noData
+                        self.sex = .female
+                        return
+                    }
                     self.sexFetchStatus = .fetched
                     self.sex = sex
                 }
@@ -161,6 +167,11 @@ extension BiometricsModel {
         
         Task {
             guard let dob = await HealthKitManager.shared.currentDateOfBirthComponents() else {
+                await MainActor.run {
+                    withAnimation {
+                        self.dobFetchStatus = .noData
+                    }
+                }
                 return
             }
             await MainActor.run {
@@ -246,6 +257,11 @@ extension BiometricsModel {
         
         Task {
             guard let (height, date) = await HealthKitManager.shared.latestHeight(unit: userHeightUnit) else {
+                await MainActor.run {
+                    withAnimation {
+                        self.heightFetchStatus = .noData
+                    }
+                }
                 return
             }
             await MainActor.run {
@@ -334,6 +350,11 @@ extension BiometricsModel {
         
         Task {
             guard let (weight, date) = await HealthKitManager.shared.latestWeight(unit: userBodyMassUnit) else {
+                await MainActor.run {
+                    withAnimation {
+                        self.weightFetchStatus = .noData
+                    }
+                }
                 return
             }
             await MainActor.run {
@@ -476,6 +497,11 @@ extension BiometricsModel {
         }
         
         guard let (lbm, date) = await HealthKitManager.shared.latestLeanBodyMass(unit: userBodyMassUnit) else {
+            await MainActor.run {
+                withAnimation {
+                    self.lbmFetchStatus = .noData
+                }
+            }
             return
         }
         await MainActor.run {

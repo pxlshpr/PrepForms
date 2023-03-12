@@ -10,7 +10,7 @@ struct BiologicalSexSection: View {
     let largeTitle: Bool
     let includeFooter: Bool
     @EnvironmentObject var model: BiometricsModel
-    
+    @State var showFormOnAppear = false
     @Namespace var namespace
     
     init(largeTitle: Bool = false, includeFooter: Bool = false) {
@@ -51,6 +51,7 @@ struct BiologicalSexSection: View {
     }
     
     func tappedManualEntry() {
+        showFormOnAppear = true
         model.changeSexSource(to: .userEntered)
     }
     
@@ -137,7 +138,8 @@ struct BiologicalSexSection: View {
                 type: .sex,
                 source: model.sexSource ?? .userEntered,
                 fetchStatus: model.sexFetchStatus,
-                prefix: nil
+                prefix: nil,
+                showFormOnAppear: $showFormOnAppear
             )
         }
     }

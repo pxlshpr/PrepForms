@@ -14,7 +14,8 @@ struct LeanBodyMassSection: View {
 
     @Namespace var namespace
     @FocusState var isFocused: Bool
-    
+    @State var showFormOnAppear = false
+
     init(largeTitle: Bool = false, includeHeader: Bool = true, footerString: Binding<String> = .constant("")) {
         self.largeTitle = largeTitle
         self.includeHeader = includeHeader
@@ -125,6 +126,7 @@ struct LeanBodyMassSection: View {
     }
     
     func tappedManualEntry() {
+        showFormOnAppear = true
         model.changeLBMSource(to: .userEntered)
         isFocused = true
     }
@@ -263,7 +265,8 @@ struct LeanBodyMassSection: View {
                 type: .leanBodyMass,
                 source: model.lbmSource ?? .userEntered,
                 fetchStatus: model.lbmFetchStatus,
-                prefix: nil
+                prefix: nil,
+                showFormOnAppear: $showFormOnAppear
             )
         }
     }

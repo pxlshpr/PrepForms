@@ -57,14 +57,13 @@ public struct BiometricsForm: View {
     
     var content: some View {
         FormStyledScrollView {
+            biologicalSexSection
             infoSection
-//            maintenanceEnergySection
             restingEnergySection
             activeEnergySection
             weightSection
             leanBodyMassSection
-//            heightSection
-            biologicalSexSection
+            heightSection
             ageSection
         }
     }

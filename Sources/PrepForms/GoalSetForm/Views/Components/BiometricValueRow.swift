@@ -18,7 +18,7 @@ struct BiometricValueRow: View {
     let matchedGeometryNamespace: Namespace.ID?
 
     @State var showingForm: Bool = false
-    @State var showFormOnAppear: Bool
+    @Binding var showFormOnAppear: Bool
     
     init(
         value: Binding<BiometricValue?>,
@@ -26,6 +26,7 @@ struct BiometricValueRow: View {
         source: BiometricSource,
         fetchStatus: HealthKitFetchStatus,
         prefix: String? = nil,
+        showFormOnAppear: Binding<Bool> = .constant(false),
         matchedGeometryId: String? = nil,
         matchedGeometryNamespace: Namespace.ID? = nil
     ) {
@@ -38,8 +39,11 @@ struct BiometricValueRow: View {
         self.matchedGeometryId = matchedGeometryId
         self.matchedGeometryNamespace = matchedGeometryNamespace
         
-//        _showFormOnAppear = State(initialValue: source.isUserEntered)
-        _showFormOnAppear = State(initialValue: false)
+        if type == .sex {
+            _showFormOnAppear = .constant(false)
+        } else {
+            _showFormOnAppear = showFormOnAppear
+        }
     }
     
     enum Style {
@@ -121,26 +125,6 @@ struct BiometricValueRow: View {
             nonAnimatedContent
                 .opacity(showingValue ? 0 : 1)
         }
-//        if isHealthSynced {
-//            switch fetchStatus {
-//            case .fetching, .notFetched:
-//                ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
-//                    .frame(width: 25, height: 25)
-//                    .foregroundColor(.secondary)
-//            case .fetched:
-//                animatedValueContent
-//            case .noData:
-//                Text("no data")
-//                    .font(font)
-//                    .foregroundColor(.secondary)
-//            case .noDataOrNotAuthorized:
-//                Text("no data or not authorized")
-//                    .font(font)
-//                    .foregroundColor(.secondary)
-//            }
-//        } else {
-//            animatedValueContent
-//        }
     }
     
     var valueString: String {
@@ -207,11 +191,68 @@ struct BiometricValueRow: View {
     
     @ViewBuilder
     var animatedValueContent: some View {
-//        if isUserEntered {
+        if type == .sex {
+            sexPicker
+        } else {
             button
-//        } else {
-//            texts
-//        }
+        }
+    }
+    
+    var sexPicker: some View {
+        let sexBinding = Binding<BiometricSex>(
+            get: { value?.sex ?? .female },
+            set: { newValue in
+                value = .sex(newValue)
+            }
+        )
+        
+        var labelString: String {
+            if !isUserEntered, fetchStatus == .noData {
+                return "no data"
+            } else {
+                return sexBinding.wrappedValue.description
+            }
+        }
+        
+        return Menu {
+            Picker(selection: sexBinding, label: EmptyView()) {
+                ForEach([BiometricSex.female, BiometricSex.male], id: \.self) {
+                    Text($0.description).tag($0)
+                }
+            }
+        } label: {
+            HStack {
+                Text(labelString)
+                    .font(font)
+                    .multilineTextAlignment(.trailing)
+                if isUserEntered {
+                    Image(systemName: "chevron.up.chevron.down")
+                        .fontWeight(.semibold)
+                        .imageScale(.small)
+                }
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            .foregroundColor(textColor)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 15)
+            .background(background)
+        }
+        .animation(.none, value: value)
+        .fixedSize(horizontal: true, vertical: false)
+        .contentShape(Rectangle())
+        .simultaneousGesture(TapGesture().onEnded {
+            Haptics.feedback(style: .light)
+        })
+        .disabled(!isUserEntered)
+    }
+    
+    var background: some View {
+        RoundedRectangle(cornerRadius: 7, style: .continuous)
+            .fill(
+                Color.accentColor
+                    .opacity(colorScheme == .dark ? 0.1 : 0.15)
+            )
+            .opacity(isUserEntered ? 1 : 0)
     }
 
     var button: some View {
@@ -222,14 +263,7 @@ struct BiometricValueRow: View {
             texts
                 .padding(.vertical, isUserEntered ? 8 : 0)
                 .padding(.horizontal, isUserEntered ? 15 : 0)
-                .background(
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(
-                            Color.accentColor
-                                .opacity(colorScheme == .dark ? 0.1 : 0.15)
-                        )
-                        .opacity(isUserEntered ? 1 : 0)
-                )
+                .background(background)
         }
         .disabled(!isUserEntered)
     }

@@ -58,12 +58,18 @@ extension BiometricsModel {
         }
 
         //TODO: Revisit this
-        self.restingEnergyFetchStatus = .notFetched
-        self.activeEnergyFetchStatus = .notFetched
-        self.lbmFetchStatus = .notFetched
-        self.weightFetchStatus = .notFetched
-        self.heightFetchStatus = .notFetched
-        self.sexFetchStatus = .notFetched
-        self.dobFetchStatus = .notFetched
+//        if self.lbmSource == .health, self.lbm == nil {
+//            self.lbmFetchStatus = .noData
+//        } else {
+//            self.lbmFetchStatus = .notFetched
+//        }
+        
+        self.restingEnergyFetchStatus = .noData
+        self.activeEnergyFetchStatus = .noData
+        self.weightFetchStatus = .noData
+        self.lbmFetchStatus = .noData
+        self.heightFetchStatus = .noData
+        self.sexFetchStatus = .noData
+        self.dobFetchStatus = .noData
     }
 }

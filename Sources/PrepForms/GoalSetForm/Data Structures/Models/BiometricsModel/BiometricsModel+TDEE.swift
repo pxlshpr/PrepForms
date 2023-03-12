@@ -294,11 +294,15 @@ extension BiometricsModel {
                 }
             } catch HealthKitManagerError.noData {
                 await MainActor.run {
-                    withAnimation { restingEnergyFetchStatus = .noData }
+                    withAnimation {
+                        restingEnergyFetchStatus = .noData
+                    }
                 }
             } catch HealthKitManagerError.noDataOrNotAuthorized {
                 await MainActor.run {
-                    withAnimation { restingEnergyFetchStatus = .noDataOrNotAuthorized }
+                    withAnimation {
+                        restingEnergyFetchStatus = .noDataOrNotAuthorized
+                    }
                 }
             } catch {
                 
@@ -559,11 +563,15 @@ extension BiometricsModel {
                 }
             } catch HealthKitManagerError.noData {
                 await MainActor.run {
-                    withAnimation { activeEnergyFetchStatus = .noData }
+                    withAnimation {
+                        activeEnergyFetchStatus = .noData
+                    }
                 }
             } catch HealthKitManagerError.noDataOrNotAuthorized {
                 await MainActor.run {
-                    withAnimation { activeEnergyFetchStatus = .noDataOrNotAuthorized }
+                    withAnimation {
+                        activeEnergyFetchStatus = .noDataOrNotAuthorized
+                    }
                 }
             } catch {
                 

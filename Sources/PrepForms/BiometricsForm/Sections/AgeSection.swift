@@ -11,7 +11,8 @@ struct AgeSection: View {
     @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     @FocusState var isFocused: Bool
-    
+    @State var showFormOnAppear = false
+
     init(largeTitle: Bool = false) {
         self.largeTitle = largeTitle
     }
@@ -49,6 +50,7 @@ struct AgeSection: View {
     }
     
     func tappedManualEntry() {
+        showFormOnAppear = true
         model.changeAgeSource(to: .userEntered)
         isFocused = true
     }
@@ -132,7 +134,8 @@ struct AgeSection: View {
                 type: .age,
                 source: model.ageSource ?? .userEntered,
                 fetchStatus: model.dobFetchStatus,
-                prefix: nil
+                prefix: nil,
+                showFormOnAppear: $showFormOnAppear
             )
         }
     }

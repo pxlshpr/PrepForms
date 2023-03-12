@@ -1,6 +1,6 @@
 import Foundation
 
-enum HealthKitFetchStatus {
+enum HealthKitFetchStatus: String {
     case notFetched
     case fetching
     case fetched
