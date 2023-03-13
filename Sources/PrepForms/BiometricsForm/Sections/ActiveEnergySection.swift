@@ -281,7 +281,6 @@ struct ActiveEnergySection: View {
                 withAnimation {
                     model.activeEnergySource = .health
                 }
-//                await model.fetchActiveEnergyFromHealth()
                 model.syncActiveEnergy()
             } catch {
                 cprint("Error syncing with Health: \(error)")

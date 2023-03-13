@@ -134,7 +134,7 @@ public struct TDEEForm: View {
     @State var healthRestingEnergy: Double? = nil
     @State var healthActiveEnergy: Double? = nil
     
-    @State var healthEnergyPeriod: HealthPeriodType = .previousDay
+    @State var healthEnergyPeriod: HealthPeriodType = .latest
     @State var healthEnergyPeriodInterval: DateComponents = DateComponents(day: 1)
     
     //    @State var useHealthAppData = false

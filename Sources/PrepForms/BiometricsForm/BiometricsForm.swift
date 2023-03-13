@@ -26,7 +26,12 @@ public struct BiometricsForm: View {
                 .navigationTitle("Biometrics")
                 .toolbar { trailingContent }
                 .toolbar { leadingContent }
+                .onAppear(perform: appeared)
         }
+    }
+    
+    func appeared() {
+        UserManager.setDidViewBiometrics()
     }
     
     var leadingContent: some ToolbarContent {

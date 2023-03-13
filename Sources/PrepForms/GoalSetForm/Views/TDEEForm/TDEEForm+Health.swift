@@ -16,7 +16,7 @@ extension TDEEForm {
             VStack(alignment: .leading, spacing: 5) {
                 Group {
                     switch healthEnergyPeriod {
-                    case .previousDay:
+                    case .latest:
                         Text("Your maintenance energy will always be the energy your resting + active energy from the previous day. This will update daily.")
                     case .average:
                         Text("Your maintenance energy will always be the daily average of your resting + active energy from the past week. This will update daily.")

@@ -253,7 +253,7 @@ struct RestingEnergySection: View {
                 withAnimation {
                     model.restingEnergySource = .health
                 }
-                model.fetchRestingEnergyFromHealth()
+                model.syncRestingEnergy()
             } catch {
                 cprint("Error syncing with Health: \(error)")
             }
