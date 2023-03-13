@@ -10,10 +10,11 @@ public struct BiometricsForm: View {
     
     @Namespace var namespace
     @Environment(\.colorScheme) var colorScheme
-    @Environment(\.scenePhase) var scenePhase
     @Environment(\.dismiss) var dismiss
 
     let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
+    
+    @State var changedTypes: [BiometricType] = []
     
     public init() {
         let user = DataManager.shared.user
@@ -31,26 +32,11 @@ public struct BiometricsForm: View {
                 .toolbar { leadingContent }
                 .onAppear(perform: appeared)
                 .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
-                .onChange(of: scenePhase, perform: scenePhaseChanged)
         }
-    }
-    
-    func scenePhaseChanged(newValue: ScenePhase) {
-        switch newValue {
-//        case .active:
-//            UserManager.setDidViewBiometrics()
-        default:
-            break
-        }
-    }
-    
-    func setBadges(from previousBiometrics: PreviousBiometrics) {
-        print("🤎 Setting biometrics from previous")
     }
     
     func appeared() {
-        if UserManager.shouldShowBiometricsBadge, let previousBiometrics = UserManager.previousBiometrics {
-            setBadges(from: previousBiometrics)
+        if UserManager.previousBiometrics != nil {
             UserManager.setDidViewBiometrics()
         }
     }
@@ -60,16 +46,14 @@ public struct BiometricsForm: View {
         withAnimation {
             self.model.load(updated)
         }
-        if let previousBiometrics = UserManager.previousBiometrics {
-            setBadges(from: previousBiometrics)
-        }
         UserManager.setDidViewBiometrics()
     }
     
     var leadingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarLeading) {
-//            syncAllButton
-            lastUpdatedAt
+            if model.isSyncingAtLeastOneType {
+                lastUpdatedAt
+            }
         }
     }
     
@@ -121,6 +105,7 @@ public struct BiometricsForm: View {
             heightSection
             ageSection
             biologicalSexSection
+            footerSection
         }
     }
     
@@ -166,6 +151,12 @@ public struct BiometricsForm: View {
             .environmentObject(model)
     }
     
+    func updatedBinding(for type: BiometricType) -> Binding<Bool> {
+        Binding<Bool>(
+            get: { changedTypes.contains(type) },
+            set: { _ in }
+        )
+    }
     var restingEnergySection: some View {
         RestingEnergySection()
             .environmentObject(model)
@@ -199,6 +190,21 @@ public struct BiometricsForm: View {
     var leanBodyMassSection: some View {
         LeanBodyMassSection()
             .environmentObject(model)
+    }
+    
+    @ViewBuilder
+    var footerSection: some View {
+        if model.isSyncingAtLeastOneType {
+            HStack(alignment: .firstTextBaseline) {
+                appleHealthBolt
+                    .imageScale(.small)
+                    .frame(width: 25)
+                Text("These biometrics are being kept in sync with your data from the Health App.")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal, 20)
+        }
     }
 }
 

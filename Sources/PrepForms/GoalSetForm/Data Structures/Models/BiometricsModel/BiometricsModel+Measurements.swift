@@ -306,15 +306,18 @@ extension BiometricsModel {
 extension BiometricsModel {
     
     var heightDateFormatted: String? {
-        heightDate?.biometricFormat
+        guard heightSource == .health else { return nil }
+        return heightDate?.biometricFormat
     }
     
     var weightDateFormatted: String? {
-        weightDate?.biometricFormat
+        guard weightSource == .health else { return nil }
+        return weightDate?.biometricFormat
     }
     
     var lbmDateFormatted: String? {
-        lbmDate?.biometricFormat
+        guard lbmSource == .health else { return nil }
+        return lbmDate?.biometricFormat
     }
 }
 

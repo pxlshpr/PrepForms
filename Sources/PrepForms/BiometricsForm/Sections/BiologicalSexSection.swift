@@ -127,7 +127,9 @@ struct BiologicalSexSection: View {
     }
  
     var header: some View {
-        biometricHeaderView("Biological Sex", largeTitle: largeTitle)
+//        biometricHeaderView("Biological Sex", largeTitle: largeTitle)
+        BiometricSectionHeader(type: .sex)
+            .environmentObject(model)
     }
 }
 

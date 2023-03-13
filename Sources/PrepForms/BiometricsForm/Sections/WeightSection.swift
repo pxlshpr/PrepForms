@@ -130,10 +130,12 @@ struct WeightSection: View {
     @ViewBuilder
     var header: some View {
         if includeHeader {
-            biometricHeaderView("Weight", largeTitle: largeTitle)
+//            biometricHeaderView("Weight", largeTitle: largeTitle)
+            BiometricSectionHeader(type: .weight)
+                .environmentObject(model)
         }
     }
-    
+
     var body: some View {
         FormStyledSection(header: header) {
             content

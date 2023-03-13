@@ -6,6 +6,27 @@ import SwiftUISugar
 import HealthKit
 import PrepCoreDataStack
 
+struct UpdatedBadge: View {
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        Text("Updated")
+            .textCase(.uppercase)
+            .font(.footnote)
+            .fontWeight(.bold)
+            .foregroundColor(.white)
+            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(
+                        HealthGradient
+                            .opacity(colorScheme == .dark ? 0.5 : 0.8)
+                    )
+            )
+    }
+}
 struct RestingEnergySection: View {
     
     @EnvironmentObject var model: BiometricsModel
@@ -13,7 +34,7 @@ struct RestingEnergySection: View {
     @Namespace var namespace
     @FocusState var restingEnergyTextFieldIsFocused: Bool
     @State var showFormOnAppear = false
-
+    
     var body: some View {
         VStack(spacing: 7) {
             header
@@ -25,17 +46,9 @@ struct RestingEnergySection: View {
     }
     
     var header: some View {
-        HStack {
-            Image(systemName: EnergyComponent.resting.systemImage)
-                .matchedGeometryEffect(id: "resting-header-icon", in: namespace)
-            Text("Resting Energy")
-        }
-        .textCase(.uppercase)
-        .fixedSize(horizontal: false, vertical: true)
-        .foregroundColor(Color(.secondaryLabel))
-        .font(.footnote)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 20)
+        BiometricSectionHeader(type: .restingEnergy)
+            .environmentObject(model)
+            .padding(.horizontal, 20)
     }
     
     var contentRow: some View {

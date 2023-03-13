@@ -14,13 +14,14 @@ struct ActiveEnergySection: View {
 
     var body: some View {
         VStack(spacing: 7) {
-            activeHeader
-                .textCase(.uppercase)
-                .fixedSize(horizontal: false, vertical: true)
-                .foregroundColor(Color(.secondaryLabel))
-                .font(.footnote)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
+            header
+//            activeHeader
+//                .textCase(.uppercase)
+//                .fixedSize(horizontal: false, vertical: true)
+//                .foregroundColor(Color(.secondaryLabel))
+//                .font(.footnote)
+//                .frame(maxWidth: .infinity, alignment: .leading)
+//                .padding(.horizontal, 20)
             content
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 0)
@@ -38,6 +39,12 @@ struct ActiveEnergySection: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 10)
+    }
+    
+    var header: some View {
+        BiometricSectionHeader(type: .activeEnergy)
+            .environmentObject(model)
+            .padding(.horizontal, 20)
     }
     
     var sourceSection: some View {

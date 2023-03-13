@@ -32,7 +32,9 @@ struct LeanBodyMassSection: View {
     @ViewBuilder
     var header: some View {
         if includeHeader {
-            biometricHeaderView("Lean Body Mass", largeTitle: largeTitle)
+//            biometricHeaderView("Lean Body Mass", largeTitle: largeTitle)
+            BiometricSectionHeader(type: .leanBodyMass)
+                .environmentObject(model)
         }
     }
     

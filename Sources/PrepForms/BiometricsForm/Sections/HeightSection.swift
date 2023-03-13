@@ -117,7 +117,9 @@ struct HeightSection: View {
     }
  
     var header: some View {
-        biometricHeaderView("Height", largeTitle: largetTitle)
+//        biometricHeaderView("Height", largeTitle: largetTitle)
+        BiometricSectionHeader(type: .height)
+            .environmentObject(model)
     }
     
     var body: some View {

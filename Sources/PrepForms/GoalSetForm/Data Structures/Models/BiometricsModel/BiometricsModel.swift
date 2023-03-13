@@ -2,6 +2,7 @@ import SwiftUI
 import PrepDataTypes
 import SwiftHaptics
 import HealthKit
+import PrepCoreDataStack
 
 class BiometricsModel: ObservableObject {
     var userEnergyUnit: EnergyUnit
@@ -62,7 +63,8 @@ class BiometricsModel: ObservableObject {
     @Published var lbmSyncStatus: BiometricSyncStatus = .notSynced
     
     @Published var lastUpdatedAt: Date? = nil
-    
+    @Published var previousBiometrics: Biometrics?
+
     let existingProfile: Biometrics?
     
     init(
@@ -87,7 +89,9 @@ class BiometricsModel: ObservableObject {
             detents = [.height(270), .large]
             presentationDetent = .height(270)
         }
-        
+
+        self.previousBiometrics = UserManager.previousBiometrics?.biometrics
+
         if let existingProfile {
             self.load(existingProfile)
         }
@@ -228,5 +232,63 @@ extension BiometricsModel {
             sex: sexData,
             age: ageData
         )
+    }
+}
+
+extension BiometricsModel {
+    
+    func shouldShowUpdatedBadge(for type: BiometricType) -> Bool {
+        guard let previousBiometrics,
+              isSyncing(type)
+        else { return false }
+        
+        switch type {
+        case .restingEnergy:
+            return biometrics.restingEnergy != previousBiometrics.restingEnergy
+        case .activeEnergy:
+            return biometrics.activeEnergy != previousBiometrics.activeEnergy
+        case .sex:
+            return biometrics.sex != previousBiometrics.sex
+        case .age:
+            return biometrics.age != previousBiometrics.age
+        case .weight:
+            return biometrics.weight != previousBiometrics.weight
+        case .leanBodyMass:
+            return biometrics.leanBodyMass != previousBiometrics.leanBodyMass
+        case .height:
+            return biometrics.height != previousBiometrics.height
+        default:
+            return false
+        }
+    }
+    
+    func isSyncing(_ type: BiometricType) -> Bool {
+        switch type {
+        case .restingEnergy:
+            return restingEnergySource == .health
+        case .activeEnergy:
+            return activeEnergySource == .health
+        case .sex:
+            return sexSource == .health
+        case .age:
+            return ageSource == .health
+        case .weight:
+            return weightSource == .health
+        case .leanBodyMass:
+            return lbmSource == .health
+        case .height:
+            return heightSource == .health
+        default:
+            return false
+        }
+    }
+    
+    var isSyncingAtLeastOneType: Bool {
+        for type in BiometricType.allCases {
+            if isSyncing(type) {
+                return true
+            }
+        }
+        return false
     }
 }

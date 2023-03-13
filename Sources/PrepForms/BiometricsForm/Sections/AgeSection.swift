@@ -120,6 +120,8 @@ struct AgeSection: View {
     }
  
     var header: some View {
-        biometricHeaderView("Age", largeTitle: largeTitle)
+//        biometricHeaderView("Age", largeTitle: largeTitle)
+        BiometricSectionHeader(type: .age)
+            .environmentObject(model)
     }
 }

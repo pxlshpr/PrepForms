@@ -1,5 +1,6 @@
 import Foundation
 import PrepDataTypes
+import PrepCoreDataStack
 
 extension BiometricsModel {
     
@@ -8,6 +9,8 @@ extension BiometricsModel {
         if let timestamp = biometrics.timestamp {
             self.lastUpdatedAt = Date(timeIntervalSince1970: timestamp)
         }
+        
+        self.previousBiometrics = UserManager.previousBiometrics?.biometrics
         
         self.restingEnergySource = biometrics.restingEnergy?.source
         self.restingEnergyFormula = biometrics.restingEnergy?.formula ?? .katchMcardle
