@@ -10,8 +10,11 @@ public struct BiometricsForm: View {
     
     @Namespace var namespace
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.scenePhase) var scenePhase
     @Environment(\.dismiss) var dismiss
 
+    let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
+    
     public init() {
         let user = DataManager.shared.user
         let biometrics = user?.biometrics
@@ -27,10 +30,39 @@ public struct BiometricsForm: View {
                 .toolbar { trailingContent }
                 .toolbar { leadingContent }
                 .onAppear(perform: appeared)
+                .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
+                .onChange(of: scenePhase, perform: scenePhaseChanged)
         }
     }
     
+    func scenePhaseChanged(newValue: ScenePhase) {
+        switch newValue {
+//        case .active:
+//            UserManager.setDidViewBiometrics()
+        default:
+            break
+        }
+    }
+    
+    func setBadges(from previousBiometrics: PreviousBiometrics) {
+        print("🤎 Setting biometrics from previous")
+    }
+    
     func appeared() {
+        if UserManager.shouldShowBiometricsBadge, let previousBiometrics = UserManager.previousBiometrics {
+            setBadges(from: previousBiometrics)
+            UserManager.setDidViewBiometrics()
+        }
+    }
+    
+    func didUpdateBiometrics(notification: Notification) {
+        let updated = UserManager.biometrics
+        withAnimation {
+            self.model.load(updated)
+        }
+        if let previousBiometrics = UserManager.previousBiometrics {
+            setBadges(from: previousBiometrics)
+        }
         UserManager.setDidViewBiometrics()
     }
     
