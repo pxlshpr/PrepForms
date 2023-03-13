@@ -177,9 +177,8 @@ extension BiometricsModel {
         switch restingEnergySource {
         case .health:
             syncRestingEnergy()
-        case .formula:
-            break
         default:
+            saveBiometrics()
             break
         }
     }
@@ -198,6 +197,7 @@ extension BiometricsModel {
         withAnimation {
             self.restingEnergyFormula = newFormula
         }
+        saveBiometrics()
     }
     
     var restingEnergyPeriodBinding: Binding<HealthPeriodType> {
@@ -367,6 +367,7 @@ extension BiometricsModel {
         withAnimation {
             self.activeEnergyActivityLevel = newFormula
         }
+        saveBiometrics()
     }
     
     var activeEnergyValue: Double? {
@@ -480,6 +481,7 @@ extension BiometricsModel {
         case .health:
             syncActiveEnergy()
         default:
+            saveBiometrics()
             break
         }
     }
