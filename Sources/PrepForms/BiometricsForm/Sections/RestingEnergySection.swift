@@ -200,6 +200,7 @@ struct RestingEnergySection: View {
                         heightUnit: model.userHeightUnit,
                         isSynced: model.measurementsAreSynced
                     )
+                    .fixedSize(horizontal: true, vertical: false)
                 } else {
                     MeasurementLabel(
                         label: "set parameters",

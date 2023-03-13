@@ -1,5 +1,6 @@
 import SwiftUI
 import PrepDataTypes
+import PrepCoreDataStack
 
 struct BiometricSectionHeader: View {
     
@@ -9,7 +10,7 @@ struct BiometricSectionHeader: View {
     var body: some View {
         HStack {
             symbol
-            Text(type.description)
+            Text(title)
             updatedBadge
             Spacer()
             syncedSymbol
@@ -19,6 +20,17 @@ struct BiometricSectionHeader: View {
         .foregroundColor(Color(.secondaryLabel))
         .font(.footnote)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    var title: String {
+        switch type {
+        case .restingEnergy:
+            return "Resting \(UserManager.energyDescription)"
+        case .activeEnergy:
+            return "Active \(UserManager.energyDescription)"
+        default:
+            return type.description
+        }
     }
     
     @ViewBuilder

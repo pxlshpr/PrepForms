@@ -97,8 +97,7 @@ public struct BiometricsForm: View {
     var content: some View {
         FormStyledScrollView {
             infoSection
-            restingEnergySection
-            activeEnergySection
+            energyGroup
             profileTitle
             weightSection
             leanBodyMassSection
@@ -109,8 +108,30 @@ public struct BiometricsForm: View {
         }
     }
     
+    var energyGroup: some View {
+        Group {
+            maintenanceTitle
+            maintenanceSection
+            Text("=")
+                .font(.title)
+                .foregroundColor(Color(.quaternaryLabel))
+            restingEnergySection
+            Text("+")
+                .font(.title)
+                .foregroundColor(Color(.quaternaryLabel))
+            activeEnergySection
+        }
+    }
+    
+    var maintenanceSection: some View {
+        MaintenanceSection()
+            .environmentObject(model)
+    }
+    
     var profileTitle: some View {
         HStack {
+            Image(systemName: "figure.arms.open")
+                .font(.title2)
             Text("Body Profile")
                 .font(.system(.title2, design: .rounded, weight: .bold))
                 .foregroundColor(.primary)
@@ -120,7 +141,29 @@ public struct BiometricsForm: View {
         .padding(.top, 20)
         .padding(.bottom, 0)
     }
-    
+
+    var maintenanceTitle: some View {
+        @ViewBuilder
+        var syncedSymbol: some View {
+            if model.isSyncing(.activeEnergy) || model.isSyncing(.restingEnergy) {
+                appleHealthBolt
+            }
+        }
+
+        return HStack {
+            Image(systemName: "flame.fill")
+                .font(.title2)
+            Text("Maintenance \(UserManager.energyDescription)")
+                .font(.system(.title2, design: .rounded, weight: .bold))
+                .foregroundColor(.primary)
+            Spacer()
+            syncedSymbol
+        }
+        .padding(.horizontal, 20 + 17)
+        .padding(.top, 20)
+        .padding(.bottom, 0)
+    }
+
     var infoText: some View {
 //        Text("These are used to create goals based on your **\(UserManager.tdeeDescription)**, which is an estimate of how much you would have to consume to *maintain* your current weight.")
 //        Text("Your biometric data is used to create goals based on your **Maintenance Calories**, which estimates what you need to consume to *maintain* your current weight.")
