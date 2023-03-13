@@ -20,7 +20,6 @@ class BiometricsModel: ObservableObject {
     @Published var restingEnergyFormula: RestingEnergyFormula = .katchMcardle
     @Published var restingEnergy: Double? = nil
     @Published var restingEnergyTextFieldString: String = ""
-    
     @Published var restingEnergyInterval: HealthInterval = .init(1, .week)
     
     @Published var activeEnergySource: ActiveEnergySource? = nil
@@ -28,9 +27,7 @@ class BiometricsModel: ObservableObject {
     @Published var activeEnergy: Double? = nil
     @Published var activeEnergyTextFieldString: String = ""
     
-    @Published var activeEnergyPeriod: HealthPeriodType = .previousDay
-    @Published var activeEnergyIntervalValue: Int = 1
-    @Published var activeEnergyInterval: HealthPeriod = .day
+    @Published var activeEnergyInterval: HealthInterval = .init(1, .day)
 
     @Published var lbmSource: LeanBodyMassSource? = nil
     @Published var lbmFormula: LeanBodyMassFormula = .boer
@@ -63,6 +60,8 @@ class BiometricsModel: ObservableObject {
     @Published var activeEnergySyncStatus: BiometricSyncStatus = .notSynced
     @Published var restingEnergySyncStatus: BiometricSyncStatus = .notSynced
     @Published var lbmSyncStatus: BiometricSyncStatus = .notSynced
+    
+    @Published var lastUpdatedAt: Date? = nil
     
     let existingProfile: Biometrics?
     
@@ -139,10 +138,8 @@ extension BiometricsModel {
         var restingEnergyFormula: RestingEnergyFormula? { restingEnergySource == .formula ? self.restingEnergyFormula : nil }
         var restingEnergyInterval: HealthInterval? { restingEnergySource == .health ? self.restingEnergyInterval : nil }
         
-        var activeEnergyPeriod: HealthPeriodType? { activeEnergySource == .health ? self.activeEnergyPeriod : nil }
         var activeEnergyActivityLevel: ActivityLevel? { activeEnergySource == .activityLevel ? self.activeEnergyActivityLevel : nil }
-        var activeEnergyIntervalValue: Int? { activeEnergySource == .health ? self.activeEnergyIntervalValue : nil }
-        var activeEnergyInterval: HealthPeriod? { activeEnergySource == .health ? self.activeEnergyInterval : nil }
+        var activeEnergyInterval: HealthInterval? { activeEnergySource == .health ? self.activeEnergyInterval : nil }
         
         var lbmFormula: LeanBodyMassFormula? { lbmSource == .formula ? self.lbmFormula : nil }
         var lbmDate: Date? { lbmSource == .health ? self.lbmDate : nil }
@@ -156,7 +153,7 @@ extension BiometricsModel {
                 unit: userEnergyUnit, //TODO: Change this
                 source: restingEnergySource,
                 formula: restingEnergyFormula,
-                healthInterval: restingEnergyInterval
+                interval: restingEnergyInterval
             )
         }
 
@@ -166,8 +163,6 @@ extension BiometricsModel {
                 unit: userEnergyUnit, //TODO: Change this
                 source: activeEnergySource,
                 activityLevel: activeEnergyActivityLevel,
-                period: activeEnergyPeriod,
-                intervalValue: activeEnergyIntervalValue,
                 interval: activeEnergyInterval
             )
         }

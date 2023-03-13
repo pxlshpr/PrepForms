@@ -87,7 +87,7 @@ struct WeightSection: View {
                 type: .weight,
                 source: model.weightSource ?? .userEntered,
                 syncStatus: model.weightSyncStatus,
-                prefix: nil,
+                prefix: model.weightDateFormatted,
                 showFormOnAppear: $showFormOnAppear
             )
         }

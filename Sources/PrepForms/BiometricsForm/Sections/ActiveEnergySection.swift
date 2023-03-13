@@ -69,20 +69,20 @@ struct ActiveEnergySection: View {
     var healthPeriodContent: some View {
         var periodTypeMenu: some View {
            Menu {
-               Picker(selection: model.activeEnergyPeriodBinding, label: EmptyView()) {
+               Picker(selection: model.activeEnergyPeriodTypeBinding, label: EmptyView()) {
                     ForEach(HealthPeriodType.allCases, id: \.self) {
                         Text($0.pickerDescription).tag($0)
                     }
                 }
             } label: {
                 PickerLabel(
-                    model.activeEnergyPeriod.menuDescription,
+                    model.activeEnergyInterval.periodType.menuDescription,
                     imageColor: Color(hex: "F3DED7"),
                     backgroundGradientTop: HealthTopColor,
                     backgroundGradientBottom: HealthBottomColor,
                     foregroundColor: .white
                 )
-                .animation(.none, value: model.activeEnergyPeriod)
+                .animation(.none, value: model.activeEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
@@ -100,13 +100,12 @@ struct ActiveEnergySection: View {
                 }
             } label: {
                 PickerLabel(
-                    "\(model.activeEnergyIntervalValue)",
+                    "\(model.activeEnergyInterval.value)",
                     imageColor: Color(hex: "F3DED7"),
                     backgroundGradientTop: HealthTopColor,
                     backgroundGradientBottom: HealthBottomColor,
                     foregroundColor: .white
                 )
-                .animation(.none, value: model.activeEnergyIntervalValue)
                 .animation(.none, value: model.activeEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
             }
@@ -118,21 +117,20 @@ struct ActiveEnergySection: View {
         
         var periodIntervalMenu: some View {
             Menu {
-                Picker(selection: model.activeEnergyIntervalBinding, label: EmptyView()) {
+                Picker(selection: model.activeEnergyIntervalPeriodBinding, label: EmptyView()) {
                     ForEach(HealthPeriod.allCases, id: \.self) { interval in
-                        Text("\(interval.description)\(model.activeEnergyIntervalValue > 1 ? "s" : "")").tag(interval)
+                        Text("\(interval.description)\(model.activeEnergyInterval.value > 1 ? "s" : "")").tag(interval)
                     }
                 }
             } label: {
                 PickerLabel(
-                    "\(model.activeEnergyInterval.description)\(model.activeEnergyIntervalValue > 1 ? "s" : "")",
+                    "\(model.activeEnergyInterval.period.description)\(model.activeEnergyInterval.value > 1 ? "s" : "")",
                     imageColor: Color(hex: "F3DED7"),
                     backgroundGradientTop: HealthTopColor,
                     backgroundGradientBottom: HealthBottomColor,
                     foregroundColor: .white
                 )
                 .animation(.none, value: model.activeEnergyInterval)
-                .animation(.none, value: model.activeEnergyIntervalValue)
                 .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
@@ -164,7 +162,7 @@ struct ActiveEnergySection: View {
                 }
                 Spacer()
             }
-            if model.activeEnergyPeriod == .average {
+            if model.activeEnergyInterval.periodType == .average {
                 intervalRow
             }
         }
@@ -283,7 +281,8 @@ struct ActiveEnergySection: View {
                 withAnimation {
                     model.activeEnergySource = .health
                 }
-                model.fetchActiveEnergyFromHealth()
+//                await model.fetchActiveEnergyFromHealth()
+                model.syncActiveEnergy()
             } catch {
                 cprint("Error syncing with Health: \(error)")
             }

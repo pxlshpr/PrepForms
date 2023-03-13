@@ -67,7 +67,6 @@ extension BiometricsModel {
     func fetchSexFromHealth() {
         
         @Sendable func syncFailed() {
-            Haptics.errorFeedback()
             sexSyncStatus = .lastSyncFailed
             changeSexSource(to: .userEntered)
         }
@@ -181,7 +180,6 @@ extension BiometricsModel {
             guard let dob = await HealthKitManager.shared.currentDateOfBirthComponents() else {
                 await MainActor.run {
                     withAnimation {
-                        Haptics.errorFeedback()
                         dobSyncStatus = .lastSyncFailed
                         changeAgeSource(to: .userEntered)
                     }
@@ -274,7 +272,6 @@ extension BiometricsModel {
             guard let (height, date) = await HealthKitManager.shared.latestHeight(unit: userHeightUnit) else {
                 await MainActor.run {
                     withAnimation {
-                        Haptics.errorFeedback()
                         heightSyncStatus = .lastSyncFailed
                         changeHeightSource(to: .userEntered)
                     }
@@ -295,16 +292,30 @@ extension BiometricsModel {
     var heightFormatted: String {
         height?.cleanAmount ?? ""
     }
-
+    
     var heightFormattedWithUnit: String {
         guard let height else { return "" }
         return height.cleanAmount + " " + userHeightUnit.shortDescription
     }
-
+    
     var hasHeight: Bool {
         height != nil
     }
+}
+
+extension BiometricsModel {
     
+    var heightDateFormatted: String? {
+        heightDate?.biometricFormat
+    }
+    
+    var weightDateFormatted: String? {
+        weightDate?.biometricFormat
+    }
+    
+    var lbmDateFormatted: String? {
+        lbmDate?.biometricFormat
+    }
 }
 
 //MARK: - Weight
@@ -369,7 +380,6 @@ extension BiometricsModel {
             guard let (weight, date) = await HealthKitManager.shared.latestWeight(unit: userBodyMassUnit) else {
                 await MainActor.run {
                     withAnimation {
-                        Haptics.errorFeedback()
                         weightSyncStatus = .lastSyncFailed
                         changeWeightSource(to: .userEntered)
                     }
@@ -516,7 +526,6 @@ extension BiometricsModel {
             guard let (lbm, date) = await HealthKitManager.shared.latestLeanBodyMass(unit: userBodyMassUnit) else {
                 await MainActor.run {
                     withAnimation {
-                        Haptics.errorFeedback()
                         lbmSyncStatus = .lastSyncFailed
                         changeLBMSource(to: .userEntered)
                     }

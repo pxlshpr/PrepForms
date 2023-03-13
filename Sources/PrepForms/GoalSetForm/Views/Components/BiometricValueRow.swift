@@ -64,23 +64,25 @@ struct BiometricValueRow: View {
     }
     
     var syncFailedForm: some View {
-        BiometricSyncFailedForm(type: type)
+        BiometricSyncFailedForm(type: type, syncStatus: syncStatus)
     }
     
     @ViewBuilder
     var syncFailedContent: some View {
-        if syncStatus == .lastSyncFailed {
+        if syncStatus == .lastSyncFailed || syncStatus == .nextAvailableSynced {
             Button {
+                Haptics.feedback(style: .soft)
                 showingSyncFailedInfo = true
             } label: {
                 HStack {
-                    Text("sync failed")
+                    Text(syncStatus == .lastSyncFailed ? "sync failed" : "no data")
+                        .foregroundColor(.secondary)
                         .fontWeight(.semibold)
                     Image(systemName: "info.circle")
-                        .imageScale(.large)
+                        .imageScale(.medium)
                         .fontWeight(.medium)
+                        .foregroundColor(.accentColor)
                 }
-                .foregroundColor(.accentColor)
 //                .foregroundColor(.red)
                 .font(.footnote)
                 .padding(.vertical, 8)
@@ -264,8 +266,8 @@ struct BiometricValueRow: View {
             }
             .fixedSize(horizontal: true, vertical: false)
             .foregroundColor(textColor)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 15)
+            .padding(.vertical, isUserEntered ? 8 : 0)
+            .padding(.horizontal, isUserEntered ? 15 : 0)
             .background(background)
         }
         .animation(.none, value: value)
@@ -392,22 +394,15 @@ struct BiometricSyncFailedForm: View {
     @Environment(\.colorScheme) var colorScheme
     
     let type: BiometricType
+    let syncStatus: BiometricSyncStatus
     
     var body: some View {
-        QuickForm(title: "Sync Failed") {
+        QuickForm(title: title) {
             VStack {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("There may be no **\(type.description)** data available in the Health App, or you may not have granted us permission to access it.")
-                }
-                .fixedSize(horizontal: false, vertical: true)
-                .multilineTextAlignment(.leading)
-                Button {
-                    UIApplication.shared.open(URL(string: "App-prefs:Privacy&path=HEALTH")!)
-                } label: {
-                    ButtonLabel(title: "Go to Settings", leadingSystemImage: "gear")
-                }
-                .buttonStyle(.borderless)
-                .padding(.top, 5)
+                text
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.leading)
+                settingsButton
             }
             .foregroundColor(.secondary)
             .padding(30)
@@ -417,7 +412,34 @@ struct BiometricSyncFailedForm: View {
             )
             .padding(.horizontal, 20)
         }
-        .presentationDetents([.height(280)])
+        .presentationDetents([.height(syncStatus == .lastSyncFailed ? 280 : 220)])
         .presentationDragIndicator(.hidden)
+    }
+    
+    var title: String {
+        syncStatus == .nextAvailableSynced ? "No Data" : "Sync Failed"
+    }
+    
+    @ViewBuilder
+    var settingsButton: some View {
+        if syncStatus == .lastSyncFailed {
+            Button {
+                Haptics.feedback(style: .soft)
+                UIApplication.shared.open(URL(string: "App-prefs:Privacy&path=HEALTH")!)
+            } label: {
+                ButtonLabel(title: "Go to Settings", leadingSystemImage: "gear")
+            }
+            .buttonStyle(.borderless)
+            .padding(.top, 5)
+        }
+    }
+    
+    @ViewBuilder
+    var text: some View {
+        if syncStatus == .lastSyncFailed {
+            Text("There may be no **\(type.description)** data available in the Health App, or you may not have granted us permission to access it.")
+        } else {
+            Text("No **\(type.description)** data was found for the selected period in the Health App, so the next available data was used instead.")
+        }
     }
 }

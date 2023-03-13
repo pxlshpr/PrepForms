@@ -76,7 +76,7 @@ struct HeightSection: View {
                 type: .height,
                 source: model.heightSource ?? .userEntered,
                 syncStatus: model.heightSyncStatus,
-                prefix: nil,
+                prefix: model.heightDateFormatted,
                 showFormOnAppear: $showFormOnAppear
             )
         }

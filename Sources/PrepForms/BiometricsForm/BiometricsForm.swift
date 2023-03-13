@@ -31,6 +31,14 @@ public struct BiometricsForm: View {
     
     var leadingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarLeading) {
+//            syncAllButton
+            lastUpdatedAt
+        }
+    }
+    
+    @ViewBuilder
+    var syncAllButton: some View {
+        if model.lastUpdatedAt == nil {
             Button {
                 model.tappedSyncAll()
             } label: {
@@ -41,6 +49,7 @@ public struct BiometricsForm: View {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
+            syncAllButton
             closeButton
         }
     }
@@ -51,6 +60,15 @@ public struct BiometricsForm: View {
             dismiss()
         } label: {
             CloseButtonLabel(forNavigationBar: true)
+        }
+    }
+    
+    @ViewBuilder
+    var lastUpdatedAt: some View {
+        if let lastUpdatedAt = model.lastUpdatedAt {
+            Text("Updated: \(lastUpdatedAt.biometricShortFormat)")
+                .foregroundColor(.secondary)
+                .font(.footnote)
         }
     }
 

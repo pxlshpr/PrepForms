@@ -6,6 +6,14 @@ import SwiftUISugar
 import HealthKit
 import PrepCoreDataStack
 
+extension TDEEForm {
+    
+    var restingEnergySection: some View {
+        RestingEnergySection()
+            .environmentObject(model)
+    }
+}
+
 //func label(_ label: String, _ valueString: String) -> some View {
 
 //let HealthBottomColorHex = "fc2e1d"
@@ -136,14 +144,6 @@ struct MeasurementLabel_Previews: PreviewProvider {
             }
         }
     }
-}
-
-extension TDEEForm {
-    
-    var restingEnergySection: some View {
-        RestingEnergySection()
-            .environmentObject(model)
-    }    
 }
 
 func emptyButton(_ string: String, systemImage: String? = nil, showHealthAppIcon: Bool = false, action: (() -> ())? = nil) -> some View {

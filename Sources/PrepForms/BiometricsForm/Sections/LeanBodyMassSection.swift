@@ -265,7 +265,7 @@ struct LeanBodyMassSection: View {
                 type: .leanBodyMass,
                 source: model.lbmSource ?? .userEntered,
                 syncStatus: model.lbmSyncStatus,
-                prefix: nil,
+                prefix: model.lbmDateFormatted,
                 showFormOnAppear: $showFormOnAppear
             )
         }
