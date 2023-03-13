@@ -55,88 +55,7 @@ struct HeightSection: View {
         }
     }
 
-    @ViewBuilder
-    var footer: some View {
-        switch model.heightSource {
-        case .userEntered:
-            Text("You will need to update your height manually.")
-        case .health:
-            Text("Your height will be kept in sync with the Health App.")
-        default:
-            EmptyView()
-        }
-    }
-    
     var bottomRow: some View {
-//        @ViewBuilder
-//        var health: some View {
-//            switch model.heightFetchStatus {
-//            case .noData:
-//                Text("No Data")
-//            case .noDataOrNotAuthorized:
-//                Text("No Data or Not Authorized")
-//            case .notFetched, .fetching, .fetched:
-//                HStack {
-//                    Spacer()
-//                    if model.heightFetchStatus == .fetching {
-//                        ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
-//                            .frame(width: 25, height: 25)
-//                            .foregroundColor(.secondary)
-//                    } else {
-//                        if let date = model.heightDate {
-//                            Text("as of \(date.tdeeFormat)")
-//                                .font(.subheadline)
-//                                .foregroundColor(Color(.tertiaryLabel))
-//                        }
-//                        Text(model.heightFormatted)
-//                            .font(.system(.title3, design: .rounded, weight: .semibold))
-//                            .foregroundColor(model.sexSource == .userEntered ? .primary : .secondary)
-//                            .matchedGeometryEffect(id: "height", in: namespace)
-//                            .if(!model.hasHeight) { view in
-//                                view
-//                                    .redacted(reason: .placeholder)
-//                            }
-//                        Text(model.userHeightUnit.shortDescription)
-//                            .foregroundColor(.secondary)
-//                    }
-//                }
-//            }
-//        }
-//
-//        var manualEntry: some View {
-//            var prompt: String {
-//                "height in"
-//            }
-//            var binding: Binding<String> {
-//                model.heightTextFieldStringBinding
-//            }
-//            var unitString: String {
-//                model.userHeightUnit.shortDescription
-//            }
-//            return HStack {
-//                Spacer()
-//                TextField(prompt, text: binding)
-//                    .keyboardType(.decimalPad)
-//                    .focused($isFocused)
-//                    .multilineTextAlignment(.trailing)
-//                    .font(.system(.title3, design: .rounded, weight: .semibold))
-//                    .matchedGeometryEffect(id: "height", in: namespace)
-//                Text(unitString)
-//                    .foregroundColor(.secondary)
-//            }
-//        }
-//
-//        return Group {
-//            switch model.heightSource {
-//            case .health:
-//                health
-//            case .userEntered:
-//                manualEntry
-//            default:
-//                EmptyView()
-//            }
-//        }
-        
         let valueBinding = Binding<BiometricValue?>(
             get: { model.heightBiometricValue },
             set: { newValue in
@@ -156,7 +75,7 @@ struct HeightSection: View {
                 value: valueBinding,
                 type: .height,
                 source: model.heightSource ?? .userEntered,
-                fetchStatus: model.heightFetchStatus,
+                syncStatus: model.heightSyncStatus,
                 prefix: nil,
                 showFormOnAppear: $showFormOnAppear
             )
@@ -202,7 +121,7 @@ struct HeightSection: View {
     }
     
     var body: some View {
-        FormStyledSection(header: header, footer: footer) {
+        FormStyledSection(header: header) {
             content
         }
         .onChange(of: model.heightSource, perform: heightSourceChanged)

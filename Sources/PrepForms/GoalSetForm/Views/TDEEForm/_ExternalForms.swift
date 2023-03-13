@@ -8,7 +8,7 @@ struct HealthAppPeriodPicker: View {
     @State var selection: Int = 1
     
     @State var quantity: Int = 1
-    @State var interval: HealthAppInterval = .week
+    @State var interval: HealthPeriod = .week
     
     var typePicker: some View {
         let selectionBinding = Binding<Int>(
@@ -50,7 +50,7 @@ struct HealthAppPeriodPicker: View {
                             }
                             Menu {
                                 Picker(selection: $interval, label: EmptyView()) {
-                                    ForEach(HealthAppInterval.allCases, id: \.self) { interval in
+                                    ForEach(HealthPeriod.allCases, id: \.self) { interval in
                                         Text("\(interval.description)\(quantity > 1 ? "s" : "")").tag(interval)
                                     }
                                 }

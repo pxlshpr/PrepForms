@@ -78,7 +78,7 @@ struct RestingEnergySection: View {
             case .formula:
                 formulaContent
             }
-            energyRow
+            bottomRow
         }
     }
 
@@ -131,13 +131,6 @@ struct RestingEnergySection: View {
                     }
                 }
             } label: {
-//                    PickerLabel(
-//                        model.restingEnergyFormula.year,
-//                        prefix: model.restingEnergyFormula.menuDescription,
-//                        foregroundColor: .secondary,
-//                        prefixColor: .primary
-//                    )
-//                    PickerLabel(model.restingEnergyFormula.menuDescription)
                 BiometricPickerLabel(model.restingEnergyFormula.menuDescription)
                     .animation(.none, value: model.restingEnergyFormula)
                     .fixedSize(horizontal: true, vertical: false)
@@ -281,105 +274,12 @@ struct RestingEnergySection: View {
     }
     
     var healthContent: some View {
-        Group {
-            switch model.restingEnergyFetchStatus {
-            case .noData:
-                Text("No Data")
-            case .noDataOrNotAuthorized:
-                Text("No Data or Not Authorized")
-//                    permissionRequiredContent
-            case .notFetched, .fetching, .fetched:
-                healthPeriodContent
-            }
-        }
-        .padding()
-        .padding(.horizontal)
+        healthPeriodContent
+            .padding()
+            .padding(.horizontal)
     }
     
-    var energyRow: some View {
-//            @ViewBuilder
-//            var health: some View {
-//                switch model.restingEnergyFetchStatus {
-//                case .noData:
-//                    Text("No Data")
-//                case .noDataOrNotAuthorized:
-//                    Text("No Data or Not Authorized")
-//                case .notFetched, .fetching, .fetched:
-//                    HStack {
-//                        Spacer()
-//                        if model.restingEnergyFetchStatus == .fetching {
-//                            ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
-//                                .frame(width: 25, height: 25)
-//                                .foregroundColor(.secondary)
-//                        } else {
-//                            if let prefix = model.restingEnergyPrefix {
-//                                Text(prefix)
-//                                    .font(.subheadline)
-//                                    .foregroundColor(Color(.tertiaryLabel))
-//                            }
-//                            Text(model.restingEnergyFormatted)
-//                                .font(.system(.title3, design: .rounded, weight: .semibold))
-//                                .foregroundColor(model.restingEnergySource == .userEntered ? .primary : .secondary)
-//                                .fixedSize(horizontal: true, vertical: false)
-//                                .matchedGeometryEffect(id: "resting", in: namespace)
-//                                .if(!model.hasRestingEnergy) { view in
-//                                    view
-//                                        .redacted(reason: .placeholder)
-//                                }
-//                            Text(model.userEnergyUnit.shortDescription)
-//                                .foregroundColor(.secondary)
-//                        }
-//                    }
-//                }
-//            }
-//
-//            var formula: some View {
-//                HStack {
-//                    Spacer()
-//                    Text(model.restingEnergyFormatted)
-//                        .font(.system(.title3, design: .rounded, weight: .semibold))
-//                        .foregroundColor(.secondary)
-//                        .fixedSize(horizontal: true, vertical: false)
-//                        .matchedGeometryEffect(id: "resting", in: namespace)
-//                        .if(!model.hasRestingEnergy) { view in
-//                            view
-//                                .redacted(reason: .placeholder)
-//                        }
-//                    Text(model.userEnergyUnit.shortDescription)
-//                        .foregroundColor(.secondary)
-//                }
-//            }
-//
-//            var manualEntry: some View {
-//                HStack {
-//                    Spacer()
-//                    TextField("energy in", text: model.restingEnergyTextFieldStringBinding)
-//                        .keyboardType(.decimalPad)
-//                        .focused($restingEnergyTextFieldIsFocused)
-//                        .fixedSize(horizontal: true, vertical: false)
-//                        .multilineTextAlignment(.trailing)
-////                        .fixedSize(horizontal: true, vertical: false)
-//                        .font(.system(.title3, design: .rounded, weight: .semibold))
-//                        .matchedGeometryEffect(id: "resting", in: namespace)
-//                    Text(model.userEnergyUnit.shortDescription)
-//                        .foregroundColor(.secondary)
-//                }
-//            }
-//
-//            return Group {
-//                switch model.restingEnergySource {
-//                case .health:
-//                    health
-//                case .formula:
-//                    formula
-//                case .userEntered:
-//                    manualEntry
-//                default:
-//                    EmptyView()
-//                }
-//            }
-//            .padding(.trailing)
-        
+    var bottomRow: some View {
         let valueBinding = Binding<BiometricValue?>(
             get: {
                 model.restingEnergyBiometricValue
@@ -405,32 +305,32 @@ struct RestingEnergySection: View {
             value: valueBinding,
             type: .restingEnergy,
             source: model.restingEnergySource ?? .userEntered,
-            fetchStatus: model.restingEnergyFetchStatus,
+            syncStatus: model.restingEnergySyncStatus,
             prefix: model.restingEnergyPrefix,
             showFormOnAppear: $showFormOnAppear,
             matchedGeometryId: "resting",
             matchedGeometryNamespace: namespace
         )
-        .padding(.trailing)
+        .padding(.horizontal)
     }
     
     var healthPeriodContent: some View {
         var periodTypeMenu: some View {
            Menu {
                Picker(selection: model.restingEnergyPeriodBinding, label: EmptyView()) {
-                    ForEach(HealthPeriodOption.allCases, id: \.self) {
+                    ForEach(HealthPeriodType.allCases, id: \.self) {
                         Text($0.pickerDescription).tag($0)
                     }
                 }
             } label: {
                 PickerLabel(
-                    model.restingEnergyPeriod.menuDescription,
+                    model.restingEnergyInterval.periodType.menuDescription,
                     imageColor: Color(hex: "F3DED7"),
                     backgroundGradientTop: HealthTopColor,
                     backgroundGradientBottom: HealthBottomColor,
                     foregroundColor: .white
                 )
-                .animation(.none, value: model.restingEnergyPeriod)
+                .animation(.none, value: model.restingEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
@@ -449,13 +349,12 @@ struct RestingEnergySection: View {
                 }
             } label: {
                 PickerLabel(
-                    "\(model.restingEnergyIntervalValue)",
+                    "\(model.restingEnergyInterval.value)",
                     imageColor: Color(hex: "F3DED7"),
                     backgroundGradientTop: HealthTopColor,
                     backgroundGradientBottom: HealthBottomColor,
                     foregroundColor: .white
                 )
-                .animation(.none, value: model.restingEnergyIntervalValue)
                 .animation(.none, value: model.restingEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
             }
@@ -469,20 +368,19 @@ struct RestingEnergySection: View {
         var periodIntervalMenu: some View {
             Menu {
                 Picker(selection: model.restingEnergyIntervalBinding, label: EmptyView()) {
-                    ForEach(HealthAppInterval.allCases, id: \.self) { interval in
-                        Text("\(interval.description)\(model.restingEnergyIntervalValue > 1 ? "s" : "")").tag(interval)
+                    ForEach(HealthPeriod.allCases, id: \.self) { interval in
+                        Text("\(interval.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")").tag(interval)
                     }
                 }
             } label: {
                 PickerLabel(
-                    "\(model.restingEnergyInterval.description)\(model.restingEnergyIntervalValue > 1 ? "s" : "")",
+                    "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")",
                     imageColor: Color(hex: "F3DED7"),
                     backgroundGradientTop: HealthTopColor,
                     backgroundGradientBottom: HealthBottomColor,
                     foregroundColor: .white
                 )
                 .animation(.none, value: model.restingEnergyInterval)
-                .animation(.none, value: model.restingEnergyIntervalValue)
                 .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
@@ -515,7 +413,7 @@ struct RestingEnergySection: View {
                 }
                 Spacer()
             }
-            if model.restingEnergyPeriod == .average {
+            if model.restingEnergyInterval.periodType == .average {
                 intervalRow
             }
         }

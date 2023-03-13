@@ -70,7 +70,7 @@ struct ActiveEnergySection: View {
         var periodTypeMenu: some View {
            Menu {
                Picker(selection: model.activeEnergyPeriodBinding, label: EmptyView()) {
-                    ForEach(HealthPeriodOption.allCases, id: \.self) {
+                    ForEach(HealthPeriodType.allCases, id: \.self) {
                         Text($0.pickerDescription).tag($0)
                     }
                 }
@@ -119,7 +119,7 @@ struct ActiveEnergySection: View {
         var periodIntervalMenu: some View {
             Menu {
                 Picker(selection: model.activeEnergyIntervalBinding, label: EmptyView()) {
-                    ForEach(HealthAppInterval.allCases, id: \.self) { interval in
+                    ForEach(HealthPeriod.allCases, id: \.self) { interval in
                         Text("\(interval.description)\(model.activeEnergyIntervalValue > 1 ? "s" : "")").tag(interval)
                     }
                 }
@@ -172,109 +172,12 @@ struct ActiveEnergySection: View {
     
     
     var healthContent: some View {
-//            Group {
-//                switch model.activeEnergyFetchStatus {
-//                case .noData:
-//                    healthPeriodContent
-//                case .noDataOrNotAuthorized:
-////                    Text("No Data or Not Authorized")
-//                    healthPeriodContent
-////                    permissionRequiredContent
-//                case .notFetched, .fetching:
-//                    EmptyView()
-//                case .fetched:
-//                    healthPeriodContent
-//                }
-//            }
         healthPeriodContent
-        .padding()
-        .padding(.horizontal)
+            .padding()
+            .padding(.horizontal)
     }
     
-    var energyRow: some View {
-//            @ViewBuilder
-//            var healthContent: some View {
-//                switch model.activeEnergyFetchStatus {
-//                case .noData:
-//                    Text("No Data")
-//                case .noDataOrNotAuthorized:
-//                    Text("No Data or Not Authorized")
-//                case .notFetched, .fetching, .fetched:
-//                    HStack {
-//                        Spacer()
-//                        if model.activeEnergyFetchStatus == .fetching {
-//                            ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
-//                                .frame(width: 25, height: 25)
-//                                .foregroundColor(.secondary)
-//                        } else {
-//                            if let prefix = model.activeEnergyPrefix {
-//                                Text(prefix)
-//                                    .font(.subheadline)
-//                                    .foregroundColor(Color(.tertiaryLabel))
-//                            }
-//                            Text(model.activeEnergyFormatted)
-//                                .font(.system(.title3, design: .rounded, weight: .semibold))
-//                                .multilineTextAlignment(.trailing)
-//                                .foregroundColor(model.activeEnergySource == .userEntered ? .primary : .secondary)
-//                                .fixedSize(horizontal: false, vertical: true)
-//                                .matchedGeometryEffect(id: "active", in: namespace)
-//                                .if(!model.hasActiveEnergy) { view in
-//                                    view
-//                                        .redacted(reason: .placeholder)
-//                                }
-//                            Text(model.userEnergyUnit.shortDescription)
-//                                .foregroundColor(.secondary)
-//                        }
-//                    }
-//                }
-//            }
-//
-//            var manualEntry: some View {
-//                HStack {
-//                    Spacer()
-//                    TextField("energy in", text: model.activeEnergyTextFieldStringBinding)
-//                        .keyboardType(.decimalPad)
-//                        .focused($activeEnergyTextFieldIsFocused)
-//                        .multilineTextAlignment(.trailing)
-//                        .font(.system(.title3, design: .rounded, weight: .semibold))
-////                        .fixedSize(horizontal: false, vertical: true)
-//                        .matchedGeometryEffect(id: "active", in: namespace)
-//                    Text(model.userEnergyUnit.shortDescription)
-//                        .foregroundColor(.secondary)
-//                }
-//            }
-//
-//            var activityLevel: some View {
-//                HStack {
-//                    Spacer()
-//                    Text(model.activeEnergyFormatted)
-//                        .font(.system(.title3, design: .rounded, weight: .semibold))
-//                        .foregroundColor(.secondary)
-//                        .multilineTextAlignment(.trailing)
-//                        .fixedSize(horizontal: false, vertical: true)
-//                        .matchedGeometryEffect(id: "active", in: namespace)
-//                        .if(!model.hasActiveEnergy) { view in
-//                            view
-//                                .redacted(reason: .placeholder)
-//                        }
-//                    Text(model.userEnergyUnit.shortDescription)
-//                        .foregroundColor(.secondary)
-//                }
-//            }
-//
-//            return Group {
-//                switch model.activeEnergySource {
-//                case .health:
-//                    healthContent
-//                case .activityLevel:
-//                    activityLevel
-//                case .userEntered:
-//                    manualEntry
-//                default:
-//                    EmptyView()
-//                }
-//            }
-        
+    var bottomRow: some View {
         let valueBinding = Binding<BiometricValue?>(
             get: {
                 model.activeEnergyBiometricValue
@@ -300,13 +203,13 @@ struct ActiveEnergySection: View {
             value: valueBinding,
             type: .activeEnergy,
             source: model.activeEnergySource ?? .userEntered,
-            fetchStatus: model.activeEnergyFetchStatus,
+            syncStatus: model.activeEnergySyncStatus,
             prefix: model.activeEnergyPrefix,
             showFormOnAppear: $showFormOnAppear,
             matchedGeometryId: "active",
             matchedGeometryNamespace: namespace
         )
-        .padding(.trailing)
+        .padding(.horizontal)
     }
     
     var activityLevelContent: some View {
@@ -318,12 +221,6 @@ struct ActiveEnergySection: View {
                     }
                 }
             } label: {
-//                    PickerLabel(
-//                        model.activeEnergyFormula.year,
-//                        prefix: model.activeEnergyFormula.menuDescription,
-//                        foregroundColor: .secondary,
-//                        prefixColor: .primary
-//                    )
                 BiometricPickerLabel(model.activeEnergyActivityLevel.description)
                     .animation(.none, value: model.activeEnergyActivityLevel)
                     .fixedSize(horizontal: true, vertical: false)
@@ -361,7 +258,7 @@ struct ActiveEnergySection: View {
                         case .userEntered:
                             EmptyView()
                         }
-                        energyRow
+                        bottomRow
                     }
                 } else {
                     emptyContent

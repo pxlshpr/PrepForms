@@ -44,7 +44,7 @@ extension TDEEForm {
             var periodTypeMenu: some View {
                Menu {
                    Picker(selection: model.activeEnergyPeriodBinding, label: EmptyView()) {
-                        ForEach(HealthPeriodOption.allCases, id: \.self) {
+                        ForEach(HealthPeriodType.allCases, id: \.self) {
                             Text($0.pickerDescription).tag($0)
                         }
                     }
@@ -93,7 +93,7 @@ extension TDEEForm {
             var periodIntervalMenu: some View {
                 Menu {
                     Picker(selection: model.activeEnergyIntervalBinding, label: EmptyView()) {
-                        ForEach(HealthAppInterval.allCases, id: \.self) { interval in
+                        ForEach(HealthPeriod.allCases, id: \.self) { interval in
                             Text("\(interval.description)\(model.activeEnergyIntervalValue > 1 ? "s" : "")").tag(interval)
                         }
                     }
@@ -272,7 +272,7 @@ extension TDEEForm {
                 value: valueBinding,
                 type: .activeEnergy,
                 source: model.activeEnergySource ?? .userEntered,
-                fetchStatus: model.activeEnergyFetchStatus,
+                syncStatus: model.activeEnergySyncStatus,
                 prefix: model.activeEnergyPrefix,
                 matchedGeometryId: "active",
                 matchedGeometryNamespace: namespace

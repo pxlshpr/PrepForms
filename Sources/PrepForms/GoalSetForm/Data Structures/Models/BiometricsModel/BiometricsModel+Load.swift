@@ -3,14 +3,11 @@ import PrepDataTypes
 
 extension BiometricsModel {
     func load(_ profile: Biometrics) {
-        //TODO: Biometrics
         self.restingEnergySource = profile.restingEnergy?.source
         self.restingEnergyFormula = profile.restingEnergy?.formula ?? .katchMcardle
         self.restingEnergy = profile.restingEnergy?.amount
         self.restingEnergyTextFieldString = profile.restingEnergy?.amount?.cleanAmount ?? ""
-        self.restingEnergyPeriod = profile.restingEnergy?.period ?? .average
-        self.restingEnergyIntervalValue = profile.restingEnergy?.intervalValue ?? 1
-        self.restingEnergyInterval = profile.restingEnergy?.interval ?? .week
+        self.restingEnergyInterval = profile.restingEnergy?.healthInterval ?? .init(1, .week)
 
         self.activeEnergySource = profile.activeEnergy?.source
         self.activeEnergyActivityLevel = profile.activeEnergy?.activityLevel ?? .moderatelyActive
@@ -57,19 +54,36 @@ extension BiometricsModel {
             self.ageTextFieldString = "\(age)"
         }
 
-        //TODO: Revisit this
-//        if self.lbmSource == .health, self.lbm == nil {
-//            self.lbmFetchStatus = .noData
-//        } else {
-//            self.lbmFetchStatus = .notFetched
-//        }
         
-        self.restingEnergyFetchStatus = .noData
-        self.activeEnergyFetchStatus = .noData
-        self.weightFetchStatus = .noData
-        self.lbmFetchStatus = .noData
-        self.heightFetchStatus = .noData
-        self.sexFetchStatus = .noData
-        self.dobFetchStatus = .noData
+        if restingEnergySource == .health {
+            fetchRestingEnergyFromHealth()
+        }
+        if activeEnergySource == .health {
+            fetchActiveEnergyFromHealth()
+        }
+        if ageSource == .health {
+            fetchDOBFromHealth()
+        }
+        if heightSource == .health {
+            fetchHeightFromHealth()
+        }
+        if weightSource == .health {
+            fetchWeightFromHealth()
+        }
+        if lbmSource == .health {
+            fetchLBMFromHealth()
+        }
+        if sexSource == .health {
+            fetchSexFromHealth()
+        }
+        
+        /// Save after fetches complete
+        //TODO: Do this properly as a large interval on energy would take longer
+        /// [ ] Have it as task that runs all fetches in parallel and saves once complete.
+        /// [ ] For this we would need to rewrite them as async functions
+        /// [ ] Do this also when coming back from background.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.saveBiometrics()
+        }
     }
 }

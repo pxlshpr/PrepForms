@@ -7,9 +7,9 @@ extension BiometricsModel {
     func tappedSyncAllOnLBMForm() {
         
         withAnimation {
-            sexFetchStatus = .fetching
-            weightFetchStatus = .fetching
-            heightFetchStatus = .fetching
+            sexSyncStatus = .syncing
+            weightSyncStatus = .syncing
+            heightSyncStatus = .syncing
         }
             
         Task {
@@ -33,11 +33,11 @@ extension BiometricsModel {
     func tappedSyncAllOnMeasurementsForm() {
         
         withAnimation {
-            sexFetchStatus = .fetching
-            weightFetchStatus = .fetching
-            dobFetchStatus = .fetching
+            sexSyncStatus = .syncing
+            weightSyncStatus = .syncing
+            dobSyncStatus = .syncing
             if restingEnergyFormula.requiresHeight {
-                heightFetchStatus = .fetching
+                heightSyncStatus = .syncing
             }
         }
         
@@ -72,13 +72,13 @@ extension BiometricsModel {
     func tappedSyncAll() {
         
         withAnimation {
-            restingEnergyFetchStatus = .fetching
-            activeEnergyFetchStatus = .fetching
-            lbmFetchStatus = .fetching
-            sexFetchStatus = .fetching
-            weightFetchStatus = .fetching
-            heightFetchStatus = .fetching
-            dobFetchStatus = .fetching
+            restingEnergySyncStatus = .syncing
+            activeEnergySyncStatus = .syncing
+            lbmSyncStatus = .syncing
+            sexSyncStatus = .syncing
+            weightSyncStatus = .syncing
+            heightSyncStatus = .syncing
+            dobSyncStatus = .syncing
         }
         
         Task {

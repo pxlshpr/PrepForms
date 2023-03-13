@@ -63,24 +63,35 @@ extension BiometricsModel {
         }
     }
     
+    
     func fetchSexFromHealth() {
+        
+        @Sendable func syncFailed() {
+            Haptics.errorFeedback()
+            sexSyncStatus = .lastSyncFailed
+            changeSexSource(to: .userEntered)
+        }
+        
         withAnimation {
-            sexFetchStatus = .fetching
+            sexSyncStatus = .syncing
         }
         
         Task {
             guard let sex = await HealthKitManager.shared.currentBiologicalSex() else {
-                self.sexFetchStatus = .noData
+                await MainActor.run {
+                    withAnimation {
+                        syncFailed()
+                    }
+                }
                 return
             }
             await MainActor.run {
                 withAnimation {
                     guard sex == .male || sex == .female else {
-                        self.sexFetchStatus = .noData
-                        self.sex = .female
+                        syncFailed()
                         return
                     }
-                    self.sexFetchStatus = .fetched
+                    sexSyncStatus = .synced
                     self.sex = sex
                 }
             }
@@ -161,22 +172,26 @@ extension BiometricsModel {
     }
     
     func fetchDOBFromHealth() {
+        
         withAnimation {
-            dobFetchStatus = .fetching
+            dobSyncStatus = .syncing
         }
         
         Task {
             guard let dob = await HealthKitManager.shared.currentDateOfBirthComponents() else {
                 await MainActor.run {
                     withAnimation {
-                        self.dobFetchStatus = .noData
+                        Haptics.errorFeedback()
+                        dobSyncStatus = .lastSyncFailed
+                        changeAgeSource(to: .userEntered)
                     }
                 }
                 return
             }
             await MainActor.run {
                 withAnimation {
-                    self.dobFetchStatus = .fetched
+                    dobSyncStatus = .synced
+                    
                     self.dob = dob
                     if let age = dob.age {
                         self.age = age
@@ -252,21 +267,23 @@ extension BiometricsModel {
     
     func fetchHeightFromHealth() {
         withAnimation {
-            heightFetchStatus = .fetching
+            heightSyncStatus = .syncing
         }
         
         Task {
             guard let (height, date) = await HealthKitManager.shared.latestHeight(unit: userHeightUnit) else {
                 await MainActor.run {
                     withAnimation {
-                        self.heightFetchStatus = .noData
+                        Haptics.errorFeedback()
+                        heightSyncStatus = .lastSyncFailed
+                        changeHeightSource(to: .userEntered)
                     }
                 }
                 return
             }
             await MainActor.run {
                 withAnimation {
-                    self.heightFetchStatus = .fetched
+                    heightSyncStatus = .synced
                     self.height = height
                     self.heightTextFieldString = height.cleanAmount
                     self.heightDate = date
@@ -345,21 +362,24 @@ extension BiometricsModel {
     
     func fetchWeightFromHealth() {
         withAnimation {
-            weightFetchStatus = .fetching
+            weightSyncStatus = .syncing
         }
         
         Task {
             guard let (weight, date) = await HealthKitManager.shared.latestWeight(unit: userBodyMassUnit) else {
                 await MainActor.run {
                     withAnimation {
-                        self.weightFetchStatus = .noData
+                        Haptics.errorFeedback()
+                        weightSyncStatus = .lastSyncFailed
+                        changeWeightSource(to: .userEntered)
                     }
                 }
                 return
             }
             await MainActor.run {
                 withAnimation {
-                    self.weightFetchStatus = .fetched
+                    weightSyncStatus = .synced
+                    
                     self.weight = weight
                     self.weightTextFieldString = weight.cleanAmount
                     self.weightDate = date
@@ -403,9 +423,7 @@ extension BiometricsModel {
             lbmSource = newSource
         }
         if newSource == .health {
-            Task {
-                await fetchLBMFromHealth()
-            }
+            fetchLBMFromHealth()
         }
     }
     
@@ -489,27 +507,30 @@ extension BiometricsModel {
         }
     }
     
-    func fetchLBMFromHealth() async {
-        await MainActor.run {
-            withAnimation {
-                lbmFetchStatus = .fetching
-            }
+    func fetchLBMFromHealth() {
+        withAnimation {
+            lbmSyncStatus = .syncing
         }
         
-        guard let (lbm, date) = await HealthKitManager.shared.latestLeanBodyMass(unit: userBodyMassUnit) else {
+        Task {
+            guard let (lbm, date) = await HealthKitManager.shared.latestLeanBodyMass(unit: userBodyMassUnit) else {
+                await MainActor.run {
+                    withAnimation {
+                        Haptics.errorFeedback()
+                        lbmSyncStatus = .lastSyncFailed
+                        changeLBMSource(to: .userEntered)
+                    }
+                }
+                return
+            }
             await MainActor.run {
                 withAnimation {
-                    self.lbmFetchStatus = .noData
+                    self.lbmSyncStatus = .synced
+                    
+                    self.lbm = lbm
+                    self.lbmTextFieldString = lbm.cleanAmount
+                    self.lbmDate = date
                 }
-            }
-            return
-        }
-        await MainActor.run {
-            withAnimation {
-                self.lbmFetchStatus = .fetched
-                self.lbm = lbm
-                self.lbmTextFieldString = lbm.cleanAmount
-                self.lbmDate = date
             }
         }
     }

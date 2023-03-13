@@ -17,8 +17,6 @@ public struct TDEEForm: View {
     
     let didTapSave: (Biometrics) -> ()
     
-    let didEnterForeground = NotificationCenter.default.publisher(for: .didEnterForeground)
-    
     @State var showingSaveButton: Bool = false
     
     public init(
@@ -52,7 +50,6 @@ public struct TDEEForm: View {
                     .onAppear(perform: blankViewAppeared)
             }
         }
-        .onReceive(didEnterForeground, perform: didEnterForeground)
         .presentationDetents(model.detents, selection: $model.presentationDetent)
         .presentationDragIndicator(.hidden)
     }
@@ -137,7 +134,7 @@ public struct TDEEForm: View {
     @State var healthRestingEnergy: Double? = nil
     @State var healthActiveEnergy: Double? = nil
     
-    @State var healthEnergyPeriod: HealthPeriodOption = .previousDay
+    @State var healthEnergyPeriod: HealthPeriodType = .previousDay
     @State var healthEnergyPeriodInterval: DateComponents = DateComponents(day: 1)
     
     //    @State var useHealthAppData = false

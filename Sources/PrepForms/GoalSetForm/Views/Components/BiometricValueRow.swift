@@ -12,19 +12,20 @@ struct BiometricValueRow: View {
     @Binding var value: BiometricValue?
     let type: BiometricType
     let source: BiometricSource
-    let fetchStatus: HealthKitFetchStatus
+    let syncStatus: BiometricSyncStatus
     let prefix: String?
     let matchedGeometryId: String?
     let matchedGeometryNamespace: Namespace.ID?
 
     @State var showingForm: Bool = false
+    @State var showingSyncFailedInfo: Bool = false
     @Binding var showFormOnAppear: Bool
     
     init(
         value: Binding<BiometricValue?>,
         type: BiometricType,
         source: BiometricSource,
-        fetchStatus: HealthKitFetchStatus,
+        syncStatus: BiometricSyncStatus = .notSynced,
         prefix: String? = nil,
         showFormOnAppear: Binding<Bool> = .constant(false),
         matchedGeometryId: String? = nil,
@@ -34,7 +35,7 @@ struct BiometricValueRow: View {
         
         self.type = type
         self.source = source
-        self.fetchStatus = fetchStatus
+        self.syncStatus = syncStatus
         self.prefix = prefix
         self.matchedGeometryId = matchedGeometryId
         self.matchedGeometryNamespace = matchedGeometryNamespace
@@ -53,12 +54,45 @@ struct BiometricValueRow: View {
     
     var body: some View {
         HStack {
+            syncFailedContent
             Spacer()
             content
         }
         .sheet(isPresented: $showingForm) { form }
+        .sheet(isPresented: $showingSyncFailedInfo) { syncFailedForm }
         .onAppear(perform: appeared)
     }
+    
+    var syncFailedForm: some View {
+        BiometricSyncFailedForm(type: type)
+    }
+    
+    @ViewBuilder
+    var syncFailedContent: some View {
+        if syncStatus == .lastSyncFailed {
+            Button {
+                showingSyncFailedInfo = true
+            } label: {
+                HStack {
+                    Text("sync failed")
+                        .fontWeight(.semibold)
+                    Image(systemName: "info.circle")
+                        .imageScale(.large)
+                        .fontWeight(.medium)
+                }
+                .foregroundColor(.accentColor)
+//                .foregroundColor(.red)
+                .font(.footnote)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(Color(.tertiarySystemFill))
+                )
+            }
+        }
+    }
+    
     func appeared() {
         if showFormOnAppear {
             Haptics.feedback(style: .soft)
@@ -93,27 +127,23 @@ struct BiometricValueRow: View {
     }
 
     var showingValue: Bool {
-        !isHealthSynced || fetchStatus == .fetched
+//        !isHealthSynced || fetchStatus == .fetched
+        !isHealthSynced || syncStatus != .syncing
     }
     
     @ViewBuilder
     var nonAnimatedContent: some View {
         if isHealthSynced {
-            switch fetchStatus {
-            case .fetching, .notFetched:
+            if syncStatus == .syncing {
                 ActivityIndicatorView(isVisible: .constant(true), type: .opacityDots())
                     .frame(width: 25, height: 25)
                     .foregroundColor(.secondary)
-            case .fetched:
-                EmptyView()
-            case .noData:
+            } else if value == nil {
                 Text("no data")
                     .font(font)
                     .foregroundColor(.secondary)
-            case .noDataOrNotAuthorized:
-                Text("no data or not authorized")
-                    .font(font)
-                    .foregroundColor(.secondary)
+            } else {
+                EmptyView()
             }
         }
     }
@@ -207,7 +237,8 @@ struct BiometricValueRow: View {
         )
         
         var labelString: String {
-            if !isUserEntered, fetchStatus == .noData {
+//            if !isUserEntered, fetchStatus == .noData {
+            if !isUserEntered, syncStatus != .syncing, value == nil {
                 return "no data"
             } else {
                 return sexBinding.wrappedValue.description
@@ -353,5 +384,40 @@ extension View {
             matchedGeometryId: matchedGeometryId,
             namespace: namespace
         ))
+    }
+}
+
+struct BiometricSyncFailedForm: View {
+    
+    @Environment(\.colorScheme) var colorScheme
+    
+    let type: BiometricType
+    
+    var body: some View {
+        QuickForm(title: "Sync Failed") {
+            VStack {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("There may be no **\(type.description)** data available in the Health App, or you may not have granted us permission to access it.")
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.leading)
+                Button {
+                    UIApplication.shared.open(URL(string: "App-prefs:Privacy&path=HEALTH")!)
+                } label: {
+                    ButtonLabel(title: "Go to Settings", leadingSystemImage: "gear")
+                }
+                .buttonStyle(.borderless)
+                .padding(.top, 5)
+            }
+            .foregroundColor(.secondary)
+            .padding(30)
+            .background(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .foregroundColor(Color(.quaternarySystemFill).opacity(colorScheme == .dark ? 0.5 : 1.0))
+            )
+            .padding(.horizontal, 20)
+        }
+        .presentationDetents([.height(280)])
+        .presentationDragIndicator(.hidden)
     }
 }

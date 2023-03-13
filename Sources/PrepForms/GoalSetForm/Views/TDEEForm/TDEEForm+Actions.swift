@@ -11,11 +11,6 @@ extension TDEEForm {
         }
     }
   
-    func didEnterForeground(notification: Notification) {
-        /// Do this in case the user came back from changing permissions
-        model.updateHealthAppDataIfNeeded()
-    }
-    
     func restingEnergySourceChanged(to newSource: RestingEnergySource?) {
         switch newSource {
         case .userEntered:

@@ -23,7 +23,7 @@ struct LeanBodyMassSection: View {
     }
     
     var body: some View {
-        FormStyledSection(header: header, footer: footer) {
+        FormStyledSection(header: header) {
             content
         }
         .onChange(of: model.lbmSource, perform: lbmSourceChanged)
@@ -264,7 +264,7 @@ struct LeanBodyMassSection: View {
                 value: valueBinding,
                 type: .leanBodyMass,
                 source: model.lbmSource ?? .userEntered,
-                fetchStatus: model.lbmFetchStatus,
+                syncStatus: model.lbmSyncStatus,
                 prefix: nil,
                 showFormOnAppear: $showFormOnAppear
             )

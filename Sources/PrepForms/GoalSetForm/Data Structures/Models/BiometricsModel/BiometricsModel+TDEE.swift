@@ -80,7 +80,7 @@ extension BiometricsModel {
     }
     
     var restingEnergyIntervalValues: [Int] {
-        Array(restingEnergyInterval.minValue...restingEnergyInterval.maxValue)
+        Array(restingEnergyInterval.period.minValue...restingEnergyInterval.period.maxValue)
     }
     
     var calculatedRestingEnergy: Double? {
@@ -123,7 +123,7 @@ extension BiometricsModel {
     var restingEnergyPrefix: String? {
         switch restingEnergySource {
         case .health:
-            return restingEnergyPeriod.energyPrefix
+            return restingEnergyInterval.periodType.energyPrefix
         case .formula:
             return restingEnergyFormulaUsingSyncedHealthData ? "currently" : nil
         default:
@@ -192,9 +192,11 @@ extension BiometricsModel {
         }
     }
     
-    var restingEnergyPeriodBinding: Binding<HealthPeriodOption> {
-        Binding<HealthPeriodOption>(
-            get: { self.restingEnergyPeriod },
+    var restingEnergyPeriodBinding: Binding<HealthPeriodType> {
+        Binding<HealthPeriodType>(
+            get: {
+                self.restingEnergyInterval.periodType
+            },
             set: { newPeriod in
                 Haptics.feedback(style: .soft)
                 self.changeRestingEnergyPeriod(to: newPeriod)
@@ -202,12 +204,11 @@ extension BiometricsModel {
         )
     }
     
-    func changeRestingEnergyPeriod(to newPeriod: HealthPeriodOption) {
+    func changeRestingEnergyPeriod(to newPeriod: HealthPeriodType) {
         withAnimation {
-            self.restingEnergyPeriod = newPeriod
             if newPeriod == .previousDay {
-                restingEnergyIntervalValue = 1
-                restingEnergyInterval = .day
+                restingEnergyInterval.value = 1
+                restingEnergyInterval.period = .week
             } else {
                 correctRestingEnergyIntervalValueIfNeeded()
             }
@@ -217,7 +218,9 @@ extension BiometricsModel {
     
     var restingEnergyIntervalValueBinding: Binding<Int> {
         Binding<Int>(
-            get: { self.restingEnergyIntervalValue },
+            get: {
+                self.restingEnergyInterval.value
+            },
             set: { newValue in
                 Haptics.feedback(style: .soft)
                 self.changeRestingEnergyIntervalValue(to: newValue)
@@ -226,19 +229,21 @@ extension BiometricsModel {
     }
     
     func changeRestingEnergyIntervalValue(to newValue: Int) {
-        guard newValue >= restingEnergyInterval.minValue,
-              newValue <= restingEnergyInterval.maxValue else {
+        guard newValue >= restingEnergyInterval.period.minValue,
+              newValue <= restingEnergyInterval.period.maxValue else {
             return
         }
         withAnimation {
-            restingEnergyIntervalValue = newValue
+            restingEnergyInterval.value = newValue
         }
         fetchRestingEnergyFromHealth()
     }
     
-    var restingEnergyIntervalBinding: Binding<HealthAppInterval> {
-        Binding<HealthAppInterval>(
-            get: { self.restingEnergyInterval },
+    var restingEnergyIntervalBinding: Binding<HealthPeriod> {
+        Binding<HealthPeriod>(
+            get: {
+                self.restingEnergyInterval.period
+            },
             set: { newInterval in
                 Haptics.feedback(style: .soft)
                 self.changeRestingEnergyInterval(to: newInterval)
@@ -246,9 +251,9 @@ extension BiometricsModel {
         )
     }
     
-    func changeRestingEnergyInterval(to newInterval: HealthAppInterval) {
+    func changeRestingEnergyInterval(to newPeriod: HealthPeriod) {
         withAnimation {
-            restingEnergyInterval = newInterval
+            restingEnergyInterval.period = newPeriod
             correctRestingEnergyIntervalValueIfNeeded()
         }
         
@@ -256,56 +261,90 @@ extension BiometricsModel {
     }
     
     func correctRestingEnergyIntervalValueIfNeeded() {
-        if restingEnergyIntervalValue < restingEnergyInterval.minValue {
-            restingEnergyIntervalValue = restingEnergyInterval.minValue
-        }
-        if restingEnergyIntervalValue > restingEnergyInterval.maxValue {
-            restingEnergyIntervalValue = restingEnergyInterval.maxValue
-        }
+        restingEnergyInterval.correctIfNeeded()
     }
     
     var restingEnergyFooterString: String? {
-        let prefix = "This is an estimate of the energy your body uses each day while minimally active."
-        if restingEnergySource == .health {
-            return prefix + " This will sync with your Health data and update daily."
-        }
-        return prefix
+        "This is the energy your body uses each day while minimally active."
+    }
+
+    func setAndetchRestingEnergyFromHealth() {
     }
     
     func fetchRestingEnergyFromHealth() {
+        
+        @Sendable func nextAvailableFetched(_ energy: Double, for interval: HealthInterval) async {
+            await MainActor.run {
+                withAnimation {
+                    Haptics.warningFeedback()
+                    restingEnergy = energy
+                    restingEnergyTextFieldString = "\(Int(energy.rounded()))"
+                    //TODO: Show different state here
+                    restingEnergySyncStatus = .lastSyncFailed
+                    restingEnergyInterval = interval
+                }
+            }
+        }
+        
+        @Sendable func latestFailed() async {
+            await MainActor.run {
+                withAnimation {
+                    Haptics.errorFeedback()
+                    restingEnergySyncStatus = .lastSyncFailed
+                    changeRestingEnergySource(to: .userEntered)
+                }
+            }
+        }
+        
+        @Sendable func fetchLatestAvailableRestingEnergy() async {
+            do {
+                let interval = HealthInterval(1, .day)
+                let energy = try await HealthKitManager.shared.restingEnergy(using: userEnergyUnit, for: interval)
+                await nextAvailableFetched(energy, for: interval)
+            } catch {
+                await latestFailed()
+            }
+        }
+        
+        @Sendable func fetchNextAvailableRestingEnergy() async {
+            func fetchRestingEnergy(for interval: HealthInterval) async -> Double? {
+                do {
+                    return try await HealthKitManager.shared.restingEnergy(using: userEnergyUnit, for: interval)
+                } catch {
+                    return nil
+                }
+            }
+
+            for interval in restingEnergyInterval.greaterIntervals {
+                if let energy = await fetchRestingEnergy(for: interval) {
+                    await nextAvailableFetched(energy, for: interval)
+                    return
+                }
+            }
+            
+            await fetchLatestAvailableRestingEnergy()
+        }
+        
         withAnimation {
-            restingEnergyFetchStatus = .fetching
+            restingEnergySyncStatus = .syncing
         }
         
         Task {
             do {
-                let average = try await HealthKitManager.shared.restingEnergy(
-                    using: userEnergyUnit,
-                    overPast: restingEnergyIntervalValue,
-                    interval: restingEnergyInterval
-                )
+                let energy = try await HealthKitManager.shared.restingEnergy(using: userEnergyUnit, for: restingEnergyInterval)
                 await MainActor.run {
                     withAnimation {
-                        cprint("🔥 setting average: \(average)")
-                        restingEnergy = average
-                        restingEnergyTextFieldString = "\(Int(average.rounded()))"
-                        restingEnergyFetchStatus = .fetched
-                    }
-                }
-            } catch HealthKitManagerError.noData {
-                await MainActor.run {
-                    withAnimation {
-                        restingEnergyFetchStatus = .noData
-                    }
-                }
-            } catch HealthKitManagerError.noDataOrNotAuthorized {
-                await MainActor.run {
-                    withAnimation {
-                        restingEnergyFetchStatus = .noDataOrNotAuthorized
+                        restingEnergy = energy
+                        restingEnergyTextFieldString = "\(Int(energy.rounded()))"
+                        restingEnergySyncStatus = .synced
                     }
                 }
             } catch {
-                
+                if restingEnergyInterval.periodType == .previousDay {
+                    await latestFailed()
+                } else {
+                    await fetchNextAvailableRestingEnergy()
+                }
             }
         }
     }
@@ -469,8 +508,8 @@ extension BiometricsModel {
         }
     }
     
-    var activeEnergyPeriodBinding: Binding<HealthPeriodOption> {
-        Binding<HealthPeriodOption>(
+    var activeEnergyPeriodBinding: Binding<HealthPeriodType> {
+        Binding<HealthPeriodType>(
             get: { self.activeEnergyPeriod },
             set: { newPeriod in
                 Haptics.feedback(style: .soft)
@@ -479,7 +518,7 @@ extension BiometricsModel {
         )
     }
     
-    func changeActiveEnergyPeriod(to newPeriod: HealthPeriodOption) {
+    func changeActiveEnergyPeriod(to newPeriod: HealthPeriodType) {
         withAnimation {
             self.activeEnergyPeriod = newPeriod
             if newPeriod == .previousDay {
@@ -513,8 +552,8 @@ extension BiometricsModel {
         fetchActiveEnergyFromHealth()
     }
     
-    var activeEnergyIntervalBinding: Binding<HealthAppInterval> {
-        Binding<HealthAppInterval>(
+    var activeEnergyIntervalBinding: Binding<HealthPeriod> {
+        Binding<HealthPeriod>(
             get: { self.activeEnergyInterval },
             set: { newInterval in
                 Haptics.feedback(style: .soft)
@@ -523,7 +562,7 @@ extension BiometricsModel {
         )
     }
     
-    func changeActiveEnergyInterval(to newInterval: HealthAppInterval) {
+    func changeActiveEnergyInterval(to newInterval: HealthPeriod) {
         withAnimation {
             activeEnergyInterval = newInterval
             correctActiveEnergyIntervalValueIfNeeded()
@@ -543,7 +582,7 @@ extension BiometricsModel {
     
     func fetchActiveEnergyFromHealth() {
         withAnimation {
-            activeEnergyFetchStatus = .fetching
+            activeEnergySyncStatus = .syncing
         }
         
         Task {
@@ -558,33 +597,28 @@ extension BiometricsModel {
                         cprint("🔥 setting average: \(average)")
                         activeEnergy = average
                         activeEnergyTextFieldString = "\(Int(average.rounded()))"
-                        activeEnergyFetchStatus = .fetched
-                    }
-                }
-            } catch HealthKitManagerError.noData {
-                await MainActor.run {
-                    withAnimation {
-                        activeEnergyFetchStatus = .noData
-                    }
-                }
-            } catch HealthKitManagerError.noDataOrNotAuthorized {
-                await MainActor.run {
-                    withAnimation {
-                        activeEnergyFetchStatus = .noDataOrNotAuthorized
+                        activeEnergySyncStatus = .synced
                     }
                 }
             } catch {
-                
+                await MainActor.run {
+                    withAnimation {
+                        Haptics.errorFeedback()
+                        activeEnergySyncStatus = .lastSyncFailed
+                        //TODO: We should try other intervals if the chosen one fails
+                        /// [ ] If the chosen one fails, get the latest available value instead
+                        /// [ ] Still show the sync failed status, but in the message say it `wasn't available for the period you chose`
+                        /// [ ] If we don't get any value, have the message say the default (no data or no permissions) fail message
+//                        changeAgeSource(to: .userEntered)
+                    }
+                }
             }
             /// [ ] Make sure we persist this to the backend once the user saves it
         }
     }
     
     var activeEnergyFooterString: String? {
-        let prefix = "This is an estimate of energy burnt over and above your Resting Energy use."
-        if activeEnergySource == .health {
-            return prefix + " This will sync with your Health data and update daily."
-        }
-        return prefix
+//        "This is an estimate of energy burnt over and above your Resting Energy use."
+        "This is the additional energy you burn beyond your Resting Energy."
     }
 }

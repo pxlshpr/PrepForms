@@ -57,15 +57,28 @@ public struct BiometricsForm: View {
     
     var content: some View {
         FormStyledScrollView {
-            biologicalSexSection
             infoSection
             restingEnergySection
             activeEnergySection
+            profileTitle
             weightSection
             leanBodyMassSection
             heightSection
             ageSection
+            biologicalSexSection
         }
+    }
+    
+    var profileTitle: some View {
+        HStack {
+            Text("Body Profile")
+                .font(.system(.title2, design: .rounded, weight: .bold))
+                .foregroundColor(.primary)
+            Spacer()
+        }
+        .padding(.horizontal, 20 + 17)
+        .padding(.top, 20)
+        .padding(.bottom, 0)
     }
     
     var infoText: some View {
