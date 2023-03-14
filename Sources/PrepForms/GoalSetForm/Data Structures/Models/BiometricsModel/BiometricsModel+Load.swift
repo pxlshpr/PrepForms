@@ -10,7 +10,9 @@ extension BiometricsModel {
             self.lastUpdatedAt = Date(timeIntervalSince1970: timestamp)
         }
         
-        self.previousBiometrics = UserManager.previousBiometrics?.biometrics
+        if let previousBiometrics = UserManager.previousBiometrics?.biometrics {
+            self.updatedTypes = biometrics.updatedTypes(from: previousBiometrics)
+        }
         
         self.restingEnergySource = biometrics.restingEnergy?.source
         self.restingEnergyFormula = biometrics.restingEnergy?.formula ?? .katchMcardle
@@ -61,40 +63,26 @@ extension BiometricsModel {
             self.ageTextFieldString = "\(age)"
         }
 
-        //TODO: Is this needed anymore? We're doing it when the app comes to foreground, what's the point of doing it upon loading the model?
-        syncHealSourcedBiometrics()
-    }
-    
-    func syncHealSourcedBiometrics() {
-//        if restingEnergySource == .health {
-//            fetchRestingEnergyFromHealth()
-//        }
-//        if activeEnergySource == .health {
-//            fetchActiveEnergyFromHealth()
-//        }
-//        if ageSource == .health {
-//            fetchDOBFromHealth()
-//        }
-//        if heightSource == .health {
-//            fetchHeightFromHealth()
-//        }
-//        if weightSource == .health {
-//            fetchWeightFromHealth()
-//        }
-//        if lbmSource == .health {
-//            fetchLBMFromHealth()
-//        }
-//        if sexSource == .health {
-//            fetchSexFromHealth()
-//        }
-//
-//        /// Save after fetches complete
-//        //TODO: Do this properly as a large interval on energy would take longer
-//        /// [ ] Have it as task that runs all fetches in parallel and saves once complete.
-//        /// [ ] For this we would need to rewrite them as async functions
-//        /// [ ] Do this also when coming back from background.
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-//            self.saveBiometrics()
-//        }
+        if restingEnergySyncStatus == .nextAvailableSynced {
+            restingEnergySyncStatus = .notSynced
+        }
+        if activeEnergySyncStatus == .nextAvailableSynced {
+            activeEnergySyncStatus = .notSynced
+        }
+        if lbmSyncStatus == .nextAvailableSynced {
+            lbmSyncStatus = .notSynced
+        }
+        if weightSyncStatus == .nextAvailableSynced {
+            weightSyncStatus = .notSynced
+        }
+        if heightSyncStatus == .nextAvailableSynced {
+            heightSyncStatus = .notSynced
+        }
+        if sexSyncStatus == .nextAvailableSynced {
+            sexSyncStatus = .notSynced
+        }
+        if dobSyncStatus == .nextAvailableSynced {
+            dobSyncStatus = .notSynced
+        }
     }
 }

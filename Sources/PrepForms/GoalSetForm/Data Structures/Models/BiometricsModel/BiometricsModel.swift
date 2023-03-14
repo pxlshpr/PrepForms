@@ -63,7 +63,8 @@ class BiometricsModel: ObservableObject {
     @Published var lbmSyncStatus: BiometricSyncStatus = .notSynced
     
     @Published var lastUpdatedAt: Date? = nil
-    @Published var previousBiometrics: Biometrics?
+    
+    @Published var updatedTypes: [BiometricType]
 
     let existingProfile: Biometrics?
     
@@ -90,7 +91,13 @@ class BiometricsModel: ObservableObject {
             presentationDetent = .height(270)
         }
 
-        self.previousBiometrics = UserManager.previousBiometrics?.biometrics
+        if let existingProfile,
+           let previousBiometrics = UserManager.previousBiometrics?.biometrics
+        {
+            self.updatedTypes = existingProfile.updatedTypes(from: previousBiometrics)
+        } else {
+            self.updatedTypes = []
+        }
 
         if let existingProfile {
             self.load(existingProfile)
@@ -238,28 +245,7 @@ extension BiometricsModel {
 extension BiometricsModel {
     
     func shouldShowUpdatedBadge(for type: BiometricType) -> Bool {
-        guard let previousBiometrics,
-              isSyncing(type)
-        else { return false }
-        
-        switch type {
-        case .restingEnergy:
-            return biometrics.restingEnergy != previousBiometrics.restingEnergy
-        case .activeEnergy:
-            return biometrics.activeEnergy != previousBiometrics.activeEnergy
-        case .sex:
-            return biometrics.sex != previousBiometrics.sex
-        case .age:
-            return biometrics.age != previousBiometrics.age
-        case .weight:
-            return biometrics.weight != previousBiometrics.weight
-        case .leanBodyMass:
-            return biometrics.leanBodyMass != previousBiometrics.leanBodyMass
-        case .height:
-            return biometrics.height != previousBiometrics.height
-        default:
-            return false
-        }
+        updatedTypes.contains(type)
     }
     
     func isSyncing(_ type: BiometricType) -> Bool {
