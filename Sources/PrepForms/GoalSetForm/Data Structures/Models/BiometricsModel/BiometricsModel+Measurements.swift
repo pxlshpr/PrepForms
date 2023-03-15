@@ -254,7 +254,7 @@ extension BiometricsModel {
     
     var heightInCm: Double? {
         guard let height else { return nil }
-        return userHeightUnit.cm * height
+        return UserManager.heightUnit.cm * height
     }
     
     var heightTextFieldStringBinding: Binding<String> {
@@ -284,7 +284,7 @@ extension BiometricsModel {
             }
         }
         
-        guard let (height, date) = await HealthKitManager.shared.latestHeight(unit: userHeightUnit) else {
+        guard let (height, date) = await HealthKitManager.shared.latestHeight(unit: UserManager.heightUnit) else {
             await MainActor.run {
                 withAnimation {
                     heightSyncStatus = .lastSyncFailed
@@ -309,7 +309,7 @@ extension BiometricsModel {
     
     var heightFormattedWithUnit: String {
         guard let height else { return "" }
-        return height.cleanAmount + " " + userHeightUnit.shortDescription
+        return height.cleanAmount + " " + UserManager.heightUnit.shortDescription
     }
     
     var hasHeight: Bool {
@@ -373,7 +373,7 @@ extension BiometricsModel {
     
     var weightInKg: Double? {
         guard let weight else { return nil }
-        switch userBodyMassUnit {
+        switch UserManager.bodyMassUnit {
         case .kg:
             return weight
         case .lb:
@@ -410,7 +410,7 @@ extension BiometricsModel {
             }
         }
         
-        guard let (weight, date) = await HealthKitManager.shared.latestWeight(unit: userBodyMassUnit) else {
+        guard let (weight, date) = await HealthKitManager.shared.latestWeight(unit: UserManager.bodyMassUnit) else {
             await MainActor.run {
                 withAnimation {
                     weightSyncStatus = .lastSyncFailed
@@ -436,7 +436,7 @@ extension BiometricsModel {
 
     var weightFormattedWithUnit: String {
         guard let weight else { return "" }
-        return weight.cleanAmount + " " + userBodyMassUnit.shortDescription
+        return weight.cleanAmount + " " + UserManager.bodyMassUnit.shortDescription
     }
 
     var hasWeight: Bool {
@@ -461,6 +461,24 @@ extension BiometricsModel {
     }
     
     func changeLBMSource(to newSource: LeanBodyMassSource) {
+        let changingToFatPercentage = lbmSource != .fatPercentage && newSource == .fatPercentage
+        /// If we're changing **to** fat percentage and have a weight, convert it
+        if changingToFatPercentage,
+           let lbmAsBodyMass = lbm, let weight = weight, weight > 0
+        {
+            let percentage = (1 - max(min(lbmAsBodyMass / weight, 1), 0)) * 100
+            self.lbm = percentage
+        }
+        
+        /// If we're moving **from** fat percentage and have a weight, convert it
+        let changingFromFatPercentage = lbmSource == .fatPercentage && newSource != .fatPercentage
+        if changingFromFatPercentage,
+           let fatPercentage = lbm, let weight = weight, weight > 0
+        {
+            let bodyMass = (1 - (fatPercentage/100.0)) * weight
+            self.lbm = bodyMass
+        }
+
         withAnimation {
             lbmSource = newSource
         }
@@ -503,7 +521,7 @@ extension BiometricsModel {
     
     var lbmInKg: Double? {
         guard let lbmValue else { return nil }
-        switch userBodyMassUnit {
+        switch UserManager.bodyMassUnit {
         case .kg:
             return lbmValue
         case .lb:
@@ -563,7 +581,7 @@ extension BiometricsModel {
             }
         }
         
-        guard let (lbm, date) = await HealthKitManager.shared.latestLeanBodyMass(unit: userBodyMassUnit) else {
+        guard let (lbm, date) = await HealthKitManager.shared.latestLeanBodyMass(unit: UserManager.bodyMassUnit) else {
             await MainActor.run {
                 withAnimation {
                     lbmSyncStatus = .lastSyncFailed
@@ -605,7 +623,7 @@ extension BiometricsModel {
             value = lbm
         }
         guard let value else { return "" }
-        return value.rounded(toPlaces: 1).cleanAmount + " " + userBodyMassUnit.shortDescription
+        return value.rounded(toPlaces: 1).cleanAmount + " " + UserManager.bodyMassUnit.shortDescription
     }
 
     var hasLeanBodyMass: Bool {

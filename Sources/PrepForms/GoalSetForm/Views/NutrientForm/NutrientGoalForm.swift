@@ -252,21 +252,13 @@ struct NutrientGoalForm: View {
     //MARK: - Sheets
     
     var weightForm: some View {
-        NutrientWeightForm(existingProfile: goalSet.biometrics, didTapSave: { biometrics in
-            goalSet.setBiometrics(biometrics)
-        }, didTapClose: {
-            goalSet.resetNutrientTDEEFormModel()
-        })
-        .environmentObject(goalSet.biometricsModel)
+        NutrientWeightForm()
+            .environmentObject(goalSet.biometricsModel)
     }
     
     var leanMassForm: some View {
-        NutrientLeanBodyMassForm(existingProfile: goalSet.biometrics, didTapSave: { biometrics in
-            goalSet.setBiometrics(biometrics)
-        }, didTapClose: {
-            goalSet.resetNutrientTDEEFormModel()
-        })
-        .environmentObject(goalSet.biometricsModel)
+        NutrientLeanBodyMassForm()
+            .environmentObject(goalSet.biometricsModel)
     }
 
     //MARK: - Convenience

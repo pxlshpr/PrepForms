@@ -54,10 +54,6 @@ struct LeanBodyMassForm: View {
                 .font(.title)
                 .foregroundColor(Color(.quaternaryLabel))
             WeightSection()
-//            Text("=")
-//                .font(.title)
-//                .foregroundColor(Color(.quaternaryLabel))
-//            calculatedSection
         }
     }
     
@@ -69,10 +65,6 @@ struct LeanBodyMassForm: View {
             BiologicalSexSection(includeFooter: true)
             WeightSection()
             HeightSection()
-//            Text("=")
-//                .font(.title)
-//                .foregroundColor(Color(.quaternaryLabel))
-//            calculatedSection
         }
     }
     
@@ -95,7 +87,6 @@ struct LeanBodyMassForm: View {
                     model.tappedSyncAllOnLBMForm()
                 } label: {
                     ButtonLabel(title: "Sync All", style: .health, isCompact: true)
-//                    AppleHealthButtonLabel(title: "Sync All", isCompact: true)
                 }
             }
         }

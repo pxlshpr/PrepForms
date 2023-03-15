@@ -64,7 +64,6 @@ struct HeightSection: View {
             set: { newValue in
                 guard let heightUnit = newValue?.unit?.heightUnit else { return }
                 model.height = newValue?.double
-                model.userHeightUnit = heightUnit
                 UserManager.heightUnit = heightUnit
                 
                 /// Delay this by a second so that the core-data persistence doesn't interfere with

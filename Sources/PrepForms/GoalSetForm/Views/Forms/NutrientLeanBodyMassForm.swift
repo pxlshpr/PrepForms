@@ -2,24 +2,21 @@ import SwiftUI
 import SwiftUISugar
 import PrepDataTypes
 
-struct NutrientWeightForm: View {
+struct NutrientLeanBodyMassForm: View {
 
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var model: BiometricsModel
     
     var body: some View {
         NavigationView {
-            form
+            content
                 .toolbar { leadingContent }
         }
     }
     
-    var form: some View {
-        FormStyledScrollView {
-            WeightSection(includeHeader: false)
-                .environmentObject(model)
-                .navigationTitle("Weight")
-        }
+    var content: some View {
+        LeanBodyMassForm()
+            .environmentObject(model)
     }
 
     var leadingContent: some ToolbarContent {

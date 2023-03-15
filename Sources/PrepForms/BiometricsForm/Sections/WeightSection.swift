@@ -76,11 +76,12 @@ struct WeightSection: View {
                 model.weight = newValue?.double
                 
                 /// Convert other `.bodyMassUnit` based values in `BiometricModel` before setting the unit
-                if let lbm = model.lbmValue {
-                    model.lbm = model.userBodyMassUnit.convert(lbm, to: bodyMassUnit)
+                if let lbmValue = model.lbmValue, let lbmSource = model.lbmSource {
+                    if lbmSource != .fatPercentage {
+                        model.lbm = UserManager.bodyMassUnit.convert(lbmValue, to: bodyMassUnit)
+                    }
                 }
                 
-                model.userBodyMassUnit = bodyMassUnit
                 UserManager.bodyMassUnit = bodyMassUnit
                 
                 /// Delay this by a second so that the core-data persistence doesn't interfere with

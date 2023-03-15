@@ -156,10 +156,9 @@ struct LeanBodyMassSection: View {
                         
                     /// Convert other body mass based values in `BiometricModel` before setting the unit
                     if let weight = model.weight {
-                        model.weight = model.userBodyMassUnit.convert(weight, to: bodyMassUnit)
+                        model.weight = UserManager.bodyMassUnit.convert(weight, to: bodyMassUnit)
                     }
                     
-                    model.userBodyMassUnit = bodyMassUnit
                     UserManager.bodyMassUnit = bodyMassUnit
                 }
                 
@@ -172,7 +171,7 @@ struct LeanBodyMassSection: View {
         let computedValueBinding = Binding<BiometricValue?>(
             get: {
                 guard let calculated = model.calculatedLeanBodyMass else { return nil }
-                return .leanBodyMass(calculated, model.userBodyMassUnit)
+                return .leanBodyMass(calculated, UserManager.bodyMassUnit)
             },
             set: { _ in }
         )
@@ -181,7 +180,6 @@ struct LeanBodyMassSection: View {
             var missing: [BiometricType] = []
             if model.weight == nil { missing.append(.weight) }
             if model.height == nil { missing.append(.height) }
-            if model.age == nil { missing.append(.age) }
             if model.sex == nil { missing.append(.sex) }
             guard !missing.isEmpty else { return nil }
             return "needs \(missing.map({$0.shortDescription}).joined(separator: ", "))"

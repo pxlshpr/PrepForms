@@ -5,10 +5,6 @@ import HealthKit
 import PrepCoreDataStack
 
 class BiometricsModel: ObservableObject {
-    var userEnergyUnit: EnergyUnit
-    var userBodyMassUnit: BodyMassUnit
-    var userHeightUnit: HeightUnit
-    
     @Published var restingEnergySource: RestingEnergySource? = nil
     @Published var restingEnergyFormula: RestingEnergyFormula = .katchMcardle
     @Published var restingEnergy: Double? = nil
@@ -19,7 +15,6 @@ class BiometricsModel: ObservableObject {
     @Published var activeEnergyActivityLevel: ActivityLevel = .moderatelyActive
     @Published var activeEnergy: Double? = nil
     @Published var activeEnergyTextFieldString: String = ""
-    
     @Published var activeEnergyInterval: HealthInterval = .init(1, .day)
 
     @Published var lbmSource: LeanBodyMassSource? = nil
@@ -59,20 +54,8 @@ class BiometricsModel: ObservableObject {
     @Published var updatedTypes: [BiometricType]
 
     init() {
-        let units = UserManager.units
-        self.userEnergyUnit = units.energy
-        self.userBodyMassUnit = units.bodyMass
-        self.userHeightUnit = units.height
-        
-        let biometrics = UserManager.biometrics
-        
-        if let previousBiometrics = UserManager.previousBiometrics?.biometrics {
-            self.updatedTypes = biometrics.updatedTypes(from: previousBiometrics)
-        } else {
-            self.updatedTypes = []
-        }
-
-        self.load(biometrics)
+        self.updatedTypes = UserManager.updatedBiometricTypes
+        self.load(UserManager.biometrics)
     }
 }
 
@@ -81,7 +64,7 @@ class BiometricsModel: ObservableObject {
 extension BiometricsModel {
     
     var tdeeDescriptionText: Text {
-        let energy = userEnergyUnit == .kcal ? "calories" : "kiljoules"
+        let energy = UserManager.energyUnit == .kcal ? "calories" : "kiljoules"
         return Text("This is an estimate of how many \(energy) you would have to consume to *maintain* your current weight.")
     }
     
@@ -109,7 +92,8 @@ extension BiometricsModel {
         var restingEnergyData: Biometrics.RestingEnergy {
             .init(
                 amount: restingEnergyValue,
-                unit: userEnergyUnit, //TODO: Change this
+//                unit: userEnergyUnit,
+                unit: UserManager.energyUnit,
                 source: restingEnergySource,
                 formula: restingEnergyFormula,
                 interval: restingEnergyInterval
@@ -119,7 +103,8 @@ extension BiometricsModel {
         var activeEnergyData: Biometrics.ActiveEnergy {
             .init(
                 amount: activeEnergyValue,
-                unit: userEnergyUnit, //TODO: Change this
+//                unit: userEnergyUnit,
+                unit: UserManager.energyUnit,
                 source: activeEnergySource,
                 activityLevel: activeEnergyActivityLevel,
                 interval: activeEnergyInterval
@@ -129,7 +114,7 @@ extension BiometricsModel {
         var leanBodyMassData: Biometrics.LeanBodyMass {
             .init(
                 amount: lbmValue, /// We don't use `lbm` here because it may be the actual percentage
-                unit: userBodyMassUnit, //TODO: Change this
+                unit: UserManager.bodyMassUnit,
                 source: lbmSource,
                 formula: lbmFormula,
                 date: lbmDate
@@ -139,7 +124,7 @@ extension BiometricsModel {
         var weightData: Biometrics.Weight {
             .init(
                 amount: weight,
-                unit: userBodyMassUnit, //TODO: Change this
+                unit: UserManager.bodyMassUnit,
                 source: weightSource,
                 date: weightDate
             )
@@ -148,7 +133,7 @@ extension BiometricsModel {
         var heightData: Biometrics.Height {
             .init(
                 amount: height,
-                unit: userHeightUnit, //TODO: Change this
+                unit: UserManager.heightUnit,
                 source: heightSource,
                 date: heightDate
             )

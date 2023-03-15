@@ -14,7 +14,8 @@ extension BiometricsModel {
     
     var maintenanceEnergyInKcal: Double? {
         guard let maintenanceEnergy else { return nil }
-        return userEnergyUnit.convert(maintenanceEnergy, to: .kcal)
+//        return userEnergyUnit.convert(maintenanceEnergy, to: .kcal)
+        return UserManager.energyUnit.convert(maintenanceEnergy, to: .kcal)
     }
     
     var maintenanceEnergyFormatted: String {
@@ -83,14 +84,16 @@ extension BiometricsModel {
         switch restingEnergyFormula {
         case .katchMcardle, .cunningham:
             guard let lbmInKg else { return nil }
-            return restingEnergyFormula.calculate(lbmInKg: lbmInKg, energyUnit: userEnergyUnit)
+//            return restingEnergyFormula.calculate(lbmInKg: lbmInKg, energyUnit: userEnergyUnit)
+            return restingEnergyFormula.calculate(lbmInKg: lbmInKg, energyUnit: UserManager.energyUnit)
         case .henryOxford, .schofield:
             guard let age, let weightInKg, let sex else { return nil }
             return restingEnergyFormula.calculate(
                 age: age,
                 weightInKg: weightInKg,
                 sexIsFemale: sex == .female,
-                energyUnit: userEnergyUnit
+//                energyUnit: userEnergyUnit
+                energyUnit: UserManager.energyUnit
             )
         default:
             guard let age, let weightInKg, let heightInCm, let sex else { return nil }
@@ -99,7 +102,8 @@ extension BiometricsModel {
                 weightInKg: weightInKg,
                 heightInCm: heightInCm,
                 sexIsFemale: sex == .female,
-                energyUnit: userEnergyUnit
+//                energyUnit: userEnergyUnit
+                energyUnit: UserManager.energyUnit
             )
         }
     }
@@ -287,7 +291,8 @@ extension BiometricsModel {
         
         guard let (value, date, interval) = await HealthKitManager.shared.fetchEnergy(
             type: .basalEnergyBurned,
-            using: userEnergyUnit,
+//            using: userEnergyUnit,
+            using: UserManager.energyUnit,
             for: restingEnergyInterval
         ) else {
             await MainActor.run {
@@ -379,7 +384,8 @@ extension BiometricsModel {
     
     var activeEnergyBiometricValue: BiometricValue? {
         guard let activeEnergyValue else { return nil }
-        return .activeEnergy(activeEnergyValue, userEnergyUnit)
+//        return .activeEnergy(activeEnergyValue, userEnergyUnit)
+        return .activeEnergy(activeEnergyValue, UserManager.energyUnit)
     }
 
     var ageBiometricValue: BiometricValue? {
@@ -394,12 +400,12 @@ extension BiometricsModel {
 
     var heightBiometricValue: BiometricValue? {
         guard let height else { return nil }
-        return .height(height, userHeightUnit)
+        return .height(height, UserManager.heightUnit)
     }
 
     var weightBiometricValue: BiometricValue? {
         guard let weight else { return nil }
-        return .weight(weight, userBodyMassUnit)
+        return .weight(weight, UserManager.bodyMassUnit)
     }
 
     var leanBodyMassBiometricValue: BiometricValue? {
@@ -408,13 +414,14 @@ extension BiometricsModel {
             return .fatPercentage(lbm)
         } else {
             guard let lbmValue else { return nil }
-            return .leanBodyMass(lbmValue, userBodyMassUnit)
+            return .leanBodyMass(lbmValue, UserManager.bodyMassUnit)
         }
     }
 
     var restingEnergyBiometricValue: BiometricValue? {
         guard let restingEnergyValue else { return nil }
-        return .restingEnergy(restingEnergyValue, userEnergyUnit)
+//        return .restingEnergy(restingEnergyValue, userEnergyUnit)
+        return .restingEnergy(restingEnergyValue, UserManager.energyUnit)
     }
 
     var hasActiveEnergy: Bool {
@@ -575,7 +582,8 @@ extension BiometricsModel {
         
         guard let (value, date, interval) = await HealthKitManager.shared.fetchEnergy(
             type: .activeEnergyBurned,
-            using: userEnergyUnit,
+//            using: userEnergyUnit,
+            using: UserManager.energyUnit,
             for: activeEnergyInterval
         ) else {
             await MainActor.run {

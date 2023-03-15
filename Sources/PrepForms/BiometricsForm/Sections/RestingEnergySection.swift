@@ -171,8 +171,8 @@ struct RestingEnergySection: View {
                         sex: sex,
                         weight: weight,
                         height: model.height,
-                        bodyMassUnit: model.userBodyMassUnit,
-                        heightUnit: model.userHeightUnit,
+                        bodyMassUnit: UserManager.bodyMassUnit,
+                        heightUnit: UserManager.heightUnit,
                         isSynced: model.measurementsAreSynced
                     )
                     .fixedSize(horizontal: true, vertical: false)
@@ -265,9 +265,10 @@ struct RestingEnergySection: View {
                 
                 /// Convert other energy based values in `BiometricModel` before setting the unit
                 if let activeEnergy = model.activeEnergy {
-                    model.activeEnergy = model.userEnergyUnit.convert(activeEnergy, to: energyUnit)
+//                    model.activeEnergy = model.userEnergyUnit.convert(activeEnergy, to: energyUnit)
+                    model.activeEnergy = UserManager.energyUnit.convert(activeEnergy, to: energyUnit)
                 }
-                model.userEnergyUnit = energyUnit
+//                model.userEnergyUnit = energyUnit
                 UserManager.energyUnit = energyUnit
                 
                 /// Delay this by a second so that the core-data persistence doesn't interfere with

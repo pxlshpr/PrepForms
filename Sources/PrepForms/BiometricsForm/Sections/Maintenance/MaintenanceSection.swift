@@ -1,5 +1,6 @@
 import SwiftUI
 import PrepDataTypes
+import PrepCoreDataStack
 
 struct MaintenanceSection: View {
     
@@ -57,7 +58,8 @@ struct MaintenanceSection: View {
         
         return Group {
             if let value = model.maintenanceEnergy {
-                filled(value: value, unit: model.userEnergyUnit)
+//                filled(value: value, unit: model.userEnergyUnit)
+                filled(value: value, unit: UserManager.energyUnit)
             } else {
                 empty
             }
