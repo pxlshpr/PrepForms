@@ -395,6 +395,7 @@ public struct NutrientGoalForm_New: View {
     
     var bodyMassButton: some View {
         
+        @ViewBuilder
         var label: some View {
             if haveBodyMass {
                 if goal.bodyMassIsSyncedWithHealth {
