@@ -251,18 +251,18 @@ public class GoalModel: ObservableObject {
         equivalentLowerBound != nil || equivalentUpperBound != nil
     }
     
-    var isDynamic: Bool {
+    var isSynced: Bool {
         switch type {
         case .energy:
-            return energyIsSyncedWithHealth
+            return energyGoalTypeIsSynced
         case .macro(let type, _):
-            return nutrientGoalTypeIsDynamic(type)
+            return nutrientGoalTypeIsSynced(type)
         case .micro(let type, _, _):
-            return nutrientGoalTypeIsDynamic(type)
+            return nutrientGoalTypeIsSynced(type)
         }
     }
     
-    func nutrientGoalTypeIsDynamic(_ nutrientGoalType: NutrientGoalType) -> Bool {
+    func nutrientGoalTypeIsSynced(_ nutrientGoalType: NutrientGoalType) -> Bool {
         switch nutrientGoalType {
         case .quantityPerBodyMass:
             return bodyMassIsSyncedWithHealth
@@ -280,21 +280,21 @@ public class GoalModel: ObservableObject {
         
         switch bodyMassType {
         case .weight:
-            return UserManager.biometrics.weightUpdatesWithHealth == true
+            return UserManager.biometrics.syncsWeight
         case .leanMass:
-            return UserManager.biometrics.lbmUpdatesWithHealth == true
+            return UserManager.biometrics.syncsLeanBodyMass
         }
     }
     
     var energyGoalIsSyncedWithHealth: Bool {
-        goalSetModel.energyGoal?.energyIsSyncedWithHealth ?? false
+        goalSetModel.energyGoal?.energyGoalTypeIsSynced ?? false
     }
     
-    var energyIsSyncedWithHealth: Bool {
+    var energyGoalTypeIsSynced: Bool {
         guard let energyGoalType else { return false }
         switch energyGoalType {
         case .fromMaintenance, .percentFromMaintenance:
-            return UserManager.biometrics.hasDynamicTDEE
+            return UserManager.biometrics.syncsMaintenanceEnergy
         default:
             return false
         }

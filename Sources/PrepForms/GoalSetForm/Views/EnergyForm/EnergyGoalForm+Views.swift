@@ -34,7 +34,7 @@ extension EnergyGoalForm {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            dynamicIndicator
+            syncedIndicator
             menu
         }
     }
@@ -57,24 +57,23 @@ extension EnergyGoalForm {
     }
     
     @ViewBuilder
-    var dynamicIndicator: some View {
-        if isDynamic {
+    var syncedIndicator: some View {
+        if isSynced {
             appleHealthBolt
-            Text("Dynamic")
+            Text("Synced")
                 .font(.footnote)
                 .textCase(.uppercase)
                 .foregroundColor(Color(.tertiaryLabel))
         }
     }
     
-    var isDynamic: Bool {
-        goal.isDynamic
+    var isSynced: Bool {
+        goal.isSynced
     }
     
     @ViewBuilder
     var unitsFooter: some View {
-        if isDynamic {
-//            Text("Your maintenance energy will automatically adjust to changes from the Health App, making this a dynamic goal.")
+        if isSynced {
             Text("Your maintenance energy is synced with the Health App, enabling this goal to automatically adjust to any changes.")
         }
     }
@@ -123,7 +122,7 @@ extension EnergyGoalForm {
                 showingTDEEForm = true
             } label: {
                 if let formattedTDEE = UserManager.biometrics.formattedTDEEWithUnit {
-                    if UserManager.biometrics.hasDynamicTDEE {
+                    if UserManager.biometrics.syncsMaintenanceEnergy {
                         PickerLabel(
                             formattedTDEE,
                             systemImage: "flame.fill",
@@ -264,7 +263,7 @@ extension EnergyGoalForm {
     var equivalentSection: some View {
         @ViewBuilder
         var header: some View {
-            if isDynamic {
+            if isSynced {
                 Text("Currently Equals")
             } else {
                 Text("Equals")

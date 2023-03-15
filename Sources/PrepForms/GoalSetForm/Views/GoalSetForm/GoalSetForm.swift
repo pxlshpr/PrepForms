@@ -466,24 +466,24 @@ public struct GoalSetForm: View {
     
     var footerInfoContent: some View {
         
-        var dynamicGoalsString: String {
-            let prefix = model.dynamicGoalsCount == 1 ? "This is a dynamic goal" : "These are dynamic goals"
-            return "\(prefix) and will automatically update when new data is synced from the Health App."
+        var syncedGoalsString: String {
+            let prefix = model.syncedGoalsCount == 1 ? "This goal is synced" : "These goals are synced"
+            return "\(prefix) and will update automatically when new data is available from the Health App."
         }
         
         var containsFooterContent: Bool {
-            model.containsDynamicGoal || model.containsImplicitGoal
+            model.containsSyncedGoal || model.containsImplicitGoal
         }
 
         return Group {
             if containsFooterContent {
                 VStack(alignment: .leading, spacing: 10) {
-                    if model.containsDynamicGoal {
+                    if model.containsSyncedGoal {
                         HStack(alignment: .firstTextBaseline) {
                             appleHealthBolt
                                 .imageScale(.small)
                                 .frame(width: 25)
-                            Text(dynamicGoalsString)
+                            Text(syncedGoalsString)
                         }
                     }
                     if let implicitGoalName = model.implicitGoalName {

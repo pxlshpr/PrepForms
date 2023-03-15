@@ -161,7 +161,7 @@ struct RestingEnergySection: View {
                 ProfileForm()
                     .environmentObject(model)
             } label: {
-                if model.hasMeasurements,
+                if model.hasRestingEnergyFormulaParameters,
                    let age = model.age,
                    let sex = model.sex,
                    let weight = model.weight
@@ -173,7 +173,7 @@ struct RestingEnergySection: View {
                         height: model.height,
                         bodyMassUnit: UserManager.bodyMassUnit,
                         heightUnit: UserManager.heightUnit,
-                        isSynced: model.measurementsAreSynced
+                        isSynced: model.restingEnergyFormulaParametersAreSynced
                     )
                     .fixedSize(horizontal: true, vertical: false)
                 } else {

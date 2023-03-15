@@ -6,15 +6,15 @@ import PrepCoreDataStack
 
 extension BiometricsModel {
     
-    var hasMeasurements: Bool {
+    var hasRestingEnergyFormulaParameters: Bool {
         let hasCore = (sex == .male || sex == .female)
         && age != nil && weight != nil
         
         return restingEnergyFormula.requiresHeight ? hasCore && height != nil : hasCore
     }
     
-    var measurementsAreSynced: Bool {
-        hasMeasurements
+    var restingEnergyFormulaParametersAreSynced: Bool {
+        hasRestingEnergyFormulaParameters
         && (weightSource == .health || heightSource == .health)
     }
     
@@ -116,10 +116,6 @@ extension BiometricsModel {
         sex != nil
     }
     
-    var hasDynamicSex: Bool {
-        sexSource == .health
-    }
-    
     var sexIsFemale: Bool? {
         switch sex {
         case .female:
@@ -219,11 +215,7 @@ extension BiometricsModel {
 
     var hasAge: Bool {
         age != nil
-    }
-    
-    var hasDynamicAge: Bool {
-        ageSource == .health
-    }
+    }    
 }
 
 //MARK: - Height

@@ -15,6 +15,8 @@ public struct TDEEForm: View {
     
     @State var showingSaveButton: Bool = false
     
+    let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
+    
     @ViewBuilder
     public var body: some View {
         NavigationView {
@@ -23,6 +25,13 @@ public struct TDEEForm: View {
                 .navigationTitle("Maintenance \(UserManager.energyDescription)")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { trailingContent }
+                .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
+        }
+    }
+    
+    func didUpdateBiometrics(notification: Notification) {
+        withAnimation {
+            self.model.load(UserManager.biometrics)
         }
     }
 

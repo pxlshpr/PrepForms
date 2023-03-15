@@ -67,10 +67,6 @@ extension BiometricsModel {
         let energy = UserManager.energyUnit == .kcal ? "calories" : "kiljoules"
         return Text("This is an estimate of how many \(energy) you would have to consume to *maintain* your current weight.")
     }
-    
-    var isDynamic: Bool {
-        restingEnergyIsDynamic || activeEnergyIsDynamic
-    }
 }
 
 extension BiometricsModel {

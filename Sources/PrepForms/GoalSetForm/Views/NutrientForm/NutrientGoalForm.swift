@@ -29,6 +29,10 @@ struct NutrientGoalForm: View {
     @State var shouldResignFocus = false
     
     let didTapDelete: (GoalModel) -> ()
+    
+    @StateObject var biometricsModel = BiometricsModel()
+    
+    let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
 
     init(goal: GoalModel, didTapDelete: @escaping ((GoalModel) -> ())) {
         
@@ -68,6 +72,7 @@ struct NutrientGoalForm: View {
         .sheet(isPresented: $showingLeanMassForm) { leanMassForm }
         .onDisappear(perform: disappeared)
         .scrollDismissesKeyboard(.interactively)
+        .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
     }
     
     func disappeared() {
@@ -75,6 +80,12 @@ struct NutrientGoalForm: View {
         goalSet.createImplicitGoals()
     }
     
+    func didUpdateBiometrics(notification: Notification) {
+        withAnimation {
+            biometricsModel.load(UserManager.biometrics)
+        }
+    }
+
     //MARK: - Sections
     
     var unitSection: some View {
@@ -121,7 +132,7 @@ struct NutrientGoalForm: View {
     var equivalentSection: some View {
         @ViewBuilder
         var header: some View {
-            if isDynamic {
+            if isSynced {
                 Text("Currently Equals")
             } else {
                 Text("Equals")
@@ -181,7 +192,7 @@ struct NutrientGoalForm: View {
 
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            dynamicIndicator
+            syncedIndicator
             menu
         }
     }
@@ -204,10 +215,10 @@ struct NutrientGoalForm: View {
     }
     
     @ViewBuilder
-    var dynamicIndicator: some View {
-        if isDynamic {
+    var syncedIndicator: some View {
+        if isSynced {
             appleHealthBolt
-            Text("Dynamic")
+            Text("Synced")
                 .font(.footnote)
                 .textCase(.uppercase)
                 .foregroundColor(Color(.tertiaryLabel))
@@ -226,7 +237,7 @@ struct NutrientGoalForm: View {
             }
         }
         return Group {
-            if isDynamic {
+            if isSynced {
                 Text("Your \(component) is synced with the Health App. This goal will automatically adjust when it changes.")
             } else {
                 switch nutrientGoalType {
@@ -239,7 +250,7 @@ struct NutrientGoalForm: View {
                 case .quantityPerWorkoutDuration(_):
                     Text("Your planned workout duration will be used to calculate this goal. You can specify it when setting this type on a meal.")
                     /**
-                     Text("Use this when you want to create a dynamic goal based on how long you workout for.")
+                     Text("Use this when you want to create a synced goal based on how long you workout for.")
                      Text("For e.g., you could create an \"intra-workout\" meal type that has a 0.5g/min carb goal.")
                      Text("You can then set or use your last workout time when creating a meal with this type.")
                      */
@@ -254,12 +265,12 @@ struct NutrientGoalForm: View {
     
     var weightForm: some View {
         NutrientWeightForm()
-            .environmentObject(goalSet.biometricsModel)
+            .environmentObject(biometricsModel)
     }
     
     var leanMassForm: some View {
         NutrientLeanBodyMassForm()
-            .environmentObject(goalSet.biometricsModel)
+            .environmentObject(biometricsModel)
     }
 
     //MARK: - Convenience
@@ -299,8 +310,8 @@ struct NutrientGoalForm: View {
         }
     }
     
-    var isDynamic: Bool {
-        goal.isDynamic
+    var isSynced: Bool {
+        goal.isSynced
     }
 
     var bodyMassFormattedWithUnit: String {
@@ -471,7 +482,7 @@ struct NutrientGoalForm: View {
             }
         } label: {
             if pickedDietNutrientGoal == .percentageOfEnergy {
-                if goalSet.energyGoal?.isDynamic == true {
+                if goalSet.energyGoal?.isSynced == true {
                     PickerLabel(
                         pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit),
                         systemImage: "flame.fill",

@@ -11,8 +11,6 @@ extension GoalSetForm {
         @Published var goalModels: [GoalModel] = []
         @Published var type: GoalSetType = .day
         
-        @Published var biometricsModel: BiometricsModel = BiometricsModel()
-        
         @Published var singleGoalModelToPushTo: GoalModel? = nil
         @Published var implicitGoals: [GoalModel] = []
         
@@ -31,7 +29,6 @@ extension GoalSetForm {
             isDuplicating: Bool = false
         ) {
             /// Always generate a new `UUID`, even if we're duplicating or editing (as we soft-delete the previous ones)
-//            self.id = existing?.id ?? UUID()
             self.id = UUID()
             
             self.name = existing?.name ?? ""
@@ -131,12 +128,12 @@ extension GoalSetForm.Model {
         goalModels.containsMicro(micro)
     }
     
-    var containsDynamicGoal: Bool {
-        goalModels.contains(where: { $0.isDynamic })
+    var containsSyncedGoal: Bool {
+        goalModels.contains(where: { $0.isSynced })
     }
     
-    var dynamicGoalsCount: Int {
-        goalModels.filter({ $0.isDynamic }).count
+    var syncedGoalsCount: Int {
+        goalModels.filter({ $0.isSynced }).count
     }
     
     var containsImplicitGoal: Bool {

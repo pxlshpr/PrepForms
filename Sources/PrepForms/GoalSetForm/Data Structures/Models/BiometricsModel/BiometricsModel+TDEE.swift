@@ -28,31 +28,18 @@ extension BiometricsModel {
 
 extension BiometricsModel {
     
-    var restingEnergyIsDynamic: Bool {
-        switch restingEnergySource {
-        case .health:
-            return true
-        case .formula:
-            return restingEnergyFormulaUsingSyncedHealthData
-        default:
-            return false
-        }
-    }
-    
     var restingEnergyFormulaUsingSyncedHealthData: Bool {
         if restingEnergyFormula.usesLeanBodyMass {
             switch lbmSource {
             case .health:
                 return true
-            case .fatPercentage:
-                return weightSource == .health
-            case .formula:
+            case .fatPercentage, .formula:
                 return weightSource == .health
             default:
                 return false
             }
         } else {
-            return measurementsAreSynced
+            return restingEnergyFormulaParametersAreSynced
         }
     }
     
@@ -319,15 +306,6 @@ extension BiometricsModel {
 //MARK: - Active Energy
 
 extension BiometricsModel {
-    
-    var activeEnergyIsDynamic: Bool {
-        switch activeEnergySource {
-        case .health:
-            return true
-        default:
-            return false
-        }
-    }
     
     var activeEnergyFormatted: String {
         switch activeEnergySource {
