@@ -9,7 +9,7 @@ public struct ExtractorView: View {
     @StateObject var imageViewerModel = ImageViewer.Model.shared
     let startedWithCamera: Bool
     
-    let homeViewDidBecomeInactive = NotificationCenter.default.publisher(for: .homeViewDidBecomeInactive)
+//    let homeViewDidBecomeInactive = NotificationCenter.default.publisher(for: .homeViewDidBecomeInactive)
     
     public init(extractor: Extractor, startedWithCamera: Bool) {
         self.extractor = extractor
@@ -24,23 +24,23 @@ public struct ExtractorView: View {
             .onChange(of: extractor.cutoutTextBoxes, perform: cutoutTextBoxesChanged)
             .onChange(of: extractor.state, perform: stateChanged)
             .onChange(of: extractor.transitionState, perform: transitionStateChanged)
-            .onChange(of: scenePhase, perform: scenePhaseChanged)
-            .onReceive(homeViewDidBecomeInactive, perform: homeViewDidBecomeInactive)
+//            .onChange(of: scenePhase, perform: scenePhaseChanged)
+//            .onReceive(homeViewDidBecomeInactive, perform: homeViewDidBecomeInactive)
             .onAppear(perform: appeared)
     }
     
-    func homeViewDidBecomeInactive(_ notification: Notification) {
-        extractor.setLastViewport()
-    }
-    
-    func scenePhaseChanged(_ newPhase: ScenePhase) {
-        switch newPhase {
-        case .active:
-            extractor.resetZoomToLastViewPortData()
-        default:
-            break
-        }
-    }
+    /// These are not needed anymore
+//    func homeViewDidBecomeInactive(_ notification: Notification) {
+//        extractor.setLastViewport()
+//    }
+//    func scenePhaseChanged(_ newPhase: ScenePhase) {
+//        switch newPhase {
+//        case .active:
+//            extractor.resetZoomToLastViewPortData()
+//        default:
+//            break
+//        }
+//    }
     
     func appeared() {
         withAnimation(startedWithCamera ? .none : .default) {

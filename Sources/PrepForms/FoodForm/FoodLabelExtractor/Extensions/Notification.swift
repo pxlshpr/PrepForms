@@ -12,7 +12,7 @@ extension Notification.Name {
     
     public static var didEnterForeground: Notification.Name { return .init("didEnterForeground") }
     
-    public static var homeViewDidBecomeInactive: Notification.Name { return .init("homeViewDidBecomeInactive") }
+//    public static var homeViewDidBecomeInactive: Notification.Name { return .init("homeViewDidBecomeInactive") }
 
 }
 

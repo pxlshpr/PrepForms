@@ -6,14 +6,26 @@ import PrepCoreDataStack
 
 public struct GoalSetForm: View {
         
+    enum Sheet: String, Identifiable {
+        case nutrientsPicker
+        case emojiPicker
+        case nameForm
+        case goalForm
+        
+        public var id: String { rawValue }
+    }
+    
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     
     @StateObject var model: Model
     
-    @State var showingNutrientsPicker: Bool = false
-    @State var showingEmojiPicker = false
-    
+    @State var presentedSheet: Sheet? = nil
+//    @State var showingNutrientsPicker: Bool = false
+//    @State var showingEmojiPicker = false
+//    @State var showingGoalForm: Bool = false
+//    @State var showingNameForm: Bool = false
+
     @State var showingEquivalentValuesToggle: Bool
     @State var showingEquivalentValues = false
 
@@ -21,13 +33,10 @@ public struct GoalSetForm: View {
 
     let didTapSave: (GoalSet, Bool) -> ()
 
-    @State var showingNameForm: Bool = false
-    
     @State var showingEditConfirmation: Bool = false
     @State var numberOfPreviousUses: Int = 0
     @State var showingDuplicateAlert = false
     
-    @State var showingGoalForm: Bool = false
     
     public init(
         type: GoalSetType,
@@ -49,7 +58,10 @@ public struct GoalSetForm: View {
     
     public var body: some View {
         NavigationStack(path: $model.path) {
-            content
+            ZStack {
+                content
+                TapTargetResetLayer()
+            }
             .background(Color(.systemGroupedBackground))
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.large)
@@ -67,13 +79,44 @@ public struct GoalSetForm: View {
                 actions: editConfirmationActions
             )
             .alert(isPresented: $showingDuplicateAlert) { duplicateAlert }
-            .sheet(isPresented: $showingNutrientsPicker) { nutrientsPicker }
-            .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
-            .sheet(isPresented: $showingNameForm) { nameForm }
-            .sheet(isPresented: $showingGoalForm) { goalForm }
+//            .sheet(isPresented: $showingNutrientsPicker) { nutrientsPicker }
+//            .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
+//            .sheet(isPresented: $showingNameForm) { nameForm }
+//            .sheet(isPresented: $showingGoalForm) { goalForm }
+            .onChange(of: presentedSheet, perform: presentedSheetChanged)
+            .sheet(item: $presentedSheet) { sheet(for: $0) }
         }
     }
     
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        switch sheet {
+        case .emojiPicker:
+            emojiPicker
+        case .nutrientsPicker:
+            nutrientsPicker
+        case .nameForm:
+            nameForm
+        case .goalForm:
+            goalForm
+        }
+    }
+    
+    func present(_ sheet: Sheet) {
+        if presentedSheet != nil {
+            presentedSheet = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                presentedSheet = sheet
+            }
+        } else {
+            presentedSheet = sheet
+        }
+    }
+    
+    func presentedSheetChanged(_ newValue: Sheet?) {
+        TapTargetResetLayer.presentedSheetChanged(toDismissed: newValue == nil)
+    }
+
     var duplicateAlert: Alert {
         Alert(
             title: Text("Existing \(model.type.description)"),
@@ -108,8 +151,9 @@ public struct GoalSetForm: View {
     }
     
     func showGoalForm(for goalModel: GoalModel) {
+        Haptics.feedback(style: .soft)
         model.goalModelToShowFormFor = goalModel
-        showingGoalForm = true
+        present(.goalForm)
     }
     
     func canBeSavedChanged(to newValue: Bool) {
@@ -463,7 +507,8 @@ public struct GoalSetForm: View {
         
         return Button {
             Haptics.feedback(style: .soft)
-            showingNameForm = true
+            present(.nameForm)
+//            showingNameForm = true
         } label: {
             label
         }
@@ -517,7 +562,8 @@ public struct GoalSetForm: View {
     var emojiButton: some View {
         Button {
             Haptics.feedback(style: .soft)
-            showingEmojiPicker = true
+            present(.emojiPicker)
+//            showingEmojiPicker = true
         } label: {
             Text(model.emoji)
                 .font(.system(size: 50))

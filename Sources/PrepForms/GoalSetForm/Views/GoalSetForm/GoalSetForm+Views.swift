@@ -32,7 +32,8 @@ extension GoalSetForm {
             focusOnAppear: false,
             includeCancelButton: true) { emoji in
                 Haptics.successFeedback()
-                showingEmojiPicker = false
+                present(.emojiPicker)
+//                showingEmojiPicker = false
                 model.emoji = emoji
             }
     }
@@ -187,6 +188,7 @@ extension GoalSetForm {
     
     func presentNutrientsPicker() {
         Haptics.feedback(style: .soft)
-        showingNutrientsPicker = true
+        present(.nutrientsPicker)
+//        showingNutrientsPicker = true
     }
 }
