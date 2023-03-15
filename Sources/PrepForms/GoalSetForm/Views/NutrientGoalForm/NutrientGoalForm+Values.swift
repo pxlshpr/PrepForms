@@ -4,6 +4,12 @@ import SwiftHaptics
 import PrepDataTypes
 import PrepCoreDataStack
 
+extension Double {
+    internal var formatted: String {
+        formatted(decimalValuesDisplayedUnder: 10)
+    }
+}
+
 extension NutrientGoalForm_New {
     
     enum Side {
@@ -28,8 +34,8 @@ extension NutrientGoalForm_New {
         
         var valueString: String? {
             switch side {
-            case .left:     return leftValue?.cleanAmount
-            case .right:    return rightValue?.cleanAmount
+            case .left:     return leftValue?.formatted
+            case .right:    return rightValue?.formatted
             }
         }
 
@@ -52,8 +58,8 @@ extension NutrientGoalForm_New {
         var equivalentLabel: some View {
             var string: String {
                 switch side {
-                case .left:     return equivalentValues?.0?.cleanAmount ?? ""
-                case .right:    return equivalentValues?.1?.cleanAmount ?? ""
+                case .left:     return equivalentValues?.0?.formatted ?? ""
+                case .right:    return equivalentValues?.1?.formatted ?? ""
                 }
             }
             
@@ -61,16 +67,22 @@ extension NutrientGoalForm_New {
                 valueString != nil ? "g" : ""
             }
             
-            return HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(string)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .alignmentGuide(.customCenter) { context in
-                        context[HorizontalAlignment.center]
-                    }
-                Text(unitString)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+            return HStack {
+                Image(systemName: "equal.square.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(Color(.quaternaryLabel))
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text(string)
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .foregroundColor(Color(.secondaryLabel))
+                        .alignmentGuide(.customCenter) { context in
+                            context[HorizontalAlignment.center]
+                        }
+                    Text(unitString)
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundColor(Color(.tertiaryLabel))
+                }
             }
-            .foregroundColor(Color(.secondaryLabel))
             .frame(height: 25)
         }
                 
@@ -89,7 +101,7 @@ extension NutrientGoalForm_New {
                     .foregroundColor(.accentColor)
                     .padding(.horizontal, 15)
                     .opacity(opacity)
-                    .frame(height: 50)
+                    .frame(height: 65)
                     .background(
                         RoundedRectangle(cornerRadius: 7, style: .continuous)
                             .fill(Color.accentColor.opacity(

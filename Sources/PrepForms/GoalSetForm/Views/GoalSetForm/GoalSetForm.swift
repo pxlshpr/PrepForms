@@ -275,6 +275,7 @@ public struct GoalSetForm: View {
             }
             .padding(.horizontal, 20)
         }
+        .safeAreaInset(edge: .bottom) { safeAreaInset }
         .overlay(overlay)
         .blur(radius: model.showingWizardOverlay ? 5 : 0)
         .disabled(model.formDisabled)
@@ -284,7 +285,7 @@ public struct GoalSetForm: View {
     var safeAreaInset: some View {
         if showingSaveButton {
             Spacer()
-                .frame(height: 100)
+                .frame(height: 60.0)
         }
     }
 

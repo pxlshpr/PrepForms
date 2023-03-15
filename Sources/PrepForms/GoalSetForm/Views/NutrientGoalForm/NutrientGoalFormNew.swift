@@ -78,17 +78,17 @@ public struct NutrientGoalForm_New: View {
 //                    upperBoundSection
 //                }
                 unitSection
-                bodyMassSection
+//                bodyMassSection
                 infoSection
 //                equivalentSection
             }
             .navigationTitle(goal.description)
             .navigationBarTitleDisplayMode(.large)
 //            .toolbar { trailingContent }
-            .sheet(isPresented: $showingWeightForm) { weightForm }
-            .sheet(isPresented: $showingLeanMassForm) { leanMassForm }
             .onDisappear(perform: disappeared)
             .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
+            .sheet(isPresented: $showingWeightForm) { weightForm }
+            .sheet(isPresented: $showingLeanMassForm) { leanMassForm }
         }
 //        .presentationDetents([.height(450), .large])
 //        .presentationDragIndicator(.hidden)
@@ -116,6 +116,7 @@ public struct NutrientGoalForm_New: View {
                 bodyMassTypePicker
                 workoutDurationUnitPicker
                 energyButton
+                bodyMassButton
             }
         }
         
@@ -130,7 +131,7 @@ public struct NutrientGoalForm_New: View {
         }
         
         var flowView: some View {
-            FlowView(alignment: .leading, spacing: 10, padding: 37) {
+            FlowView(alignment: .center, spacing: 10, padding: 37) {
                 contents
             }
             .padding(.horizontal, 17)
@@ -212,8 +213,10 @@ public struct NutrientGoalForm_New: View {
         
         return Group {
             if isQuantityPerBodyMass {
-                FormStyledSection(header: Text("with")) {
+//                FormStyledSection(header: Text("with")) {
+                FormStyledSection {
                     HStack {
+                        Spacer()
                         bodyMassButton
                         Spacer()
                     }
@@ -390,18 +393,9 @@ public struct NutrientGoalForm_New: View {
         }
     }
     
-    @ViewBuilder
     var bodyMassButton: some View {
-        Button {
-            Haptics.feedback(style: .soft)
-            shouldResignFocus.toggle()
-            switch pickedBodyMassType {
-            case .weight:
-                showingWeightForm = true
-            case .leanMass:
-                showingLeanMassForm = true
-            }
-        } label: {
+        
+        var label: some View {
             if haveBodyMass {
                 if goal.bodyMassIsSyncedWithHealth {
                     PickerLabel(
@@ -438,6 +432,27 @@ public struct NutrientGoalForm_New: View {
                     prefixColor: Color.white.opacity(0.75),
                     imageScale: .medium
                 )
+            }
+        }
+        
+        var button: some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                shouldResignFocus.toggle()
+                switch pickedBodyMassType {
+                case .weight:
+                    showingWeightForm = true
+                case .leanMass:
+                    showingLeanMassForm = true
+                }
+            } label: {
+                label
+            }
+        }
+        
+        return Group {
+            if isQuantityPerBodyMass {
+                button
             }
         }
     }
