@@ -15,11 +15,6 @@ extension BiometricsModel {
     var maintenanceEnergyInKcal: Double? {
         guard let maintenanceEnergy else { return nil }
         return userEnergyUnit.convert(maintenanceEnergy, to: .kcal)
-//        if userEnergyUnit == .kcal {
-//            return maintenanceEnergy
-//        } else {
-//            return maintenanceEnergy / KcalsPerKilojule
-//        }
     }
     
     var maintenanceEnergyFormatted: String {
@@ -176,6 +171,7 @@ extension BiometricsModel {
         }
         switch restingEnergySource {
         case .health:
+            restingEnergySyncStatus = .syncing
             syncRestingEnergy()
         default:
             saveBiometrics()
@@ -244,6 +240,7 @@ extension BiometricsModel {
         withAnimation {
             restingEnergyInterval.value = newValue
         }
+        restingEnergySyncStatus = .syncing
         syncRestingEnergy()
     }
     
@@ -265,6 +262,7 @@ extension BiometricsModel {
             correctRestingEnergyIntervalValueIfNeeded()
         }
         
+        restingEnergySyncStatus = .syncing
         syncRestingEnergy()
     }
     
@@ -406,7 +404,12 @@ extension BiometricsModel {
 
     var leanBodyMassBiometricValue: BiometricValue? {
         guard let lbm else { return nil }
-        return .leanBodyMass(lbm, userBodyMassUnit)
+        if lbmSource == .fatPercentage {
+            return .fatPercentage(lbm)
+        } else {
+            guard let lbmValue else { return nil }
+            return .leanBodyMass(lbmValue, userBodyMassUnit)
+        }
     }
 
     var restingEnergyBiometricValue: BiometricValue? {
@@ -479,6 +482,7 @@ extension BiometricsModel {
         }
         switch activeEnergySource {
         case .health:
+            activeEnergySyncStatus = .syncing
             syncActiveEnergy()
         default:
             saveBiometrics()
@@ -507,6 +511,7 @@ extension BiometricsModel {
         }
         
         /// Ignore interval since we're only changing the period type
+        activeEnergySyncStatus = .syncing
         syncActiveEnergy(ignoringInterval: true)
     }
     
@@ -529,6 +534,7 @@ extension BiometricsModel {
             activeEnergyInterval.value = newValue
         }
         
+        activeEnergySyncStatus = .syncing
         syncActiveEnergy()
     }
     
@@ -548,6 +554,7 @@ extension BiometricsModel {
             correctActiveEnergyIntervalValueIfNeeded()
         }
         
+        activeEnergySyncStatus = .syncing
         syncActiveEnergy()
     }
     

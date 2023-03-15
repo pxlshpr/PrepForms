@@ -51,7 +51,7 @@ struct BiometricValueForm: View {
             FormStyledSection(horizontalOuterPadding: 0) {
                 HStack {
                     textField
-                    unitPickerButton
+                    unitView
                         .layoutPriority(model.usesSecondaryUnit ? 1 : 0)
                     optionalSecondaryField
                 }
@@ -60,6 +60,15 @@ struct BiometricValueForm: View {
             .padding(.leading, 20)
             doneButton
                 .padding(.horizontal, 20)
+        }
+    }
+    
+    @ViewBuilder
+    var unitView: some View {
+        if self.model.type == .fatPercentage {
+            percentageUnitLabel
+        } else {
+            unitPickerButton
         }
     }
     
@@ -152,6 +161,22 @@ struct BiometricValueForm: View {
         )
     }
     
+    var percentageUnitLabel: some View {
+        HStack(spacing: 2) {
+            Text("%")
+                .fontWeight(.semibold)
+//            Image(systemName: "percent")
+//                .imageScale(.large)
+        }
+        .foregroundColor(.secondary)
+        .padding(.horizontal, 15)
+        .frame(height: 40)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(Color(.secondarySystemFill))
+        )
+    }
+
     var unitPickerButton: some View {
         
         func unitPicker(for type: BiometricType) -> some View {
@@ -227,7 +252,7 @@ struct BiometricValueForm: View {
                     }
                 }
             }
-
+            
             @ViewBuilder
             var unitPicker: some View {
                 switch type {

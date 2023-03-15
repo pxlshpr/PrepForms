@@ -10,7 +10,6 @@ public struct GoalSetForm: View {
     @Environment(\.dismiss) var dismiss
     
     @StateObject var model: Model
-//    @StateObject var model: Model
     
     @State var showingNutrientsPicker: Bool = false
     @State var showingEmojiPicker = false
@@ -35,16 +34,12 @@ public struct GoalSetForm: View {
         type: GoalSetType,
         existingGoalSet: GoalSet? = nil,
         isDuplicating: Bool = false,
-        userUnits: UserOptions.Units,
-        biometrics: Biometrics? = nil,
         didTapSave: @escaping (GoalSet, Biometrics?, Bool) -> ()
     ) {
         let model = Model(
-            userUnits: userUnits,
             type: type,
             existingGoalSet: existingGoalSet,
-            isDuplicating: isDuplicating,
-            biometrics: biometrics
+            isDuplicating: isDuplicating
         )
         _model = StateObject(wrappedValue: model)
         _showingEquivalentValuesToggle = State(initialValue: model.containsGoalWithEquivalentValues)
@@ -604,48 +599,6 @@ import SwiftUI
 public enum GoalSetFormRoute: Hashable {
     case goal(GoalModel)
 }
-
-//extension GoalSetForm {
-//    public class Model: ObservableObject {
-//        @Published var nutrientTDEEFormModel: BiometricsModel
-//        @Published var path: [GoalSetFormRoute] = []
-//        let existingGoalSet: GoalSet?
-//
-//        init(
-//            userOptions: UserUnits,
-//            biometrics: Biometrics?,
-//            presentedGoalId: UUID? = nil,
-//            existingGoalSet: GoalSet?
-//        ) {
-//            self.existingGoalSet = existingGoalSet
-//
-//            self.nutrientTDEEFormModel = BiometricsModel(
-//                existingProfile: biometrics,
-//                userOptions: userOptions
-//            )
-//
-//            self.path = []
-//            //TODO: Bring this back
-////            if let presentedGoalId, let goalModel = goals.first(where: { $0.id == presentedGoalId }) {
-////                self.path = [.goal(goalModel)]
-////            }
-//        }
-//    }
-//
-//    func resetNutrientTDEEFormModel() {
-//        setNutrientTDEEFormModel(with: biometrics)
-//    }
-//
-//    func setNutrientTDEEFormModel(with biometrics: Biometrics?) {
-//        nutrientTDEEFormModel = BiometricsModel(existingProfile: biometrics, userOptions: userOptions)
-//    }
-//
-//    func setBiometrics(_ biometrics: Biometrics) {
-//        /// in addition to setting the current body Profile, we also update the view model (BiometricsModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
-//        self.biometrics = biometrics
-//        setNutrientTDEEFormModel(with: biometrics)
-//    }
-//}
 
 extension GoalSet {
     func equals(_ other: GoalSet) -> Bool {

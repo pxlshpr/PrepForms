@@ -8,19 +8,29 @@ import PrepCoreDataStack
 
 struct WeightSection: View {
     
-    let largeTitle: Bool
     let includeHeader: Bool
     
     @EnvironmentObject var model: BiometricsModel
-    @Namespace var namespace
-    @FocusState var isFocused: Bool
     @State var showFormOnAppear = false
 
-    init(largeTitle: Bool = false, includeHeader: Bool = true) {
-        self.largeTitle = largeTitle
+    init(includeHeader: Bool = true) {
         self.includeHeader = includeHeader
     }
     
+    var body: some View {
+        FormStyledSection(header: header) {
+            content
+        }
+    }
+
+    @ViewBuilder
+    var header: some View {
+        if includeHeader {
+            BiometricSectionHeader(type: .weight)
+                .environmentObject(model)
+        }
+    }
+
     var content: some View {
         VStack {
             Group {
@@ -29,7 +39,6 @@ struct WeightSection: View {
                         sourceSection
                         switch source {
                         case .health:
-//                            healthContent
                             EmptyView()
                         case .userEntered:
                             EmptyView()
@@ -50,7 +59,6 @@ struct WeightSection: View {
     func tappedManualEntry() {
         showFormOnAppear = true
         model.changeWeightSource(to: .userEntered)
-        isFocused = true
     }
     
     var emptyContent: some View {
@@ -116,30 +124,5 @@ struct WeightSection: View {
             sourceMenu
             Spacer()
         }
-    }
-    
-    func weightSourceChanged(to newSource: MeasurementSource?) {
-        switch newSource {
-        case .userEntered:
-            isFocused = true
-        default:
-            break
-        }
-    }
- 
-    @ViewBuilder
-    var header: some View {
-        if includeHeader {
-//            biometricHeaderView("Weight", largeTitle: largeTitle)
-            BiometricSectionHeader(type: .weight)
-                .environmentObject(model)
-        }
-    }
-
-    var body: some View {
-        FormStyledSection(header: header) {
-            content
-        }
-        .onChange(of: model.weightSource, perform: weightSourceChanged)
     }
 }

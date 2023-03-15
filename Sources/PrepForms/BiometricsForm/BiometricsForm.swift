@@ -6,7 +6,7 @@ import SwiftHaptics
 
 public struct BiometricsForm: View {
     
-    @StateObject var model: BiometricsModel
+    @StateObject var model: BiometricsModel = BiometricsModel()
     
     @Namespace var namespace
     @Environment(\.colorScheme) var colorScheme
@@ -16,13 +16,7 @@ public struct BiometricsForm: View {
     
     @State var changedTypes: [BiometricType] = []
     
-    public init() {
-        let user = DataManager.shared.user
-        let biometrics = user?.biometrics
-        let units = user?.options.units ?? .defaultUnits
-        let model = BiometricsModel(existingProfile: biometrics, userUnits: units)
-        _model = StateObject(wrappedValue: model)
-    }
+    public init() { }
     
     public var body: some View {
         NavigationView {
@@ -187,11 +181,6 @@ public struct BiometricsForm: View {
             .cornerRadius(10)
             .padding(.bottom, 10)
             .padding(.horizontal, 17)
-    }
-    
-    var maintenanceEnergySection: some View {
-        TDEESection(includeHeader: true, largeTitle: true)
-            .environmentObject(model)
     }
     
     func updatedBinding(for type: BiometricType) -> Binding<Bool> {

@@ -1,5 +1,6 @@
 import SwiftUI
 import PrepDataTypes
+import PrepCoreDataStack
 
 extension GoalSetForm {
     public class Model: ObservableObject {
@@ -12,9 +13,10 @@ extension GoalSetForm {
         
         /// Used to calculate equivalent values
         let userUnits: UserOptions.Units
-        @Published var biometrics: Biometrics?
         
-        @Published var biometricsModel: BiometricsModel
+        //TODO: Handle
+        @Published var biometrics: Biometrics?
+        @Published var biometricsModel: BiometricsModel = BiometricsModel()
         
         @Published var singleGoalModelToPushTo: GoalModel? = nil
         @Published var implicitGoals: [GoalModel] = []
@@ -29,11 +31,9 @@ extension GoalSetForm {
         @Published var formDisabled = false
 
         init(
-            userUnits: UserOptions.Units,
             type: GoalSetType,
             existingGoalSet existing: GoalSet?,
-            isDuplicating: Bool = false,
-            biometrics: Biometrics? = nil
+            isDuplicating: Bool = false
         ) {
             /// Always generate a new `UUID`, even if we're duplicating or editing (as we soft-delete the previous ones)
 //            self.id = existing?.id ?? UUID()
@@ -43,13 +43,12 @@ extension GoalSetForm {
             self.emoji = existing?.emoji ?? randomEmoji(forGoalSetType: type)
             self.type = type
             
-            self.userUnits = userUnits
-            self.biometrics = biometrics
+            self.userUnits = UserManager.units
+            self.biometrics = UserManager.biometrics
             
             self.isDuplicating = isDuplicating
             self.existingGoalSet = isDuplicating ? nil : existing
             
-            self.biometricsModel = BiometricsModel(existingProfile: biometrics, userUnits: userUnits)
             self.goalModels = existing?.goals.goalModels(goalSet: self, goalSetType: type) ?? []
             self.createImplicitGoals()
         }
@@ -97,7 +96,7 @@ extension GoalSetForm.Model {
     }
     
     func setNutrientTDEEFormModel(with biometrics: Biometrics?) {
-        biometricsModel = BiometricsModel(existingProfile: biometrics, userUnits: userUnits)
+        biometricsModel = BiometricsModel()
     }
     
     func setBiometrics(_ biometrics: Biometrics) {

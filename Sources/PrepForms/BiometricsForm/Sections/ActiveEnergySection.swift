@@ -9,19 +9,11 @@ import PrepCoreDataStack
 struct ActiveEnergySection: View {
     
     @EnvironmentObject var model: BiometricsModel
-    @Namespace var namespace
     @State var showFormOnAppear = false
 
     var body: some View {
         VStack(spacing: 7) {
             header
-//            activeHeader
-//                .textCase(.uppercase)
-//                .fixedSize(horizontal: false, vertical: true)
-//                .foregroundColor(Color(.secondaryLabel))
-//                .font(.footnote)
-//                .frame(maxWidth: .infinity, alignment: .leading)
-//                .padding(.horizontal, 20)
             content
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 0)
@@ -29,7 +21,6 @@ struct ActiveEnergySection: View {
                 .background(
                     RoundedRectangle(cornerRadius: 10)
                         .foregroundColor(Color(.secondarySystemGroupedBackground))
-                        .matchedGeometryEffect(id: "active-bg", in: namespace)
                 )
                 .padding(.bottom, 10)
                 .if(model.activeEnergyFooterString == nil) { view in
@@ -210,9 +201,8 @@ struct ActiveEnergySection: View {
             source: model.activeEnergySource ?? .userEntered,
             syncStatus: model.activeEnergySyncStatus,
             prefix: model.activeEnergyPrefix,
-            showFormOnAppear: $showFormOnAppear,
-            matchedGeometryId: "active",
-            matchedGeometryNamespace: namespace
+            placeholder: "needs resting energy",
+            showFormOnAppear: $showFormOnAppear
         )
         .padding(.horizontal)
     }
@@ -288,6 +278,7 @@ struct ActiveEnergySection: View {
                 withAnimation {
                     model.activeEnergySource = .health
                 }
+                model.activeEnergySyncStatus = .syncing
                 model.syncActiveEnergy()
             } catch {
                 cprint("Error syncing with Health: \(error)")
@@ -303,15 +294,6 @@ struct ActiveEnergySection: View {
         }
         .padding(.horizontal, 15)
     }
-    
-    var activeHeader: some View {
-        HStack {
-            Image(systemName: EnergyComponent.active.systemImage)
-                .matchedGeometryEffect(id: "active-header-icon", in: namespace)
-            Text("Active Energy")
-        }
-    }
-    
     
     @ViewBuilder
     var footer: some View {

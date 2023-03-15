@@ -7,16 +7,15 @@ import PrepCoreDataStack
 
 struct HeightSection: View {
     
-    let largetTitle: Bool
     @EnvironmentObject var model: BiometricsModel
-    @Namespace var namespace
-    @FocusState var isFocused: Bool
     @State var showFormOnAppear = false
 
-    init(largeTitle: Bool = false) {
-        self.largetTitle = largeTitle
+    var body: some View {
+        FormStyledSection(header: header) {
+            content
+        }
     }
-    
+
     var content: some View {
         VStack {
             Group {
@@ -38,6 +37,11 @@ struct HeightSection: View {
         }
     }
 
+   var header: some View {
+       BiometricSectionHeader(type: .height)
+           .environmentObject(model)
+   }
+
     func tappedSyncWithHealth() {
         model.changeHeightSource(to: .health)
     }
@@ -45,7 +49,6 @@ struct HeightSection: View {
     func tappedManualEntry() {
         showFormOnAppear = true
         model.changeHeightSource(to: .userEntered)
-        isFocused = true
     }
     
     var emptyContent: some View {
@@ -105,27 +108,5 @@ struct HeightSection: View {
             sourceMenu
             Spacer()
         }
-    }
-    
-    func heightSourceChanged(to newSource: MeasurementSource?) {
-        switch newSource {
-        case .userEntered:
-            isFocused = true
-        default:
-            break
-        }
-    }
- 
-    var header: some View {
-//        biometricHeaderView("Height", largeTitle: largetTitle)
-        BiometricSectionHeader(type: .height)
-            .environmentObject(model)
-    }
-    
-    var body: some View {
-        FormStyledSection(header: header) {
-            content
-        }
-        .onChange(of: model.heightSource, perform: heightSourceChanged)
     }
 }

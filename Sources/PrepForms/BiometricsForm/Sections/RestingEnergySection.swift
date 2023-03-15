@@ -6,33 +6,9 @@ import SwiftUISugar
 import HealthKit
 import PrepCoreDataStack
 
-struct UpdatedBadge: View {
-    
-    @Environment(\.colorScheme) var colorScheme
-    
-    var body: some View {
-        Text("Updated")
-            .textCase(.uppercase)
-            .font(.footnote)
-            .fontWeight(.bold)
-            .foregroundColor(.white)
-            .padding(.vertical, 4)
-            .padding(.horizontal, 8)
-            .background(
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(
-                        HealthGradient
-                            .opacity(colorScheme == .dark ? 0.5 : 0.8)
-                    )
-            )
-    }
-}
 struct RestingEnergySection: View {
     
     @EnvironmentObject var model: BiometricsModel
-    
-    @Namespace var namespace
-    @FocusState var restingEnergyTextFieldIsFocused: Bool
     @State var showFormOnAppear = false
     
     var body: some View {
@@ -59,7 +35,6 @@ struct RestingEnergySection: View {
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .foregroundColor(Color(.secondarySystemGroupedBackground))
-                .matchedGeometryEffect(id: "resting-bg", in: namespace)
         )
         .if(model.restingEnergyFooterString == nil) { view in
             view.padding(.bottom, 10)
@@ -229,19 +204,7 @@ struct RestingEnergySection: View {
                 parametersFormLink
             }
         }
-        
-        var flowView: some View {
-            return FlowView(alignment: .center, spacing: 10, padding: 17) {
-                ZStack {
-                    Capsule(style: .continuous)
-                        .foregroundColor(Color(.clear))
-                    prefixString
-                }
-                .fixedSize(horizontal: true, vertical: true)
-                link
-            }
-            .padding(.bottom, 5)
-        }
+
         
         var hStack: some View {
             HStack {
@@ -250,14 +213,12 @@ struct RestingEnergySection: View {
             }
         }
         
-//        return flowView
         return hStack
     }
     
     func tappedManualEntry() {
         showFormOnAppear = true
         model.changeRestingEnergySource(to: .userEntered)
-        restingEnergyTextFieldIsFocused = true
     }
     
     func tappedSyncWithHealth() {
@@ -321,9 +282,7 @@ struct RestingEnergySection: View {
             source: model.restingEnergySource ?? .userEntered,
             syncStatus: model.restingEnergySyncStatus,
             prefix: model.restingEnergyPrefix,
-            showFormOnAppear: $showFormOnAppear,
-            matchedGeometryId: "resting",
-            matchedGeometryNamespace: namespace
+            showFormOnAppear: $showFormOnAppear
         )
         .padding(.horizontal)
     }

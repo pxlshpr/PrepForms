@@ -23,7 +23,6 @@ struct ProfileForm: View {
                     model.tappedSyncAllOnMeasurementsForm()
                 } label: {
                     ButtonLabel(title: "Sync All", style: .health, isCompact: true)
-//                    AppleHealthButtonLabel(title: "Sync All", isCompact: true)
                 }
             }
         }
@@ -39,7 +38,6 @@ struct ProfileForm: View {
                 HeightSection()
             }
         }
-//        .navigationTitle(model.restingEnergyFormula.menuDescription + " Formula")
         .navigationTitle("Parameters")
         .toolbar { trailingContent }
     }

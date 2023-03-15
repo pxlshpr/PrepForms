@@ -9,14 +9,6 @@ class BiometricsModel: ObservableObject {
     var userBodyMassUnit: BodyMassUnit
     var userHeightUnit: HeightUnit
     
-    @Published var path: [TDEEFormRoute] = []
-    @Published var isEditing = false
-    
-    @Published var presentationDetent: PresentationDetent
-    @Published var detents: Set<PresentationDetent>
-    
-    @Published var hasAppeared = false
-    
     @Published var restingEnergySource: RestingEnergySource? = nil
     @Published var restingEnergyFormula: RestingEnergyFormula = .katchMcardle
     @Published var restingEnergy: Double? = nil
@@ -66,42 +58,21 @@ class BiometricsModel: ObservableObject {
     
     @Published var updatedTypes: [BiometricType]
 
-    let existingProfile: Biometrics?
-    
-    init(
-        existingProfile: Biometrics?,
-        userUnits: UserOptions.Units
-    ) {
-        self.userEnergyUnit = userUnits.energy
-        self.userBodyMassUnit = userUnits.bodyMass
-        self.userHeightUnit = userUnits.height
+    init() {
+        let units = UserManager.units
+        self.userEnergyUnit = units.energy
+        self.userBodyMassUnit = units.bodyMass
+        self.userHeightUnit = units.height
         
-        self.existingProfile = existingProfile
+        let biometrics = UserManager.biometrics
         
-        if let existingProfile, existingProfile.hasTDEE {
-            if existingProfile.hasDynamicTDEE {
-                detents = [.medium, .large]
-                presentationDetent = .medium
-            } else {
-                detents = [.height(400), .large]
-                presentationDetent = .height(400)
-            }
-        } else {
-            detents = [.height(270), .large]
-            presentationDetent = .height(270)
-        }
-
-        if let existingProfile,
-           let previousBiometrics = UserManager.previousBiometrics?.biometrics
-        {
-            self.updatedTypes = existingProfile.updatedTypes(from: previousBiometrics)
+        if let previousBiometrics = UserManager.previousBiometrics?.biometrics {
+            self.updatedTypes = biometrics.updatedTypes(from: previousBiometrics)
         } else {
             self.updatedTypes = []
         }
 
-        if let existingProfile {
-            self.load(existingProfile)
-        }
+        self.load(biometrics)
     }
 }
 
@@ -112,29 +83,6 @@ extension BiometricsModel {
     var tdeeDescriptionText: Text {
         let energy = userEnergyUnit == .kcal ? "calories" : "kiljoules"
         return Text("This is an estimate of how many \(energy) you would have to consume to *maintain* your current weight.")
-    }
-    
-    var shouldShowSaveButton: Bool {
-        guard isEditing, biometrics.hasTDEE else { return false }
-        if let existingProfile {
-            /// We're only checking the parameters as the `updatedAt` flag, `syncStatus` might differ.
-            return existingProfile != biometrics
-        }
-        return true
-    }
-    
-    var shouldShowEditButton: Bool {
-        guard !isEditing else { return false }
-        return existingProfile != nil
-    }
-    
-    var shouldShowInitialSetupButton: Bool {
-        !shouldShowSummary
-        //        existingProfile == nil && !isEditing
-    }
-    
-    var shouldShowSummary: Bool {
-        biometrics.hasTDEE
     }
     
     var isDynamic: Bool {

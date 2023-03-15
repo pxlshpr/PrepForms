@@ -329,10 +329,20 @@ extension BiometricsModel {
         return weightDate?.biometricFormat
     }
     
-    var lbmDateFormatted: String? {
-        guard lbmSource == .health else { return nil }
-        return lbmDate?.biometricFormat
-    }
+    var lbmPrefix: String? {
+        switch lbmSource {
+        case .health:
+            return lbmDate?.biometricFormat
+        case .fatPercentage:
+            if weight != nil {
+                return nil
+            } else {
+                return "requires weight"
+            }
+        default:
+            return nil
+        }
+    }    
 }
 
 //MARK: - Weight
@@ -474,12 +484,13 @@ extension BiometricsModel {
     }
     
     var fatPercentage: Double? {
-        switch lbmSource {
-        case .fatPercentage:
-            return lbm
-        default:
-            return calculatedFatPercentage
-        }
+        return lbm
+//        switch lbmSource {
+//        case .fatPercentage:
+//            return lbm
+//        default:
+//            return calculatedFatPercentage
+//        }
     }
     
     var calculatedFatPercentage: Double? {

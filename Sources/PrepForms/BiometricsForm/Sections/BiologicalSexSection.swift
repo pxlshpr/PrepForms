@@ -7,14 +7,11 @@ import HealthKit
 
 struct BiologicalSexSection: View {
     
-    let largeTitle: Bool
     let includeFooter: Bool
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
-    @Namespace var namespace
     
-    init(largeTitle: Bool = false, includeFooter: Bool = false) {
-        self.largeTitle = largeTitle
+    init(includeFooter: Bool = false) {
         self.includeFooter = includeFooter
     }
     
@@ -22,7 +19,6 @@ struct BiologicalSexSection: View {
         FormStyledSection(header: header) {
             content
         }
-        .onChange(of: model.sexSource, perform: sexSourceChanged)
     }
 
     var content: some View {
@@ -83,7 +79,6 @@ struct BiologicalSexSection: View {
                 value: valueBinding,
                 type: .sex,
                 source: model.sexSource ?? .userEntered,
-//                isFetching: model.fetchingSex,
                 syncStatus: model.sexSyncStatus,
                 prefix: nil,
                 showFormOnAppear: $showFormOnAppear
@@ -117,36 +112,8 @@ struct BiologicalSexSection: View {
         }
     }
     
-    func sexSourceChanged(to newSource: MeasurementSource?) {
-        switch newSource {
-        case .userEntered:
-            break
-        default:
-            break
-        }
-    }
- 
     var header: some View {
-//        biometricHeaderView("Biological Sex", largeTitle: largeTitle)
         BiometricSectionHeader(type: .sex)
             .environmentObject(model)
-    }
-}
-
-let BiometricSectionHeaderFont: Font = .system(.title2, design: .rounded, weight: .semibold)
-
-func biometricHeaderView(_ title: String, largeTitle: Bool) -> some View {
-    var titleView: some View {
-        Text(title)
-    }
-    return Group {
-        if largeTitle {
-            titleView
-                .textCase(.none)
-                .font(BiometricSectionHeaderFont)
-                .foregroundColor(.primary)
-        } else {
-            titleView
-        }
     }
 }

@@ -1,0 +1,71 @@
+import SwiftUI
+import SwiftUISugar
+import SwiftHaptics
+import PrepDataTypes
+import HealthKit
+import PrepCoreDataStack
+
+public struct TDEEForm: View {
+    
+    @Namespace var namespace
+    @Environment(\.scenePhase) var scenePhase
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    @StateObject var model: BiometricsModel = BiometricsModel()
+    
+    @State var showingSaveButton: Bool = false
+    
+    @ViewBuilder
+    public var body: some View {
+        NavigationView {
+            form
+                .scrollDismissesKeyboard(.interactively)
+                .navigationTitle("Maintenance \(UserManager.energyDescription)")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar { trailingContent }
+        }
+    }
+
+    var form: some View {
+        FormStyledScrollView {
+            maintenanceSection
+            symbol("=")
+            restingEnergySection
+            symbol("+")
+            activeEnergySection
+        }
+    }
+    
+    func symbol(_ string: String) -> some View {
+        Text(string)
+            .font(.title)
+            .foregroundColor(Color(.quaternaryLabel))
+    }
+    
+    var restingEnergySection: some View {
+        RestingEnergySection()
+            .environmentObject(model)
+    }
+    
+    var activeEnergySection: some View {
+        ActiveEnergySection()
+            .environmentObject(model)
+    }
+    
+    var maintenanceSection: some View {
+        MaintenanceSection()
+            .environmentObject(model)
+    }
+    
+    
+    var trailingContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            Button {
+                Haptics.feedback(style: .soft)
+                dismiss()
+            } label: {
+                closeButtonLabel
+            }
+        }
+    }
+}

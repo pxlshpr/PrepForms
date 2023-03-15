@@ -7,21 +7,13 @@ import HealthKit
 
 struct AgeSection: View {
     
-    let largeTitle: Bool
     @EnvironmentObject var model: BiometricsModel
-    @Namespace var namespace
-    @FocusState var isFocused: Bool
     @State var showFormOnAppear = false
 
-    init(largeTitle: Bool = false) {
-        self.largeTitle = largeTitle
-    }
-    
     var body: some View {
         FormStyledSection(header: header) {
             content
         }
-        .onChange(of: model.ageSource, perform: ageSourceChanged)
     }
 
     var content: some View {
@@ -52,7 +44,6 @@ struct AgeSection: View {
     func tappedManualEntry() {
         showFormOnAppear = true
         model.changeAgeSource(to: .userEntered)
-        isFocused = true
     }
     
     var emptyContent: some View {
@@ -110,17 +101,7 @@ struct AgeSection: View {
         }
     }
     
-    func ageSourceChanged(to newSource: MeasurementSource?) {
-        switch newSource {
-        case .userEntered:
-            isFocused = true
-        default:
-            break
-        }
-    }
- 
     var header: some View {
-//        biometricHeaderView("Age", largeTitle: largeTitle)
         BiometricSectionHeader(type: .age)
             .environmentObject(model)
     }
