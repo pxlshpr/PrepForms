@@ -29,12 +29,10 @@ struct MaintenanceSection: View {
 
         func filled(value: Double, unit: EnergyUnit) -> some View {
             HStack {
-                MaintenanceEnergyView(
-                    value: value,
-                    unit: unit,
-                    namespace: namespace
-                )
-                .fixedSize(horizontal: true, vertical: false)
+                Color.clear
+                    .animatedMaintenanceEnergyModifier(value: value, energyUnit: unit)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .frame(maxWidth: .infinity, alignment: .center)
                 updatedBadge
             }
         }
@@ -53,12 +51,10 @@ struct MaintenanceSection: View {
                 .foregroundColor(Color(.tertiaryLabel))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-//                    .padding(.vertical)
         }
         
         return Group {
             if let value = model.maintenanceEnergy {
-//                filled(value: value, unit: model.userEnergyUnit)
                 filled(value: value, unit: UserManager.energyUnit)
             } else {
                 empty

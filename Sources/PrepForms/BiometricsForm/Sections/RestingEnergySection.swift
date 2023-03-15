@@ -265,10 +265,8 @@ struct RestingEnergySection: View {
                 
                 /// Convert other energy based values in `BiometricModel` before setting the unit
                 if let activeEnergy = model.activeEnergy {
-//                    model.activeEnergy = model.userEnergyUnit.convert(activeEnergy, to: energyUnit)
                     model.activeEnergy = UserManager.energyUnit.convert(activeEnergy, to: energyUnit)
                 }
-//                model.userEnergyUnit = energyUnit
                 UserManager.energyUnit = energyUnit
                 
                 /// Delay this by a second so that the core-data persistence doesn't interfere with

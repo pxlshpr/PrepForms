@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftUISugar
 import SwiftHaptics
 import PrepDataTypes
+import PrepCoreDataStack
 
 struct NutrientGoalForm: View {
     
@@ -292,9 +293,9 @@ struct NutrientGoalForm: View {
     var haveBodyMass: Bool {
         switch pickedBodyMassType {
         case .weight:
-            return goalSet.biometrics?.hasWeight == true
+            return UserManager.biometrics.hasWeight == true
         case .leanMass:
-            return goalSet.biometrics?.hasLBM == true
+            return UserManager.biometrics.hasLBM == true
         }
     }
     
@@ -303,19 +304,16 @@ struct NutrientGoalForm: View {
     }
 
     var bodyMassFormattedWithUnit: String {
-        //TODO: Biometrics
-//        return ""
-        guard let biometrics = goalSet.biometrics else { return "" }
         switch pickedBodyMassType {
         case .weight:
-            guard let amount = biometrics.weight?.amount,
-                  let unit = biometrics.weight?.unit
+            guard let amount = UserManager.biometrics.weight?.amount,
+                  let unit = UserManager.biometrics.weight?.unit
             else { return "" }
             return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
 
         case .leanMass:
-            guard let amount = biometrics.leanBodyMass?.amount,
-                  let unit = biometrics.leanBodyMass?.unit
+            guard let amount = UserManager.biometrics.leanBodyMass?.amount,
+                  let unit = UserManager.biometrics.leanBodyMass?.unit
             else { return "" }
             return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
         }

@@ -208,7 +208,7 @@ extension ItemForm {
                 meal: dayMealBinding,
                 day: $model.day,
                 lastUsedGoalSet: lastUsedGoalSetBinding,
-                userUnits: UserManager.units,
+                units: UserManager.units,
 //                biometrics: model.day?.biometrics //TODO: We need to load the Day's biometrics here once supported
                 biometrics: UserManager.biometrics,
                 didTapGoalSetButton: didTapGoalSetButton
@@ -223,7 +223,8 @@ extension ItemForm {
             return IngredientPortion(
                 ingredientItem: itemBinding,
                 lastUsedGoalSet: lastUsedGoalSetBinding,
-                userUnits: UserManager.units,
+                units: UserManager.units,
+//                biometrics: model.day?.biometrics //TODO: We need to load the Day's biometrics here once supported
                 biometrics: UserManager.biometrics,
                 didTapGoalSetButton: didTapGoalSetButton
             )

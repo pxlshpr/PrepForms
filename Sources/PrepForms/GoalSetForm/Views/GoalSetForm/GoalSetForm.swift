@@ -21,7 +21,7 @@ public struct GoalSetForm: View {
     
     @State var showingSaveButton: Bool
 
-    let didTapSave: (GoalSet, Biometrics?, Bool) -> ()
+    let didTapSave: (GoalSet, Bool) -> ()
 
     @State var showingNameForm: Bool = false
     
@@ -29,12 +29,11 @@ public struct GoalSetForm: View {
     @State var numberOfPreviousUses: Int = 0
     @State var showingDuplicateAlert = false
     
-    //TODO: Use user's units here
     public init(
         type: GoalSetType,
         existingGoalSet: GoalSet? = nil,
         isDuplicating: Bool = false,
-        didTapSave: @escaping (GoalSet, Biometrics?, Bool) -> ()
+        didTapSave: @escaping (GoalSet, Bool) -> ()
     ) {
         let model = Model(
             type: type,
@@ -327,7 +326,7 @@ public struct GoalSetForm: View {
     }
     
     func saveAndDismiss(overwritingPreviousUses: Bool = false) {
-        didTapSave(model.goalSet, model.biometrics, overwritingPreviousUses)
+        didTapSave(model.goalSet, overwritingPreviousUses)
         dismiss()
     }
 

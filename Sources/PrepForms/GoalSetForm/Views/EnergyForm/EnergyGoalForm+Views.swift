@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftUISugar
 import SwiftHaptics
+import PrepCoreDataStack
 
 extension EnergyGoalForm {
     var body: some View {
@@ -121,9 +122,8 @@ extension EnergyGoalForm {
                 Haptics.feedback(style: .soft)
                 showingTDEEForm = true
             } label: {
-                //TODO: Make this respond to changes, `GoalSetForm.Model` should update its copy of the biometrics when it changes
-                if let profile = model.biometrics, let formattedTDEE = profile.formattedTDEEWithUnit {
-                    if profile.hasDynamicTDEE {
+                if let formattedTDEE = UserManager.biometrics.formattedTDEEWithUnit {
+                    if UserManager.biometrics.hasDynamicTDEE {
                         PickerLabel(
                             formattedTDEE,
                             systemImage: "flame.fill",

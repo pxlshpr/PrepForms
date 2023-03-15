@@ -5,7 +5,7 @@ enum MealEnergyTypeOption: CaseIterable {
     
     case fixed
     
-    func description(userEnergyUnit energyUnit: EnergyUnit) -> String {
+    func description(energyUnit: EnergyUnit) -> String {
         switch self {
         case .fixed: return energyUnit.shortDescription
         }

@@ -7,7 +7,7 @@ enum DietEnergyTypeOption: CaseIterable {
     case fromMaintenance
     case percentageFromMaintenance
     
-    func description(userEnergyUnit energyUnit: EnergyUnit) -> String {
+    func description(energyUnit: EnergyUnit) -> String {
         switch self {
         case .fixed:
             return energyUnit.shortDescription
@@ -18,7 +18,7 @@ enum DietEnergyTypeOption: CaseIterable {
         }
     }
     
-    func shortDescription(userEnergyUnit energyUnit: EnergyUnit) -> String {
+    func shortDescription(energyUnit: EnergyUnit) -> String {
         switch self {
         case .fixed, .fromMaintenance:
             return energyUnit.shortDescription

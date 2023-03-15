@@ -11,11 +11,6 @@ extension GoalSetForm {
         @Published var goalModels: [GoalModel] = []
         @Published var type: GoalSetType = .day
         
-        /// Used to calculate equivalent values
-        let userUnits: UserOptions.Units
-        
-        //TODO: Handle
-        @Published var biometrics: Biometrics?
         @Published var biometricsModel: BiometricsModel = BiometricsModel()
         
         @Published var singleGoalModelToPushTo: GoalModel? = nil
@@ -42,9 +37,6 @@ extension GoalSetForm {
             self.name = existing?.name ?? ""
             self.emoji = existing?.emoji ?? randomEmoji(forGoalSetType: type)
             self.type = type
-            
-            self.userUnits = UserManager.units
-            self.biometrics = UserManager.biometrics
             
             self.isDuplicating = isDuplicating
             self.existingGoalSet = isDuplicating ? nil : existing
@@ -91,27 +83,13 @@ extension GoalSetForm.Model {
         return true
     }
 
-    func resetNutrientTDEEFormModel() {
-        setNutrientTDEEFormModel(with: biometrics)
-    }
-    
-    func setNutrientTDEEFormModel(with biometrics: Biometrics?) {
-        biometricsModel = BiometricsModel()
-    }
-    
-    func setBiometrics(_ biometrics: Biometrics) {
-        /// in addition to setting the current body Profile, we also update the view model (BiometricsModel) we have  in GoalSetForm.Model (or at least the relevant fields for weight and lbm)
-        self.biometrics = biometrics
-        setNutrientTDEEFormModel(with: biometrics)
-    }
-    
     func didAddNutrients(pickedEnergy: Bool, pickedMacros: [Macro], pickedMicros: [NutrientType]) {
         var newGoalModels: [GoalModel] = []
         if pickedEnergy, !goalModels.containsEnergy {
             newGoalModels.append(GoalModel(
                 goalSet: self,
                 goalSetType: type,
-                type: .energy(.fixed(userUnits.energy))
+                type: .energy(.fixed(UserManager.energyUnit))
             ))
         }
         for macro in pickedMacros {
@@ -170,14 +148,15 @@ extension GoalSetForm.Model {
     }
     
     var hasTDEE: Bool {
-        biometrics?.hasTDEE ?? false
+        UserManager.biometrics.hasTDEE
     }
     
     var hasWeight: Bool {
-        biometrics?.hasWeight ?? false
+        UserManager.biometrics.hasWeight
     }
+    
     var hasLBM: Bool {
-        biometrics?.hasLBM ?? false
+        UserManager.biometrics.hasLBM
     }
 
     var energyGoal: GoalModel? {
@@ -195,8 +174,8 @@ extension GoalSetForm.Model {
     
     func goalCalcParams(includeEnergyGoal: Bool = true) -> GoalCalcParams {
         GoalCalcParams(
-            userUnits: userUnits,
-            biometrics: biometrics,
+            units: UserManager.units,
+            biometrics: UserManager.biometrics,
             energyGoal: includeEnergyGoal ? energyGoal?.goal : nil
         )
     }
@@ -210,7 +189,7 @@ extension GoalSetForm.Model {
     }
 
     var implicitEnergyType: GoalType {
-        .energy(.fixed(userUnits.energy))
+        .energy(.fixed(UserManager.energyUnit))
     }
     
     var carbGoal: GoalModel? { goalModels.first { $0.type.macro == .carb } }

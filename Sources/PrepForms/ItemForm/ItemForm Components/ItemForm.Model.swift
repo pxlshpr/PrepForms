@@ -387,7 +387,7 @@ extension ItemFormModel {
         FoodValue(
             value: amount ?? 0,
             foodQuantityUnit: unit,
-            userUnits: UserManager.options.units
+            units: UserManager.options.units
         )
     }
     
@@ -414,19 +414,19 @@ extension FoodValue {
     init(
         value: Double,
         foodQuantityUnit unit: FoodQuantity.Unit,
-        userUnits: UserOptions.Units
+        units: UserOptions.Units
     ) {
         
         let volumeExplicitUnit: VolumeExplicitUnit?
         if let volumeUnit = unit.formUnit.volumeUnit {
-            volumeExplicitUnit = userUnits.volume.volumeExplicitUnit(for: volumeUnit)
+            volumeExplicitUnit = units.volume.volumeExplicitUnit(for: volumeUnit)
         } else {
             volumeExplicitUnit = nil
         }
 
         let sizeUnitVolumePrefixExplicitUnit: VolumeExplicitUnit?
         if let volumeUnit = unit.formUnit.sizeUnitVolumePrefixUnit {
-            sizeUnitVolumePrefixExplicitUnit = userUnits.volume.volumeExplicitUnit(for: volumeUnit)
+            sizeUnitVolumePrefixExplicitUnit = units.volume.volumeExplicitUnit(for: volumeUnit)
         } else {
             sizeUnitVolumePrefixExplicitUnit = nil
         }

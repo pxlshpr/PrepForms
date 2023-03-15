@@ -3,7 +3,6 @@ import SwiftUI
 struct ButtonLabel: View {
     
     @Environment(\.colorScheme) var colorScheme
-    @Namespace var localNamespace
     
     enum Style {
         case plain
@@ -22,10 +21,6 @@ struct ButtonLabel: View {
     let trailingSystemImage: String?
     let trailingImageScale: Image.Scale
 
-    let namespace: Namespace.ID?
-    let titleMatchedGeometryId: String
-    let imageMatchedGeometryId: String
-    
     init(
         title: String,
         prefix: String? = nil,
@@ -34,10 +29,7 @@ struct ButtonLabel: View {
         leadingSystemImage: String? = nil,
         leadingImageScale: Image.Scale = .medium,
         trailingSystemImage: String? = nil,
-        trailingImageScale: Image.Scale = .medium,
-        namespace: Namespace.ID? = nil,
-        titleMatchedGeometryId: String? = nil,
-        imageMatchedGeometryId: String? = nil
+        trailingImageScale: Image.Scale = .medium
     ) {
         self.style = style
         self.isCompact = isCompact
@@ -47,9 +39,6 @@ struct ButtonLabel: View {
         self.trailingImageScale = trailingImageScale
         self.title = title
         self.prefix = prefix
-        self.namespace = namespace
-        self.titleMatchedGeometryId = titleMatchedGeometryId ?? UUID().uuidString
-        self.imageMatchedGeometryId = imageMatchedGeometryId ?? UUID().uuidString
     }
     
     var body: some View {
@@ -72,7 +61,6 @@ struct ButtonLabel: View {
             Image(systemName: leadingSystemImage)
                 .imageScale(leadingImageScale)
                 .foregroundColor(foregroundColor)
-                .matchedGeometryEffect(id: imageMatchedGeometryId, in: namespace ?? localNamespace)
         } else if style == .health || style == .healthPlain {
             Image(systemName: "heart.fill")
                 .symbolRenderingMode(.palette)
@@ -129,7 +117,6 @@ struct ButtonLabel: View {
             }
             Text(title)
                 .fontWeight(.bold)
-                .matchedGeometryEffect(id: titleMatchedGeometryId, in: namespace ?? localNamespace)
         }
         .foregroundColor(foregroundColor)
     }

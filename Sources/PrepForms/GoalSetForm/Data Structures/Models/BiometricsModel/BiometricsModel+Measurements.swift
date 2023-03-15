@@ -470,8 +470,8 @@ extension BiometricsModel {
             self.lbm = percentage
         }
         
-        /// If we're moving **from** fat percentage and have a weight, convert it
-        let changingFromFatPercentage = lbmSource == .fatPercentage && newSource != .fatPercentage
+        /// If we're moving **from** fat percentage from *userEntered* and have a weight, convert it
+        let changingFromFatPercentage = lbmSource == .fatPercentage && newSource == .userEntered
         if changingFromFatPercentage,
            let fatPercentage = lbm, let weight = weight, weight > 0
         {
@@ -482,6 +482,7 @@ extension BiometricsModel {
         withAnimation {
             lbmSource = newSource
         }
+        
         Task {
             if newSource == .health {
                 await fetchLBMFromHealth()

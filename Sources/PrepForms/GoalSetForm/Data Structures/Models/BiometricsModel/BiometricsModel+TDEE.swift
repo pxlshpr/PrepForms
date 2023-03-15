@@ -14,7 +14,6 @@ extension BiometricsModel {
     
     var maintenanceEnergyInKcal: Double? {
         guard let maintenanceEnergy else { return nil }
-//        return userEnergyUnit.convert(maintenanceEnergy, to: .kcal)
         return UserManager.energyUnit.convert(maintenanceEnergy, to: .kcal)
     }
     
@@ -84,7 +83,6 @@ extension BiometricsModel {
         switch restingEnergyFormula {
         case .katchMcardle, .cunningham:
             guard let lbmInKg else { return nil }
-//            return restingEnergyFormula.calculate(lbmInKg: lbmInKg, energyUnit: userEnergyUnit)
             return restingEnergyFormula.calculate(lbmInKg: lbmInKg, energyUnit: UserManager.energyUnit)
         case .henryOxford, .schofield:
             guard let age, let weightInKg, let sex else { return nil }
@@ -92,7 +90,6 @@ extension BiometricsModel {
                 age: age,
                 weightInKg: weightInKg,
                 sexIsFemale: sex == .female,
-//                energyUnit: userEnergyUnit
                 energyUnit: UserManager.energyUnit
             )
         default:
@@ -102,7 +99,6 @@ extension BiometricsModel {
                 weightInKg: weightInKg,
                 heightInCm: heightInCm,
                 sexIsFemale: sex == .female,
-//                energyUnit: userEnergyUnit
                 energyUnit: UserManager.energyUnit
             )
         }
@@ -291,7 +287,6 @@ extension BiometricsModel {
         
         guard let (value, date, interval) = await HealthKitManager.shared.fetchEnergy(
             type: .basalEnergyBurned,
-//            using: userEnergyUnit,
             using: UserManager.energyUnit,
             for: restingEnergyInterval
         ) else {
@@ -384,7 +379,6 @@ extension BiometricsModel {
     
     var activeEnergyBiometricValue: BiometricValue? {
         guard let activeEnergyValue else { return nil }
-//        return .activeEnergy(activeEnergyValue, userEnergyUnit)
         return .activeEnergy(activeEnergyValue, UserManager.energyUnit)
     }
 
@@ -420,7 +414,6 @@ extension BiometricsModel {
 
     var restingEnergyBiometricValue: BiometricValue? {
         guard let restingEnergyValue else { return nil }
-//        return .restingEnergy(restingEnergyValue, userEnergyUnit)
         return .restingEnergy(restingEnergyValue, UserManager.energyUnit)
     }
 
@@ -582,7 +575,6 @@ extension BiometricsModel {
         
         guard let (value, date, interval) = await HealthKitManager.shared.fetchEnergy(
             type: .activeEnergyBurned,
-//            using: userEnergyUnit,
             using: UserManager.energyUnit,
             for: activeEnergyInterval
         ) else {

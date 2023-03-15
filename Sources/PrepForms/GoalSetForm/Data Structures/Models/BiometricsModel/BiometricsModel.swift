@@ -92,7 +92,6 @@ extension BiometricsModel {
         var restingEnergyData: Biometrics.RestingEnergy {
             .init(
                 amount: restingEnergyValue,
-//                unit: userEnergyUnit,
                 unit: UserManager.energyUnit,
                 source: restingEnergySource,
                 formula: restingEnergyFormula,
@@ -103,7 +102,6 @@ extension BiometricsModel {
         var activeEnergyData: Biometrics.ActiveEnergy {
             .init(
                 amount: activeEnergyValue,
-//                unit: userEnergyUnit,
                 unit: UserManager.energyUnit,
                 source: activeEnergySource,
                 activityLevel: activeEnergyActivityLevel,

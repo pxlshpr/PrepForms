@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftHaptics
 import PrepDataTypes
+import PrepCoreDataStack
 
 extension EnergyGoalForm {
     
@@ -15,7 +16,7 @@ extension EnergyGoalForm {
     
     var mealTypePicker: some View {
         PickerLabel(
-            pickedMealEnergyGoalType.description(userEnergyUnit: model.userUnits.energy),
+            pickedMealEnergyGoalType.description(energyUnit: UserManager.energyUnit),
             systemImage: nil
         )
         .animation(.none, value: pickedMealEnergyGoalType)
@@ -48,11 +49,11 @@ extension EnergyGoalForm {
         return Menu {
             Picker(selection: binding, label: EmptyView()) {
                 ForEach(DietEnergyTypeOption.allCases, id: \.self) {
-                    Text($0.description(userEnergyUnit: model.userUnits.energy)).tag($0)
+                    Text($0.description(energyUnit: UserManager.energyUnit)).tag($0)
                 }
             }
         } label: {
-            PickerLabel(pickedDietEnergyGoalType.shortDescription(userEnergyUnit: model.userUnits.energy))
+            PickerLabel(pickedDietEnergyGoalType.shortDescription(energyUnit: UserManager.energyUnit))
         }
         .animation(.none, value: pickedDietEnergyGoalType)
         .contentShape(Rectangle())
