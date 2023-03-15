@@ -669,13 +669,9 @@ public struct NutrientGoalForm_New: View {
         PickerLabel(
             string,
             prefix: prefix,
-            systemImage: systemImage,
-//            imageColor: <#T##Color#>,
-            backgroundColor: .accentColor,
-            foregroundColor: .accentColor
-//            prefixColor: <#T##Color#>,
-//            imageScale: <#T##Image.Scale#>,
-//            infiniteMaxHeight: <#T##Bool#>
+            systemImage: systemImage
+//            backgroundColor: .accentColor,
+//            foregroundColor: .accentColor
         )
     }
     

@@ -21,10 +21,6 @@ public struct GoalSetForm: View {
     @StateObject var model: Model
     
     @State var presentedSheet: Sheet? = nil
-//    @State var showingNutrientsPicker: Bool = false
-//    @State var showingEmojiPicker = false
-//    @State var showingGoalForm: Bool = false
-//    @State var showingNameForm: Bool = false
 
     @State var showingEquivalentValuesToggle: Bool
     @State var showingEquivalentValues = false
@@ -79,10 +75,6 @@ public struct GoalSetForm: View {
                 actions: editConfirmationActions
             )
             .alert(isPresented: $showingDuplicateAlert) { duplicateAlert }
-//            .sheet(isPresented: $showingNutrientsPicker) { nutrientsPicker }
-//            .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
-//            .sheet(isPresented: $showingNameForm) { nameForm }
-//            .sheet(isPresented: $showingGoalForm) { goalForm }
             .onChange(of: presentedSheet, perform: presentedSheetChanged)
             .sheet(item: $presentedSheet) { sheet(for: $0) }
         }
@@ -235,6 +227,7 @@ public struct GoalSetForm: View {
                 upperBound: $0.upperBound
             )
         }
+        model.createImplicitGoals()
     }
     
     @ViewBuilder
@@ -282,7 +275,6 @@ public struct GoalSetForm: View {
             }
             .padding(.horizontal, 20)
         }
-        .safeAreaInset(edge: .bottom) { safeAreaInset }
         .overlay(overlay)
         .blur(radius: model.showingWizardOverlay ? 5 : 0)
         .disabled(model.formDisabled)
@@ -298,7 +290,8 @@ public struct GoalSetForm: View {
 
     var addHeroButton: some View {
         var label: some View {
-            Image(systemName: "plus")
+            Image(systemName: "checkmark")
+//            Image(systemName: "plus")
                 .font(.system(size: 25))
                 .fontWeight(.medium)
                 .foregroundColor(.white)
@@ -338,10 +331,10 @@ public struct GoalSetForm: View {
                 }
             }
             .padding(.horizontal, 20)
-            if showingSaveButton {
-                saveButton
-                    .transition(.move(edge: .bottom))
-            }
+//            if showingSaveButton {
+//                saveButton
+//                    .transition(.move(edge: .bottom))
+//            }
         }
         .padding(.bottom, 34)
         .edgesIgnoringSafeArea(.bottom)
@@ -541,7 +534,10 @@ public struct GoalSetForm: View {
                             Image(systemName: "sparkles")
                                 .imageScale(.medium)
                                 .frame(width: 25)
-                            Text("Your \(implicitGoalName.lowercased()) goal has been automatically generated based on your other goals. You can still create a different goal to use instead of this.")
+//                            Text("Your \(implicitGoalName.lowercased()) goal has been automatically generated based on your other goals. You can still create a different goal to use instead of this.")
+//                            Text("Your \(implicitGoalName.lowercased()) goal has been auto-generated based on your other goals. Feel free to create a custom goal if you prefer.")
+//                            Text("Your \(implicitGoalName.lowercased()) goal has been auto-generated based on your other goals. Feel free to create a custom goal if you prefer.")
+                            Text("Your \(implicitGoalName.lowercased()) goal has been set automatically based on your other macro goals. If you prefer, you can create a custom goal instead.")
                         }
                     }
                 }

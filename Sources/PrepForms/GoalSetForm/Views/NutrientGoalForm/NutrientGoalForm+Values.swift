@@ -12,7 +12,7 @@ extension NutrientGoalForm_New {
     }
     
     var valuesSection: some View {
-        FormStyledSection {
+        FormStyledSection(header: Text("Goal")) {
             HStack {
                 contentsForSide(.left)
                 contentsForSide(.right)
