@@ -23,9 +23,11 @@ extension GoalSetForm {
         @Published var showingWizard: Bool  = true
         @Published var formDisabled = false
 
-        init(
+        @Published var goalModelToShowFormFor: GoalModel? = nil
+        
+        public init(
             type: GoalSetType,
-            existingGoalSet existing: GoalSet?,
+            existingGoalSet existing: GoalSet? = nil,
             isDuplicating: Bool = false
         ) {
             /// Always generate a new `UUID`, even if we're duplicating or editing (as we soft-delete the previous ones)

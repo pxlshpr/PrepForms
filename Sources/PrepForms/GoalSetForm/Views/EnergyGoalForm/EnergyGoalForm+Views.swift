@@ -74,7 +74,7 @@ extension EnergyGoalForm {
     @ViewBuilder
     var unitsFooter: some View {
         if isSynced {
-            Text("Your maintenance energy is synced with the Health App, enabling this goal to automatically adjust to any changes.")
+            Text("Your maintenance \(UserManager.energyDescription.lowercased()) is synced with the Health App, so this goal will adjust automatically to any changes.")
         }
     }
     

@@ -4,10 +4,11 @@ import SwiftHaptics
 import PrepDataTypes
 import PrepCoreDataStack
 
-struct NutrientGoalForm: View {
+public struct NutrientGoalForm_New: View {
     
     @Environment(\.dismiss) var dismiss
-    
+    @Environment(\.colorScheme) var colorScheme
+
     @EnvironmentObject var goalSet: GoalSetForm.Model
     @ObservedObject var goal: GoalModel
 
@@ -34,14 +35,22 @@ struct NutrientGoalForm: View {
     
     let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
 
-    init(goal: GoalModel, didTapDelete: @escaping ((GoalModel) -> ())) {
+    public init(goal: GoalModel, didTapDelete: @escaping ((GoalModel) -> ())) {
         
         self.goal = goal
         
         self.nutrientUnit = goal.nutrientUnit ?? .g
         
-        let pickedMealNutrientGoal = MealNutrientGoal(goalModel: goal) ?? .fixed
-        let pickedDietNutrientGoal = DietNutrientGoal(goalModel: goal) ?? .fixed
+        let pickedDietNutrientGoal: DietNutrientGoal
+        let pickedMealNutrientGoal: MealNutrientGoal
+        if goal.goalSetType == .day {
+            pickedDietNutrientGoal = DietNutrientGoal(goalModel: goal) ?? .fixed
+            pickedMealNutrientGoal = .fixed
+        } else {
+            pickedMealNutrientGoal = MealNutrientGoal(goalModel: goal) ?? .fixed
+            pickedDietNutrientGoal = .fixed
+        }
+        
         let bodyMassType = goal.bodyMassType ?? .weight
         let bodyMassUnit = goal.bodyMassUnit ?? .kg // TODO: User's default unit here
         let workoutDurationUnit = goal.workoutDurationUnit ?? .min
@@ -54,25 +63,35 @@ struct NutrientGoalForm: View {
         self.didTapDelete = didTapDelete
     }
     
-    var body: some View {
-        FormStyledScrollView {
-            HStack(spacing: 0) {
-                lowerBoundSection
-                swapValuesButton
-                upperBoundSection
+    public var body: some View {
+        navigationStack
+    }
+    
+    var navigationStack: some View {
+        NavigationStack {
+            FormStyledScrollView {
+//            QuickForm(title: goal.description) {
+                valuesSection
+//                HStack(spacing: 0) {
+//                    lowerBoundSection
+//                    swapValuesButton
+//                    upperBoundSection
+//                }
+                unitSection
+                bodyMassSection
+                infoSection
+//                equivalentSection
             }
-            unitSection
-            bodyMassSection
-            equivalentSection
+            .navigationTitle(goal.description)
+            .navigationBarTitleDisplayMode(.large)
+//            .toolbar { trailingContent }
+            .sheet(isPresented: $showingWeightForm) { weightForm }
+            .sheet(isPresented: $showingLeanMassForm) { leanMassForm }
+            .onDisappear(perform: disappeared)
+            .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
         }
-        .navigationTitle(goal.description)
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar { trailingContent }
-        .sheet(isPresented: $showingWeightForm) { weightForm }
-        .sheet(isPresented: $showingLeanMassForm) { leanMassForm }
-        .onDisappear(perform: disappeared)
-        .scrollDismissesKeyboard(.interactively)
-        .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
+//        .presentationDetents([.height(450), .large])
+//        .presentationDragIndicator(.hidden)
     }
     
     func disappeared() {
@@ -89,20 +108,38 @@ struct NutrientGoalForm: View {
     //MARK: - Sections
     
     var unitSection: some View {
-        FormStyledSection(footer: unitsFooter, horizontalPadding: 0) {
+        
+        var contents: some View {
+            Group {
+                typePicker
+                bodyMassUnitPicker
+                bodyMassTypePicker
+                workoutDurationUnitPicker
+                energyButton
+            }
+        }
+        
+        var scrollView: some View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    typePicker
-                    bodyMassUnitPicker
-                    bodyMassTypePicker
-                    workoutDurationUnitPicker
-                    energyButton
+                    contents
                     Spacer()
                 }
                 .padding(.horizontal, 17)
             }
-            .frame(maxWidth: .infinity)
-//            .frame(height: 50)
+        }
+        
+        var flowView: some View {
+            FlowView(alignment: .leading, spacing: 10, padding: 37) {
+                contents
+            }
+            .padding(.horizontal, 17)
+        }
+        
+        return FormStyledSection(horizontalPadding: 0) {
+//            scrollView
+            flowView
+                .frame(maxWidth: .infinity)
         }
     }
     
@@ -173,12 +210,9 @@ struct NutrientGoalForm: View {
     
     var bodyMassSection: some View {
         
-        var footer: some View {
-            Text("Your \(pickedBodyMassType.description) is being used to calculate this goal.")
-        }
         return Group {
             if isQuantityPerBodyMass {
-                FormStyledSection(header: Text("with"), footer: footer) {
+                FormStyledSection(header: Text("with")) {
                     HStack {
                         bodyMassButton
                         Spacer()
@@ -224,40 +258,46 @@ struct NutrientGoalForm: View {
                 .foregroundColor(Color(.tertiaryLabel))
         }
     }
-
-    var unitsFooter: some View {
-        var component: String {
-            switch nutrientGoalType {
-            case .quantityPerBodyMass(let bodyMass, _):
-                return bodyMass.description
-            case .percentageOfEnergy:
-                return "maintenance energy (which your energy goal is based on)"
-            default:
-                return ""
-            }
-        }
-        return Group {
-            if isSynced {
-                Text("Your \(component) is synced with the Health App. This goal will automatically adjust when it changes.")
-            } else {
+    
+    var unitsFooterString: String? {
+        
+        guard !isSynced else {
+            var component: String {
                 switch nutrientGoalType {
-                case .fixed:
-                    EmptyView()
+                case .quantityPerBodyMass(let bodyMass, _):
+                    return bodyMass.description
                 case .percentageOfEnergy:
-                    Text("Your energy goal is being used to calculate this goal.")
-                case .quantityPerBodyMass:
-                    EmptyView()
-                case .quantityPerWorkoutDuration(_):
-                    Text("Your planned workout duration will be used to calculate this goal. You can specify it when setting this type on a meal.")
-                    /**
-                     Text("Use this when you want to create a synced goal based on how long you workout for.")
-                     Text("For e.g., you could create an \"intra-workout\" meal type that has a 0.5g/min carb goal.")
-                     Text("You can then set or use your last workout time when creating a meal with this type.")
-                     */
+                    return "maintenance energy (which your energy goal is based on)"
                 default:
-                    EmptyView()
+                    return ""
                 }
             }
+
+            return "Your \(component) is synced with the Health App. This goal will automatically adjust when it changes."
+        }
+        
+        switch nutrientGoalType {
+        case .percentageOfEnergy:
+            return "Your energy goal is being used to calculate this goal."
+        case .quantityPerWorkoutDuration(_):
+            return "Your planned workout duration will be used to calculate this goal. You can specify it when setting this type on a meal."
+        case .quantityPerBodyMass:
+            return nil
+        case .quantityPerEnergy:
+            return nil
+        case .fixed:
+            return nil
+        default:
+            return nil
+        }
+    }
+
+    @ViewBuilder
+    var unitsFooter: some View {
+        if let unitsFooterString {
+            Text(unitsFooterString)
+        } else {
+            EmptyView()
         }
     }
     
@@ -342,9 +382,11 @@ struct NutrientGoalForm: View {
                     energyValue.cleanAmount + " " + pickedEnergyUnit.shortDescription,
                     prefix: "per",
                     systemImage: "flame.fill",
+//                    backgroundColor: Color(.tertiaryLabel),
                     imageScale: .small
                 )
             }
+            .disabled(true)
         }
     }
     
@@ -378,7 +420,10 @@ struct NutrientGoalForm: View {
                         bodyMassFormattedWithUnit,
                         prefix: "\(pickedBodyMassType.description)",
                         systemImage: "figure.arms.open",
-                        imageColor: Color(.tertiaryLabel),
+//                        imageColor: Color(.tertiaryLabel),
+                        imageColor: .accentColor,
+                        backgroundColor: .accentColor,
+                        foregroundColor: .accentColor,
                         imageScale: .medium
                     )
                 }
@@ -452,7 +497,7 @@ struct NutrientGoalForm: View {
                 }
             }
         } label: {
-            PickerLabel(
+            defaultPickerLabel(
                 pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit)
             )
         }
@@ -469,8 +514,8 @@ struct NutrientGoalForm: View {
             set: { newType in
                 withAnimation {
                     self.pickedDietNutrientGoal = newType
+                    self.goal.nutrientGoalType = nutrientGoalType
                 }
-                self.goal.nutrientGoalType = nutrientGoalType
             }
         )
         
@@ -493,14 +538,14 @@ struct NutrientGoalForm: View {
                         imageScale: .small
                     )
                 } else {
-                    PickerLabel(
+                    defaultPickerLabel(
                         pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit),
                         systemImage: "flame.fill"
                     )
                 }
 
             } else {
-                PickerLabel(pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit))
+                defaultPickerLabel(pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit))
             }
         }
         .animation(.none, value: pickedDietNutrientGoal)
@@ -511,7 +556,8 @@ struct NutrientGoalForm: View {
     }
     
     var isQuantityPerBodyMass: Bool {
-        pickedDietNutrientGoal == .quantityPerBodyMass || pickedMealNutrientGoal == .quantityPerBodyMass
+        pickedDietNutrientGoal == .quantityPerBodyMass
+        || pickedMealNutrientGoal == .quantityPerBodyMass
     }
     
     var bodyMassTypePicker: some View {
@@ -533,7 +579,7 @@ struct NutrientGoalForm: View {
                         }
                     }
                 } label: {
-                    PickerLabel(
+                    defaultPickerLabel(
                         pickedBodyMassType.pickerDescription,
                         prefix: pickedBodyMassType.pickerPrefix
                     )
@@ -566,7 +612,7 @@ struct NutrientGoalForm: View {
                         }
                     }
                 } label: {
-                    PickerLabel(
+                    defaultPickerLabel(
                         pickedWorkoutDurationUnit.menuDescription,
                         prefix: "per"
                     )
@@ -601,7 +647,7 @@ struct NutrientGoalForm: View {
                         }
                     }
                 } label: {
-                    PickerLabel(
+                    defaultPickerLabel(
                         pickedBodyMassUnit.pickerDescription,
                         prefix: pickedBodyMassUnit.pickerPrefix
                     )
@@ -614,61 +660,44 @@ struct NutrientGoalForm: View {
             }
         }
     }
-}
-
-extension GoalModel {
+    
+    func defaultPickerLabel(
+        _ string: String,
+        prefix: String? = nil,
+        systemImage: String? = "chevron.up.chevron.down"
+    ) -> some View {
+        PickerLabel(
+            string,
+            prefix: prefix,
+            systemImage: systemImage,
+//            imageColor: <#T##Color#>,
+            backgroundColor: .accentColor,
+            foregroundColor: .accentColor
+//            prefixColor: <#T##Color#>,
+//            imageScale: <#T##Image.Scale#>,
+//            infiniteMaxHeight: <#T##Bool#>
+        )
+    }
+    
     @ViewBuilder
-    var equivalentTextHStack: some View {
-        if let equivalentUnitString {
-            HStack(alignment: haveBothBounds ? .center : .firstTextBaseline) {
-                Image(systemName: EqualSymbol)
-                    .foregroundColor(Color(.tertiaryLabel))
-                    .imageScale(.large)
-                Spacer()
-                if let lower = equivalentLowerBound {
-                    if equivalentUpperBound == nil {
-                        equivalentAccessoryText("at least")
-                    }
-                    HStack(spacing: 3) {
-                        equivalentValueText(lower.formattedEnergy)
-                        if equivalentUpperBound == nil {
-                            equivalentUnitText(equivalentUnitString)
-                        }
-                    }
-                }
-                if let upper = equivalentUpperBound {
-                    equivalentAccessoryText(equivalentLowerBound == nil ? "at most" : "to")
-                    HStack(spacing: 3) {
-                        equivalentValueText(upper.formattedEnergy)
-                        equivalentUnitText(equivalentUnitString)
-                    }
-                }
-            }
+    var infoSection: some View {
+        if let unitsFooterString {
+            Text(unitsFooterString)
+                .multilineTextAlignment(.leading)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 15)
+                .padding(.horizontal, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .foregroundColor(
+                            Color(.quaternarySystemFill)
+                                .opacity(colorScheme == .dark ? 0.5 : 1)
+                        )
+                )
+                .cornerRadius(10)
+                .padding(.bottom, 10)
+                .padding(.horizontal, 17)
         }
     }
-}
-
-func equivalentAccessoryText(_ string: String) -> some View {
-    Text(string)
-//        .font(.system(.callout, design: .rounded, weight: .regular))
-//        .foregroundColor(Color(.tertiaryLabel))
-        .font(.system(.title3, design: .rounded, weight: .regular))
-        .foregroundColor(Color(.tertiaryLabel))
-}
-
-func equivalentUnitText(_ string: String) -> some View {
-    Text(string)
-//        .font(.system(.subheadline, design: .rounded, weight: .regular))
-//        .foregroundColor(Color(.tertiaryLabel))
-        .font(.system(.body, design: .rounded, weight: .regular))
-        .foregroundColor(Color(.tertiaryLabel))
-}
-
-func equivalentValueText(_ string: String) -> some View {
-    Text(string)
-        .monospacedDigit()
-//        .font(.system(.body, design: .rounded, weight: .regular))
-//        .foregroundColor(.secondary)
-        .font(.system(.title2, design: .rounded, weight: .regular))
-        .foregroundColor(.secondary)
 }

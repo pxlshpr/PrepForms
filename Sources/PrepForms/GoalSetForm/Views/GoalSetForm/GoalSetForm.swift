@@ -17,8 +17,6 @@ public struct GoalSetForm: View {
     @State var showingEquivalentValuesToggle: Bool
     @State var showingEquivalentValues = false
 
-    @FocusState var isFocused: Bool
-    
     @State var showingSaveButton: Bool
 
     let didTapSave: (GoalSet, Bool) -> ()
@@ -28,6 +26,8 @@ public struct GoalSetForm: View {
     @State var showingEditConfirmation: Bool = false
     @State var numberOfPreviousUses: Int = 0
     @State var showingDuplicateAlert = false
+    
+    @State var showingGoalForm: Bool = false
     
     public init(
         type: GoalSetType,
@@ -70,6 +70,7 @@ public struct GoalSetForm: View {
             .sheet(isPresented: $showingNutrientsPicker) { nutrientsPicker }
             .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
             .sheet(isPresented: $showingNameForm) { nameForm }
+            .sheet(isPresented: $showingGoalForm) { goalForm }
         }
     }
     
@@ -102,9 +103,13 @@ public struct GoalSetForm: View {
     func singleGoalModelToPushTo(to goalModel: GoalModel?) {
         guard let goalModel else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            isFocused = false
-            model.path.append(.goal(goalModel))
+            showGoalForm(for: goalModel)
         }
+    }
+    
+    func showGoalForm(for goalModel: GoalModel) {
+        model.goalModelToShowFormFor = goalModel
+        showingGoalForm = true
     }
     
     func canBeSavedChanged(to newValue: Bool) {
@@ -121,10 +126,11 @@ public struct GoalSetForm: View {
     
     @ViewBuilder
     func navigationDestination(for route: GoalSetFormRoute) -> some View {
-        switch route {
-        case .goal(let goalModel):
-            goalForm(for: goalModel)
-        }
+        EmptyView()
+//        switch route {
+//        case .goal(let goalModel):
+//            goalForm(for: goalModel)
+//        }
     }
     
     var title: String {
@@ -393,8 +399,7 @@ public struct GoalSetForm: View {
         return Group {
             if isButton {
                 Button {
-                    isFocused = false
-                    model.path.append(.goal(goalModel))
+                    showGoalForm(for: goalModel)
                 } label: {
                     label
                 }
@@ -517,14 +522,6 @@ public struct GoalSetForm: View {
             Text(model.emoji)
                 .font(.system(size: 50))
         }
-    }
-    
-    @ViewBuilder
-    var nameTextField: some View {
-        TextField("Enter a Name", text: $model.name)
-            .font(.title3)
-            .multilineTextAlignment(.leading)
-            .focused($isFocused)
     }
 
     func titleCell(_ title: String) -> some View {

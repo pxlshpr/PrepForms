@@ -110,6 +110,7 @@ struct PickerLabel: View {
 //                    .colorMultiply(foregroundColor)
 //                    .foregroundColor(backgroundColor)
                     .foregroundColor(textColor)
+                    .animation(.none, value: string)
                 if let systemImage {
                     Image(systemName: systemImage)
 //                        .foregroundColor(imageColor)
