@@ -33,6 +33,7 @@ public struct GoalSetForm: View {
     @State var numberOfPreviousUses: Int = 0
     @State var showingDuplicateAlert = false
     
+    @State var blurRadius: CGFloat = 0
     
     public init(
         type: GoalSetType,
@@ -77,6 +78,8 @@ public struct GoalSetForm: View {
             .alert(isPresented: $showingDuplicateAlert) { duplicateAlert }
             .onChange(of: presentedSheet, perform: presentedSheetChanged)
             .sheet(item: $presentedSheet) { sheet(for: $0) }
+            .blur(radius: blurRadius)
+            .onChange(of: presentedSheet, perform: presentedSheetChanged)
         }
     }
     
@@ -91,6 +94,11 @@ public struct GoalSetForm: View {
             nameForm
         case .goalForm:
             goalForm
+                .onWillDisappear {
+                    withAnimation(.interactiveSpring()) {
+                        blurRadius = 0
+                    }
+                }
         }
     }
     
@@ -107,6 +115,9 @@ public struct GoalSetForm: View {
     
     func presentedSheetChanged(_ newValue: Sheet?) {
         TapTargetResetLayer.presentedSheetChanged(toDismissed: newValue == nil)
+        withAnimation(.interactiveSpring()) {
+            blurRadius = newValue == nil ? 0 : 5
+        }
     }
 
     var duplicateAlert: Alert {
@@ -647,5 +658,55 @@ extension GoalSet {
         emoji == other.emoji
         && name == other.name
         && goals == other.goals
+    }
+}
+
+struct WillDisappearHandler: UIViewControllerRepresentable {
+    func makeCoordinator() -> WillDisappearHandler.Coordinator {
+        Coordinator(onWillDisappear: onWillDisappear)
+    }
+
+    let onWillDisappear: () -> Void
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<WillDisappearHandler>) -> UIViewController {
+        context.coordinator
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<WillDisappearHandler>) {
+    }
+
+    typealias UIViewControllerType = UIViewController
+
+    class Coordinator: UIViewController {
+        let onWillDisappear: () -> Void
+
+        init(onWillDisappear: @escaping () -> Void) {
+            self.onWillDisappear = onWillDisappear
+            super.init(nibName: nil, bundle: nil)
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override func viewWillDisappear(_ animated: Bool) {
+            super.viewWillDisappear(animated)
+            onWillDisappear()
+        }
+    }
+}
+
+struct WillDisappearModifier: ViewModifier {
+    let callback: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .background(WillDisappearHandler(onWillDisappear: callback))
+    }
+}
+
+extension View {
+    func onWillDisappear(_ perform: @escaping () -> Void) -> some View {
+        self.modifier(WillDisappearModifier(callback: perform))
     }
 }
