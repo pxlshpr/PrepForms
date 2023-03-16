@@ -187,13 +187,13 @@ var TemplateDiets: [GoalSet] {
     
     let cutting = GoalSet(
         type: .day,
-        name: "Cutting",
+        name: "Weight Loss",
         emoji: "⬇️",
         goals: [
             Goal(type: .energy(.fromMaintenance(.kcal, .deficit)),
                  lowerBound: 500, upperBound: 750
             ),
-            Goal(type: .macro(.quantityPerBodyMass(.weight, .kg), .protein),
+            Goal(type: .macro(.quantityPerBodyMass(.leanMass, .kg), .protein),
                  lowerBound: 2.2, upperBound: 3
             ),
             Goal(type: .macro(.percentageOfEnergy, .fat),

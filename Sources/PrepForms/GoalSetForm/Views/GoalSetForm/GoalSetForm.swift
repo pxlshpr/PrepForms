@@ -83,22 +83,23 @@ public struct GoalSetForm: View {
         }
     }
     
-    @ViewBuilder
     func sheet(for sheet: Sheet) -> some View {
-        switch sheet {
-        case .emojiPicker:
-            emojiPicker
-        case .nutrientsPicker:
-            nutrientsPicker
-        case .nameForm:
-            nameForm
-        case .goalForm:
-            goalForm
-                .onWillDisappear {
-                    withAnimation(.interactiveSpring()) {
-                        blurRadius = 0
-                    }
-                }
+        Group {
+            switch sheet {
+            case .emojiPicker:
+                emojiPicker
+            case .nutrientsPicker:
+                nutrientsPicker
+            case .nameForm:
+                nameForm
+            case .goalForm:
+                goalForm
+            }
+        }
+        .onWillDisappear {
+            withAnimation(.interactiveSpring()) {
+                blurRadius = 0
+            }
         }
     }
     
@@ -115,8 +116,10 @@ public struct GoalSetForm: View {
     
     func presentedSheetChanged(_ newValue: Sheet?) {
         TapTargetResetLayer.presentedSheetChanged(toDismissed: newValue == nil)
-        withAnimation(.interactiveSpring()) {
-            blurRadius = newValue == nil ? 0 : 5
+        if newValue != nil {
+            withAnimation(.interactiveSpring()) {
+                blurRadius = 5
+            }
         }
     }
 
