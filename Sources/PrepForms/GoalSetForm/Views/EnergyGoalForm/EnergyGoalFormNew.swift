@@ -82,19 +82,21 @@ struct EnergyGoalForm_New: View {
             set: { _ in }
         )
         
-        let unitStringBinding = Binding<String>(
-            get: { goal.unitString },
+        let unitStringsBinding = Binding<(String, String?)>(
+            get: { goal.unitStrings },
             set: { _ in }
         )
         
         //TODO: Maybe just give it the GoalModel, which it can manipulate and return back to us
-        return GoalValuesSection(
-            values: valuesBinding,
-            equivalentValues: equivalentValuesBinding,
-            usesSingleValue: usesSingleValueBinding,
-            unitString: unitStringBinding,
-            equivalentUnitString: goal.equivalentUnitString
-        )
+//        return GoalValuesSection(
+//            values: valuesBinding,
+//            equivalentValues: equivalentValuesBinding,
+//            usesSingleValue: usesSingleValueBinding,
+//            unitStrings: unitStringsBinding,
+//            equivalentUnitString: goal.equivalentUnitString
+//        )
+        
+        return GoalValuesSection(goalModel: goal)
     }
     
     @ViewBuilder

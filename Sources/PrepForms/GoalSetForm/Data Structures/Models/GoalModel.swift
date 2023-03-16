@@ -503,14 +503,14 @@ extension GoalModel {
 
 
 extension GoalModel {
-    var unitString: String {
+    var unitStrings: (String, String?) {
         switch type {
         case .energy(let type):
-            return type.unitDescription
+            return type.unitStrings
         case .macro(let type, _):
-            return type.unitDescription(nutrientUnit: .g)
+            return type.unitStrings(nutrientUnit: .g)
         case .micro(let type, _, let nutrientUnit):
-            return type.unitDescription(nutrientUnit: nutrientUnit)
+            return type.unitStrings(nutrientUnit: nutrientUnit)
         }
     }
 }

@@ -41,16 +41,8 @@ extension GoalSetForm {
     @ViewBuilder
     var goalForm: some View {
         if let goalModel = model.goalModelToShowFormFor {
-            if goalModel.type.isEnergy {
-                EnergyGoalForm_New(goal: goalModel, didTapDelete: didTapDeleteOnGoal)
-                    .environmentObject(model)
-            } else if goalModel.type.isMacro {
-                NutrientGoalForm_New(goal: goalModel, didTapDelete: didTapDeleteOnGoal)
-                    .environmentObject(model)
-            } else {
-                NutrientGoalForm_New(goal: goalModel, didTapDelete: didTapDeleteOnGoal)
-                    .environmentObject(model)
-            }
+            GoalForm(goalModel: goalModel, didTapDelete: didTapDeleteOnGoal)
+                .environmentObject(model)
         } else {
             EmptyView()
         }

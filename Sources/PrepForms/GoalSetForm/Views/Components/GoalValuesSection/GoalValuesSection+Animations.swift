@@ -6,6 +6,7 @@ struct AnimatableGoalValueModifier: AnimatableModifier {
     @State var size: CGSize = .zero
 
     var value: Double
+    var fontSize: CGFloat
     
     var animatableData: Double {
         get { value }
@@ -25,7 +26,7 @@ struct AnimatableGoalValueModifier: AnimatableModifier {
     
     var animatedLabel: some View {
         Text(value.formattedGoalValue)
-            .font(.system(size: 30, weight: .bold, design: .rounded))
+            .font(.system(size: fontSize, weight: .bold, design: .rounded))
             .frame(maxWidth: .infinity)
             .multilineTextAlignment(.trailing)
             .fixedSize(horizontal: true, vertical: false)
@@ -33,8 +34,8 @@ struct AnimatableGoalValueModifier: AnimatableModifier {
 }
 
 public extension View {
-    func animatedGoalValueModifier(value: Double) -> some View {
-        modifier(AnimatableGoalValueModifier(value: value))
+    func animatedGoalValueModifier(value: Double, fontSize: CGFloat) -> some View {
+        modifier(AnimatableGoalValueModifier(value: value, fontSize: fontSize))
     }
 }
 

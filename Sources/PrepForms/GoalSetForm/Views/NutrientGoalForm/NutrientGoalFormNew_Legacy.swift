@@ -4,7 +4,7 @@ import SwiftHaptics
 import PrepDataTypes
 import PrepCoreDataStack
 
-public struct NutrientGoalForm_New: View {
+public struct NutrientGoalForm_New_Legacy: View {
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
@@ -67,6 +67,14 @@ public struct NutrientGoalForm_New: View {
         navigationStack
     }
     
+    enum Sheet: String, Identifiable {
+        case weightForm
+        case leanMassForm
+        case lowerBoundForm
+        case upperBoundForm
+        var id: String { rawValue }
+    }
+    
     var navigationStack: some View {
         NavigationStack {
             FormStyledScrollView {
@@ -78,9 +86,41 @@ public struct NutrientGoalForm_New: View {
             .navigationBarTitleDisplayMode(.large)
             .onDisappear(perform: disappeared)
             .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
-            .sheet(isPresented: $showingWeightForm) { weightForm }
-            .sheet(isPresented: $showingLeanMassForm) { leanMassForm }
+//            .sheet(isPresented: $showingWeightForm) { weightForm }
+//            .sheet(isPresented: $showingLeanMassForm) { leanMassForm }
         }
+    }
+    
+    var valuesSection: some View {
+        
+        let valuesBinding = Binding<GoalValues>(
+            get: {
+                .init(lower: goal.lowerBound, upper: goal.upperBound)
+            },
+            set: { newPair in
+                goal.lowerBound = newPair.lower
+                goal.upperBound = newPair.upper
+            }
+        )
+        
+        let equivalentValuesBinding = Binding<GoalValues>(
+            get: { .init(lower: goal.equivalentLowerBound, upper: goal.equivalentUpperBound) },
+            set: { _ in }
+        )
+        
+        let unitStringsBinding = Binding<(String, String?)>(
+            get: { goal.unitStrings },
+            set: { _ in }
+        )
+
+//        return GoalValuesSection(
+//            values: valuesBinding,
+//            equivalentValues: equivalentValuesBinding,
+//            unitStrings: unitStringsBinding,
+//            equivalentUnitString: goal.equivalentUnitString
+//        )
+        
+        return GoalValuesSection(goalModel: goal)
     }
     
     func disappeared() {

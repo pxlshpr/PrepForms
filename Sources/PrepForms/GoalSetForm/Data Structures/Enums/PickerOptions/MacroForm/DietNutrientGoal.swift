@@ -28,9 +28,9 @@ enum DietNutrientGoal: CaseIterable {
         case .quantityPerBodyMass:
             return "\(unit) / body mass"
         case .quantityPerEnergy:
-            return "\(unit) / energy"
+            return "\(unit) / energy goal"
         case .percentageOfEnergy:
-            return "% of energy"
+            return "% of energy goal"
         }
     }
     
@@ -39,7 +39,7 @@ enum DietNutrientGoal: CaseIterable {
         case .fixed, .quantityPerBodyMass, .quantityPerEnergy:
             return nutrientUnit.shortDescription
         case .percentageOfEnergy:
-            return "% of energy"
+            return "% of energy goal"
         }
     }
 }

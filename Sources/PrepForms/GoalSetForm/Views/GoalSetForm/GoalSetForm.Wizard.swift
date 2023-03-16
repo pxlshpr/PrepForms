@@ -335,7 +335,7 @@ var TemplateMealTypes: [GoalSet] {
                  lowerBound: 20, upperBound: nil
             ),
             Goal(type: .micro(.quantityPerWorkoutDuration(.hour), .sodium, .mg),
-                 lowerBound: 500, upperBound: 700
+                 lowerBound: 500, upperBound: 1000
             ),
         ]
     )
