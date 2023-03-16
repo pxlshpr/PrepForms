@@ -20,6 +20,8 @@ struct GoalValuesSection: View {
     @Binding var values: GoalValues
     @Binding var equivalentValues: GoalValues
     @Binding var usesSingleValue: Bool
+    @Binding var unitString: String
+    let equivalentUnitString: String?
 
     @State var leftValue: Double? = nil
     @State var rightValue: Double? = nil
@@ -27,14 +29,26 @@ struct GoalValuesSection: View {
     @State var equivalentRightValue: Double? = nil
     @State var animatedUsesSingleValue: Bool
     
+    @State var presentedSheet: Sheet? = nil
+    
+    enum Sheet: String, Identifiable {
+        case leftValue
+        case rightValue
+        var id: String { rawValue }
+    }
+    
     init(
         values: Binding<GoalValues>,
         equivalentValues: Binding<GoalValues>,
-        usesSingleValue: Binding<Bool> = .constant(false)
+        usesSingleValue: Binding<Bool> = .constant(false),
+        unitString: Binding<String>,
+        equivalentUnitString: String?
     ) {
         _values = values
         _equivalentValues = equivalentValues
         _usesSingleValue = usesSingleValue
+        _unitString = unitString
+        self.equivalentUnitString = equivalentUnitString
         
         _leftValue = State(initialValue: values.wrappedValue.lower)
         _rightValue = State(initialValue: values.wrappedValue.upper)
@@ -55,10 +69,41 @@ struct GoalValuesSection: View {
         .onChange(of: values, perform: valuesChanged)
         .onChange(of: equivalentValues, perform: equivalentValuesChanged)
         .onChange(of: usesSingleValue, perform: usesSingleValueChanged)
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                self.values = .init(lower: 2.0, upper: nil)
+        .sheet(item: $presentedSheet) { sheet(for: $0) }
+    }
+    
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        switch sheet {
+        case .leftValue:
+            valueForm(for: .left)
+        case .rightValue:
+            valueForm(for: .right)
+        }
+    }
+    
+    func valueForm(for side: Side) -> some View {
+        EmptyView()
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedSheet = nil
+        }
+
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
             }
+        }
+
+        if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else {
+            present()
         }
     }
     
@@ -119,18 +164,46 @@ struct GoalValuesSection: View {
                 }
             }
             
+            var secondaryValue: Double? {
+                guard usesSingleValue else { return nil }
+                return equivalentRightValue
+            }
+            
             var unitString: String {
-                valueString != nil ? "g" : ""
+                guard valueString != nil, let equivalentUnitString else {
+                    return ""
+                }
+                return equivalentUnitString
             }
             
             var label: some View {
                 Group {
                     if let value {
-                        Color.clear
-                            .animatedGoalEquivalentValueModifier(
-                                value: value,
-                                unitString: unitString
-                            )
+                        HStack {
+                            Image(systemName: "equal.square.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(Color(.quaternaryLabel))
+                            HStack(spacing: 2) {
+                                Color.clear
+                                    .animatedGoalEquivalentValueModifier(value: value)
+                                    .alignmentGuide(.customCenter) { context in
+                                        context[HorizontalAlignment.center]
+                                    }
+                                if let secondaryValue {
+                                    Text("–")
+                                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                                        .foregroundColor(Color(.tertiaryLabel))
+                                    Color.clear
+                                        .animatedGoalEquivalentValueModifier(value: secondaryValue)
+                                        .alignmentGuide(.customCenter) { context in
+                                            context[HorizontalAlignment.center]
+                                        }
+                                }
+                                Text(unitString)
+                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                    .foregroundColor(Color(.tertiaryLabel))
+                            }
+                        }
                     } else {
                         Color.clear
                     }

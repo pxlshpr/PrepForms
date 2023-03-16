@@ -73,16 +73,17 @@ struct EnergyGoalForm_New: View {
         )
         
         let equivalentValuesBinding = Binding<GoalValues>(
-            get: {
-                .init(lower: goal.equivalentLowerBound, upper: goal.equivalentUpperBound)
-            },
+            get: { .init(lower: goal.equivalentLowerBound, upper: goal.equivalentUpperBound) },
             set: { _ in }
         )
         
         let usesSingleValueBinding = Binding<Bool>(
-            get: {
-                goal.energyGoalType?.delta == .deviation
-            },
+            get: { goal.energyGoalType?.delta == .deviation },
+            set: { _ in }
+        )
+        
+        let unitStringBinding = Binding<String>(
+            get: { goal.unitString },
             set: { _ in }
         )
         
@@ -90,7 +91,9 @@ struct EnergyGoalForm_New: View {
         return GoalValuesSection(
             values: valuesBinding,
             equivalentValues: equivalentValuesBinding,
-            usesSingleValue: usesSingleValueBinding
+            usesSingleValue: usesSingleValueBinding,
+            unitString: unitStringBinding,
+            equivalentUnitString: goal.equivalentUnitString
         )
     }
     

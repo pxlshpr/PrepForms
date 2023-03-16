@@ -193,13 +193,13 @@ extension FoodForm {
         Haptics.feedback(style: .soft)
         switch action {
         case .emoji:
-            showingEmojiPicker = true
+            present(.emojiPicker)
         case .name:
-            showingNameForm = true
+            present(.name)
         case .detail:
-            showingDetailForm = true
+            present(.detail)
         case .brand:
-            showingBrandForm = true
+            present(.brand)
         }
     }
 
@@ -278,14 +278,22 @@ struct DetailsQuickForm: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var fields: FoodForm.Fields
     
-    @State var showingBrandForm = false
-    @State var showingNameForm = false
-    @State var showingDetailForm = false
+    @State var presentedSheet: Sheet? = nil
+//    @State var showingBrandForm = false
+//    @State var showingNameForm = false
+//    @State var showingDetailForm = false
     
     let brandLabel: String
     
     init(brandLabel: String = "Brand") {
         self.brandLabel = brandLabel
+    }
+    
+    enum Sheet: String, Identifiable {
+        case brand
+        case name
+        case detail
+        var id: String { rawValue }
     }
 
     var body: some View {
@@ -294,14 +302,31 @@ struct DetailsQuickForm: View {
         }
         .presentationDetents([.height(280)])
         .presentationDragIndicator(.hidden)
-        .sheet(isPresented: $showingNameForm) {
+        .sheet(item: $presentedSheet) { sheet(for: $0) }
+    }
+    
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        switch sheet {
+        case .name:
             DetailsNameForm(title: "Name", isRequired: true, name: $fields.name)
-        }
-        .sheet(isPresented: $showingDetailForm) {
+        case .brand:
+            DetailsNameForm(title: brandLabel, isRequired: false, name: $fields.brand)
+        case .detail:
             DetailsNameForm(title: "Detail", isRequired: false, name: $fields.detail)
         }
-        .sheet(isPresented: $showingBrandForm) {
-            DetailsNameForm(title: brandLabel, isRequired: false, name: $fields.brand)
+    }
+    
+    func present(_ sheet: Sheet) {
+        if presentedSheet != nil {
+            presentedSheet = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                Haptics.feedback(style: .soft)
+                presentedSheet = sheet
+            }
+        } else {
+            Haptics.feedback(style: .soft)
+            presentedSheet = sheet
         }
     }
     
@@ -313,21 +338,21 @@ struct DetailsQuickForm: View {
                         Text("Name")
                             .foregroundColor(.secondary)
                         fieldButton(fields.name, isRequired: true) {
-                            showingNameForm = true
+                            present(.name)
                         }
                     }
                     GridRow {
                         Text("Detail")
                             .foregroundColor(.secondary)
                         fieldButton(fields.detail) {
-                            showingDetailForm = true
+                            present(.detail)
                         }
                     }
                     GridRow {
                         Text("Brand")
                             .foregroundColor(.secondary)
                         fieldButton(fields.brand) {
-                            showingBrandForm = true
+                            present(.brand)
                         }
                     }
                 }

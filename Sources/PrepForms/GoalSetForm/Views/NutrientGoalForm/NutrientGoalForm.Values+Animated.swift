@@ -44,7 +44,6 @@ struct AnimatableGoalEquivalentValueModifier: AnimatableModifier {
     @State var size: CGSize = .zero
 
     var value: Double
-    var unitString: String
     
     var animatableData: Double {
         get { value }
@@ -63,30 +62,17 @@ struct AnimatableGoalEquivalentValueModifier: AnimatableModifier {
     }
     
     var animatedLabel: some View {
-        HStack {
-            Image(systemName: "equal.square.fill")
-                .font(.system(size: 20))
-                .foregroundColor(Color(.quaternaryLabel))
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(value.formattedGoalValue)
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundColor(Color(.secondaryLabel))
-                    .alignmentGuide(.customCenter) { context in
-                        context[HorizontalAlignment.center]
-                    }
-                Text(unitString)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundColor(Color(.tertiaryLabel))
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .multilineTextAlignment(.trailing)
-        .fixedSize(horizontal: true, vertical: false)
+        Text(value.formattedGoalValue)
+            .font(.system(size: 18, weight: .semibold, design: .rounded))
+            .foregroundColor(Color(.secondaryLabel))
+            .frame(maxWidth: .infinity)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: true, vertical: false)
     }
 }
 
 public extension View {
-    func animatedGoalEquivalentValueModifier(value: Double, unitString: String) -> some View {
-        modifier(AnimatableGoalEquivalentValueModifier(value: value, unitString: unitString))
+    func animatedGoalEquivalentValueModifier(value: Double) -> some View {
+        modifier(AnimatableGoalEquivalentValueModifier(value: value))
     }
 }

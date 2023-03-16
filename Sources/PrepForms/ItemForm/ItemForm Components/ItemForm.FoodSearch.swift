@@ -83,8 +83,8 @@ extension ItemForm.FoodSearch {
 //        .sheet(item: $foodToShowMacrosFor) { macrosView(for: $0) }
         .navigationBarBackButtonHidden(model.food == nil)
         .toolbar { trailingContent }
-        .sheet(item: $presentedSheet) { sheet(for: $0) }
         .fullScreenCover(item: $presentedFullScreenSheet) { sheet(for: $0) }
+        .sheet(item: $presentedSheet) { sheet(for: $0) }
     }
 
     @ViewBuilder

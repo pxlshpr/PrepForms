@@ -56,6 +56,17 @@ extension FoodForm {
             .font(.footnote)
         }
         
+        let showingBarcodeScannerBinding = Binding<Bool>(
+            get: { presentedFullScreenSheet == .barcodeScanner },
+            set: { newValue in
+                if newValue {
+                    presentFullScreen(.barcodeScanner)
+                } else {
+                    presentedFullScreenSheet = nil
+                }
+            }
+        )
+        
         var barcodesForm: some View {
             BarcodesForm(
                 barcodeValues: Binding<[FieldValue]>(
@@ -67,7 +78,7 @@ extension FoodForm {
                     set: { _ in }
                 ),
                 showingAddBarcodeAlert: $showingAddBarcodeAlert,
-                showingBarcodeScanner: $showingBarcodeScanner,
+                showingBarcodeScanner: showingBarcodeScannerBinding,
                 deleteBarcodes: deleteBarcodes)
         }
         
@@ -144,7 +155,7 @@ extension FoodForm {
                             Group {
                                 foodFormButton("Scan", image: "barcode.viewfinder", isSecondary: true, colorScheme: colorScheme) {
                                     Haptics.feedback(style: .soft)
-                                    showingBarcodeScanner = true
+                                    presentFullScreen(.barcodeScanner)
                                 }
                                 foodFormButton("Enter", image: "keyboard", isSecondary: true, colorScheme: colorScheme) {
                                     showAddBarcodeAlert()
@@ -164,7 +175,7 @@ extension FoodForm {
                                 
                                 Button {
                                     Haptics.feedback(style: .soft)
-                                    showingBarcodeScanner = true
+                                    presentFullScreen(.barcodeScanner)
                                 } label: {
                                     Label("Scan", systemImage: "barcode.viewfinder")
                                 }
@@ -202,7 +213,7 @@ extension FoodForm {
                 HStack {
                     foodFormButton("Scan", image: "barcode.viewfinder", isSecondary: true) {
                         Haptics.feedback(style: .soft)
-                        showingBarcodeScanner = true
+                        presentFullScreen(.barcodeScanner)
                     }
                     foodFormButton("Enter", image: "keyboard", isSecondary: true) {
                         showAddBarcodeAlert()

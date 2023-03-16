@@ -22,14 +22,10 @@ public struct FoodForm: View {
     @StateObject var extractor: Extractor = Extractor.shared
     @StateObject var model: Model = Model.shared
     
-    @State var showingEmojiPicker = false
-//    @State var showingDetailsForm = false
-    @State var showingBrandForm = false
-    @State var showingNameForm = false
-    @State var showingDetailForm = false
+    @State var presentedSheet: Sheet? = nil
+    @State var presentedFullScreenSheet: Sheet? = nil
 
     @State var showingPhotosPicker = false
-    @State var showingBarcodeScanner = false
     @State var showingAddLinkAlert = false
     @State var showingAddBarcodeAlert = false
     @State var showingDismissConfirmationDialog = false
@@ -72,6 +68,15 @@ public struct FoodForm: View {
         }
     }
 
+    enum Sheet: String, Identifiable {
+        case name
+        case detail
+        case brand
+        case emojiPicker
+        case barcodeScanner
+        var id: String { rawValue }
+    }
+    
     var navigationView: some View {
         var formContent: some View {
             ZStack {
@@ -93,20 +98,6 @@ public struct FoodForm: View {
                 .onChange(of: model.showingWizard, perform: showingWizardChanged)
                 .onChange(of: showingAddLinkAlert, perform: showingAddLinkAlertChanged)
                 .onChange(of: showingAddBarcodeAlert, perform: showingAddBarcodeAlertChanged)
-            
-                .sheet(isPresented: $showingNameForm) {
-                    DetailsNameForm(title: "Name", isRequired: true, name: $fields.name)
-                }
-                .sheet(isPresented: $showingDetailForm) {
-                    DetailsNameForm(title: "Detail", isRequired: false, name: $fields.detail)
-                }
-                .sheet(isPresented: $showingBrandForm) {
-                    DetailsNameForm(title: "Brand", isRequired: false, name: $fields.brand)
-                }
-
-                .sheet(isPresented: $showingEmojiPicker) { emojiPicker }
-//                .sheet(isPresented: $showingDetailsForm) { detailsForm }
-                .fullScreenCover(isPresented: $showingBarcodeScanner) { barcodeScanner }
                 .alert(addBarcodeTitle,
                        isPresented: $showingAddBarcodeAlert,
                        actions: { addBarcodeActions },
@@ -114,10 +105,76 @@ public struct FoodForm: View {
                 .photosPicker(
                     isPresented: $showingPhotosPicker,
                     selection: $sources.selectedPhotos,
-                    //                    maxSelectionCount: sources.availableImagesCount,
+//                    maxSelectionCount: sources.availableImagesCount,
                     maxSelectionCount: 1,
                     matching: .images
                 )
+                .fullScreenCover(item: $presentedFullScreenSheet) { sheet(for: $0) }
+                .sheet(item: $presentedSheet) { sheet(for: $0) }
+        }
+    }
+    
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        switch sheet {
+        case .name:
+            DetailsNameForm(title: "Name", isRequired: true, name: $fields.name)
+        case .detail:
+            DetailsNameForm(title: "Detail", isRequired: false, name: $fields.detail)
+        case .brand:
+            DetailsNameForm(title: "Brand", isRequired: false, name: $fields.brand)
+        case .emojiPicker:
+            emojiPicker
+        case .barcodeScanner:
+            barcodeScanner
+        }
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedSheet = sheet
+        }
+
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+
+        if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else if presentedFullScreenSheet != nil {
+            presentedFullScreenSheet = nil
+            delayedPresent()
+        } else {
+            present()
+        }
+    }
+    
+    func presentFullScreen(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedFullScreenSheet = sheet
+        }
+        
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+        
+        if presentedFullScreenSheet != nil {
+            presentedFullScreenSheet = nil
+            delayedPresent()
+        } else if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else {
+            present()
         }
     }
     

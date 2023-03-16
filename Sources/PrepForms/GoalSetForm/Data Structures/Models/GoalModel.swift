@@ -499,20 +499,23 @@ extension GoalModel {
     }
 }
 
-extension GoalModel: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(type.identifyingHashValue)
+//MARK: Unit String
+
+
+extension GoalModel {
+    var unitString: String {
+        switch type {
+        case .energy(let type):
+            return type.unitDescription
+        case .macro(let type, _):
+            return type.unitDescription(nutrientUnit: .g)
+        case .micro(let type, _, let nutrientUnit):
+            return type.unitDescription(nutrientUnit: nutrientUnit)
+        }
     }
 }
 
-extension GoalModel: Equatable {
-    public static func ==(lhs: GoalModel, rhs: GoalModel) -> Bool {
-        lhs.hashValue == rhs.hashValue
-    }
-}
-
-
-//MARK: - Equivalent Values
+//MARK: Equivalent Values
 
 import PrepDataTypes
 
@@ -540,5 +543,17 @@ extension GoalModel {
     
     var equivalentUpperBound: Double? {
         goal.calculateUpperBound(with: goalCalcParams)
+    }
+}
+
+extension GoalModel: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(type.identifyingHashValue)
+    }
+}
+
+extension GoalModel: Equatable {
+    public static func ==(lhs: GoalModel, rhs: GoalModel) -> Bool {
+        lhs.hashValue == rhs.hashValue
     }
 }

@@ -24,15 +24,20 @@ extension NutrientGoalForm_New {
         )
         
         let equivalentValuesBinding = Binding<GoalValues>(
-            get: {
-                .init(lower: goal.equivalentLowerBound, upper: goal.equivalentUpperBound)
-            },
+            get: { .init(lower: goal.equivalentLowerBound, upper: goal.equivalentUpperBound) },
             set: { _ in }
         )
         
+        let unitStringBinding = Binding<String>(
+            get: { goal.unitString },
+            set: { _ in }
+        )
+
         return GoalValuesSection(
             values: valuesBinding,
-            equivalentValues: equivalentValuesBinding
+            equivalentValues: equivalentValuesBinding,
+            unitString: unitStringBinding,
+            equivalentUnitString: goal.equivalentUnitString
         )
     }
     

@@ -15,7 +15,7 @@ extension FoodForm {
         ) { emoji in
             Haptics.successFeedback()
             fields.emoji = emoji
-            showingEmojiPicker = false
+            present(.emojiPicker)
         }
     }
     
