@@ -33,7 +33,8 @@ public struct GoalSetForm: View {
     @State var numberOfPreviousUses: Int = 0
     @State var showingDuplicateAlert = false
     
-    @State var blurRadius: CGFloat = 0
+//    @State var blurRadius: CGFloat = 0
+    @State var blurRadiusOverride: CGFloat? = nil
     
     public init(
         type: GoalSetType,
@@ -78,7 +79,6 @@ public struct GoalSetForm: View {
             .alert(isPresented: $showingDuplicateAlert) { duplicateAlert }
             .onChange(of: presentedSheet, perform: presentedSheetChanged)
             .sheet(item: $presentedSheet) { sheet(for: $0) }
-            .blur(radius: blurRadius)
             .onChange(of: presentedSheet, perform: presentedSheetChanged)
         }
     }
@@ -98,7 +98,10 @@ public struct GoalSetForm: View {
         }
         .onWillDisappear {
             withAnimation(.interactiveSpring()) {
-                blurRadius = 0
+                blurRadiusOverride = 0
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                blurRadiusOverride = nil
             }
         }
     }
@@ -116,11 +119,13 @@ public struct GoalSetForm: View {
     
     func presentedSheetChanged(_ newValue: Sheet?) {
         TapTargetResetLayer.presentedSheetChanged(toDismissed: newValue == nil)
-        if newValue != nil {
-            withAnimation(.interactiveSpring()) {
-                blurRadius = 5
-            }
-        }
+//        if newValue != nil {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+//                withAnimation(.interactiveSpring()) {
+//                    blurRadius = 5
+//                }
+//            }
+//        }
     }
 
     var duplicateAlert: Alert {
@@ -294,8 +299,15 @@ public struct GoalSetForm: View {
         }
         .safeAreaInset(edge: .bottom) { safeAreaInset }
         .overlay(overlay)
-        .blur(radius: model.showingWizardOverlay ? 5 : 0)
+        .blur(radius: computedBlurRadius)
         .disabled(model.formDisabled)
+    }
+    
+    var computedBlurRadius: CGFloat {
+        if let blurRadiusOverride {
+            return blurRadiusOverride
+        }
+        return model.showingWizardOverlay || presentedSheet != nil ? 5 : 0
     }
     
     @ViewBuilder
