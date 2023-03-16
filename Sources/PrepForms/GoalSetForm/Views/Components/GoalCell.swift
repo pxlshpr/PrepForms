@@ -11,15 +11,13 @@ struct GoalCell: View {
     @Binding var showingEquivalentValues: Bool
 
     var body: some View {
-        ZStack {
-            content
-        }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 13)
-        .padding(.top, 13)
-        .background(backgroundColor)
-        .cornerRadius(10)
-        .padding(.bottom, 10)
+        content
+            .padding(.horizontal, 16)
+            .padding(.bottom, 13)
+            .padding(.top, 13)
+            .background(backgroundColor)
+            .cornerRadius(10)
+            .padding(.bottom, 10)
     }
     
     var backgroundColor: Color {
@@ -195,10 +193,6 @@ struct GoalCell: View {
     var bottomRowTexts: some View {
         if goal.type.showsEquivalentValues && showingEquivalentValues {
             equivalentTexts
-//                .transition(.asymmetric(
-//                    insertion: .move(edge: .leading),
-//                    removal: .scale.combined(with: .opacity).combined(with: .move(edge: .bottom))
-//                ))
                 .transition(.asymmetric(
                     insertion: .move(edge: .bottom).combined(with: .opacity),
                     removal: .move(edge: .bottom).combined(with: .opacity)
@@ -206,10 +200,6 @@ struct GoalCell: View {
 
         } else {
             texts
-//                .transition(.asymmetric(
-//                    insertion: .move(edge: .leading),
-//                    removal: .scale.combined(with: .opacity).combined(with: .move(edge: .bottom))
-//                ))
                 .transition(.asymmetric(
                     insertion: .move(edge: .top).combined(with: .opacity),
                     removal: .move(edge: .top).combined(with: .opacity)
@@ -262,9 +252,6 @@ struct GoalCell: View {
                 .font(.system(size: 20, weight: .medium, design: .rounded))
         } else {
             HStack(alignment: .firstTextBaseline) {
-//                if showingEquivalentValues {
-//                    equalSymbol
-//                }
                 if let lowerBound {
                     if upperBound == nil {
                         accessoryText("at least")
@@ -272,7 +259,6 @@ struct GoalCell: View {
                     amountAndUnitTexts(lowerBound, upperBound == nil ? unitString : nil)
                 }
                 if let upperBound {
-//                    accessoryText(lowerBound == nil ? "below" : "to")
                     accessoryText(lowerBound == nil ? "at most" : "to")
                     amountAndUnitTexts(upperBound, unitString)
                 }

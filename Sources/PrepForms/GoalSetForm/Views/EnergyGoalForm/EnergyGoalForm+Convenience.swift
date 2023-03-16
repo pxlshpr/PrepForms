@@ -13,6 +13,8 @@ extension EnergyGoalForm {
             return .deficit
         case .above:
             return .surplus
+        case .around:
+            return .deviation
         }
     }
     

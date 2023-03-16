@@ -42,13 +42,13 @@ extension GoalSetForm {
     var goalForm: some View {
         if let goalModel = model.goalModelToShowFormFor {
             if goalModel.type.isEnergy {
-                EnergyGoalForm(goal: goalModel, didTapDelete: didTapDeleteOnGoal)
+                EnergyGoalForm_New(goal: goalModel, didTapDelete: didTapDeleteOnGoal)
                     .environmentObject(model)
             } else if goalModel.type.isMacro {
                 NutrientGoalForm_New(goal: goalModel, didTapDelete: didTapDeleteOnGoal)
                     .environmentObject(model)
             } else {
-                NutrientGoalForm(goal: goalModel, didTapDelete: didTapDeleteOnGoal)
+                NutrientGoalForm_New(goal: goalModel, didTapDelete: didTapDeleteOnGoal)
                     .environmentObject(model)
             }
         } else {

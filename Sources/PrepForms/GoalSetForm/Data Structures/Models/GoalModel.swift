@@ -445,12 +445,18 @@ extension GoalModel {
                 break
             case .deficit:
                 validateNoBoundResultingInLessThan500(unit: energyUnit)
+            case .deviation:
+                //TODO: Deviation
+                validateNoBoundResultingInLessThan500(unit: energyUnit)
             }
         case .percentFromMaintenance(let delta):
             switch delta {
             case .surplus:
                 break
             case .deficit:
+                validateNoPercentageBoundResultingInLessThan500()
+            case .deviation:
+                //TODO: Deviation
                 validateNoPercentageBoundResultingInLessThan500()
             }
         }

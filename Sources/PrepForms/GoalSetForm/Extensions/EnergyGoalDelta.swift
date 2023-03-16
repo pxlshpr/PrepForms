@@ -7,6 +7,8 @@ extension EnergyGoalDelta {
             return .above
         case .deficit:
             return .below
+        case .deviation:
+            return .around
         }
     }
 }

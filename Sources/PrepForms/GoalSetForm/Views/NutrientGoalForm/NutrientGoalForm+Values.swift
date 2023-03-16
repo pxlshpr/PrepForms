@@ -4,20 +4,39 @@ import SwiftHaptics
 import PrepDataTypes
 import PrepCoreDataStack
 
-extension Double {
-    internal var formatted: String {
-        formatted(decimalValuesDisplayedUnder: 10)
-    }
-}
-
 extension NutrientGoalForm_New {
     
     enum Side {
         case left
         case right
     }
-    
+
     var valuesSection: some View {
+        
+        let valuesBinding = Binding<GoalValues>(
+            get: {
+                .init(lower: goal.lowerBound, upper: goal.upperBound)
+            },
+            set: { newPair in
+                goal.lowerBound = newPair.lower
+                goal.upperBound = newPair.upper
+            }
+        )
+        
+        let equivalentValuesBinding = Binding<GoalValues>(
+            get: {
+                .init(lower: goal.equivalentLowerBound, upper: goal.equivalentUpperBound)
+            },
+            set: { _ in }
+        )
+        
+        return GoalValuesSection(
+            values: valuesBinding,
+            equivalentValues: equivalentValuesBinding
+        )
+    }
+    
+    var valuesSection_legacy: some View {
         FormStyledSection(header: Text("Goal")) {
             HStack {
                 contentsForSide(.left)
@@ -34,8 +53,8 @@ extension NutrientGoalForm_New {
         
         var valueString: String? {
             switch side {
-            case .left:     return leftValue?.formatted
-            case .right:    return rightValue?.formatted
+            case .left:     return leftValue?.formattedGoalValue
+            case .right:    return rightValue?.formattedGoalValue
             }
         }
 
@@ -58,8 +77,8 @@ extension NutrientGoalForm_New {
         var equivalentLabel: some View {
             var string: String {
                 switch side {
-                case .left:     return equivalentValues?.0?.formatted ?? ""
-                case .right:    return equivalentValues?.1?.formatted ?? ""
+                case .left:     return equivalentValues?.0?.formattedGoalValue ?? ""
+                case .right:    return equivalentValues?.1?.formattedGoalValue ?? ""
                 }
             }
             
@@ -125,14 +144,4 @@ extension NutrientGoalForm_New {
             }
         }
     }
-}
-
-struct CustomCenter: AlignmentID {
-    static func defaultValue(in context: ViewDimensions) -> CGFloat {
-        context[HorizontalAlignment.center]
-    }
-}
-
-extension HorizontalAlignment {
-    static let customCenter: HorizontalAlignment = .init(CustomCenter.self)
 }

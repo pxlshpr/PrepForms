@@ -227,7 +227,10 @@ public struct GoalSetForm: View {
                 upperBound: $0.upperBound
             )
         }
+        
         model.createImplicitGoals()
+        
+        showingEquivalentValues = true
     }
     
     @ViewBuilder

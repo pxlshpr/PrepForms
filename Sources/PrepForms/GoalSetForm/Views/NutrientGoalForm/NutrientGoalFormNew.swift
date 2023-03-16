@@ -70,28 +70,17 @@ public struct NutrientGoalForm_New: View {
     var navigationStack: some View {
         NavigationStack {
             FormStyledScrollView {
-//            QuickForm(title: goal.description) {
                 valuesSection
-//                HStack(spacing: 0) {
-//                    lowerBoundSection
-//                    swapValuesButton
-//                    upperBoundSection
-//                }
                 unitSection
-//                bodyMassSection
                 infoSection
-//                equivalentSection
             }
             .navigationTitle(goal.description)
             .navigationBarTitleDisplayMode(.large)
-//            .toolbar { trailingContent }
             .onDisappear(perform: disappeared)
             .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
             .sheet(isPresented: $showingWeightForm) { weightForm }
             .sheet(isPresented: $showingLeanMassForm) { leanMassForm }
         }
-//        .presentationDetents([.height(450), .large])
-//        .presentationDragIndicator(.hidden)
     }
     
     func disappeared() {
