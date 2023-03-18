@@ -6,6 +6,7 @@ struct PickerLabel: View {
     
     let string: String
     let prefix: String?
+    let prefixImage: String?
     let systemImage: String?
     let imageColor: Color
     let imageScale: Image.Scale
@@ -22,6 +23,7 @@ struct PickerLabel: View {
     init(
         _ string: String,
         prefix: String? = nil,
+        prefixImage: String? = nil,
         systemImage: String? = "chevron.up.chevron.down",
         imageColor: Color = Color(.tertiaryLabel),
 //        backgroundColor: Color = Color(.secondarySystemFill),
@@ -35,6 +37,7 @@ struct PickerLabel: View {
     ) {
         self.string = string
         self.prefix = prefix
+        self.prefixImage = prefixImage
         self.systemImage = systemImage
         self.imageColor = imageColor
         self.imageScale = imageScale
@@ -96,26 +99,22 @@ struct PickerLabel: View {
         
         var contentsLayer: some View {
             HStack(spacing: 5) {
+                if let prefixImage {
+                    Image(systemName: prefixImage)
+                        .imageScale(imageScale)
+                        .foregroundColor(textColor)
+                }
                 if let prefix {
                     Text(prefix)
-//                        .fontWeight(.bold)
-//                        .foregroundColor(.white)
-//                        .colorMultiply(prefixColor)
-//                        .foregroundColor(backgroundColor)
                         .foregroundColor(textColor)
                 }
                 Text(string)
                     .fontWeight(.bold)
-//                    .foregroundColor(.white)
-//                    .colorMultiply(foregroundColor)
-//                    .foregroundColor(backgroundColor)
                     .foregroundColor(textColor)
                     .animation(.none, value: string)
                 if let systemImage {
                     Image(systemName: systemImage)
-//                        .foregroundColor(imageColor)
                         .imageScale(imageScale)
-//                        .foregroundColor(backgroundColor)
                         .foregroundColor(textColor)
                 }
             }

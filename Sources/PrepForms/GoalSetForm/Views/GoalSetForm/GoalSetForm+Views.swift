@@ -55,7 +55,6 @@ extension GoalSetForm {
         }
     }
     
-    
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             closeButton

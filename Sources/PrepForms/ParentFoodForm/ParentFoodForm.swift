@@ -315,10 +315,10 @@ public struct ParentFoodForm: View {
         }
     }
     
-    var detailsForm: some View {
-        DetailsQuickForm(brandLabel: "Source")
-            .environmentObject(fields)
-    }
+//    var detailsForm: some View {
+//        DetailsQuickForm(brandLabel: "Source")
+//            .environmentObject(fields)
+//    }
 
     var navigationTrailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {

@@ -11,6 +11,7 @@ public struct GoalForm: View {
     
     @EnvironmentObject var goalSetModel: GoalSetForm.Model
     @ObservedObject var model: GoalModel
+    
     let didTapDelete: (GoalModel) -> ()
     
     @State var leftValue: Double?
@@ -22,10 +23,12 @@ public struct GoalForm: View {
     @State var showSyncedIndicator: Bool
     let equivalentUnitString: String?
 
+    @State var presentedSheet: Sheet? = nil
+
     public init(goalModel: GoalModel, didTapDelete: @escaping ((GoalModel) -> ())) {
         self.model = goalModel
+//        _model = StateObject(wrappedValue: goalModel)
         self.didTapDelete = didTapDelete
-        //TODO: Have a way of knowing if this goal is new
         
         _leftValue = State(initialValue: goalModel.lowerBound)
         _rightValue = State(initialValue: goalModel.upperBound)
@@ -39,8 +42,20 @@ public struct GoalForm: View {
     
     public var body: some View {
         quickForm
-            .presentationDetents([.height(260)])
+            .presentationDetents([.height(200)])
             .onDisappear(perform: disappeared)
+            .sheet(item: $presentedSheet) { sheet(for: $0) }
+            .onChange(of: model.type, perform: typeChanged)
+    }
+    
+    func typeChanged(_ newType: GoalType) {
+        withAnimation {
+            equivalentLeftValue = model.equivalentLowerBound
+            equivalentRightValue = model.equivalentUpperBound
+            usesSingleValue = model.usesSingleValue
+            hasEquivalentValues = model.hasEquivalentValues
+            showSyncedIndicator = model.showsSyncedIndicator
+        }
     }
 
     var quickForm: some View {
@@ -50,16 +65,63 @@ public struct GoalForm: View {
             deleteAction: deleteActionBinding
         ) {
             valuesContent
-            saveButton
         }
+    }
+    
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        switch sheet {
+        case .lowerBound:
+            valueForm(for: .left)
+        case .upperBound:
+            valueForm(for: .right)
+        case .unit:
+            unitForm
+        default:
+            EmptyView()
+        }
+    }
+    
+    var unitForm: some View {
+        GoalUnitForm(model: model)
+    }
+    
+    func setValue(_ value: Double?, for side: Side) {
+        switch side {
+        case .left:
+            model.lowerBound = value
+            withAnimation {
+                self.leftValue = value
+                self.equivalentLeftValue = model.equivalentLowerBound
+            }
+        case .right:
+            model.upperBound = value
+            withAnimation {
+                self.rightValue = value
+                self.equivalentRightValue = model.equivalentUpperBound
+            }
+        }
+        model.goalSetModel.createImplicitGoals()
+    }
+
+    func valueForm(for side: Side) -> some View {
+        func handleNewValue(_ newValue: Double?) {
+            setValue(newValue, for: side)
+        }
+        
+        return GoalValueForm(
+            value: valueForSide(side),
+            unitStrings: model.unitStrings,
+            handleNewValue: handleNewValue
+        )
     }
     
     var valuesContent: some View {
         VStack(spacing: 10) {
             HStack {
-                contentsForSide(.left)
+                buttonForSide(.left)
                 if !usesSingleValue {
-                    contentsForSide(.right)
+                    buttonForSide(.right)
                 }
                 unitButton
             }
@@ -81,7 +143,7 @@ public struct GoalForm: View {
         }
     }
 
-    func contentsForSide(_ side: Side) -> some View {
+    func buttonForSide(_ side: Side) -> some View {
         
         var valueString: String? {
             valueForSide(side)?.formattedGoalValue
@@ -127,34 +189,38 @@ public struct GoalForm: View {
                 return equivalentUnitString
             }
             
-            var label: some View {
+            func label(for value: Double) -> some View {
+                HStack {
+                    Image(systemName: "equal.square.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(Color(.quaternaryLabel))
+                    HStack(spacing: 2) {
+                        Color.clear
+                            .animatedGoalEquivalentValueModifier(value: value)
+                            .alignmentGuide(.customCenter) { context in
+                                context[HorizontalAlignment.center]
+                            }
+                        if let secondaryValue {
+                            Text("–")
+                                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                                .foregroundColor(Color(.tertiaryLabel))
+                            Color.clear
+                                .animatedGoalEquivalentValueModifier(value: secondaryValue)
+                                .alignmentGuide(.customCenter) { context in
+                                    context[HorizontalAlignment.center]
+                                }
+                        }
+                        Text(unitString)
+                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                            .foregroundColor(Color(.tertiaryLabel))
+                    }
+                }
+            }
+            
+            var optionalLabel: some View {
                 Group {
                     if let value {
-                        HStack {
-                            Image(systemName: "equal.square.fill")
-                                .font(.system(size: 20))
-                                .foregroundColor(Color(.quaternaryLabel))
-                            HStack(spacing: 2) {
-                                Color.clear
-                                    .animatedGoalEquivalentValueModifier(value: value)
-                                    .alignmentGuide(.customCenter) { context in
-                                        context[HorizontalAlignment.center]
-                                    }
-                                if let secondaryValue {
-                                    Text("–")
-                                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                                        .foregroundColor(Color(.tertiaryLabel))
-                                    Color.clear
-                                        .animatedGoalEquivalentValueModifier(value: secondaryValue)
-                                        .alignmentGuide(.customCenter) { context in
-                                            context[HorizontalAlignment.center]
-                                        }
-                                }
-                                Text(unitString)
-                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                                    .foregroundColor(Color(.tertiaryLabel))
-                            }
-                        }
+                        label(for: value)
                     } else {
                         Color.clear
                     }
@@ -162,7 +228,7 @@ public struct GoalForm: View {
                 .frame(height: 25)
             }
             
-            return label
+            return optionalLabel
         }
         
         var largerValue: Double? {
@@ -229,7 +295,7 @@ public struct GoalForm: View {
             
             
             return Button {
-//                present(side == .left ? .leftValue : .rightValue)
+                present(side == .left ? .lowerBound : .upperBound)
             } label: {
                 label
             }
@@ -238,6 +304,27 @@ public struct GoalForm: View {
         return VStack(alignment: .customCenter, spacing: 5) {
             headerLabel
             button
+        }
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedSheet = sheet
+        }
+
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+
+        if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else {
+            present()
         }
     }
     
@@ -256,6 +343,7 @@ public struct GoalForm: View {
     }
     
     func disappeared() {
+        model.validateEnergy()
         model.validateNutrient()
         goalSetModel.createImplicitGoals()
     }
@@ -267,6 +355,7 @@ public struct GoalForm: View {
                     .grayscale(model.isSynced ? 0 : 1)
                 Text("\(model.isSynced ? "" : "not ")synced")
                     .foregroundColor(Color(.tertiaryLabel))
+                    .minimumScaleFactor(0.8)
             }
             .padding(.vertical, 5)
             .padding(.horizontal, 10)
@@ -373,13 +462,18 @@ public struct GoalForm: View {
             .fixedSize(horizontal: true, vertical: false)
         }
         
+        /// Used to align the buttons horizontally
+        var headerPlaceholder: some View {
+            Text("...")
+                .foregroundColor(Color(.tertiaryLabel))
+                .opacity(0)
+        }
+        
         return Button {
-            
+            present(.unit)
         } label: {
             VStack(spacing: 5) {
-                Text("...")
-                    .foregroundColor(Color(.tertiaryLabel))
-                    .opacity(0)
+                headerPlaceholder
                 label
             }
         }
@@ -446,10 +540,11 @@ public struct GoalForm: View {
     }
     
     enum Sheet: String, Identifiable {
-        case weightForm
-        case leanMassForm
-        case lowerBoundForm
-        case upperBoundForm
+        case lowerBound
+        case upperBound
+        case unit
+        case info
+        
         var id: String { rawValue }
     }
     

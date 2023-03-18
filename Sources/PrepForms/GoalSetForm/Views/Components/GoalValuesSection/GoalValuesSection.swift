@@ -90,7 +90,7 @@ struct GoalValuesSection: View {
             }
         }
         
-        return ValueForm(
+        return GoalValueForm(
             value: valueForSide(side),
             unitStrings: goalModel.unitStrings,
             handleNewValue: handleNewValue
@@ -324,3 +324,4 @@ struct GoalValues: Equatable {
         self.lower == nil && self.upper == nil
     }
 }
+

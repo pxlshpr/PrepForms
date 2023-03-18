@@ -132,7 +132,7 @@ extension BiometricValueForm.Model {
                 return double
             }
             
-        case .age, .sex, .fatPercentage, .activeEnergy, .restingEnergy:
+        default:
             return double
         }
     }

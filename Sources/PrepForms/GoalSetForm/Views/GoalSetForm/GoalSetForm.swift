@@ -100,13 +100,14 @@ public struct GoalSetForm: View {
             withAnimation(.interactiveSpring()) {
                 blurRadiusOverride = 0
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 blurRadiusOverride = nil
             }
         }
     }
     
     func present(_ sheet: Sheet) {
+        blurRadiusOverride = nil
         if presentedSheet != nil {
             presentedSheet = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -304,10 +305,15 @@ public struct GoalSetForm: View {
     }
     
     var computedBlurRadius: CGFloat {
-        if let blurRadiusOverride {
-            return blurRadiusOverride
+        var shouldBlur: Bool {
+            model.showingWizardOverlay
+//            if let blurRadiusOverride {
+//                return blurRadiusOverride
+//            }
+//            return model.showingWizardOverlay || presentedSheet != nil ? 5 : 0
         }
-        return model.showingWizardOverlay || presentedSheet != nil ? 5 : 0
+        
+        return shouldBlur ? 5 : 0
     }
     
     @ViewBuilder
@@ -459,7 +465,7 @@ public struct GoalSetForm: View {
     func cell(for goalModel: GoalModel, isButton: Bool = true) -> some View {
         var label: some View {
             GoalCell(
-                goal: goalModel,
+                model: goalModel,
                 showingEquivalentValues: $showingEquivalentValues
             )
         }
@@ -624,6 +630,35 @@ public struct GoalSetForm: View {
         )
         return Group {
             if showingEquivalentValuesToggle {
+                Picker("", selection: binding) {
+                    Image(systemName: "target").tag(false)
+                    Image(systemName: "equal").tag(true)
+//                    Text("Goals").tag(false)
+//                    Text("Totals").tag(true)
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 150)
+//                .scaledToFit()
+//                .frame(minWidth: 100)
+            } else {
+                Spacer()
+            }
+        }
+        .frame(height: 28)
+    }
+    
+    var equivalentValuesToggle_legacy: some View {
+        let binding = Binding<Bool>(
+            get: { showingEquivalentValues },
+            set: { newValue in
+                Haptics.feedback(style: .rigid)
+                withAnimation {
+                    showingEquivalentValues = newValue
+                }
+            }
+        )
+        return Group {
+            if showingEquivalentValuesToggle {
                 Toggle(isOn: binding) {
                     Label("Calculated Goals", systemImage: "equal.square")
 //                    Text("Calculated Goals")
@@ -636,16 +671,7 @@ public struct GoalSetForm: View {
         }
         .frame(height: 28)
     }
-//    var calculatedButton: some View {
-//        Button {
-//            Haptics.feedback(style: .rigid)
-//            withAnimation {
-//                showingEquivalentValues.toggle()
-//            }
-//        } label: {
-//            Image(systemName: "equal.square\(showingEquivalentValues ? ".fill" : "")")
-//        }
-//    }
+    
     func subtitleCell(_ title: String) -> some View {
         Group {
             Spacer().frame(height: 5)

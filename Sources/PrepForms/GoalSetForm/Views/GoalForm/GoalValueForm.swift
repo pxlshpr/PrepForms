@@ -2,73 +2,69 @@ import SwiftUI
 import SwiftUISugar
 import SwiftHaptics
 
-extension GoalValuesSection {
-    struct ValueForm: View {
-        @Environment(\.dismiss) var dismiss
-        @Environment(\.colorScheme) var colorScheme
-        @FocusState var isFocused: Bool
-        
-        @State var hasFocusedOnAppear: Bool = false
-        @State var hasCompletedFocusedOnAppearAnimation: Bool = false
+struct GoalValueForm: View {
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
+    @FocusState var isFocused: Bool
+    
+    @State var hasFocusedOnAppear: Bool = false
+    @State var hasCompletedFocusedOnAppearAnimation: Bool = false
 
-        @StateObject var model: Model
-        
-        let handleNewValue: (Double?) -> ()
-        
-        init(
-            value: Double?,
-            unitStrings: (String, String?),
-            handleNewValue: @escaping (Double?) -> ()
-        ) {
-            self.handleNewValue = handleNewValue
-            let model = Model(
-                initialDouble: value,
-                unitStrings: unitStrings
-            )
-            _model = StateObject(wrappedValue: model)
+    @StateObject var model: Model
+    
+    let handleNewValue: (Double?) -> ()
+    
+    init(
+        value: Double?,
+        unitStrings: (String, String?),
+        handleNewValue: @escaping (Double?) -> ()
+    ) {
+        self.handleNewValue = handleNewValue
+        let model = Model(
+            initialDouble: value,
+            unitStrings: unitStrings
+        )
+        _model = StateObject(wrappedValue: model)
+    }
+    
+    class Model: ObservableObject {
+        let initialDouble: Double?
+        let unitStrings: (String, String?)
+        @Published var internalString: String = ""
+        @Published var internalDouble: Double? = nil
+
+        init(initialDouble: Double?, unitStrings: (String, String?)) {
+            self.initialDouble = initialDouble
+            self.internalDouble = initialDouble
+            self.internalString = initialDouble?.cleanAmount ?? ""
+            self.unitStrings = unitStrings
         }
         
-        class Model: ObservableObject {
-            let initialDouble: Double?
-            let unitStrings: (String, String?)
-            @Published var internalString: String = ""
-            @Published var internalDouble: Double? = nil
-
-            init(initialDouble: Double?, unitStrings: (String, String?)) {
-                self.initialDouble = initialDouble
-                self.internalDouble = initialDouble
-                self.internalString = initialDouble?.cleanAmount ?? ""
-                self.unitStrings = unitStrings
-            }
-            
-            var textFieldString: String {
-                get { internalString }
-                set {
-                    guard !newValue.isEmpty else {
-                        internalDouble = nil
-                        internalString = newValue
-                        return
-                    }
-                    guard let double = Double(newValue) else {
-                        return
-                    }
-                    self.internalDouble = double
-                    self.internalString = newValue
+        var textFieldString: String {
+            get { internalString }
+            set {
+                guard !newValue.isEmpty else {
+                    internalDouble = nil
+                    internalString = newValue
+                    return
                 }
-            }
-            
-            var shouldDisableDone: Bool {
-                if initialDouble == internalDouble {
-                    return true
+                guard let double = Double(newValue) else {
+                    return
                 }
-
-                return false
+                self.internalDouble = double
+                self.internalString = newValue
             }
+        }
+        
+        var shouldDisableDone: Bool {
+            if initialDouble == internalDouble {
+                return true
+            }
+
+            return false
         }
     }
-}
-
-extension GoalValuesSection.ValueForm {
+    
     var body: some View {
         NavigationStack {
             QuickForm(title: "Amount") {

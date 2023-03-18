@@ -265,137 +265,137 @@ extension FoodForm {
     }
 }
 
-extension FoodForm {
-    var detailsForm: some View {
-        DetailsQuickForm()
-            .environmentObject(fields)
-    }
-}
-
-
-struct DetailsQuickForm: View {
-    
-    @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var fields: FoodForm.Fields
-    
-    @State var presentedSheet: Sheet? = nil
-//    @State var showingBrandForm = false
-//    @State var showingNameForm = false
-//    @State var showingDetailForm = false
-    
-    let brandLabel: String
-    
-    init(brandLabel: String = "Brand") {
-        self.brandLabel = brandLabel
-    }
-    
-    enum Sheet: String, Identifiable {
-        case brand
-        case name
-        case detail
-        var id: String { rawValue }
-    }
-
-    var body: some View {
-        NavigationStack {
-            form
-        }
-        .presentationDetents([.height(280)])
-        .presentationDragIndicator(.hidden)
-        .sheet(item: $presentedSheet) { sheet(for: $0) }
-    }
-    
-    @ViewBuilder
-    func sheet(for sheet: Sheet) -> some View {
-        switch sheet {
-        case .name:
-            DetailsNameForm(title: "Name", isRequired: true, name: $fields.name)
-        case .brand:
-            DetailsNameForm(title: brandLabel, isRequired: false, name: $fields.brand)
-        case .detail:
-            DetailsNameForm(title: "Detail", isRequired: false, name: $fields.detail)
-        }
-    }
-    
-    func present(_ sheet: Sheet) {
-        if presentedSheet != nil {
-            presentedSheet = nil
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                Haptics.feedback(style: .soft)
-                presentedSheet = sheet
-            }
-        } else {
-            Haptics.feedback(style: .soft)
-            presentedSheet = sheet
-        }
-    }
-    
-    var form: some View {
-        QuickForm(title: "Details", confirmButtonForDismiss: true) {
-            FormStyledSection {
-                Grid(alignment: .leading) {
-                    GridRow {
-                        Text("Name")
-                            .foregroundColor(.secondary)
-                        fieldButton(fields.name, isRequired: true) {
-                            present(.name)
-                        }
-                    }
-                    GridRow {
-                        Text("Detail")
-                            .foregroundColor(.secondary)
-                        fieldButton(fields.detail) {
-                            present(.detail)
-                        }
-                    }
-                    GridRow {
-                        Text("Brand")
-                            .foregroundColor(.secondary)
-                        fieldButton(fields.brand) {
-                            present(.brand)
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
-    }
-    
-    func fieldButton(_ string: String, isRequired: Bool = false, action: @escaping () -> ()) -> some View {
-        let fill: Color = colorScheme == .light
-        ? Color(hex: "EFEFF0")
-        : Color(.secondarySystemFill)
-        
-        return Button {
-            Haptics.feedback(style: .soft)
-            action()
-        } label: {
-            Text(!string.isEmpty ? string : (isRequired ? "Required" : "Optional"))
-                .foregroundColor(!string.isEmpty ? .primary : Color(.tertiaryLabel))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 15)
-                .padding(.vertical, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .foregroundColor(fill)
-                )
-        }
-    }
-}
-
-struct DetailsQuickFormPreview: View {
-    
-    var body: some View {
-        Color.clear
-            .sheet(isPresented: .constant(true)) {
-                DetailsQuickForm()
-                    .preferredColorScheme(.dark)
-            }
-    }
-}
-
-struct DetailsQuickForm_Previews: PreviewProvider {
-    static var previews: some View {
-        DetailsQuickFormPreview()
-    }
-}
+//extension FoodForm {
+//    var detailsForm: some View {
+//        DetailsQuickForm()
+//            .environmentObject(fields)
+//    }
+//}
+//
+//
+//struct DetailsQuickForm: View {
+//
+//    @Environment(\.colorScheme) var colorScheme
+//    @EnvironmentObject var fields: FoodForm.Fields
+//
+//    @State var presentedSheet: Sheet? = nil
+////    @State var showingBrandForm = false
+////    @State var showingNameForm = false
+////    @State var showingDetailForm = false
+//
+//    let brandLabel: String
+//
+//    init(brandLabel: String = "Brand") {
+//        self.brandLabel = brandLabel
+//    }
+//
+//    enum Sheet: String, Identifiable {
+//        case brand
+//        case name
+//        case detail
+//        var id: String { rawValue }
+//    }
+//
+//    var body: some View {
+//        NavigationStack {
+//            form
+//        }
+//        .presentationDetents([.height(280)])
+//        .presentationDragIndicator(.hidden)
+//        .sheet(item: $presentedSheet) { sheet(for: $0) }
+//    }
+//
+//    @ViewBuilder
+//    func sheet(for sheet: Sheet) -> some View {
+//        switch sheet {
+//        case .name:
+//            DetailsNameForm(title: "Name", isRequired: true, name: $fields.name)
+//        case .brand:
+//            DetailsNameForm(title: brandLabel, isRequired: false, name: $fields.brand)
+//        case .detail:
+//            DetailsNameForm(title: "Detail", isRequired: false, name: $fields.detail)
+//        }
+//    }
+//
+//    func present(_ sheet: Sheet) {
+//        if presentedSheet != nil {
+//            presentedSheet = nil
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+//                Haptics.feedback(style: .soft)
+//                presentedSheet = sheet
+//            }
+//        } else {
+//            Haptics.feedback(style: .soft)
+//            presentedSheet = sheet
+//        }
+//    }
+//
+//    var form: some View {
+//        QuickForm(title: "Details", saveInPlaceOfDismiss: true) {
+//            FormStyledSection {
+//                Grid(alignment: .leading) {
+//                    GridRow {
+//                        Text("Name")
+//                            .foregroundColor(.secondary)
+//                        fieldButton(fields.name, isRequired: true) {
+//                            present(.name)
+//                        }
+//                    }
+//                    GridRow {
+//                        Text("Detail")
+//                            .foregroundColor(.secondary)
+//                        fieldButton(fields.detail) {
+//                            present(.detail)
+//                        }
+//                    }
+//                    GridRow {
+//                        Text("Brand")
+//                            .foregroundColor(.secondary)
+//                        fieldButton(fields.brand) {
+//                            present(.brand)
+//                        }
+//                    }
+//                }
+//                .frame(maxWidth: .infinity, alignment: .leading)
+//            }
+//        }
+//    }
+//
+//    func fieldButton(_ string: String, isRequired: Bool = false, action: @escaping () -> ()) -> some View {
+//        let fill: Color = colorScheme == .light
+//        ? Color(hex: "EFEFF0")
+//        : Color(.secondarySystemFill)
+//
+//        return Button {
+//            Haptics.feedback(style: .soft)
+//            action()
+//        } label: {
+//            Text(!string.isEmpty ? string : (isRequired ? "Required" : "Optional"))
+//                .foregroundColor(!string.isEmpty ? .primary : Color(.tertiaryLabel))
+//                .frame(maxWidth: .infinity, alignment: .leading)
+//                .padding(.horizontal, 15)
+//                .padding(.vertical, 10)
+//                .background(
+//                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+//                            .foregroundColor(fill)
+//                )
+//        }
+//    }
+//}
+//
+//struct DetailsQuickFormPreview: View {
+//
+//    var body: some View {
+//        Color.clear
+//            .sheet(isPresented: .constant(true)) {
+//                DetailsQuickForm()
+//                    .preferredColorScheme(.dark)
+//            }
+//    }
+//}
+//
+//struct DetailsQuickForm_Previews: PreviewProvider {
+//    static var previews: some View {
+//        DetailsQuickFormPreview()
+//    }
+//}
