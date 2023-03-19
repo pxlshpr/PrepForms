@@ -23,6 +23,10 @@ public struct GoalForm: View {
     @State var showSyncedIndicator: Bool
     @State var hasValidUpperBound: Bool
     @State var hasValidLowerBound: Bool
+    @State var lowerBoundPrefix: String?
+    @State var upperBoundPrefix: String?
+    @State var lowerBoundSuffix: String?
+    @State var upperBoundSuffix: String?
 
     let equivalentUnitString: String?
 
@@ -42,6 +46,10 @@ public struct GoalForm: View {
         _showSyncedIndicator = State(initialValue: goalModel.showsSyncedIndicator)
         _hasValidLowerBound = State(initialValue: goalModel.hasValidLowerBound)
         _hasValidUpperBound = State(initialValue: goalModel.hasValidUpperBound)
+        _lowerBoundPrefix = State(initialValue: goalModel.lowerBoundPrefix(equivalent: true))
+        _upperBoundPrefix = State(initialValue: goalModel.upperBoundPrefix(equivalent: true))
+        _lowerBoundSuffix = State(initialValue: goalModel.lowerBoundSuffix(equivalent: true))
+        _upperBoundSuffix = State(initialValue: goalModel.upperBoundSuffix(equivalent: true))
         self.equivalentUnitString = goalModel.equivalentUnitString
     }
     
@@ -50,12 +58,20 @@ public struct GoalForm: View {
             .presentationDetents([.height(200)])
             .onDisappear(perform: disappeared)
             .sheet(item: $presentedSheet) { sheet(for: $0) }
-            .onChange(of: model.type, perform: typeChanged)
+            .onChange(of: model.type) { [oldValue = model.type] newValue in
+                typeChanged(from: oldValue, to: newValue)
+            }
             .onChange(of: model.lowerBound, perform: lowerBoundChanged)
             .onChange(of: model.upperBound, perform: upperBoundChanged)
     }
     
-    func typeChanged(_ newType: GoalType) {
+    func typeChanged(from oldType: GoalType, to newType: GoalType) {
+        if oldType.isDualBounded, newType.isSingleBounded,
+           leftValue == nil, rightValue != nil
+        {
+            model.lowerBound = model.upperBound
+            model.upperBound = nil
+        }
         updateWithAnimation()
     }
 
@@ -68,6 +84,7 @@ public struct GoalForm: View {
     }
 
     func updateWithAnimation() {
+        print("💫 updateWithAnimation()")
         withAnimation {
             leftValue = model.lowerBound
             rightValue = model.upperBound
@@ -78,13 +95,11 @@ public struct GoalForm: View {
             showSyncedIndicator = model.showsSyncedIndicator
             hasValidLowerBound = model.hasValidLowerBound
             hasValidUpperBound = model.hasValidUpperBound
-            
-            /// If we've just moved from a dual-bounded goal to a single-bounded one,
-            /// and the value was in the upper bound—move it over to the lower bound
-            if usesSingleValue, leftValue == nil, rightValue != nil {
-                leftValue = rightValue
-                rightValue = nil
-            }
+
+            lowerBoundPrefix = model.lowerBoundPrefix(equivalent: true)
+            upperBoundPrefix = model.upperBoundPrefix(equivalent: true)
+            lowerBoundSuffix = model.lowerBoundSuffix(equivalent: true)
+            upperBoundSuffix = model.upperBoundSuffix(equivalent: true)
         }
     }
 
@@ -228,13 +243,14 @@ public struct GoalForm: View {
             valueForSide(side)?.formattedGoalValue
         }
 
-        var headerString: String {
+        var headerString: String? {
             var haveBothBounds: Bool {
                 leftValue != nil && rightValue != nil
             }
             
             guard !usesSingleValue else {
-                return "within"
+                return nil
+//                return "within"
            }
 
             switch side {
@@ -243,9 +259,12 @@ public struct GoalForm: View {
             }
         }
         
+        @ViewBuilder
         var headerLabel: some View {
-            Text(headerString)
-                .foregroundColor(Color(.tertiaryLabel))
+            if let headerString {
+                Text(headerString)
+                    .foregroundColor(Color(.tertiaryLabel))
+            }
         }
         
         var largerValue: Double? {
@@ -420,15 +439,15 @@ public struct GoalForm: View {
                 if let equivalentLeftValue {
                     amountAndUnitTexts(
                         equivalentLeftValue,
-                        unit: hasValidUpperBound ? nil : unitString,
-                        prefix: hasValidUpperBound ?  nil : "at least"
+                        unit: lowerBoundSuffix,
+                        prefix: lowerBoundPrefix
                     )
                 }
-                if let equivalentRightValue, hasValidUpperBound {
+                if let equivalentRightValue {
                     amountAndUnitTexts(
                         equivalentRightValue,
-                        unit: equivalentUnitString,
-                        prefix: hasValidLowerBound ? "to" : "at most"
+                        unit: upperBoundSuffix,
+                        prefix: upperBoundPrefix
                     )
                 }
             }
@@ -537,10 +556,13 @@ public struct GoalForm: View {
         }
         
         /// Used to align the buttons horizontally
+        @ViewBuilder
         var headerPlaceholder: some View {
-            Text("...")
-                .foregroundColor(Color(.tertiaryLabel))
-                .opacity(0)
+            if !usesSingleValue {
+                Text("...")
+                    .foregroundColor(Color(.tertiaryLabel))
+                    .opacity(0)
+            }
         }
         
         return Button {

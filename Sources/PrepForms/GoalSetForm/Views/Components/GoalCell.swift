@@ -22,6 +22,11 @@ struct GoalCell: View {
     @State var hasValidUpperBound: Bool = true
     @State var hasValidLowerBound: Bool = true
 
+    @State var lowerBoundPrefix: String? = nil
+    @State var upperBoundPrefix: String? = nil
+    @State var lowerBoundSuffix: String? = nil
+    @State var upperBoundSuffix: String? = nil
+
     init(model: GoalModel, showingEquivalentValues: Binding<Bool>) {
         self.model = model
         _showingEquivalentValues = showingEquivalentValues
@@ -243,13 +248,13 @@ struct GoalCell: View {
         }
     }
     
-    var unitString: String {
-        if showingEquivalentValues, let unitString = model.equivalentUnitString {
-            return unitString
-        } else {
-            return model.type.unitString
-        }
-    }
+//    var unitString: String {
+//        if showingEquivalentValues, let unitString = model.equivalentUnitString {
+//            return unitString
+//        } else {
+//            return model.type.unitString
+//        }
+//    }
     
     var computedUpperBound: Double? {
         if showingEquivalentValues, let upperBound = model.equivalentUpperBound {
@@ -307,9 +312,15 @@ struct GoalCell: View {
         withAnimation {
             self.lowerBound = computedLowerBound
             self.upperBound = computedUpperBound
+            
             self.hasValidLowerBound = computedHasValidLowerBound
             self.hasValidUpperBound = computedHasValidUpperBound
             
+            self.lowerBoundPrefix = model.lowerBoundPrefix(equivalent: showingEquivalentValues)
+            self.upperBoundPrefix = model.upperBoundPrefix(equivalent: showingEquivalentValues)
+            self.lowerBoundSuffix = model.lowerBoundSuffix(equivalent: showingEquivalentValues)
+            self.upperBoundSuffix = model.upperBoundSuffix(equivalent: showingEquivalentValues)
+
             self.shouldShowType = computedShouldShowType
             self.typeDescription = model.type.accessoryDescription
             self.typeImage = model.type.accessorySystemImage
@@ -333,15 +344,15 @@ struct GoalCell: View {
                 if let lowerBound, hasValidLowerBound {
                     amountAndUnitTexts(
                         lowerBound,
-                        unit: hasValidUpperBound ? nil : unitString,
-                        prefix: hasValidUpperBound ? nil : "at least"
+                        unit: lowerBoundSuffix,
+                        prefix: lowerBoundPrefix
                     )
                 }
                 if let upperBound, hasValidUpperBound {
                     amountAndUnitTexts(
                         upperBound,
-                        unit: unitString,
-                        prefix: hasValidLowerBound ? "to" : "at most"
+                        unit: upperBoundSuffix,
+                        prefix: upperBoundPrefix
                     )
                     .opacity(upperBound == 0 ? 0 : 1)
                 }
@@ -366,18 +377,18 @@ struct GoalCell: View {
     var equivalentTexts: some View {
         var filled: some View {
             HStack {
-                if let lowerBound {
+                if let lowerBound, hasValidLowerBound {
                     amountAndUnitTexts(
                         lowerBound,
-                        unit: hasValidUpperBound ? nil : unitString,
-                        prefix: hasValidUpperBound ?  nil : "at least"
+                        unit: lowerBoundSuffix,
+                        prefix: lowerBoundPrefix
                     )
                 }
                 if let upperBound, hasValidUpperBound {
                     amountAndUnitTexts(
                         upperBound,
-                        unit: unitString,
-                        prefix: hasValidLowerBound ? "to" : "at most"
+                        unit: upperBoundSuffix,
+                        prefix: upperBoundPrefix
                     )
                 }
             }

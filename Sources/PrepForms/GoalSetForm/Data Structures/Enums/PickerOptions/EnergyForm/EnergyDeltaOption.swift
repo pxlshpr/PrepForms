@@ -12,7 +12,8 @@ enum EnergyDeltaOption: CaseIterable {
         case .below:
             return "below"
         case .around:
-            return "above or below"
+//            return "above or below"
+            return "within"
         }
     }
     
