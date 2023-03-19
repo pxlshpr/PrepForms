@@ -119,7 +119,7 @@ struct GoalUnitPicker: View {
         let saveAction = Binding<FormConfirmableAction?>(
             get: {
                 FormConfirmableAction(
-                    position: .topTrailing,
+                    position: .bottomFilled,
                     isDisabled: !hasParameters,
                     handler: didTapSave
                 )

@@ -316,8 +316,8 @@ public struct GoalSetForm: View {
             return model.showingWizardOverlay || presentedSheet != nil ? 5 : 0
         }
         
-        return blurringOnlyForWizard
-//        return blurringForWizardAndPresentingSheets
+//        return blurringOnlyForWizard
+        return blurringForWizardAndPresentingSheets
     }
     
     @ViewBuilder
