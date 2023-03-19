@@ -4,7 +4,7 @@ import SwiftHaptics
 import PrepDataTypes
 import PrepCoreDataStack
 
-struct GoalUnitForm: View {
+struct GoalUnitPicker: View {
     
     @Environment(\.dismiss) var dismiss
     
@@ -118,13 +118,16 @@ struct GoalUnitForm: View {
         
         let saveAction = Binding<FormConfirmableAction?>(
             get: {
-                FormConfirmableAction(isDisabled: !hasParameters, handler: didTapSave)
+                FormConfirmableAction(
+                    position: .topTrailing,
+                    isDisabled: !hasParameters,
+                    handler: didTapSave
+                )
             },
             set: { _ in }
         )
         return QuickForm(
             title: "Unit",
-            saveInPlaceOfDismiss: true,
             saveAction: saveAction
         ) {
             pickerSection

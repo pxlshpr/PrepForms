@@ -21,6 +21,9 @@ public struct GoalForm: View {
     @State var usesSingleValue: Bool
     @State var hasEquivalentValues: Bool
     @State var showSyncedIndicator: Bool
+    @State var hasValidUpperBound: Bool
+    @State var hasValidLowerBound: Bool
+
     let equivalentUnitString: String?
 
     @State var presentedSheet: Sheet? = nil
@@ -37,6 +40,8 @@ public struct GoalForm: View {
         _usesSingleValue = State(initialValue: goalModel.usesSingleValue)
         _hasEquivalentValues = State(initialValue: goalModel.hasEquivalentValues)
         _showSyncedIndicator = State(initialValue: goalModel.showsSyncedIndicator)
+        _hasValidLowerBound = State(initialValue: goalModel.hasValidLowerBound)
+        _hasValidUpperBound = State(initialValue: goalModel.hasValidUpperBound)
         self.equivalentUnitString = goalModel.equivalentUnitString
     }
     
@@ -46,15 +51,40 @@ public struct GoalForm: View {
             .onDisappear(perform: disappeared)
             .sheet(item: $presentedSheet) { sheet(for: $0) }
             .onChange(of: model.type, perform: typeChanged)
+            .onChange(of: model.lowerBound, perform: lowerBoundChanged)
+            .onChange(of: model.upperBound, perform: upperBoundChanged)
     }
     
     func typeChanged(_ newType: GoalType) {
+        updateWithAnimation()
+    }
+
+    func upperBoundChanged(_ newValue: Double?) {
+        updateWithAnimation()
+    }
+
+    func lowerBoundChanged(_ newValue: Double?) {
+        updateWithAnimation()
+    }
+
+    func updateWithAnimation() {
         withAnimation {
+            leftValue = model.lowerBound
+            rightValue = model.upperBound
             equivalentLeftValue = model.equivalentLowerBound
             equivalentRightValue = model.equivalentUpperBound
             usesSingleValue = model.usesSingleValue
             hasEquivalentValues = model.hasEquivalentValues
             showSyncedIndicator = model.showsSyncedIndicator
+            hasValidLowerBound = model.hasValidLowerBound
+            hasValidUpperBound = model.hasValidUpperBound
+            
+            /// If we've just moved from a dual-bounded goal to a single-bounded one,
+            /// and the value was in the upper bound—move it over to the lower bound
+            if usesSingleValue, leftValue == nil, rightValue != nil {
+                leftValue = rightValue
+                rightValue = nil
+            }
         }
     }
 
@@ -83,7 +113,7 @@ public struct GoalForm: View {
     }
     
     var unitForm: some View {
-        GoalUnitForm(model: model)
+        GoalUnitPicker(model: model)
     }
     
     func setValue(_ value: Double?, for side: Side) {
@@ -116,22 +146,71 @@ public struct GoalForm: View {
         )
     }
     
+    @State var buttonsHeight: CGFloat = 0
+    
     var valuesContent: some View {
-        VStack(spacing: 10) {
-            HStack {
-                buttonForSide(.left)
-                if !usesSingleValue {
-                    buttonForSide(.right)
+        var topRow: some View {
+            var valuesButtons: some View {
+                var buttonsLayer: some View {
+                    HStack {
+                        buttonForSide(.left)
+                        if !usesSingleValue {
+                            buttonForSide(.right)
+                        }
+                    }
                 }
+                
+                @ViewBuilder
+                var swapValuesButtonLayer: some View {
+                    if !usesSingleValue {
+                        VStack {
+                            swapValuesButton
+                                .padding(.top, 2)
+                            Color.clear
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: buttonsHeight, alignment: .top)
+                    }
+                }
+                
+                return ZStack {
+                    buttonsLayer
+                        .readSize { size in
+                            self.buttonsHeight = size.height
+                        }
+                    swapValuesButtonLayer
+                }
+            }
+            
+            return HStack {
+                valuesButtons
                 unitButton
             }
+        }
+        
+        var bottomRow: some View {
             HStack {
-                if hasEquivalentValues {
-                    equivalentLabel
+                if let missingRequirement = model.missingRequirement {
+                    Button {
+                        
+                    } label: {
+                        GoalRequirementLabel(requirement: missingRequirement)
+                    }
+                    .disabled(!missingRequirement.isBiometric)
+                    .fixedSize(horizontal: false, vertical: true)
+                } else if hasEquivalentValues {
+//                    equivalentLabel
+                    equivalentTexts
                 }
                 Spacer()
                 syncedButton
             }
+        }
+        
+        return VStack(spacing: 10) {
+            topRow
+            bottomRow
+            Spacer() /// so that contents sticks to top when dragging form upwards
         }
         .padding(.horizontal, 20)
     }
@@ -167,68 +246,6 @@ public struct GoalForm: View {
         var headerLabel: some View {
             Text(headerString)
                 .foregroundColor(Color(.tertiaryLabel))
-        }
-        
-        var equivalentLabel: some View {
-            var value: Double? {
-                switch side {
-                case .left:     return equivalentLeftValue
-                case .right:    return equivalentRightValue
-                }
-            }
-            
-            var secondaryValue: Double? {
-                guard usesSingleValue else { return nil }
-                return equivalentRightValue
-            }
-            
-            var unitString: String {
-                guard valueString != nil, let equivalentUnitString else {
-                    return ""
-                }
-                return equivalentUnitString
-            }
-            
-            func label(for value: Double) -> some View {
-                HStack {
-                    Image(systemName: "equal.square.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(Color(.quaternaryLabel))
-                    HStack(spacing: 2) {
-                        Color.clear
-                            .animatedGoalEquivalentValueModifier(value: value)
-                            .alignmentGuide(.customCenter) { context in
-                                context[HorizontalAlignment.center]
-                            }
-                        if let secondaryValue {
-                            Text("–")
-                                .font(.system(size: 18, weight: .semibold, design: .rounded))
-                                .foregroundColor(Color(.tertiaryLabel))
-                            Color.clear
-                                .animatedGoalEquivalentValueModifier(value: secondaryValue)
-                                .alignmentGuide(.customCenter) { context in
-                                    context[HorizontalAlignment.center]
-                                }
-                        }
-                        Text(unitString)
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color(.tertiaryLabel))
-                    }
-                }
-            }
-            
-            var optionalLabel: some View {
-                Group {
-                    if let value {
-                        label(for: value)
-                    } else {
-                        Color.clear
-                    }
-                }
-                .frame(height: 25)
-            }
-            
-            return optionalLabel
         }
         
         var largerValue: Double? {
@@ -351,13 +368,19 @@ public struct GoalForm: View {
     var syncedButton: some View {
         var label: some View {
             HStack {
-                appleHealthBolt
+//                appleHealthBolt
+                Image(systemName: "bolt.horizontal.fill")
+                    .symbolRenderingMode(.palette)
+                    .imageScale(.small)
+                    .foregroundStyle(.green.gradient)
                     .grayscale(model.isSynced ? 0 : 1)
                 Text("\(model.isSynced ? "" : "not ")synced")
                     .foregroundColor(Color(.tertiaryLabel))
-                    .minimumScaleFactor(0.8)
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+//                    .minimumScaleFactor(0.8)
+                    .lineLimit(1)
             }
-            .padding(.vertical, 5)
+            .padding(.vertical, 8)
             .padding(.horizontal, 10)
             .background(
                 RoundedRectangle(cornerRadius: 7, style: .continuous)
@@ -380,6 +403,55 @@ public struct GoalForm: View {
         }
     }
     
+    var equivalentTexts: some View {
+        func amountAndUnitTexts(_ amount: Double, unit: String?, prefix: String?) -> some View {
+            Color.clear
+                .animatedGoalCellValueModifier(
+                    value: amount,
+                    unitString: unit,
+                    prefixString: prefix,
+                    isAutoGenerated: model.isAutoGenerated,
+                    style: .form
+                )
+        }
+
+        func texts(with unitString: String) -> some View {
+            HStack(spacing: 5) {
+                if let equivalentLeftValue {
+                    amountAndUnitTexts(
+                        equivalentLeftValue,
+                        unit: hasValidUpperBound ? nil : unitString,
+                        prefix: hasValidUpperBound ?  nil : "at least"
+                    )
+                }
+                if let equivalentRightValue, hasValidUpperBound {
+                    amountAndUnitTexts(
+                        equivalentRightValue,
+                        unit: equivalentUnitString,
+                        prefix: hasValidLowerBound ? "to" : "at most"
+                    )
+                }
+            }
+        }
+        
+        return Group {
+            if let equivalentUnitString, hasAtLeastOneEquivalentValue {
+                HStack {
+                    Image(systemName: "equal.square.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(Color(.quaternaryLabel))
+                    texts(with: equivalentUnitString)
+                }
+            }
+        }
+    }
+    
+    var hasAtLeastOneEquivalentValue: Bool {
+        equivalentLeftValue != nil || equivalentRightValue != nil
+    }
+    
+    
+    //MARK: Legacy (To be removed)
     var equivalentLabel: some View {
         
         var leftValue: Double? {
@@ -390,17 +462,19 @@ public struct GoalForm: View {
             equivalentRightValue
         }
         
-        func label(_ leftValue: Double, unitString: String) -> some View {
-            HStack {
+        func label(leftValue: Double?, rightValue: Double?, unitString: String) -> some View {
+            return HStack {
                 Image(systemName: "equal.square.fill")
                     .font(.system(size: 20))
                     .foregroundColor(Color(.quaternaryLabel))
                 HStack(spacing: 5) {
-                    Color.clear
-                        .animatedGoalEquivalentValueModifier(value: leftValue)
-                        .alignmentGuide(.customCenter) { context in
-                            context[HorizontalAlignment.center]
-                        }
+                    if let leftValue {
+                        Color.clear
+                            .animatedGoalEquivalentValueModifier(value: leftValue)
+                            .alignmentGuide(.customCenter) { context in
+                                context[HorizontalAlignment.center]
+                            }
+                    }
                     if let rightValue {
                         Text("to")
                             .font(.system(size: 18, weight: .semibold, design: .rounded))
@@ -420,8 +494,8 @@ public struct GoalForm: View {
         
         
         return Group {
-            if let leftValue, let equivalentUnitString {
-                label(leftValue, unitString: equivalentUnitString)
+            if hasAtLeastOneEquivalentValue, let equivalentUnitString {
+                label(leftValue: leftValue, rightValue: rightValue, unitString: equivalentUnitString)
             } else {
                 Color.clear
             }
@@ -480,30 +554,51 @@ public struct GoalForm: View {
     }
     
     var swapValuesButton: some View {
-        VStack(spacing: 7) {
-            Text("")
-            if model.lowerBound != nil, model.upperBound == nil {
-                Button {
-                    Haptics.feedback(style: .rigid)
-                    model.upperBound = model.lowerBound
-                    model.lowerBound = nil
-                } label: {
-                    Image(systemName: "rectangle.righthalf.inset.filled.arrow.right")
-                        .foregroundColor(.accentColor)
-                }
-            } else if model.upperBound != nil, model.lowerBound == nil {
-                Button {
-                    Haptics.feedback(style: .rigid)
-                    model.lowerBound = model.upperBound
-                    model.upperBound = nil
-                } label: {
-                    Image(systemName: "rectangle.lefthalf.inset.filled.arrow.left")
-                        .foregroundColor(.accentColor)
+        enum Direction {
+            case left
+            case right
+            
+            var image: String {
+                switch self {
+                case .left:
+                    return "rectangle.lefthalf.inset.filled.arrow.left"
+                case .right:
+                    return "rectangle.righthalf.inset.filled.arrow.right"
                 }
             }
         }
-        .padding(.top, 10)
-        .frame(width: 16, height: 20)
+        
+        var direction: Direction? {
+            if model.upperBound != nil, model.lowerBound == nil {
+                return .left
+            }
+            if model.lowerBound != nil, model.upperBound == nil {
+                return .right
+            }
+            return nil
+        }
+
+        return Group {
+            if let direction {
+                Button {
+                    Haptics.feedback(style: .rigid)
+                    switch direction {
+                    case .right:
+                        model.upperBound = model.lowerBound
+                        model.lowerBound = nil
+                    case .left:
+                        model.lowerBound = model.upperBound
+                        model.upperBound = nil
+                    }
+                    updateWithAnimation()
+               } label: {
+                   Image(systemName: direction.image)
+                       .foregroundColor(.accentColor)
+               }
+//               .frame(width: 16, height: 20)
+//               .frame(height: 20)
+            }
+        }
     }
     
     var saveButton: some View {

@@ -305,15 +305,11 @@ public struct GoalSetForm: View {
     }
     
     var computedBlurRadius: CGFloat {
-        var shouldBlur: Bool {
-            model.showingWizardOverlay
-//            if let blurRadiusOverride {
-//                return blurRadiusOverride
-//            }
-//            return model.showingWizardOverlay || presentedSheet != nil ? 5 : 0
+//        model.showingWizardOverlay ? 5 : 0
+        if let blurRadiusOverride {
+            return blurRadiusOverride
         }
-        
-        return shouldBlur ? 5 : 0
+        return model.showingWizardOverlay || presentedSheet != nil ? 5 : 0
     }
     
     @ViewBuilder

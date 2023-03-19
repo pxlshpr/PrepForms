@@ -246,6 +246,16 @@ public class GoalModel: ObservableObject, Identifiable {
     var hasOneBound: Bool {
         lowerBound != nil || upperBound != nil
     }
+    
+    var hasValidLowerBound: Bool {
+        guard let lowerBound else { return false }
+        return lowerBound > 0
+    }
+
+    var hasValidUpperBound: Bool {
+        guard let upperBound else { return false }
+        return upperBound > 0
+    }
 
     var hasOneEquivalentBound: Bool {
         equivalentLowerBound != nil || equivalentUpperBound != nil
