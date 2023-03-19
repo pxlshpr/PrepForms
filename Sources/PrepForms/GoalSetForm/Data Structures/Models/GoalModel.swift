@@ -507,6 +507,14 @@ extension GoalModel {
         }
     }
 
+    func validateDeviationPercentageLessThan100() {
+        if let lowerBound, lowerBound > 99 {
+            withAnimation {
+                self.lowerBound = 99
+            }
+        }
+    }
+
     func validateEnergy() {
         guard let energyGoalType else { return }
         switch energyGoalType {
@@ -529,8 +537,8 @@ extension GoalModel {
             case .deficit:
                 validateNoPercentageBoundResultingInLessThan500()
             case .deviation:
+                validateDeviationPercentageLessThan100()
                 /// We're not validating the result is less than 500 as there's no way to fix this for deviations
-                break
             }
         }
         validateLowerBoundLowerThanUpper()
