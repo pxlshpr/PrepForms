@@ -422,6 +422,8 @@ public struct GoalForm: View {
         }
     }
     
+    @Namespace var namespace
+    
     var equivalentTexts: some View {
         func amountAndUnitTexts(_ amount: Double, unit: String?, prefix: String?) -> some View {
             Color.clear

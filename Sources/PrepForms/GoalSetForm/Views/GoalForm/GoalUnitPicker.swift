@@ -129,6 +129,7 @@ struct GoalUnitPicker: View {
             get: {
                 FormConfirmableAction(
                     position: .bottomFilled,
+                    confirmationButtonTitle: "Done",
                     isDisabled: !hasParameters,
                     handler: didTapSave
                 )

@@ -207,13 +207,13 @@ var TemplateDiets: [GoalSet] {
         name: "Bulking",
         emoji: "⬆️",
         goals: [
-            Goal(type: .energy(.percentFromMaintenance(.surplus)),
-//                 lowerBound: 10, upperBound: 20
-                 lowerBound: 10, upperBound: nil
-            ),
-//            Goal(type: .energy(.percentFromMaintenance(.deviation)),
+//            Goal(type: .energy(.percentFromMaintenance(.surplus)),
+////                 lowerBound: 10, upperBound: 20
 //                 lowerBound: 10, upperBound: nil
 //            ),
+            Goal(type: .energy(.percentFromMaintenance(.deviation)),
+                 lowerBound: 10, upperBound: nil
+            ),
             Goal(type: .macro(.quantityPerBodyMass(.weight, .kg), .protein),
                  lowerBound: 2, upperBound: 2.5
             ),

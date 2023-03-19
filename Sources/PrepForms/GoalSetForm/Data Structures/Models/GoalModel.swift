@@ -467,13 +467,13 @@ extension GoalModel {
         
         if let lowerBound, tdee - lowerBound < 500 {
             withAnimation {
-                self.lowerBound = tdee - 500
+                self.lowerBound = max(tdee - 500, 0)
             }
         }
 
         if let upperBound, tdee - upperBound < 500 {
             withAnimation {
-                self.upperBound = tdee - 500
+                self.upperBound = max(tdee - 500, 0)
             }
         }
     }
@@ -484,13 +484,13 @@ extension GoalModel {
         
         if let lowerBound, tdee - ((lowerBound/100) * tdee) < 500 {
             withAnimation {
-                self.lowerBound = (tdee-500)/tdee * 100
+                self.lowerBound = max((tdee-500)/tdee * 100, 0)
             }
         }
 
         if let upperBound, tdee - ((upperBound/100) * tdee) < 500 {
             withAnimation {
-                self.upperBound = (tdee-500)/tdee * 100
+                self.upperBound = max((tdee-500)/tdee * 100, 0)
             }
         }
     }
@@ -519,8 +519,8 @@ extension GoalModel {
             case .deficit:
                 validateNoBoundResultingInLessThan500(unit: energyUnit)
             case .deviation:
-                //TODO: Deviation
-                validateNoBoundResultingInLessThan500(unit: energyUnit)
+                /// We're not validating the result is less than 500 as there's no way to fix this for deviations
+                break
             }
         case .percentFromMaintenance(let delta):
             switch delta {
@@ -529,8 +529,8 @@ extension GoalModel {
             case .deficit:
                 validateNoPercentageBoundResultingInLessThan500()
             case .deviation:
-                //TODO: Deviation
-                validateNoPercentageBoundResultingInLessThan500()
+                /// We're not validating the result is less than 500 as there's no way to fix this for deviations
+                break
             }
         }
         validateLowerBoundLowerThanUpper()
