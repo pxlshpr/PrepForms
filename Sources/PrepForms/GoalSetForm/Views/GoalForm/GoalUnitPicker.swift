@@ -9,12 +9,12 @@ struct GoalUnitPicker: View {
     @Environment(\.dismiss) var dismiss
     
     @ObservedObject var model: GoalModel
-
+    
     /// Energy
     @State var pickedMealEnergyGoalType: MealEnergyTypeOption
     @State var pickedDietEnergyGoalType: DietEnergyTypeOption
     @State var pickedDelta: EnergyDeltaOption
-
+    
     /// Nutrients
     @State var pickedMealNutrientGoal: MealNutrientGoal
     @State var pickedDietNutrientGoal: DietNutrientGoal
@@ -23,7 +23,7 @@ struct GoalUnitPicker: View {
     @State var pickedEnergyUnit: EnergyUnit = .kcal
     @State var pickedWorkoutDurationUnit: WorkoutDurationUnit
     @State var energyValue: Double = 1000
-
+    
     @State var presentedSheet: Sheet? = nil
     
     init(model: GoalModel) {
@@ -57,13 +57,22 @@ struct GoalUnitPicker: View {
     }
     
     var body: some View {
-//        navigationStack
+        //        navigationStack
         quickForm
-//        .onChange(of: pickedMealEnergyGoalType, perform: mealEnergyGoalChanged)
-//        .onChange(of: pickedDietEnergyGoalType, perform: dietEnergyGoalChanged)
-//        .onChange(of: pickedDelta, perform: deltaChanged)
-        .sheet(item: $presentedSheet) { sheet(for: $0) }
-        .presentationDetents([.height(250)])
+            .onChange(of: pickedMealEnergyGoalType) { _ in changed() }
+            .onChange(of: pickedDietEnergyGoalType) { _ in changed() }
+            .onChange(of: pickedDelta) { _ in changed() }
+            .onChange(of: pickedMealNutrientGoal) { _ in changed() }
+            .onChange(of: pickedDietNutrientGoal) { _ in changed() }
+            .onChange(of: pickedBodyMassType) { _ in changed() }
+            .onChange(of: pickedBodyMassUnit) { _ in changed() }
+            .onChange(of: pickedWorkoutDurationUnit) { _ in changed() }
+            .sheet(item: $presentedSheet) { sheet(for: $0) }
+            .presentationDetents([.height(250)])
+    }
+    
+    func changed() {
+        Haptics.feedback(style: .soft)
     }
     
     var trailingContent: some ToolbarContent {
@@ -87,7 +96,7 @@ struct GoalUnitPicker: View {
         }
         dismiss()
     }
-
+    
     var hasParameters: Bool {
         if let energyGoalType {
             switch energyGoalType {
@@ -149,7 +158,7 @@ struct GoalUnitPicker: View {
             contents
                 .navigationTitle("Unit")
                 .navigationBarTitleDisplayMode(.inline)
-//                .toolbar { doneButtonToolbarContent }
+            //                .toolbar { doneButtonToolbarContent }
         }
     }
     
@@ -166,14 +175,14 @@ struct GoalUnitPicker: View {
             dismiss()
         }
     }
-
+    
     var largeDoneButton: some View {
         var shadowOpacity: CGFloat { 0 }
         var buttonHeight: CGFloat { 52 }
         var buttonCornerRadius: CGFloat { 10 }
         var shadowSize: CGFloat { 2 }
         var foregroundColor: Color {
-//            (colorScheme == .light && saveIsDisabled) ? .black : .white
+            //            (colorScheme == .light && saveIsDisabled) ? .black : .white
             .white
         }
         
@@ -194,11 +203,11 @@ struct GoalUnitPicker: View {
         }
         .buttonStyle(.borderless)
         .padding(.horizontal, 20)
-//        .position(x: xPosition, y: yPosition)
-//        .disabled(saveIsDisabled)
-//        .opacity(saveIsDisabled ? (colorScheme == .light ? 0.2 : 0.2) : 1)
+        //        .position(x: xPosition, y: yPosition)
+        //        .disabled(saveIsDisabled)
+        //        .opacity(saveIsDisabled ? (colorScheme == .light ? 0.2 : 0.2) : 1)
     }
-
+    
     @ViewBuilder
     var pickers: some View {
         if model.type.isEnergy {
@@ -215,7 +224,7 @@ struct GoalUnitPicker: View {
             tdeeButton
         }
     }
-
+    
     var nutrientPickers: some View {
         Group {
             nutrientTypePicker
@@ -226,7 +235,7 @@ struct GoalUnitPicker: View {
             bodyMassButton
         }
     }
-
+    
     @ViewBuilder
     func sheet(for sheet: Sheet) -> some View {
         switch sheet {
@@ -238,11 +247,11 @@ struct GoalUnitPicker: View {
             EmptyView()
         }
     }
-
+    
     func appeared() {
-//        pickedMealEnergyGoalType = MealEnergyTypeOption(goalModel: model) ?? .fixed
-//        pickedDietEnergyGoalType = DietEnergyTypeOption(goalModel: model) ?? .fixed
-//        pickedDelta = EnergyDeltaOption(goalModel: model) ?? .below
+        //        pickedMealEnergyGoalType = MealEnergyTypeOption(goalModel: model) ?? .fixed
+        //        pickedDietEnergyGoalType = DietEnergyTypeOption(goalModel: model) ?? .fixed
+        //        pickedDelta = EnergyDeltaOption(goalModel: model) ?? .below
     }
     
     func dietEnergyGoalChanged(_ newValue: DietEnergyTypeOption) {
@@ -263,13 +272,13 @@ struct GoalUnitPicker: View {
             Haptics.feedback(style: .soft)
             presentedSheet = sheet
         }
-
+        
         func delayedPresent() {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 present()
             }
         }
-
+        
         if presentedSheet != nil {
             presentedSheet = nil
             delayedPresent()
@@ -281,7 +290,7 @@ struct GoalUnitPicker: View {
     var shouldShowEnergyDeltaElements: Bool {
         model.goalSetType != .meal  && pickedDietEnergyGoalType != .fixed
     }
-
+    
     var energyUnit: EnergyUnit {
         model.energyUnit ?? .kcal
     }
@@ -360,7 +369,7 @@ struct GoalUnitPicker: View {
             Haptics.feedback(style: .soft)
         })
     }
-
+    
     @ViewBuilder
     var deltaPicker: some View {
         if shouldShowEnergyDeltaElements {
@@ -450,7 +459,7 @@ struct GoalUnitPicker: View {
                 withAnimation {
                     self.pickedMealNutrientGoal = newType
                 }
-//                self.model.nutrientGoalType = nutrientGoalType
+                //                self.model.nutrientGoalType = nutrientGoalType
             }
         )
         return Menu {
@@ -470,7 +479,7 @@ struct GoalUnitPicker: View {
             Haptics.feedback(style: .soft)
         })
     }
-
+    
     var nutrientDietTypePicker: some View {
         let binding = Binding<DietNutrientGoal>(
             get: { pickedDietNutrientGoal },
@@ -478,7 +487,7 @@ struct GoalUnitPicker: View {
                 withAnimation {
                     self.pickedDietNutrientGoal = newType
                 }
-//                self.model.nutrientGoalType = nutrientGoalType
+                //                self.model.nutrientGoalType = nutrientGoalType
             }
         )
         
@@ -506,7 +515,7 @@ struct GoalUnitPicker: View {
                         systemImage: "flame.fill"
                     )
                 }
-
+                
             } else {
                 defaultPickerLabel(pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit))
             }
@@ -530,7 +539,7 @@ struct GoalUnitPicker: View {
                 withAnimation {
                     self.pickedBodyMassType = newBodyMassType
                 }
-//                self.model.nutrientGoalType = nutrientGoalType
+                //                self.model.nutrientGoalType = nutrientGoalType
             }
         )
         return Group {
@@ -563,7 +572,7 @@ struct GoalUnitPicker: View {
                 withAnimation {
                     self.pickedWorkoutDurationUnit = newUnit
                 }
-//                self.model.nutrientGoalType = nutrientGoalType
+                //                self.model.nutrientGoalType = nutrientGoalType
             }
         )
         return Group {
@@ -598,7 +607,7 @@ struct GoalUnitPicker: View {
                 withAnimation {
                     self.pickedBodyMassUnit = newWeightUnit
                 }
-//                self.model.nutrientGoalType = nutrientGoalType
+                //                self.model.nutrientGoalType = nutrientGoalType
             }
         )
         return Group {
@@ -633,8 +642,8 @@ struct GoalUnitPicker: View {
             string,
             prefix: prefix,
             systemImage: systemImage
-//            backgroundColor: .accentColor,
-//            foregroundColor: .accentColor
+            //            backgroundColor: .accentColor,
+            //            foregroundColor: .accentColor
         )
     }
     
@@ -648,7 +657,7 @@ struct GoalUnitPicker: View {
                     energyValue.cleanAmount + " " + pickedEnergyUnit.shortDescription,
                     prefix: "per",
                     systemImage: "flame.fill",
-//                    backgroundColor: Color(.tertiaryLabel),
+                    //                    backgroundColor: Color(.tertiaryLabel),
                     imageScale: .small
                 )
             }
@@ -678,7 +687,7 @@ struct GoalUnitPicker: View {
                         bodyMassFormattedWithUnit,
                         prefix: "\(pickedBodyMassType.description)",
                         systemImage: "figure.arms.open",
-//                        imageColor: Color(.tertiaryLabel),
+                        //                        imageColor: Color(.tertiaryLabel),
                         imageColor: .accentColor,
                         backgroundColor: .accentColor,
                         foregroundColor: .accentColor,
@@ -701,14 +710,14 @@ struct GoalUnitPicker: View {
         
         var button: some View {
             Button {
-//                Haptics.feedback(style: .soft)
-//                shouldResignFocus.toggle()
-//                switch pickedBodyMassType {
-//                case .weight:
-//                    showingWeightForm = true
-//                case .leanMass:
-//                    showingLeanMassForm = true
-//                }
+                //                Haptics.feedback(style: .soft)
+                //                shouldResignFocus.toggle()
+                //                switch pickedBodyMassType {
+                //                case .weight:
+                //                    showingWeightForm = true
+                //                case .leanMass:
+                //                    showingLeanMassForm = true
+                //                }
             } label: {
                 label
             }
@@ -763,7 +772,7 @@ struct GoalUnitPicker: View {
     var nutrientUnit: NutrientUnit {
         model.nutrientUnit ?? .g
     }
-
+    
     var bodyMassFormattedWithUnit: String {
         switch pickedBodyMassType {
         case .weight:
@@ -771,7 +780,7 @@ struct GoalUnitPicker: View {
                   let unit = UserManager.biometrics.weight?.unit
             else { return "" }
             return amount.rounded(toPlaces: 1).cleanAmount + " \(unit.shortDescription)"
-
+            
         case .leanMass:
             guard let amount = UserManager.biometrics.leanBodyMass?.amount,
                   let unit = UserManager.biometrics.leanBodyMass?.unit
