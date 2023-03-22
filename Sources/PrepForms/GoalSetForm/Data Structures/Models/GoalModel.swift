@@ -163,7 +163,7 @@ public class GoalModel: ObservableObject, Identifiable {
         }
     }
     
-    var bodyMassType: NutrientGoalBodyMassType? {
+    var bodyMassType: BodyMassType? {
         guard let nutrientGoalType else { return nil }
         switch nutrientGoalType {
         case .quantityPerBodyMass(let bodyMassType, _):

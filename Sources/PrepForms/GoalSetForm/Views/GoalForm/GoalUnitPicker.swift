@@ -14,56 +14,16 @@ struct GoalUnitPicker: View {
     @State var type: GoalType
     
     //TODO: Replace all these
-    @State var pickedMealEnergyGoalType: MealEnergyTypeOption
-    @State var pickedDelta: EnergyDeltaOption
-    @State var pickedMealNutrientGoal: MealNutrientGoal
-    @State var pickedDietNutrientGoal: DietNutrientGoal
-    @State var pickedBodyMassType: NutrientGoalBodyMassType
-    @State var pickedBodyMassUnit: BodyMassUnit
     @State var pickedEnergyUnit: EnergyUnit = .kcal
-    @State var pickedWorkoutDurationUnit: WorkoutDurationUnit
     @State var energyValue: Double = 1000
     
     init(model: GoalModel) {
         self.model = model
         _type = State(initialValue: model.type)
-        
-        let mealEnergyGoalType = MealEnergyTypeOption(goalModel: model) ?? .fixed
-        let dietEnergyGoalType = DietEnergyTypeOption(goalModel: model) ?? .fixed
-        let delta = EnergyDeltaOption(goalModel: model) ?? .below
-        _pickedMealEnergyGoalType = State(initialValue: mealEnergyGoalType)
-        _pickedDelta = State(initialValue: delta)
-        
-        
-        let pickedDietNutrientGoal: DietNutrientGoal
-        let pickedMealNutrientGoal: MealNutrientGoal
-        if model.goalSetType == .day {
-            pickedDietNutrientGoal = DietNutrientGoal(goalModel: model) ?? .fixed
-            pickedMealNutrientGoal = .fixed
-        } else {
-            pickedMealNutrientGoal = MealNutrientGoal(goalModel: model) ?? .fixed
-            pickedDietNutrientGoal = .fixed
-        }
-        let bodyMassType = model.bodyMassType ?? .weight
-        let bodyMassUnit = model.bodyMassUnit ?? .kg // TODO: User's default unit here
-        let workoutDurationUnit = model.workoutDurationUnit ?? .min
-        _pickedMealNutrientGoal = State(initialValue: pickedMealNutrientGoal)
-        _pickedDietNutrientGoal = State(initialValue: pickedDietNutrientGoal)
-        _pickedBodyMassType = State(initialValue: bodyMassType)
-        _pickedBodyMassUnit = State(initialValue: bodyMassUnit)
-        _pickedWorkoutDurationUnit = State(initialValue: workoutDurationUnit)
-        
     }
     
     var body: some View {
         quickForm
-            .onChange(of: pickedMealEnergyGoalType) { _ in changed() }
-            .onChange(of: pickedDelta) { _ in changed() }
-            .onChange(of: pickedMealNutrientGoal) { _ in changed() }
-            .onChange(of: pickedDietNutrientGoal) { _ in changed() }
-            .onChange(of: pickedBodyMassType) { _ in changed() }
-            .onChange(of: pickedBodyMassUnit) { _ in changed() }
-            .onChange(of: pickedWorkoutDurationUnit) { _ in changed() }
             .sheet(item: $presentedSheet) { sheet(for: $0) }
             .presentationDetents([.height(300)])
     }
@@ -270,18 +230,6 @@ struct GoalUnitPicker: View {
     func appeared() {
     }
     
-    func dietEnergyGoalChanged(_ newValue: DietEnergyTypeOption) {
-        //        model.energyGoalType = self.energyGoalType
-    }
-    
-    func mealEnergyGoalChanged(_ newValue: MealEnergyTypeOption) {
-        //        model.energyGoalType = self.energyGoalType
-    }
-    
-    func deltaChanged(to newValue: EnergyDeltaOption) {
-        //        model.energyGoalType = self.energyGoalType
-    }
-    
     func present(_ sheet: Sheet) {
         
         func present() {
@@ -311,20 +259,8 @@ struct GoalUnitPicker: View {
         model.energyUnit ?? .kcal
     }
     
-    var energyDelta: EnergyGoalDelta {
-        switch pickedDelta {
-        case .below:
-            return .deficit
-        case .above:
-            return .surplus
-        case .around:
-            return .deviation
-        }
-    }
-    
     var isQuantityPerBodyMass: Bool {
-        pickedDietNutrientGoal == .quantityPerBodyMass
-        || pickedMealNutrientGoal == .quantityPerBodyMass
+        type.nutrientGoalType?.isQuantityPerBodyMass == true
     }
 }
 
@@ -342,11 +278,7 @@ extension GoalUnitPicker {
         
         var mealPicker: some View {
             /// We don't have any options so we're leaving this here as a placeholder for now
-            PickerLabel(
-                pickedMealEnergyGoalType.description(energyUnit: UserManager.energyUnit),
-                systemImage: nil
-            )
-            .animation(.none, value: pickedMealEnergyGoalType)
+            PickerLabel(type.pickerDiscription, systemImage: nil)
         }
         
         
@@ -359,20 +291,20 @@ extension GoalUnitPicker {
         }
     }
     
-    var nutrientTypePicker_new: some View {
+    var nutrientTypePicker: some View {
+        
+        let description = type.pickerDiscription
         
         @ViewBuilder
         var label: some View {
             if model.goalSetType == .meal {
-                defaultPickerLabel(
-                    pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit)
-                )
+                PickerLabel(description)
             } else {
-                if pickedDietNutrientGoal == .percentageOfEnergy {
+                if type.usesEnergyGoal {
                     if model.goalSetModel.energyGoal?.isSynced == true {
                         PickerLabel(
-                            pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit),
-                            systemImage: "flame.fill",
+                            description,
+                            systemImage: "chevron.up.chevron.down",
                             imageColor: Color(hex: "F3DED7"),
                             backgroundGradientTop: HealthTopColor,
                             backgroundGradientBottom: HealthBottomColor,
@@ -380,14 +312,15 @@ extension GoalUnitPicker {
                             imageScale: .small
                         )
                     } else {
-                        defaultPickerLabel(
-                            pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit),
-                            systemImage: "flame.fill"
+                        PickerLabel(
+                            description,
+                            systemImage: "chevron.up.chevron.down",
+                            imageScale: .small
                         )
                     }
                     
                 } else {
-                    defaultPickerLabel(pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit))
+                    PickerLabel(description)
                 }
             }
         }
@@ -398,62 +331,23 @@ extension GoalUnitPicker {
             label
         }
     }
-    
-    var nutrientTypePicker: some View {
-        var dayPicker: some View {
-            
-            @ViewBuilder
-            var label: some View {
-                if pickedDietNutrientGoal == .percentageOfEnergy {
-                    if model.goalSetModel.energyGoal?.isSynced == true {
-                        PickerLabel(
-                            pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit),
-                            systemImage: "flame.fill",
-                            imageColor: Color(hex: "F3DED7"),
-                            backgroundGradientTop: HealthTopColor,
-                            backgroundGradientBottom: HealthBottomColor,
-                            foregroundColor: .white,
-                            imageScale: .small
-                        )
-                    } else {
-                        defaultPickerLabel(
-                            pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit),
-                            systemImage: "flame.fill"
-                        )
-                    }
-                    
-                } else {
-                    defaultPickerLabel(pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit))
-                }
-            }
-            
-            return Button {
-                present(.dayNutrientPicker)
-            } label: {
-                label
-            }
-        }
-        
-        var mealPicker: some View {
-            Button {
-                present(.mealNutrientPicker)
-            } label: {
-                defaultPickerLabel(
-                    pickedDietNutrientGoal.pickerDescription(nutrientUnit: nutrientUnit)
-                )
-            }
-        }
-        
-        
-        return Group {
-            if model.goalSetType == .meal {
-                mealPicker
-            } else {
-                dayPicker
-            }
-        }
+
+    var energyDelta: EnergyGoalDelta {
+        type.energyDelta ?? .deficit
     }
-    
+
+    var bodyMassType: BodyMassType {
+        type.bodyMassType ?? .weight
+    }
+
+    var bodyMassUnit: BodyMassUnit {
+        type.bodyMassUnit ?? UserManager.bodyMassUnit
+    }
+
+    var workoutDurationUnit: WorkoutDurationUnit {
+        type.workoutDurationUnit ?? .hour
+    }
+
     @ViewBuilder
     var deltaPicker: some View {
         if shouldShowEnergyDeltaElements {
@@ -461,8 +355,8 @@ extension GoalUnitPicker {
                 present(.deltaPicker)
             } label: {
                 PickerLabel(
-                    pickedDelta.description,
-                    prefixImage: pickedDelta.systemImage
+                    energyDelta.shortDescription,
+                    prefixImage: energyDelta.systemImage
                 )
             }
         }
@@ -474,10 +368,14 @@ extension GoalUnitPicker {
             Button {
                 present(.bodyMassUnitPicker)
             } label: {
-                defaultPickerLabel(
-                    pickedBodyMassUnit.pickerDescription,
-                    prefix: pickedBodyMassUnit.pickerPrefix
+                PickerLabel(
+                    bodyMassUnit.pickerDescription,
+                    prefix: bodyMassUnit.pickerPrefix
                 )
+//                defaultPickerLabel(
+//                    pickedBodyMassUnit.pickerDescription,
+//                    prefix: pickedBodyMassUnit.pickerPrefix
+//                )
             }
         }
     }
@@ -488,136 +386,237 @@ extension GoalUnitPicker {
             Button {
                 present(.bodyMassTypePicker)
             } label: {
-                defaultPickerLabel(
-                    pickedBodyMassType.pickerDescription,
-                    prefix: pickedBodyMassType.pickerPrefix
+                PickerLabel(
+                    bodyMassType.pickerDescription,
+                    prefix: bodyMassType.pickerPrefix
                 )
+//                defaultPickerLabel(
+//                    pickedBodyMassType.pickerDescription,
+//                    prefix: pickedBodyMassType.pickerPrefix
+//                )
             }
         }
     }
     
     @ViewBuilder
     var workoutDurationUnitPicker: some View {
-        if model.goalSetType == .meal, pickedMealNutrientGoal == .quantityPerWorkoutDuration {
+        if type.nutrientGoalType?.isQuantityPerWorkoutDuration == true {
             Button {
                 present(.workoutDurationUnitPicker)
             } label: {
-                defaultPickerLabel(
-                    pickedWorkoutDurationUnit.menuDescription,
+                PickerLabel(
+                    workoutDurationUnit.menuDescription,
                     prefix: "per"
                 )
+//                defaultPickerLabel(
+//                    pickedWorkoutDurationUnit.menuDescription,
+//                    prefix: "per"
+//                )
             }
         }
+    }
+}
+
+//MARK: - Enum PickerItem Extensions
+
+extension BodyMassType {
+    var pickerDetail: String {
+        switch self {
+        case .leanMass:
+            return "Lean body mass is your weight minus your body fat"
+        case .weight:
+            return "Your body weight"
+        }
+    }
+
+    static var pickerItems: [PickerItem] {
+        allCases.map { $0.pickerItem }
+    }
+    
+    var pickerTitle: String {
+        switch self {
+        case .weight:
+            return "weight"
+        case .leanMass:
+            return "lean body mass"
+        }
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(rawValue)",
+            title: pickerTitle,
+            secondaryDetail: pickerDetail
+        )
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id) else { return nil }
+        self.init(rawValue: int16)
+    }
+}
+
+extension BodyMassUnit {
+    var pickerDetail: String {
+        switch self {
+        case .kg:
+            return "Kilograms"
+        case .lb:
+            return "Pounds"
+        case .st:
+            return "Stones"
+        }
+    }
+
+    static var pickerItems: [PickerItem] {
+        allCases.map { $0.pickerItem }
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(rawValue)",
+            title: shortDescription,
+            secondaryDetail: pickerDetail
+        )
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id) else { return nil }
+        self.init(rawValue: int16)
+    }
+}
+
+extension WorkoutDurationUnit {
+    var pickerDetail: String {
+        switch self {
+        case .hour:
+            return "Hours of exercise"
+        case .min:
+            return "Minutes of exercise"
+        }
+    }
+
+    static var pickerItems: [PickerItem] {
+        allCases.map { $0.pickerItem }
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(rawValue)",
+            title: shortDescription,
+            secondaryDetail: pickerDetail
+        )
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id) else { return nil }
+        self.init(rawValue: int16)
+    }
+}
+
+extension EnergyGoalDelta {
+    static var pickerItems: [PickerItem] {
+        allCases.map { $0.pickerItem }
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(rawValue)",
+            title: shortDescription,
+            secondaryDetail: pickerDetail,
+            systemImage: systemImage
+        )
+    }
+    
+    var pickerDetail: String {
+        switch self {
+        case .deficit:
+            return "e.g. 500 \(UserManager.energyUnit.shortDescription) deficit from your maintenance \(UserManager.energyDescription)"
+        case .surplus:
+            return "e.g. 500 \(UserManager.energyUnit.shortDescription) surplus from your maintenance \(UserManager.energyDescription)"
+        case .deviation:
+            return "e.g. within 200 \(UserManager.energyUnit.shortDescription) of your maintenance \(UserManager.energyDescription)"
+        }
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id) else {
+            return nil
+        }
+        self.init(rawValue: int16)
     }
 }
 
 //MARK: - Picker Sheets
 extension GoalUnitPicker {
     
-    var deltaPickerSheet: some View {
-        EmptyView()
-//        PickerSheet<EnergyDeltaOption>(
-//            title: "Relative Energy",
-//            items: EnergyDeltaOption.allCases,
-//            pickedItem: $pickedDelta,
-//            didPick: { pickedItem in
-//                self.pickedDelta = pickedItem
-//            }
-//        )
-    }
-    
     var dayEnergyPickerSheet: some View {
-        
-        let items: [PickerItem] = GoalType.dietEnergyPickerItems
-        
-        let binding = Binding<PickerItem>(
-            get: { type.pickerItem },
-            set: { _ in }
-        )
-        
-        return PickerSheet(
-            title: "Choose a Goal Type",
-            items: items,
-            pickedItem: binding,
-            didPick: {
-                self.type = type.applyingPickedItem($0)
-            }
-        )
+        nutrientPickerSheet(items: GoalType.dietEnergyPickerItems)
     }
     
     var dayNutrientPickerSheet: some View {
-        
-        let items = GoalType.dietNutrientPickerItems(with: nutrientUnit)
-
-        let binding = Binding<PickerItem>(
-            get: { type.pickerItem },
-            set: { _ in }
-        )
-
-        return PickerSheet(
-            title: "Choose a Goal Type",
-            items: items,
-            pickedItem: binding,
-            didPick: {
-                self.type = type.applyingPickedItem($0)
-            }
+        nutrientPickerSheet(
+            items: GoalType.dietNutrientPickerItems(
+                with: nutrientUnit,
+                nutrientType: type.nutrientType,
+                macro: type.macro
+            )
         )
     }
 
     var mealNutrientPickerSheet: some View {
-        EmptyView()
-//        PickerSheet<MealNutrientGoal>(
-//            title: "Nutrient Goal Type",
-//            items: MealNutrientGoal.allCases,
-//            pickedItem: $pickedMealNutrientGoal,
-//            didPick: { pickedItem in
-//                self.pickedMealNutrientGoal = pickedItem
-//            }
-//        )
+        nutrientPickerSheet(
+            items: GoalType.dietNutrientPickerItems(
+                with: nutrientUnit,
+                nutrientType: type.nutrientType,
+                macro: type.macro
+            )
+        )
     }
 
+    func nutrientPickerSheet(items: [PickerItem]) -> some View {
+        PickerSheet(
+            title: "Choose a Goal Type",
+            items: items,
+            pickedItem: type.pickerItem,
+            didPick: { type = type.applyingPickedTypeItem($0) }
+        )
+    }
+    
+    var deltaPickerSheet: some View {
+        PickerSheet(
+            title: "Choose Energy Difference",
+            items: EnergyGoalDelta.pickerItems,
+            pickedItem: energyDelta.pickerItem,
+            didPick: { type = type.applyingPickedDeltaItem($0) }
+        )
+    }
+    
     var bodyMassTypePickerSheet: some View {
-        EmptyView()
-//        PickerSheet<NutrientGoalBodyMassType>(
-//            title: "Choose a body mass type",
-//            items: NutrientGoalBodyMassType.allCases,
-//            pickedItem: $pickedBodyMassType,
-//            didPick: { pickedItem in
-//                self.pickedBodyMassType = pickedItem
-//            }
-//        )
+        PickerSheet(
+            title: "Choose Body Mass Type",
+            items: BodyMassType.pickerItems,
+            pickedItem: bodyMassType.pickerItem,
+            didPick: { type = type.applyingPickedBodyMassTypeItem($0) }
+        )
     }
 
     var bodyMassUnitPickerSheet: some View {
-        EmptyView()
-//        PickerSheet<BodyMassUnit>(
-//            title: "Choose a body mass unit",
-//            items: BodyMassUnit.allCases,
-//            pickedItem: $pickedBodyMassUnit,
-//            didPick: { pickedItem in
-//                self.pickedBodyMassUnit = pickedItem
-//            }
-//        )
+        PickerSheet(
+            title: "Choose Body Mass Unit",
+            items: BodyMassUnit.pickerItems,
+            pickedItem: bodyMassUnit.pickerItem,
+            didPick: { type = type.applyingPickedBodyMassUnitItem($0) }
+        )
     }
 
     var workoutDurationUnitPickerSheet: some View {
-        EmptyView()
-//        PickerSheet<WorkoutDurationUnit>(
-//            title: "Workout Duration in",
-//            items: WorkoutDurationUnit.allCases,
-//            pickedItem: $pickedWorkoutDurationUnit,
-//            didPick: { pickedItem in
-//                self.pickedWorkoutDurationUnit = pickedItem
-//            }
-//        )
-    }
-    
-    func defaultPickerLabel(
-        _ string: String,
-        prefix: String? = nil,
-        systemImage: String? = "chevron.up.chevron.down"
-    ) -> some View {
-        PickerLabel(string, prefix: prefix, systemImage: systemImage)
+        PickerSheet(
+            title: "Choose Duration Unit",
+            items: WorkoutDurationUnit.pickerItems,
+            pickedItem: workoutDurationUnit.pickerItem,
+            didPick: { type = type.applyingPickedWorkoutDurationUnitItem($0) }
+        )
     }
     
     //MARK: Biometric Buttons
@@ -671,7 +670,7 @@ extension GoalUnitPicker {
     
     @ViewBuilder
     var energyButton: some View {
-        if pickedDietNutrientGoal == .quantityPerEnergy {
+        if type.nutrientGoalType?.isQuantityPerEnergy == true {
             Button {
                 
             } label: {
@@ -695,7 +694,7 @@ extension GoalUnitPicker {
                 if model.bodyMassIsSyncedWithHealth {
                     PickerLabel(
                         bodyMassFormattedWithUnit,
-                        prefix: "\(pickedBodyMassType.description)",
+                        prefix: "\(bodyMassType.description)",
                         systemImage: "figure.arms.open",
                         imageColor: Color(hex: "F3DED7"),
                         backgroundGradientTop: HealthTopColor,
@@ -707,7 +706,7 @@ extension GoalUnitPicker {
                 } else {
                     PickerLabel(
                         bodyMassFormattedWithUnit,
-                        prefix: "\(pickedBodyMassType.description)",
+                        prefix: "\(bodyMassType.description)",
                         systemImage: "figure.arms.open",
                         //                        imageColor: Color(.tertiaryLabel),
                         imageColor: .accentColor,
@@ -718,7 +717,7 @@ extension GoalUnitPicker {
                 }
             } else {
                 PickerLabel(
-                    "\(pickedBodyMassType.description)",
+                    "\(bodyMassType.description)",
                     prefix: "set",
                     systemImage: "figure.arms.open",
                     imageColor: Color.white.opacity(0.75),
@@ -752,34 +751,8 @@ extension GoalUnitPicker {
         }
     }
     
-    var nutrientGoalType: NutrientGoalType? {
-        if model.goalSetType == .meal {
-            
-            switch pickedMealNutrientGoal {
-            case .fixed:
-                return .fixed
-            case .quantityPerWorkoutDuration:
-                return .quantityPerWorkoutDuration(pickedWorkoutDurationUnit)
-            case .quantityPerBodyMass:
-                return .quantityPerBodyMass(pickedBodyMassType, pickedBodyMassUnit)
-            }
-            
-        } else {
-            switch pickedDietNutrientGoal {
-            case .fixed:
-                return .fixed
-            case .quantityPerBodyMass:
-                return .quantityPerBodyMass(pickedBodyMassType, pickedBodyMassUnit)
-            case .percentageOfEnergy:
-                return .percentageOfEnergy
-            case .quantityPerEnergy:
-                return .quantityPerEnergy(energyValue, pickedEnergyUnit)
-            }
-        }
-    }
-    
     var haveBodyMass: Bool {
-        switch pickedBodyMassType {
+        switch bodyMassType {
         case .weight:
             return UserManager.biometrics.hasWeight == true
         case .leanMass:
@@ -796,7 +769,7 @@ extension GoalUnitPicker {
     }
     
     var bodyMassFormattedWithUnit: String {
-        switch pickedBodyMassType {
+        switch bodyMassType {
         case .weight:
             guard let amount = UserManager.biometrics.weight?.amount,
                   let unit = UserManager.biometrics.weight?.unit
@@ -828,180 +801,6 @@ extension GoalUnitPicker {
         var id: String { rawValue }
     }
 }
-
-extension EnergyDeltaOption: PickableItem {
-
-    var pickerTitle: String {
-        switch self {
-        case .above:
-            return "above"
-        case .below:
-            return "below"
-        case .around:
-            return "within"
-        }
-    }
-
-    var pickerSystemImage: String? {
-        self.systemImage
-    }
-
-    var pickerDetail: String? {
-        switch self {
-        case .below:
-            return "Use this to specify a deficit from your maintenance."
-        case .above:
-            return "Use this to specify a surplus from your maintenance."
-        case .around:
-            return "Use this to specify a range around your maintenace."
-        }
-    }
-}
-
-extension WorkoutDurationUnit: PickableItem {
-    public var pickerTitle: String {
-        switch self {
-        case .hour:
-            return "hour"
-        case .min:
-            return "minute"
-        }
-    }
-
-    public var pickerSystemImage: String? {
-        nil
-    }
-
-    public var pickerDetail: String? {
-        switch self {
-        case .hour:
-            return "Hours of exercise."
-        case .min:
-            return "Minutes of exercise."
-        }
-    }
-}
-
-extension NutrientGoalBodyMassType: PickableItem {
-
-    public var pickerTitle: String {
-        switch self {
-        case .leanMass:
-            return "lean body mass"
-        case .weight:
-            return "body weight"
-        }
-    }
-
-    public var pickerDetail: String? {
-        switch self {
-        case .leanMass:
-            return "Lean body mass is the weight of your body minus your body fat (adipose tissue)."
-        case .weight:
-            return "The weight of your body."
-        }
-    }
-}
-
-extension BodyMassUnit: PickableItem {
-    public var pickerTitle: String {
-        switch self {
-        case .kg:
-            return "kg"
-        case .lb:
-            return "lb"
-        case .st:
-            return "st"
-        }
-    }
-
-    public var pickerDetail: String? {
-        switch self {
-        case .kg:
-            return "Kilograms"
-        case .lb:
-            return "Pounds"
-        case .st:
-            return "Stones"
-        }
-    }
-}
-
-//extension DietNutrientGoal: PickableItem {
-//    public var pickerTitle: String {
-//        switch self {
-//        case .fixed:
-//            return ""
-//        case .percentageOfEnergy:
-//            return ""
-//        case .quantityPerEnergy:
-//            return ""
-//        case .quantityPerBodyMass:
-//            return ""
-//        }
-//    }
-//
-//    public var pickerSystemImage: String? {
-//        switch self {
-//        case .fixed:
-//            return ""
-//        case .percentageOfEnergy:
-//            return ""
-//        case .quantityPerEnergy:
-//            return ""
-//        case .quantityPerBodyMass:
-//            return ""
-//        }
-//    }
-//
-//    public var pickerDetail: String? {
-//        switch self {
-//        case .fixed:
-//            return "Use this when you want to specify exact values."
-//        case .percentageOfEnergy:
-//            return ""
-//        case .quantityPerEnergy:
-//            return ""
-//        case .quantityPerBodyMass:
-//            return ""
-//        }
-//    }
-//}
-//
-//extension MealNutrientGoal: PickableItem {
-//    public var pickerTitle: String {
-//        switch self {
-//        case .fixed:
-//            return ""
-//        case .quantityPerBodyMass:
-//            return ""
-//        case .quantityPerWorkoutDuration:
-//            return ""
-//        }
-//    }
-//
-//    public var pickerSystemImage: String? {
-//        switch self {
-//        case .fixed:
-//            return ""
-//        case .quantityPerBodyMass:
-//            return ""
-//        case .quantityPerWorkoutDuration:
-//            return ""
-//        }
-//    }
-//
-//    public var pickerDetail: String? {
-//        switch self {
-//        case .fixed:
-//            return ""
-//        case .quantityPerBodyMass:
-//            return ""
-//        case .quantityPerWorkoutDuration:
-//            return ""
-//        }
-//    }
-//}
 
 extension NutrientGoalType {
     func pickerDescription(nutrientUnit: NutrientUnit) -> String {
@@ -1061,18 +860,22 @@ extension EnergyGoalType {
 }
 
 extension NutrientGoalType {
-    func flattenedType(with nutrientUnit: NutrientUnit = .g) -> FlattenedGoalType {
+    func flattenedType(
+        with nutrientUnit: NutrientUnit = .g,
+        nutrientType: NutrientType? = nil,
+        macro: Macro? = nil
+    ) -> FlattenedGoalType {
         switch self {
         case .fixed:
-            return .nutrientFixed(nutrientUnit)
+            return .nutrientFixed(nutrientUnit, nutrientType, macro)
         case .quantityPerBodyMass:
-            return .nutrientPerBodyMass(nutrientUnit)
+            return .nutrientPerBodyMass(nutrientUnit, nutrientType, macro)
         case .percentageOfEnergy:
-            return .nutrientPercentageOfEnergy(nutrientUnit)
+            return .nutrientPercentageOfEnergy(nutrientUnit, nutrientType, macro)
         case .quantityPerEnergy:
-            return .nutrientPerEnergy(nutrientUnit)
+            return .nutrientPerEnergy(nutrientUnit, nutrientType, macro)
         case .quantityPerWorkoutDuration:
-            return .nutrientPerWorkoutDuration(nutrientUnit)
+            return .nutrientPerWorkoutDuration(nutrientUnit, nutrientType, macro)
         }
     }
 }
@@ -1082,11 +885,11 @@ enum FlattenedGoalType  {
     case energyFixed
     case energyFromMaintenance
     case energyPercentFromMaintenance
-    case nutrientFixed(NutrientUnit)
-    case nutrientPerBodyMass(NutrientUnit)
-    case nutrientPerWorkoutDuration(NutrientUnit)
-    case nutrientPerEnergy(NutrientUnit)
-    case nutrientPercentageOfEnergy(NutrientUnit)
+    case nutrientFixed(NutrientUnit, NutrientType?, Macro?)
+    case nutrientPerBodyMass(NutrientUnit, NutrientType?, Macro?)
+    case nutrientPerWorkoutDuration(NutrientUnit, NutrientType?, Macro?)
+    case nutrientPerEnergy(NutrientUnit, NutrientType?, Macro?)
+    case nutrientPercentageOfEnergy(NutrientUnit, NutrientType?, Macro?)
     
     var title: String {
         switch self {
@@ -1096,13 +899,13 @@ enum FlattenedGoalType  {
             return "\(UserManager.energyUnit.shortDescription) from maintenance"
         case .energyPercentFromMaintenance:
             return "% from maintenance"
-        case .nutrientFixed(let unit):
+        case .nutrientFixed(let unit, _, _):
             return "\(unit.shortDescription)"
-        case .nutrientPerBodyMass(let unit):
+        case .nutrientPerBodyMass(let unit, _, _):
             return "\(unit.shortDescription) / body mass"
-        case .nutrientPerWorkoutDuration(let unit):
+        case .nutrientPerWorkoutDuration(let unit, _, _):
             return "\(unit) / workout duration"
-        case .nutrientPerEnergy(let unit):
+        case .nutrientPerEnergy(let unit, _, _):
             return "\(unit) / 1000 \(UserManager.energyUnit.shortDescription) of energy goal"
         case .nutrientPercentageOfEnergy:
             return "% of energy goal"
@@ -1137,23 +940,30 @@ enum FlattenedGoalType  {
     }
     
     var secondaryDetail: String? {
+        func nutrient(_ nutrientType: NutrientType?, _ macro: Macro?) -> String {
+            let description = nutrientType?.description ?? macro?.description ?? ""
+            return description.lowercased()
+        }
+        
+        let energyUnit = UserManager.energyUnit.shortDescription
+        
         switch self {
         case .energyFixed:
-            return "e.g. 2000 kcal"
+            return "e.g. 2000 \(energyUnit)"
         case .energyFromMaintenance:
-            return "e.g. 500 kcal below maintenance"
+            return "e.g. 500 \(energyUnit) below maintenance"
         case .energyPercentFromMaintenance:
             return "e.g. 10% within maintenance"
-        case .nutrientFixed(let unit):
-            return "e.g. 20g"
-        case .nutrientPerBodyMass(let unit):
-            return "e.g. 1g/lb of lean body mass"
-        case .nutrientPerWorkoutDuration(let unit):
-            return "e.g. 600mg/hour of exercise"
-        case .nutrientPerEnergy(let unit):
-            return "e.g. 10g/1000 \(UserManager.energyUnit.shortDescription) of energy"
-        case .nutrientPercentageOfEnergy:
-            return "e.g. 30% of energy goal"
+        case .nutrientFixed(let unit, let n, let m):
+            return "e.g. 20\(unit.shortDescription) of \(nutrient(n, m))"
+        case .nutrientPerBodyMass(let unit, let n, let m):
+            return "e.g. 1\(unit.shortDescription) of \(nutrient(n, m)) per \(UserManager.bodyMassUnit.shortDescription) of weight or lean body mass"
+        case .nutrientPerWorkoutDuration(let unit, let n, let m):
+            return "e.g. 600\(unit) per hour working out of \(nutrient(n, m))"
+        case .nutrientPerEnergy(let unit, let n, let m):
+            return "e.g. 10\(unit.shortDescription) \(nutrient(n, m)) per 1000 \(energyUnit) of energy goal"
+        case .nutrientPercentageOfEnergy(_, let n, let m):
+            return "e.g. 30% of energy goal from \(nutrient(n, m))"
         }
     }
     
@@ -1188,12 +998,12 @@ enum FlattenedGoalType  {
         [.energyFixed, .energyFromMaintenance, .energyPercentFromMaintenance]
     }
     
-    static func dietNutrientTypes(with nutrientUnit: NutrientUnit) -> [FlattenedGoalType] {
+    static func dietNutrientTypes(with nutrientUnit: NutrientUnit, nutrientType: NutrientType? = nil, macro: Macro? = nil) -> [FlattenedGoalType] {
         [
-            .nutrientFixed(nutrientUnit),
-            .nutrientPerBodyMass(nutrientUnit),
-            .nutrientPerEnergy(nutrientUnit),
-            .nutrientPercentageOfEnergy(nutrientUnit)
+            .nutrientFixed(nutrientUnit, nutrientType, macro),
+            .nutrientPerBodyMass(nutrientUnit, nutrientType, macro),
+            .nutrientPerEnergy(nutrientUnit, nutrientType, macro),
+            .nutrientPercentageOfEnergy(nutrientUnit, nutrientType, macro)
         ]
     }
 
@@ -1201,9 +1011,13 @@ enum FlattenedGoalType  {
         [.energyFixed]
     }
     
-//    static var mealNutrientTypes: [FlattenedGoalType] {
-//        [.nutrientFixed, .nutrientPerBodyMass, .nutrientPerWorkoutDuration]
-//    }
+    static func mealNutrientTypes(with nutrientUnit: NutrientUnit, nutrientType: NutrientType? = nil, macro: Macro? = nil) -> [FlattenedGoalType] {
+        [
+            .nutrientFixed(nutrientUnit, nutrientType, macro),
+            .nutrientPerBodyMass(nutrientUnit, nutrientType, macro),
+            .nutrientPerWorkoutDuration(nutrientUnit, nutrientType, macro)
+        ]
+    }
 }
 
 extension FlattenedGoalType: RawRepresentable {
@@ -1216,11 +1030,11 @@ extension FlattenedGoalType: RawRepresentable {
         case "energyFixed": self = .energyFixed
         case "energyFromMaintenance": self = .energyFromMaintenance
         case "energyPercentFromMaintenance": self = .energyPercentFromMaintenance
-        case "nutrientFixed": self = .nutrientFixed(.g)
-        case "nutrientPerBodyMass": self = .nutrientPerBodyMass(.g)
-        case "nutrientPerWorkoutDuration": self = .nutrientPerWorkoutDuration(.g)
-        case "nutrientPerEnergy": self = .nutrientPerEnergy(.g)
-        case "nutrientPercentageOfEnergy": self = .nutrientPercentageOfEnergy(.g)
+        case "nutrientFixed": self = .nutrientFixed(.g, nil, nil)
+        case "nutrientPerBodyMass": self = .nutrientPerBodyMass(.g, nil, nil)
+        case "nutrientPerWorkoutDuration": self = .nutrientPerWorkoutDuration(.g, nil, nil)
+        case "nutrientPerEnergy": self = .nutrientPerEnergy(.g, nil, nil)
+        case "nutrientPercentageOfEnergy": self = .nutrientPercentageOfEnergy(.g, nil, nil)
         default:
             return nil
         }
@@ -1255,9 +1069,16 @@ extension GoalType {
         FlattenedGoalType.dietEnergyTypes.map { $0.pickerItem }
     }
     
-    static func dietNutrientPickerItems(with nutrientUnit: NutrientUnit) -> [PickerItem] {
-        FlattenedGoalType.dietNutrientTypes(with: nutrientUnit).map { $0.pickerItem }
+    static func dietNutrientPickerItems(with nutrientUnit: NutrientUnit, nutrientType: NutrientType? = nil, macro: Macro? = nil) -> [PickerItem] {
+        FlattenedGoalType.dietNutrientTypes(with: nutrientUnit, nutrientType: nutrientType, macro: macro)
+            .map { $0.pickerItem }
     }
+    
+    static func mealNutrientPickerItems(with nutrientUnit: NutrientUnit, nutrientType: NutrientType? = nil, macro: Macro? = nil) -> [PickerItem] {
+        FlattenedGoalType.mealNutrientTypes(with: nutrientUnit, nutrientType: nutrientType, macro: macro)
+            .map { $0.pickerItem }
+    }
+
 }
 
 extension GoalType {
@@ -1281,7 +1102,7 @@ extension GoalType {
         energyGoalType?.delta
     }
     
-    var bodyMassType: NutrientGoalBodyMassType? {
+    var bodyMassType: BodyMassType? {
         nutrientGoalType?.bodyMassType
     }
     
@@ -1296,8 +1117,101 @@ extension GoalType {
     var perEnergyValue: Double? {
         nutrientGoalType?.perEnergyValue
     }
+
+    func applyingPickedDeltaItem(_ pickerItem: PickerItem) -> GoalType {
+        guard let pickedDelta = EnergyGoalDelta(pickerItem: pickerItem) else {
+            return self
+        }
+        
+        switch self {
+        case .energy(let energyGoalType):
+            switch energyGoalType {
+            case .fromMaintenance(let energyUnit, _):
+                return .energy(.fromMaintenance(energyUnit, pickedDelta))
+            case .percentFromMaintenance(_):
+                return .energy(.percentFromMaintenance(pickedDelta))
+            default:
+                return self
+            }
+        default:
+            return self
+        }
+    }
     
-    func applyingPickedItem(_ pickerItem: PickerItem) -> GoalType {
+    func applyingPickedBodyMassTypeItem(_ pickerItem: PickerItem) -> GoalType {
+        guard let pickedBodyMassType = BodyMassType(pickerItem: pickerItem) else {
+            return self
+        }
+        
+        switch self {
+        case .macro(let type, let macro):
+            switch type {
+            case .quantityPerBodyMass(_, let bodyMassUnit):
+                return .macro(.quantityPerBodyMass(pickedBodyMassType, bodyMassUnit), macro)
+            default:
+                return self
+            }
+        case .micro(let type, let nutrientType, let nutrientUnit):
+            switch type {
+            case .quantityPerBodyMass(_, let bodyMassUnit):
+                return .micro(.quantityPerBodyMass(pickedBodyMassType, bodyMassUnit), nutrientType, nutrientUnit)
+            default:
+                return self
+            }
+        default:
+            return self
+        }
+    }
+
+    func applyingPickedBodyMassUnitItem(_ pickerItem: PickerItem) -> GoalType {
+        guard let pickedBodyMassUnit = BodyMassUnit(pickerItem: pickerItem) else {
+            return self
+        }
+        switch self {
+        case .macro(let type, let macro):
+            switch type {
+            case .quantityPerBodyMass(let bodyMassType, _):
+                return .macro(.quantityPerBodyMass(bodyMassType, pickedBodyMassUnit), macro)
+            default:
+                return self
+            }
+        case .micro(let type, let nutrientType, let nutrientUnit):
+            switch type {
+            case .quantityPerBodyMass(let bodyMassType, _):
+                return .micro(.quantityPerBodyMass(bodyMassType, pickedBodyMassUnit), nutrientType, nutrientUnit)
+            default:
+                return self
+            }
+        default:
+            return self
+        }
+    }
+    
+    func applyingPickedWorkoutDurationUnitItem(_ pickerItem: PickerItem) -> GoalType {
+        guard let pickedWorkoutDurationUnit = WorkoutDurationUnit(pickerItem: pickerItem) else {
+            return self
+        }
+        switch self {
+        case .macro(let type, let macro):
+            switch type {
+            case .quantityPerWorkoutDuration:
+                return .macro(.quantityPerWorkoutDuration(pickedWorkoutDurationUnit), macro)
+            default:
+                return self
+            }
+        case .micro(let type, let nutrientType, let nutrientUnit):
+            switch type {
+            case .quantityPerWorkoutDuration:
+                return .micro(.quantityPerWorkoutDuration(pickedWorkoutDurationUnit), nutrientType, nutrientUnit)
+            default:
+                return self
+            }
+        default:
+            return self
+        }
+    }
+    
+    func applyingPickedTypeItem(_ pickerItem: PickerItem) -> GoalType {
         guard let flattenedType = FlattenedGoalType(rawValue: pickerItem.id) else {
             return self
         }
