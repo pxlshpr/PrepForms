@@ -13,10 +13,6 @@ struct GoalUnitPicker: View {
     
     @State var type: GoalType
     
-    //TODO: Replace all these
-    @State var pickedEnergyUnit: EnergyUnit = .kcal
-    @State var energyValue: Double = 1000
-    
     init(model: GoalModel) {
         self.model = model
         _type = State(initialValue: model.type)
@@ -26,9 +22,10 @@ struct GoalUnitPicker: View {
         quickForm
             .sheet(item: $presentedSheet) { sheet(for: $0) }
             .presentationDetents([.height(300)])
+            .onChange(of: type, perform: typeChanged)
     }
     
-    func changed() {
+    func typeChanged(_ newValue: GoalType) {
         Haptics.feedback(style: .soft)
     }
     
@@ -347,6 +344,10 @@ extension GoalUnitPicker {
     var workoutDurationUnit: WorkoutDurationUnit {
         type.workoutDurationUnit ?? .hour
     }
+    
+    var perEnergyValue: Double {
+        type.perEnergyValue ?? 1000
+    }
 
     @ViewBuilder
     var deltaPicker: some View {
@@ -490,9 +491,9 @@ extension WorkoutDurationUnit {
     var pickerDetail: String {
         switch self {
         case .hour:
-            return "Hours of exercise"
+            return "e.g. 600mg / hour of exercise"
         case .min:
-            return "Minutes of exercise"
+            return "e.g. 0.5g / min of exercise"
         }
     }
 
@@ -503,7 +504,7 @@ extension WorkoutDurationUnit {
     var pickerItem: PickerItem {
         PickerItem(
             id: "\(rawValue)",
-            title: shortDescription,
+            title: pickerDescription,
             secondaryDetail: pickerDetail
         )
     }
@@ -566,7 +567,7 @@ extension GoalUnitPicker {
 
     var mealNutrientPickerSheet: some View {
         nutrientPickerSheet(
-            items: GoalType.dietNutrientPickerItems(
+            items: GoalType.mealNutrientPickerItems(
                 with: nutrientUnit,
                 nutrientType: type.nutrientType,
                 macro: type.macro
@@ -675,7 +676,7 @@ extension GoalUnitPicker {
                 
             } label: {
                 PickerLabel(
-                    energyValue.cleanAmount + " " + pickedEnergyUnit.shortDescription,
+                    perEnergyValue.cleanAmount + " " + UserManager.energyUnit.shortDescription,
                     prefix: "per",
                     systemImage: "flame.fill",
 //                    backgroundColor: Color(.tertiaryLabel),
@@ -957,11 +958,11 @@ enum FlattenedGoalType  {
         case .nutrientFixed(let unit, let n, let m):
             return "e.g. 20\(unit.shortDescription) of \(nutrient(n, m))"
         case .nutrientPerBodyMass(let unit, let n, let m):
-            return "e.g. 1\(unit.shortDescription) of \(nutrient(n, m)) per \(UserManager.bodyMassUnit.shortDescription) of weight or lean body mass"
+            return "e.g. 1\(unit.shortDescription) of \(nutrient(n, m)) / \(UserManager.bodyMassUnit.shortDescription) of weight or lean body mass"
         case .nutrientPerWorkoutDuration(let unit, let n, let m):
-            return "e.g. 600\(unit) per hour working out of \(nutrient(n, m))"
+            return "e.g. 600\(unit) / hour working out of \(nutrient(n, m))"
         case .nutrientPerEnergy(let unit, let n, let m):
-            return "e.g. 10\(unit.shortDescription) \(nutrient(n, m)) per 1000 \(energyUnit) of energy goal"
+            return "e.g. 10\(unit.shortDescription) \(nutrient(n, m)) / 1000 \(energyUnit) of energy goal"
         case .nutrientPercentageOfEnergy(_, let n, let m):
             return "e.g. 30% of energy goal from \(nutrient(n, m))"
         }
