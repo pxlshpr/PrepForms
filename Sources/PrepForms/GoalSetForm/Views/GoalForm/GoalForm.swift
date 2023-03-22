@@ -83,9 +83,8 @@ public struct GoalForm: View {
         updateWithAnimation()
     }
 
-    func updateWithAnimation() {
-        print("💫 updateWithAnimation()")
-        withAnimation {
+    func updateWithAnimation(_ animated: Bool = true) {
+        func updates() {
             leftValue = model.lowerBound
             rightValue = model.upperBound
             equivalentLeftValue = model.equivalentLowerBound
@@ -100,6 +99,14 @@ public struct GoalForm: View {
             upperBoundPrefix = model.upperBoundPrefix(equivalent: true)
             lowerBoundSuffix = model.lowerBoundSuffix(equivalent: true)
             upperBoundSuffix = model.upperBoundSuffix(equivalent: true)
+        }
+        
+        if animated {
+            withAnimation {
+                updates()
+            }
+        } else {
+            updates()
         }
     }
 
@@ -614,13 +621,12 @@ public struct GoalForm: View {
                         model.lowerBound = model.upperBound
                         model.upperBound = nil
                     }
+                    model.animateNextBoundChange = false
                     updateWithAnimation()
                } label: {
                    Image(systemName: direction.image)
                        .foregroundColor(.accentColor)
                }
-//               .frame(width: 16, height: 20)
-//               .frame(height: 20)
             }
         }
     }

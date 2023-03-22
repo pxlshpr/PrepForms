@@ -161,6 +161,10 @@ extension GoalSetForm.Model {
     var hasLBM: Bool {
         UserManager.biometrics.hasLBM
     }
+    
+    var isForMeal: Bool {
+        type == .meal
+    }
 
     var energyGoal: GoalModel? {
         get {

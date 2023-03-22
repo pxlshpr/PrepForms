@@ -621,7 +621,7 @@ extension GoalModel {
     var equivalentTextHStack: some View {
         if let equivalentUnitString {
             HStack(alignment: haveBothBounds ? .center : .firstTextBaseline) {
-                Image(systemName: EqualSymbol)
+                Image(systemName: "equal.square")
                     .foregroundColor(Color(.tertiaryLabel))
                     .imageScale(.large)
                 Spacer()

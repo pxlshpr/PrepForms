@@ -1,10 +1,12 @@
 import Foundation
 
-enum EnergyDeltaOption: CaseIterable {
+enum EnergyDeltaOption: String, CaseIterable, Identifiable {
     case below
     case above
     case around /// used for deviation, ie. plus or minus
 
+    var id: String { rawValue }
+    
     var description: String {
         switch self {
         case .above:

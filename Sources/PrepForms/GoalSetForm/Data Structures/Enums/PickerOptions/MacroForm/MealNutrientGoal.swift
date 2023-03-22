@@ -1,10 +1,12 @@
 import Foundation
 import PrepDataTypes
 
-enum MealNutrientGoal: CaseIterable {
+enum MealNutrientGoal: String, CaseIterable, Identifiable {
     case fixed
     case quantityPerBodyMass
     case quantityPerWorkoutDuration
+    
+    var id: String { rawValue }
     
     init?(goalModel: GoalModel) {
         switch goalModel.nutrientGoalType {

@@ -14,6 +14,8 @@ public class GoalModel: ObservableObject, Identifiable {
     @Published var lowerBound: Double?
     @Published var upperBound: Double?
     
+    var animateNextBoundChange = true
+    
     var anyCancellable: AnyCancellable? = nil
         
     public init(
@@ -54,6 +56,10 @@ public class GoalModel: ObservableObject, Identifiable {
             return hasOneBound
         }
         return hasOneEquivalentBound
+    }
+    
+    var isForMeal: Bool {
+        goalSetModel.isForMeal
     }
     
     //MARK: - Energy

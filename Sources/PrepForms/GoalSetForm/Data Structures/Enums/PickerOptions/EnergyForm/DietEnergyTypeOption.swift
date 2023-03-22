@@ -1,11 +1,13 @@
 import Foundation
 import PrepDataTypes
 
-enum DietEnergyTypeOption: CaseIterable {
+enum DietEnergyTypeOption: String, CaseIterable, Identifiable {
     
     case fixed
     case fromMaintenance
     case percentageFromMaintenance
+    
+    var id: String { rawValue }
     
     func description(energyUnit: EnergyUnit) -> String {
         switch self {
