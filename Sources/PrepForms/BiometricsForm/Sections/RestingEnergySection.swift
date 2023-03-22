@@ -297,10 +297,9 @@ struct RestingEnergySection: View {
             } label: {
                 PickerLabel(
                     model.restingEnergyInterval.periodType.menuDescription,
-                    imageColor: Color(hex: "F3DED7"),
-                    backgroundGradientTop: HealthTopColor,
-                    backgroundGradientBottom: HealthBottomColor,
-                    foregroundColor: .white
+                    imageColor: .green,
+                    backgroundColor: .green,
+                    foregroundColor: .green
                 )
                 .animation(.none, value: model.restingEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
@@ -322,10 +321,9 @@ struct RestingEnergySection: View {
             } label: {
                 PickerLabel(
                     "\(model.restingEnergyInterval.value)",
-                    imageColor: Color(hex: "F3DED7"),
-                    backgroundGradientTop: HealthTopColor,
-                    backgroundGradientBottom: HealthBottomColor,
-                    foregroundColor: .white
+                    imageColor: .green,
+                    backgroundColor: .green,
+                    foregroundColor: .green
                 )
                 .animation(.none, value: model.restingEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
@@ -347,10 +345,9 @@ struct RestingEnergySection: View {
             } label: {
                 PickerLabel(
                     "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")",
-                    imageColor: Color(hex: "F3DED7"),
-                    backgroundGradientTop: HealthTopColor,
-                    backgroundGradientBottom: HealthBottomColor,
-                    foregroundColor: .white
+                    imageColor: .green,
+                    backgroundColor: .green,
+                    foregroundColor: .green
                 )
                 .animation(.none, value: model.restingEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)

@@ -128,13 +128,13 @@ public struct GoalForm: View {
         case .upperBound:
             valueForm(for: .right)
         case .unit:
-            unitForm
+            unitPicker
         default:
             EmptyView()
         }
     }
     
-    var unitForm: some View {
+    var unitPicker: some View {
         GoalUnitPicker(model: model)
     }
     
@@ -162,8 +162,9 @@ public struct GoalForm: View {
         }
         
         return GoalValueForm(
+            goalModel: model,
+            side: side,
             value: valueForSide(side),
-            unitStrings: model.unitStrings,
             handleNewValue: handleNewValue
         )
     }

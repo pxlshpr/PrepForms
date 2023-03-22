@@ -47,9 +47,9 @@ struct GoalUnitPicker: View {
         dismiss()
     }
     
-    var hasParameters: Bool {
+    var hasRequiredParameters: Bool {
         
-        func nutrientGoalTypeHasParameters(_ nutrientGoalType: NutrientGoalType) -> Bool {
+        func nutrientGoalTypeHasRequiredParameters(_ nutrientGoalType: NutrientGoalType) -> Bool {
             switch nutrientGoalType {
             case .quantityPerBodyMass(let bodyMassType, _):
                 switch bodyMassType {
@@ -74,10 +74,18 @@ struct GoalUnitPicker: View {
                 return false
             }
         case .macro(let nutrientGoalType, _):
-            return nutrientGoalTypeHasParameters(nutrientGoalType)
+            return nutrientGoalTypeHasRequiredParameters(nutrientGoalType)
         case .micro(let nutrientGoalType, _, _):
-            return nutrientGoalTypeHasParameters(nutrientGoalType)
+            return nutrientGoalTypeHasRequiredParameters(nutrientGoalType)
         }
+    }
+    
+    var isDirty: Bool {
+        true
+    }
+    
+    var shouldDisableSaveButton: Bool {
+        !hasRequiredParameters || !isDirty
     }
     
     var quickForm: some View {
@@ -87,14 +95,14 @@ struct GoalUnitPicker: View {
                 FormConfirmableAction(
                     position: .bottomFilled,
                     confirmationButtonTitle: "Done",
-                    isDisabled: !hasParameters,
+                    isDisabled: !hasRequiredParameters,
                     handler: didTapSave
                 )
             },
             set: { _ in }
         )
         return QuickForm(
-            title: "Unit",
+            title: "Change Unit",
             saveAction: saveAction
         ) {
             pickerSection
@@ -364,7 +372,7 @@ extension GoalUnitPicker {
     }
     
     @ViewBuilder
-    var bodyMassTypePicker: some View {
+    var bodyMassUnitPicker: some View {
         if isQuantityPerBodyMass {
             Button {
                 present(.bodyMassUnitPicker)
@@ -373,16 +381,12 @@ extension GoalUnitPicker {
                     bodyMassUnit.pickerDescription,
                     prefix: bodyMassUnit.pickerPrefix
                 )
-//                defaultPickerLabel(
-//                    pickedBodyMassUnit.pickerDescription,
-//                    prefix: pickedBodyMassUnit.pickerPrefix
-//                )
             }
         }
     }
     
     @ViewBuilder
-    var bodyMassUnitPicker: some View {
+    var bodyMassTypePicker: some View {
         if isQuantityPerBodyMass {
             Button {
                 present(.bodyMassTypePicker)
@@ -391,10 +395,6 @@ extension GoalUnitPicker {
                     bodyMassType.pickerDescription,
                     prefix: bodyMassType.pickerPrefix
                 )
-//                defaultPickerLabel(
-//                    pickedBodyMassType.pickerDescription,
-//                    prefix: pickedBodyMassType.pickerPrefix
-//                )
             }
         }
     }
@@ -409,10 +409,6 @@ extension GoalUnitPicker {
                     workoutDurationUnit.menuDescription,
                     prefix: "per"
                 )
-//                defaultPickerLabel(
-//                    pickedWorkoutDurationUnit.menuDescription,
-//                    prefix: "per"
-//                )
             }
         }
     }
@@ -636,10 +632,9 @@ extension GoalUnitPicker {
                             prefix: "maintenance",
                             prefixImage: "flame.fill",
                             systemImage: "chevron.forward",
-                            imageColor: Color(hex: "F3DED7"),
-                            backgroundGradientTop: HealthTopColor,
-                            backgroundGradientBottom: HealthBottomColor,
-                            foregroundColor: .white,
+                            imageColor: .green,
+                            backgroundColor: .green,
+                            foregroundColor: .green,
                             imageScale: .small
                         )
                     } else {
@@ -692,40 +687,38 @@ extension GoalUnitPicker {
         @ViewBuilder
         var label: some View {
             if haveBodyMass {
-                if model.bodyMassIsSyncedWithHealth {
+                if !model.bodyMassIsSyncedWithHealth {
                     PickerLabel(
                         bodyMassFormattedWithUnit,
                         prefix: "\(bodyMassType.description)",
-                        systemImage: "figure.arms.open",
-                        imageColor: Color(hex: "F3DED7"),
-                        backgroundGradientTop: HealthTopColor,
-                        backgroundGradientBottom: HealthBottomColor,
-                        foregroundColor: .white,
-                        prefixColor: Color(hex: "F3DED7"),
-                        imageScale: .medium
+                        prefixImage: "figure.arms.open",
+                        systemImage: "chevron.forward",
+                        imageColor: .green,
+                        backgroundColor: .green,
+                        foregroundColor: .green,
+                        prefixColor: .green,
+                        imageScale: .small
                     )
                 } else {
                     PickerLabel(
                         bodyMassFormattedWithUnit,
                         prefix: "\(bodyMassType.description)",
-                        systemImage: "figure.arms.open",
-                        //                        imageColor: Color(.tertiaryLabel),
-                        imageColor: .accentColor,
-                        backgroundColor: .accentColor,
-                        foregroundColor: .accentColor,
-                        imageScale: .medium
+                        prefixImage: "figure.arms.open",
+                        systemImage: "chevron.forward",
+                        imageScale: .small
                     )
                 }
             } else {
                 PickerLabel(
                     "\(bodyMassType.description)",
                     prefix: "set",
-                    systemImage: "figure.arms.open",
+                    prefixImage: "figure.arms.open",
+                    systemImage: "chevron.forward",
                     imageColor: Color.white.opacity(0.75),
                     backgroundColor: .accentColor,
                     foregroundColor: .white,
                     prefixColor: Color.white.opacity(0.75),
-                    imageScale: .medium
+                    imageScale: .small
                 )
             }
         }

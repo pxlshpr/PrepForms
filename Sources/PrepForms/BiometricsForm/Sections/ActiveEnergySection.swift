@@ -75,10 +75,9 @@ struct ActiveEnergySection: View {
             } label: {
                 PickerLabel(
                     model.activeEnergyInterval.periodType.menuDescription,
-                    imageColor: Color(hex: "F3DED7"),
-                    backgroundGradientTop: HealthTopColor,
-                    backgroundGradientBottom: HealthBottomColor,
-                    foregroundColor: .white
+                    imageColor: .green,
+                    backgroundColor: .green,
+                    foregroundColor: .green
                 )
                 .animation(.none, value: model.activeEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
@@ -99,10 +98,9 @@ struct ActiveEnergySection: View {
             } label: {
                 PickerLabel(
                     "\(model.activeEnergyInterval.value)",
-                    imageColor: Color(hex: "F3DED7"),
-                    backgroundGradientTop: HealthTopColor,
-                    backgroundGradientBottom: HealthBottomColor,
-                    foregroundColor: .white
+                    imageColor: .green,
+                    backgroundColor: .green,
+                    foregroundColor: .green
                 )
                 .animation(.none, value: model.activeEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
@@ -123,10 +121,9 @@ struct ActiveEnergySection: View {
             } label: {
                 PickerLabel(
                     "\(model.activeEnergyInterval.period.description)\(model.activeEnergyInterval.value > 1 ? "s" : "")",
-                    imageColor: Color(hex: "F3DED7"),
-                    backgroundGradientTop: HealthTopColor,
-                    backgroundGradientBottom: HealthBottomColor,
-                    foregroundColor: .white
+                    imageColor: .green,
+                    backgroundColor: .green,
+                    foregroundColor: .green
                 )
                 .animation(.none, value: model.activeEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
