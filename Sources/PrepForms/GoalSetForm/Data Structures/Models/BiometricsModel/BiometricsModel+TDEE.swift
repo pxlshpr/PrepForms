@@ -202,18 +202,6 @@ extension BiometricsModel {
         syncRestingEnergy()
     }
     
-//    var restingEnergyIntervalBinding: Binding<HealthPeriod> {
-//        Binding<HealthPeriod>(
-//            get: {
-//                self.restingEnergyInterval.period
-//            },
-//            set: { newInterval in
-//                Haptics.feedback(style: .soft)
-//                self.changeRestingEnergyIntervalPeriod(to: newInterval)
-//            }
-//        )
-//    }
-    
     func changeRestingEnergyIntervalPeriod(to newPeriod: HealthPeriod) {
         withAnimation {
             restingEnergyInterval.period = newPeriod

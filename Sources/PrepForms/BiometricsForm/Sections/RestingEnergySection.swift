@@ -357,7 +357,7 @@ struct RestingEnergySection: View {
     
     var intervalTypePickerSheet: some View {
         PickerSheet(
-            title: "Choose Timeframe Type",
+            title: "Choose Timeframe",
             items: HealthIntervalType.pickerItems,
             pickedItem: model.restingEnergyInterval.intervalType.pickerItem,
             didPick: {
@@ -370,7 +370,7 @@ struct RestingEnergySection: View {
 
     var intervalPeriodPickerSheet: some View {
         PickerSheet(
-            title: "Choose Timeframe Period",
+            title: "Rolling Average's Period",
             items: HealthPeriod.pickerItems,
             pickedItem: model.restingEnergyInterval.period.pickerItem,
             didPick: {
@@ -516,19 +516,8 @@ extension HealthPeriod {
             id: "\(self.rawValue)",
             title: description,
             detail: nil,
-            secondaryDetail: pickerDetail
+            secondaryDetail: nil
         )
-    }
-    
-    var pickerDetail: String {
-        switch self {
-        case .day:
-            return "e.g. past 3 days"
-        case .week:
-            return "e.g. past 2 weeks"
-        case .month:
-            return "e.g. past month"
-        }
     }
 }
 
@@ -568,9 +557,9 @@ extension HealthIntervalType {
     var pickerDetail: String {
         switch self {
         case .latest:
-            return "Latest value in your Health App data."
+            return "Use the latest available value."
         case .average:
-            return "This is the average daily value for the past timeframe that you specify. It is a rolling average that will change every day."
+            return "Use the average daily value for the past timeframe that you specify. This will continuously update to always average the latest timeframe."
         }
     }
 }
