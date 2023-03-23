@@ -71,8 +71,8 @@ struct LeanBodyMassForm: View {
                     return "You will need to ensure your lean body mass is kept up to date for an accurate calculation."
                 case .health:
                     return "Your lean body mass will be kept in sync with the Health App."
-                case .formula:
-                    return "Use a formula to calculate your lean body mass."
+                case .equation:
+                    return "Use an equation to calculate your lean body mass."
                 case .fatPercentage:
                     return "Enter your fat percentage to calculate your lean body mass."
                 default:
@@ -93,7 +93,7 @@ struct LeanBodyMassForm: View {
         }
     }
     
-    var formulaSupplementaryContent: some View {
+    var equationSupplementaryContent: some View {
         Group {
             Text("with")
                 .font(.title)
@@ -112,8 +112,8 @@ struct LeanBodyMassForm: View {
         switch model.lbmSource {
         case .fatPercentage:
             percentageSupplementaryContent
-        case .formula:
-            formulaSupplementaryContent
+        case .equation:
+            equationSupplementaryContent
         default:
             EmptyView()
         }

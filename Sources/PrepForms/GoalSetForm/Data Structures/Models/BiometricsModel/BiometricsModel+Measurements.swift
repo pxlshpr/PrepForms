@@ -6,19 +6,19 @@ import PrepCoreDataStack
 
 extension BiometricsModel {
     
-    var hasRestingEnergyFormulaParameters: Bool {
+    var hasRestingEnergyEquationVariables: Bool {
         let hasCore = (sex == .male || sex == .female)
         && age != nil && weight != nil
         
-        return restingEnergyFormula.requiresHeight ? hasCore && height != nil : hasCore
+        return restingEnergyEquation.requiresHeight ? hasCore && height != nil : hasCore
     }
     
-    var restingEnergyFormulaParametersAreSynced: Bool {
-        guard hasRestingEnergyFormulaParameters, restingEnergySource == .formula else {
+    var restingEnergyEquationVariablesAreSynced: Bool {
+        guard hasRestingEnergyEquationVariables, restingEnergySource == .equation else {
             return false
         }
         
-        if restingEnergyFormula.usesLeanBodyMass {
+        if restingEnergyEquation.usesLeanBodyMass {
             return isSyncingLeanBodyMass
         } else {
             return weightSource == .health
@@ -26,7 +26,7 @@ extension BiometricsModel {
     }
 
     var leanBodyMassParametersAreSynced: Bool {
-        guard lbmSource == .formula || lbmSource == .fatPercentage else { return false }
+        guard lbmSource == .equation || lbmSource == .fatPercentage else { return false }
         return weightSource == .health
     }
 
@@ -35,7 +35,7 @@ extension BiometricsModel {
         if sexSource != .health { countNotSynced += 1 }
         if weightSource != .health { countNotSynced += 1 }
         if ageSource != .health { countNotSynced += 1 }
-        if restingEnergyFormula.requiresHeight {
+        if restingEnergyEquation.requiresHeight {
             if heightSource != .health { countNotSynced += 1 }
         }
         return countNotSynced > 1
@@ -499,7 +499,7 @@ extension BiometricsModel {
     
     var lbmValue: Double? {
         switch lbmSource {
-        case .fatPercentage, .formula:
+        case .fatPercentage, .equation:
             return calculatedLeanBodyMass
         default:
             return lbm
@@ -562,19 +562,19 @@ extension BiometricsModel {
         )
     }
     
-    var lbmFormulaBinding: Binding<LeanBodyMassFormula> {
-        Binding<LeanBodyMassFormula>(
-            get: { self.lbmFormula },
-            set: { newFormula in
+    var lbmEquationBinding: Binding<LeanBodyMassEquation> {
+        Binding<LeanBodyMassEquation>(
+            get: { self.lbmEquation },
+            set: { newEquation in
                 Haptics.feedback(style: .soft)
-                self.changeLBMFormula(to: newFormula)
+                self.changeLBMEquation(to: newEquation)
             }
         )
     }
     
-    func changeLBMFormula(to newFormula: LeanBodyMassFormula) {
+    func changeLBMEquation(to newEquation: LeanBodyMassEquation) {
         withAnimation {
-            self.lbmFormula = newFormula
+            self.lbmEquation = newEquation
         }
         saveBiometrics()
     }
@@ -608,7 +608,7 @@ extension BiometricsModel {
     
     var lbmFormatted: String {
         switch lbmSource {
-        case .formula, .fatPercentage:
+        case .equation, .fatPercentage:
             return calculatedLeanBodyMass?.clean ?? ""
         default:
             return lbm?.clean ?? ""
@@ -622,7 +622,7 @@ extension BiometricsModel {
     var lbmFormattedWithUnit: String {
         let value: Double?
         switch lbmSource {
-        case .formula, .fatPercentage:
+        case .equation, .fatPercentage:
             value = calculatedLeanBodyMass
         default:
             value = lbm
@@ -633,7 +633,7 @@ extension BiometricsModel {
 
     var hasLeanBodyMass: Bool {
         switch lbmSource {
-        case .fatPercentage, .formula:
+        case .fatPercentage, .equation:
             return calculatedLeanBodyMass != nil
         case .health, .userEntered:
             return lbm != nil
@@ -649,9 +649,9 @@ extension BiometricsModel {
             guard let percent = lbm, let weight else { return nil }
             guard percent >= 0, percent <= 100 else { return nil }
             calculatedLBM = (1.0 - (percent/100.0)) * weight
-        case .formula:
+        case .equation:
             guard let weightInKg, let heightInCm, let sex else { return nil }
-            calculatedLBM = lbmFormula.calculate(
+            calculatedLBM = lbmEquation.calculate(
                 sexIsFemale: sex == .female,
                 weightInKg: weightInKg,
                 heightInCm: heightInCm
@@ -667,12 +667,12 @@ extension BiometricsModel {
 extension BiometricsModel {
     
     var shouldShowSyncAllForLBMForm: Bool {
-        guard lbmSource == .formula else { return false }
+        guard lbmSource == .equation else { return false }
         var countNotSynced = 0
         if sexSource != .health { countNotSynced += 1 }
         if weightSource != .health { countNotSynced += 1 }
         if heightSource != .health { countNotSynced += 1 }
-        /// return true if the user has picked `.formula` as the source and we have at least two parameters not synced
+        /// return true if the user has picked `.equation` as the source and we have at least two parameters not synced
         return countNotSynced > 1
     }
 

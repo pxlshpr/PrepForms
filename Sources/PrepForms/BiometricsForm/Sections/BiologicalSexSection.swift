@@ -62,7 +62,7 @@ struct BiologicalSexSection: View {
     @ViewBuilder
     var footer: some View {
         if includeFooter {
-            Text("This is the biological sex used in the formula.")
+            Text("This is the biological sex used in the equation.")
         }
     }
     

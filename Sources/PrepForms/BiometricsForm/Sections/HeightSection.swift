@@ -181,8 +181,8 @@ extension LeanBodyMassSource {
         switch self {
         case .fatPercentage:
             return "Calculate using your fat percentage."
-        case .formula:
-            return "Calculate using a formula."
+        case .equation:
+            return "Calculate using an equation."
         case .health:
             return "Updates automatically."
         case .userEntered:
@@ -210,10 +210,20 @@ extension ActiveEnergySource {
             title: pickerDescription,
             detail: nil,
             secondaryDetail: pickerDetail,
-            systemImage: systemImage
+            systemImage: systemImage,
+            colorStyle: colorStyle
         )
     }
     
+    var colorStyle: PickerItem.ColorStyle? {
+        switch self {
+        case .health:
+            return .gradient(HealthTopColor, HealthBottomColor)
+        default:
+            return nil
+        }
+    }
+
     var pickerDetail: String {
         switch self {
         case .activityLevel:
@@ -261,8 +271,8 @@ extension RestingEnergySource {
     
     var pickerDetail: String {
         switch self {
-        case .formula:
-            return "Calculate using a formula."
+        case .equation:
+            return "Calculate using an equation."
         case .health:
             return "Updates automatically."
         case .userEntered:

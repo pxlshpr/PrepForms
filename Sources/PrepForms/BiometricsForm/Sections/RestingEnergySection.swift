@@ -38,6 +38,8 @@ struct RestingEnergySection: View {
             intervalPeriodPickerSheet
         case .intervalValuePicker:
             intervalValuePickerSheet
+        case .equationPicker:
+            equationPickerSheet
         }
     }
     
@@ -83,8 +85,8 @@ struct RestingEnergySection: View {
                 healthContent
             case .userEntered:
                 EmptyView()
-            case .formula:
-                formulaContent
+            case .equation:
+                equationContent
             }
             bottomRow
         }
@@ -145,30 +147,40 @@ struct RestingEnergySection: View {
         }
     }
     
-    //MARK: - Formula Content
+    //MARK: - Equation Content
     
-    var formulaContent: some View {
+    var equationContent: some View {
         VStack {
-            formulaRow
+            equationRow
             parametersRow
         }
     }
     
-    var formulaRow: some View {
-        var formulaMenu: some View {
+    var equationRow: some View {
+        
+        var equationButton: some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                present(.equationPicker)
+            } label: {
+                BiometricPickerLabel(model.restingEnergyEquation.menuDescription)
+            }
+        }
+        
+        var equationMenu: some View {
             Menu {
-                Picker(selection: model.restingEnergyFormulaBinding, label: EmptyView()) {
-                    ForEach(RestingEnergyFormula.latest, id: \.self) { formula in
-                        Text(formula.pickerDescription + " • " + formula.year).tag(formula)
+                Picker(selection: model.restingEnergyEquationBinding, label: EmptyView()) {
+                    ForEach(RestingEnergyEquation.latest, id: \.self) { equation in
+                        Text(equation.pickerDescription + " • " + equation.year).tag(equation)
                     }
                     Divider()
-                    ForEach(RestingEnergyFormula.legacy, id: \.self) {
+                    ForEach(RestingEnergyEquation.legacy, id: \.self) {
                         Text($0.pickerDescription + " • " + $0.year).tag($0)
                     }
                 }
             } label: {
-                BiometricPickerLabel(model.restingEnergyFormula.menuDescription)
-                    .animation(.none, value: model.restingEnergyFormula)
+                BiometricPickerLabel(model.restingEnergyEquation.menuDescription)
+                    .animation(.none, value: model.restingEnergyEquation)
                     .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
@@ -181,8 +193,8 @@ struct RestingEnergySection: View {
             HStack {
                 Text("using")
                     .foregroundColor(Color(.tertiaryLabel))
-                formulaMenu
-                Text("formula")
+                equationButton
+                Text("equation")
                     .foregroundColor(Color(.tertiaryLabel))
             }
         }
@@ -202,7 +214,7 @@ struct RestingEnergySection: View {
         
         var lbmFormButton: some View {
             let isSyncedBinding = Binding<Bool>(
-                get: { model.restingEnergyFormulaParametersAreSynced },
+                get: { model.restingEnergyEquationVariablesAreSynced },
                 set: { _ in }
             )
             return Button {
@@ -218,11 +230,14 @@ struct RestingEnergySection: View {
         }
         
         var profileFormButton: some View {
-            Button {
-                Haptics.feedback(style: .soft)
-                present(.profileForm)
-            } label: {
-                if model.hasRestingEnergyFormulaParameters,
+            
+            var usesHeight: Bool {
+                model.restingEnergyEquation.requiresHeight
+            }
+            
+            @ViewBuilder
+            var label: some View {
+                if model.hasRestingEnergyEquationVariables,
                    let age = model.age,
                    let sex = model.sex,
                    let weight = model.weight
@@ -231,10 +246,10 @@ struct RestingEnergySection: View {
                         age: age,
                         sex: sex,
                         weight: weight,
-                        height: model.height,
+                        height: usesHeight ? model.height : nil,
                         bodyMassUnit: UserManager.bodyMassUnit,
                         heightUnit: UserManager.heightUnit,
-                        isSynced: model.restingEnergyFormulaParametersAreSynced
+                        isSynced: model.restingEnergyEquationVariablesAreSynced
                     )
                     .fixedSize(horizontal: true, vertical: false)
                 } else {
@@ -245,10 +260,17 @@ struct RestingEnergySection: View {
                     )
                 }
             }
+            
+            return Button {
+                Haptics.feedback(style: .soft)
+                present(.profileForm)
+            } label: {
+                label
+            }
         }
         
         var prefixString: some View {
-            Text(model.restingEnergyFormula == .katchMcardle ? "with" : "as")
+            Text(model.restingEnergyEquation == .katchMcardle ? "with" : "as")
                 .foregroundColor(Color(.tertiaryLabel))
 //                .frame(height: 25)
 //                .frame(maxHeight: .infinity)
@@ -259,7 +281,7 @@ struct RestingEnergySection: View {
         
         @ViewBuilder
         var link: some View {
-            if model.restingEnergyFormula.usesLeanBodyMass {
+            if model.restingEnergyEquation.usesLeanBodyMass {
                 lbmFormButton
             } else {
                 profileFormButton
@@ -296,14 +318,14 @@ struct RestingEnergySection: View {
         }
     }
     
-    func tappedFormula() {
-        model.changeRestingEnergySource(to: .formula)
+    func tappedEquation() {
+        model.changeRestingEnergySource(to: .equation)
     }
 
     var emptyContent: some View {
         HStack {
             BiometricButton(healthTitle: "Sync", action: tappedSyncWithHealth)
-            BiometricButton("Calculate", systemImage: "function", action: tappedFormula)
+            BiometricButton("Calculate", systemImage: "function", action: tappedEquation)
             BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
         }
         .padding(.horizontal, 15)
@@ -354,13 +376,14 @@ struct RestingEnergySection: View {
         case intervalTypePicker
         case intervalPeriodPicker
         case intervalValuePicker
+        case equationPicker
         
         var id: String { rawValue }
     }
     
     var intervalTypePickerSheet: some View {
         PickerSheet(
-            title: "Choose Timeframe",
+            title: "Choose a value",
             items: HealthIntervalType.pickerItems,
             pickedItem: model.restingEnergyInterval.intervalType.pickerItem,
             didPick: {
@@ -373,13 +396,26 @@ struct RestingEnergySection: View {
 
     var intervalPeriodPickerSheet: some View {
         PickerSheet(
-            title: "Rolling Average Period",
+            title: "Duration to average",
             items: HealthPeriod.pickerItems,
             pickedItem: model.restingEnergyInterval.period.pickerItem,
             didPick: {
                 Haptics.feedback(style: .soft)
                 guard let pickedPeriod = HealthPeriod(pickerItem: $0) else { return }
                 model.changeRestingEnergyIntervalPeriod(to: pickedPeriod)
+            }
+        )
+    }
+    
+    var equationPickerSheet: some View {
+        PickerSheet(
+            title: "Equation",
+            items: RestingEnergyEquation.pickerItems,
+            pickedItem: model.restingEnergyEquation.pickerItem,
+            didPick: {
+                Haptics.feedback(style: .soft)
+                guard let pickedEquation = RestingEnergyEquation(pickerItem: $0) else { return }
+                model.changeRestingEnergyEquation(to: pickedEquation)
             }
         )
     }
@@ -516,8 +552,8 @@ extension HealthIntervalType {
         PickerItem(
             id: "\(self.rawValue)",
             title: pickerDescription,
-            detail: nil,
-            secondaryDetail: pickerDetail,
+            detail: pickerDetail,
+            secondaryDetail: pickerSecondaryDetail,
             systemImage: systemImage
         )
     }
@@ -530,13 +566,73 @@ extension HealthIntervalType {
             return "sum"
         }
     }
-    
-    var pickerDetail: String {
+
+    var pickerDetail: String? {
         switch self {
         case .latest:
             return "Use the latest available value."
         case .average:
-            return "Use the average daily value for the past timeframe that you specify. This will continuously update to always average the latest timeframe."
+            return "Use the average daily value of the past x days/weeks/months. "
+        }
+    }
+
+    var pickerSecondaryDetail: String? {
+        switch self {
+        case .latest:
+            return nil
+        case .average:
+            return "This will a rolling average that updates every day."
+        }
+    }
+}
+
+extension RestingEnergyEquation {
+    static var pickerItems: [PickerItem] {
+        allCases
+            .sorted(by: { $0.year > $1.year })
+            .map { $0.pickerItem }
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id),
+              let source = RestingEnergyEquation(rawValue: int16) else {
+            return nil
+        }
+        self = source
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(self.rawValue)",
+            title: pickerTitle,
+            detail: pickerDetail,
+            secondaryDetail: pickerSecondaryDetail
+        )
+    }
+    
+    var pickerTitle: String {
+        "\(pickerDescription) • \(year)"
+    }
+
+    var pickerDetail: String? {
+        switch self {
+        case .rozaShizgal:
+            return "This is the revised Harris-Benedict equation."
+        case .schofield:
+            return "This is the equation used by the WHO."
+        default:
+            return nil
+        }
+    }
+
+    var pickerSecondaryDetail: String? {
+        switch self {
+        case .katchMcardle, .cunningham:
+            return "Uses your lean body mass."
+        case .henryOxford, .schofield:
+            return "Uses your age, weight and biological sex."
+        case .mifflinStJeor, .rozaShizgal, .harrisBenedict:
+            return "Uses your age, weight, height and biological sex."
         }
     }
 }

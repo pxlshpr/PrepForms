@@ -36,7 +36,7 @@ extension BiometricsModel {
             sexSyncStatus = .syncing
             weightSyncStatus = .syncing
             dobSyncStatus = .syncing
-            if restingEnergyFormula.requiresHeight {
+            if restingEnergyEquation.requiresHeight {
                 heightSyncStatus = .syncing
             }
         }
@@ -44,7 +44,7 @@ extension BiometricsModel {
         Task {
             do {
                 let quantityTypes: [HKQuantityTypeIdentifier]
-                if restingEnergyFormula.requiresHeight {
+                if restingEnergyEquation.requiresHeight {
                     quantityTypes = [.bodyMass, .height]
                 } else {
                     quantityTypes = [.bodyMass]
@@ -59,7 +59,7 @@ extension BiometricsModel {
                     changeSexSource(to: .health)
                     changeWeightSource(to: .health)
                     changeAgeSource(to: .health)
-                    if restingEnergyFormula.requiresHeight {
+                    if restingEnergyEquation.requiresHeight {
                         changeHeightSource(to: .health)
                     }
                 }

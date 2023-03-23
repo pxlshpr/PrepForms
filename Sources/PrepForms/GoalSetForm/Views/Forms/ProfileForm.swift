@@ -18,7 +18,7 @@ struct ProfileForm: View {
             AgeSection()
             BiologicalSexSection(includeFooter: true)
             WeightSection()
-            if model.restingEnergyFormula.requiresHeight {
+            if model.restingEnergyEquation.requiresHeight {
                 HeightSection()
             }
         }
@@ -27,7 +27,7 @@ struct ProfileForm: View {
     
     var infoSection: some View {
         FormStyledSection {
-            Text("These are used to calculate your resting energy using the \(model.restingEnergyFormula.menuDescription) formula.")
+            Text("These are used to calculate your resting energy using the \(model.restingEnergyEquation.menuDescription) equation.")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(.secondary)

@@ -55,8 +55,8 @@ struct LeanBodyMassSection: View {
                             EmptyView()
                         case .fatPercentage:
                             EmptyView()
-                        case .formula:
-                            formulaContent
+                        case .equation:
+                            equationContent
                         }
                         bottomRow
                     }
@@ -67,23 +67,23 @@ struct LeanBodyMassSection: View {
         }
     }
 
-    var formulaContent: some View {
-        var formulaRow: some View {
+    var equationContent: some View {
+        var equationRow: some View {
             var menu: some View {
                 Menu {
-                    Picker(selection: model.lbmFormulaBinding, label: EmptyView()) {
-                        ForEach(LeanBodyMassFormula.allCases, id: \.self) {
+                    Picker(selection: model.lbmEquationBinding, label: EmptyView()) {
+                        ForEach(LeanBodyMassEquation.allCases, id: \.self) {
                             Text($0.pickerDescription).tag($0)
                         }
                     }
                 } label: {
                     PickerLabel(
-                        model.lbmFormula.year,
-                        prefix: model.lbmFormula.menuDescription,
+                        model.lbmEquation.year,
+                        prefix: model.lbmEquation.menuDescription,
                         foregroundColor: .secondary,
                         prefixColor: .primary
                     )
-                    .animation(.none, value: model.lbmFormula)
+                    .animation(.none, value: model.lbmEquation)
                     .fixedSize(horizontal: true, vertical: false)
                 }
                 .contentShape(Rectangle())
@@ -97,7 +97,7 @@ struct LeanBodyMassSection: View {
                     Text("using")
                         .foregroundColor(Color(.tertiaryLabel))
                     menu
-                    Text("formula")
+                    Text("equation")
                         .foregroundColor(Color(.tertiaryLabel))
                 }
             }
@@ -105,7 +105,7 @@ struct LeanBodyMassSection: View {
         }
         
         return VStack {
-            formulaRow
+            equationRow
                 .padding(.bottom)
         }
     }
@@ -114,8 +114,8 @@ struct LeanBodyMassSection: View {
         model.changeLBMSource(to: .health)
     }
     
-    func tappedFormula() {
-        model.changeLBMSource(to: .formula)
+    func tappedEquation() {
+        model.changeLBMSource(to: .equation)
     }
     
     func tappedFatPercentage() {
@@ -135,7 +135,7 @@ struct LeanBodyMassSection: View {
                 BiometricButton("Enter", systemImage: "keyboard", action: tappedManualEntry)
             }
             HStack {
-                BiometricButton("Calculate", systemImage: "function", action: tappedFormula)
+                BiometricButton("Calculate", systemImage: "function", action: tappedEquation)
                 BiometricButton("Enter Fat %", systemImage: "function", action: tappedFatPercentage)
             }
         }

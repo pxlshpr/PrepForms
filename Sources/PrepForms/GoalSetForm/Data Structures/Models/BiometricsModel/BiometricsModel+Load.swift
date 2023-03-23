@@ -15,7 +15,7 @@ extension BiometricsModel {
         }
         
         self.restingEnergySource = biometrics.restingEnergy?.source
-        self.restingEnergyFormula = biometrics.restingEnergy?.formula ?? .katchMcardle
+        self.restingEnergyEquation = biometrics.restingEnergy?.equation ?? .katchMcardle
         self.restingEnergy = biometrics.restingEnergy?.amount
         self.restingEnergyTextFieldString = biometrics.restingEnergy?.amount?.cleanAmount ?? ""
         self.restingEnergyInterval = biometrics.restingEnergy?.interval ?? .init(1, .week)
@@ -27,7 +27,7 @@ extension BiometricsModel {
         self.activeEnergyInterval = biometrics.activeEnergy?.interval ?? .init(1, .day)
 
         self.lbmSource = biometrics.leanBodyMass?.source
-        self.lbmFormula = biometrics.leanBodyMass?.formula ?? .boer
+        self.lbmEquation = biometrics.leanBodyMass?.equation ?? .boer
         self.lbmDate = biometrics.leanBodyMass?.sampleDate
 
         if self.lbmSource == .fatPercentage {

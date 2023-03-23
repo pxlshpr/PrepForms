@@ -6,7 +6,7 @@ import PrepCoreDataStack
 
 class BiometricsModel: ObservableObject {
     @Published var restingEnergySource: RestingEnergySource? = nil
-    @Published var restingEnergyFormula: RestingEnergyFormula = .katchMcardle
+    @Published var restingEnergyEquation: RestingEnergyEquation = .katchMcardle
     @Published var restingEnergy: Double? = nil
     @Published var restingEnergyTextFieldString: String = ""
     @Published var restingEnergyInterval: HealthInterval = .init(1, .week)
@@ -18,7 +18,7 @@ class BiometricsModel: ObservableObject {
     @Published var activeEnergyInterval: HealthInterval = .init(1, .day)
 
     @Published var lbmSource: LeanBodyMassSource? = nil
-    @Published var lbmFormula: LeanBodyMassFormula = .boer
+    @Published var lbmEquation: LeanBodyMassEquation = .boer
     @Published var lbm: Double? = nil
     @Published var lbmTextFieldString: String = ""
     @Published var lbmDate: Date? = nil
@@ -73,13 +73,13 @@ extension BiometricsModel {
     
     var biometrics: Biometrics {
         
-        var restingEnergyFormula: RestingEnergyFormula? { restingEnergySource == .formula ? self.restingEnergyFormula : nil }
+        var restingEnergyEquation: RestingEnergyEquation? { restingEnergySource == .equation ? self.restingEnergyEquation : nil }
         var restingEnergyInterval: HealthInterval? { restingEnergySource == .health ? self.restingEnergyInterval : nil }
         
         var activeEnergyActivityLevel: ActivityLevel? { activeEnergySource == .activityLevel ? self.activeEnergyActivityLevel : nil }
         var activeEnergyInterval: HealthInterval? { activeEnergySource == .health ? self.activeEnergyInterval : nil }
         
-        var lbmFormula: LeanBodyMassFormula? { lbmSource == .formula ? self.lbmFormula : nil }
+        var lbmEquation: LeanBodyMassEquation? { lbmSource == .equation ? self.lbmEquation : nil }
         var lbmDate: Date? { lbmSource == .health ? self.lbmDate : nil }
         
         var weightDate: Date? { weightSource == .health ? self.weightDate : nil }
@@ -90,7 +90,7 @@ extension BiometricsModel {
                 amount: restingEnergyValue,
                 unit: UserManager.energyUnit,
                 source: restingEnergySource,
-                formula: restingEnergyFormula,
+                equation: restingEnergyEquation,
                 interval: restingEnergyInterval
             )
         }
@@ -110,7 +110,7 @@ extension BiometricsModel {
                 amount: lbmValue, /// We don't use `lbm` here because it may be the actual percentage
                 unit: UserManager.bodyMassUnit,
                 source: lbmSource,
-                formula: lbmFormula,
+                equation: lbmEquation,
                 date: lbmDate
             )
         }
@@ -177,7 +177,7 @@ extension BiometricsModel {
     
     var isSyncingRestingEnergy: Bool {
         restingEnergySource == .health
-        || restingEnergyFormulaParametersAreSynced
+        || restingEnergyEquationVariablesAreSynced
     }
     
     var isSyncingLeanBodyMass: Bool {

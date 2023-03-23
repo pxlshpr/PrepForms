@@ -30,7 +30,7 @@ extension BiometricsModel {
     
     var restingEnergyValue: Double? {
         switch restingEnergySource {
-        case .formula:
+        case .equation:
             return calculatedRestingEnergy
         default:
             return restingEnergy
@@ -39,7 +39,7 @@ extension BiometricsModel {
     
     var restingEnergyFormatted: String {
         switch restingEnergySource {
-        case .formula:
+        case .equation:
             return calculatedRestingEnergy?.formattedEnergy ?? "zero" /// this string is required for the redaction to be visible
         default:
             return restingEnergy?.formattedEnergy ?? ""
@@ -51,14 +51,14 @@ extension BiometricsModel {
     }
     
     var calculatedRestingEnergy: Double? {
-        guard restingEnergySource == .formula else { return nil }
-        switch restingEnergyFormula {
+        guard restingEnergySource == .equation else { return nil }
+        switch restingEnergyEquation {
         case .katchMcardle, .cunningham:
             guard let lbmInKg else { return nil }
-            return restingEnergyFormula.calculate(lbmInKg: lbmInKg, energyUnit: UserManager.energyUnit)
+            return restingEnergyEquation.calculate(lbmInKg: lbmInKg, energyUnit: UserManager.energyUnit)
         case .henryOxford, .schofield:
             guard let age, let weightInKg, let sex else { return nil }
-            return restingEnergyFormula.calculate(
+            return restingEnergyEquation.calculate(
                 age: age,
                 weightInKg: weightInKg,
                 sexIsFemale: sex == .female,
@@ -66,7 +66,7 @@ extension BiometricsModel {
             )
         default:
             guard let age, let weightInKg, let heightInCm, let sex else { return nil }
-            return restingEnergyFormula.calculate(
+            return restingEnergyEquation.calculate(
                 age: age,
                 weightInKg: weightInKg,
                 heightInCm: heightInCm,
@@ -78,7 +78,7 @@ extension BiometricsModel {
     
     var hasRestingEnergy: Bool {
         switch restingEnergySource {
-        case .formula:
+        case .equation:
             return calculatedRestingEnergy != nil
         case .health, .userEntered:
             return restingEnergy != nil
@@ -149,19 +149,19 @@ extension BiometricsModel {
         }
     }
     
-    var restingEnergyFormulaBinding: Binding<RestingEnergyFormula> {
-        Binding<RestingEnergyFormula>(
-            get: { self.restingEnergyFormula },
-            set: { newFormula in
+    var restingEnergyEquationBinding: Binding<RestingEnergyEquation> {
+        Binding<RestingEnergyEquation>(
+            get: { self.restingEnergyEquation },
+            set: { newEquation in
                 Haptics.feedback(style: .soft)
-                self.changeRestingEnergyFormula(to: newFormula)
+                self.changeRestingEnergyEquation(to: newEquation)
             }
         )
     }
     
-    func changeRestingEnergyFormula(to newFormula: RestingEnergyFormula) {
+    func changeRestingEnergyEquation(to newEquation: RestingEnergyEquation) {
         withAnimation {
-            self.restingEnergyFormula = newFormula
+            self.restingEnergyEquation = newEquation
         }
         saveBiometrics()
     }
@@ -298,9 +298,9 @@ extension BiometricsModel {
         )
     }
     
-    func changeActiveEnergyActivityLevel(to newFormula: ActivityLevel) {
+    func changeActiveEnergyActivityLevel(to newActivityLevel: ActivityLevel) {
         withAnimation {
-            self.activeEnergyActivityLevel = newFormula
+            self.activeEnergyActivityLevel = newActivityLevel
         }
         saveBiometrics()
     }
@@ -427,19 +427,9 @@ extension BiometricsModel {
         }
     }
     
-    var activeEnergyIntervalTypeBinding: Binding<HealthIntervalType> {
-        Binding<HealthIntervalType>(
-            get: { self.activeEnergyInterval.intervalType },
-            set: { newPeriod in
-                Haptics.feedback(style: .soft)
-                self.changeActiveEnergyIntervalType(to: newPeriod)
-            }
-        )
-    }
-    
-    func changeActiveEnergyIntervalType(to newPreiodType: HealthIntervalType) {
+    func changeActiveEnergyIntervalType(to newIntervalType: HealthIntervalType) {
         withAnimation {
-            if newPreiodType == .latest {
+            if newIntervalType == .latest {
                 activeEnergyInterval.value = 1
                 activeEnergyInterval.period = .day
             } else {
@@ -450,16 +440,6 @@ extension BiometricsModel {
         /// Ignore interval since we're only changing the period type
         activeEnergySyncStatus = .syncing
         syncActiveEnergy(ignoringInterval: true)
-    }
-    
-    var activeEnergyIntervalValueBinding: Binding<Int> {
-        Binding<Int>(
-            get: { self.activeEnergyInterval.value },
-            set: { newValue in
-                Haptics.feedback(style: .soft)
-                self.changeActiveEnergyIntervalValue(to: newValue)
-            }
-        )
     }
     
     func changeActiveEnergyIntervalValue(to newValue: Int) {
@@ -475,19 +455,9 @@ extension BiometricsModel {
         syncActiveEnergy()
     }
     
-    var activeEnergyIntervalPeriodBinding: Binding<HealthPeriod> {
-        Binding<HealthPeriod>(
-            get: { self.activeEnergyInterval.period },
-            set: { newInterval in
-                Haptics.feedback(style: .soft)
-                self.changeActiveEnergyPeriodInterval(to: newInterval)
-            }
-        )
-    }
-    
-    func changeActiveEnergyPeriodInterval(to newInterval: HealthPeriod) {
+    func changeActiveEnergyIntervalPeriod(to newPeriod: HealthPeriod) {
         withAnimation {
-            activeEnergyInterval.period = newInterval
+            activeEnergyInterval.period = newPeriod
             correctActiveEnergyIntervalValueIfNeeded()
         }
         
