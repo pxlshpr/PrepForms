@@ -687,7 +687,7 @@ extension GoalUnitPicker {
         @ViewBuilder
         var label: some View {
             if haveBodyMass {
-                if !model.bodyMassIsSyncedWithHealth {
+                if model.bodyMassIsSyncedWithHealth {
                     PickerLabel(
                         bodyMassFormattedWithUnit,
                         prefix: "\(bodyMassType.description)",
