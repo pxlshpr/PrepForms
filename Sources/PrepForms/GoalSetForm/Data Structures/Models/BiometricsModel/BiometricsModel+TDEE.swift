@@ -90,7 +90,7 @@ extension BiometricsModel {
     var restingEnergyPrefix: String? {
         switch restingEnergySource {
         case .health:
-            switch restingEnergyInterval.periodType {
+            switch restingEnergyInterval.intervalType {
             case .average:
                 return "daily average"
             case .latest:
@@ -166,19 +166,7 @@ extension BiometricsModel {
         saveBiometrics()
     }
     
-    var restingEnergyPeriodBinding: Binding<HealthPeriodType> {
-        Binding<HealthPeriodType>(
-            get: {
-                self.restingEnergyInterval.periodType
-            },
-            set: { newPeriod in
-                Haptics.feedback(style: .soft)
-                self.changeRestingEnergyPeriod(to: newPeriod)
-            }
-        )
-    }
-    
-    func changeRestingEnergyPeriod(to newPeriod: HealthPeriodType) {
+    func changeRestingEnergyIntervalType(to newPeriod: HealthIntervalType) {
         withAnimation {
             if newPeriod == .latest {
                 restingEnergyInterval.value = 1
@@ -214,19 +202,19 @@ extension BiometricsModel {
         syncRestingEnergy()
     }
     
-    var restingEnergyIntervalBinding: Binding<HealthPeriod> {
-        Binding<HealthPeriod>(
-            get: {
-                self.restingEnergyInterval.period
-            },
-            set: { newInterval in
-                Haptics.feedback(style: .soft)
-                self.changeRestingEnergyInterval(to: newInterval)
-            }
-        )
-    }
+//    var restingEnergyIntervalBinding: Binding<HealthPeriod> {
+//        Binding<HealthPeriod>(
+//            get: {
+//                self.restingEnergyInterval.period
+//            },
+//            set: { newInterval in
+//                Haptics.feedback(style: .soft)
+//                self.changeRestingEnergyIntervalPeriod(to: newInterval)
+//            }
+//        )
+//    }
     
-    func changeRestingEnergyInterval(to newPeriod: HealthPeriod) {
+    func changeRestingEnergyIntervalPeriod(to newPeriod: HealthPeriod) {
         withAnimation {
             restingEnergyInterval.period = newPeriod
             correctRestingEnergyIntervalValueIfNeeded()
@@ -392,7 +380,7 @@ extension BiometricsModel {
     var activeEnergyPrefix: String? {
         switch activeEnergySource {
         case .health:
-            switch activeEnergyInterval.periodType {
+            switch activeEnergyInterval.intervalType {
             case .average:
                 return "daily average"
             case .latest:
@@ -451,17 +439,17 @@ extension BiometricsModel {
         }
     }
     
-    var activeEnergyPeriodTypeBinding: Binding<HealthPeriodType> {
-        Binding<HealthPeriodType>(
-            get: { self.activeEnergyInterval.periodType },
+    var activeEnergyIntervalTypeBinding: Binding<HealthIntervalType> {
+        Binding<HealthIntervalType>(
+            get: { self.activeEnergyInterval.intervalType },
             set: { newPeriod in
                 Haptics.feedback(style: .soft)
-                self.changeActiveEnergyPeriodType(to: newPeriod)
+                self.changeActiveEnergyIntervalType(to: newPeriod)
             }
         )
     }
     
-    func changeActiveEnergyPeriodType(to newPreiodType: HealthPeriodType) {
+    func changeActiveEnergyIntervalType(to newPreiodType: HealthIntervalType) {
         withAnimation {
             if newPreiodType == .latest {
                 activeEnergyInterval.value = 1

@@ -75,16 +75,16 @@ struct ActiveEnergySection: View {
     }
     
     var healthPeriodContent: some View {
-        var periodTypeMenu: some View {
+        var intervalTypeMenu: some View {
            Menu {
-               Picker(selection: model.activeEnergyPeriodTypeBinding, label: EmptyView()) {
-                    ForEach(HealthPeriodType.allCases, id: \.self) {
+               Picker(selection: model.activeEnergyIntervalTypeBinding, label: EmptyView()) {
+                    ForEach(HealthIntervalType.allCases, id: \.self) {
                         Text($0.pickerDescription).tag($0)
                     }
                 }
             } label: {
                 PickerLabel(
-                    model.activeEnergyInterval.periodType.menuDescription,
+                    model.activeEnergyInterval.intervalType.menuDescription,
                     imageColor: .green,
                     backgroundColor: .green,
                     foregroundColor: .green
@@ -98,7 +98,7 @@ struct ActiveEnergySection: View {
             })
         }
         
-        var periodValueMenu: some View {
+        var intervalValueMenu: some View {
             Menu {
                 Picker(selection: model.activeEnergyIntervalValueBinding, label: EmptyView()) {
                     ForEach(model.activeEnergyIntervalValues, id: \.self) { quantity in
@@ -150,7 +150,7 @@ struct ActiveEnergySection: View {
                 HStack(spacing: 5) {
                     Text("previous")
                         .foregroundColor(Color(.tertiaryLabel))
-                    periodValueMenu
+                    intervalValueMenu
                     periodIntervalMenu
                 }
                 Spacer()
@@ -163,11 +163,11 @@ struct ActiveEnergySection: View {
                 HStack {
                     Text("using")
                         .foregroundColor(Color(.tertiaryLabel))
-                    periodTypeMenu
+                    intervalTypeMenu
                 }
                 Spacer()
             }
-            if model.activeEnergyInterval.periodType == .average {
+            if model.activeEnergyInterval.intervalType == .average {
                 intervalRow
             }
         }

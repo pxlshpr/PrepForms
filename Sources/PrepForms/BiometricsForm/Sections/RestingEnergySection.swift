@@ -32,6 +32,10 @@ struct RestingEnergySection: View {
             leanBodyMassForm
         case .profileForm:
             profileForm
+        case .intervalTypePicker:
+            intervalTypePickerSheet
+        case .intervalPeriodPicker:
+            intervalPeriodPickerSheet
         }
     }
     
@@ -118,14 +122,6 @@ struct RestingEnergySection: View {
         .padding(.horizontal, 17)
     }
 
-    enum Sheet: String, Identifiable {
-        case profileForm
-        case leanBodyMassForm
-        case sourcePicker
-        
-        var id: String { rawValue }
-    }
-    
     func present(_ sheet: Sheet) {
         
         func present() {
@@ -349,35 +345,98 @@ struct RestingEnergySection: View {
         .padding(.horizontal)
     }
     
-    var healthPeriodContent: some View {
-        var periodTypeMenu: some View {
-           Menu {
-               Picker(selection: model.restingEnergyPeriodBinding, label: EmptyView()) {
-                    ForEach(HealthPeriodType.allCases, id: \.self) {
-                        Text($0.pickerDescription).tag($0)
-                    }
-                }
-            } label: {
-                BiometricPickerLabel(
-                    model.restingEnergyInterval.periodType.menuDescription
-                )
-//                PickerLabel(
-//                    model.restingEnergyInterval.periodType.menuDescription,
-//                    imageColor: .green,
-//                    backgroundColor: .green,
-//                    foregroundColor: .green
-//                )
-                .animation(.none, value: model.restingEnergyInterval)
-                .fixedSize(horizontal: true, vertical: false)
-            }
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
+    enum Sheet: String, Identifiable {
+        case profileForm
+        case leanBodyMassForm
+        case sourcePicker
+        case intervalTypePicker
+        case intervalPeriodPicker
+        
+        var id: String { rawValue }
+    }
+    
+    var intervalTypePickerSheet: some View {
+        PickerSheet(
+            title: "Choose Timeframe Type",
+            items: HealthIntervalType.pickerItems,
+            pickedItem: model.restingEnergyInterval.intervalType.pickerItem,
+            didPick: {
                 Haptics.feedback(style: .soft)
-            })
+                guard let pickedType = HealthIntervalType(pickerItem: $0) else { return }
+                model.changeRestingEnergyIntervalType(to: pickedType)
+            }
+        )
+    }
+
+    var intervalPeriodPickerSheet: some View {
+        PickerSheet(
+            title: "Choose Timeframe Period",
+            items: HealthPeriod.pickerItems,
+            pickedItem: model.restingEnergyInterval.period.pickerItem,
+            didPick: {
+                Haptics.feedback(style: .soft)
+                guard let pickedPeriod = HealthPeriod(pickerItem: $0) else { return }
+                model.changeRestingEnergyIntervalPeriod(to: pickedPeriod)
+            }
+        )
+    }
+
+    var healthPeriodContent: some View {
+        var intervalTypeMenu: some View {
+            var pickerButton: some View {
+                Button {
+                    Haptics.feedback(style: .soft)
+                    present(.intervalTypePicker)
+                } label: {
+                    BiometricPickerLabel(model.restingEnergyInterval.intervalType.menuDescription)
+                }
+            }
+            
+            return HStack {
+                pickerButton
+                Spacer()
+            }
+        }
+        
+        var periodIntervalMenu: some View {
+            var pickerButton: some View {
+                Button {
+                    Haptics.feedback(style: .soft)
+                    present(.intervalPeriodPicker)
+                } label: {
+                    BiometricPickerLabel(
+                        "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")"
+                    )
+                }
+            }
+            
+            return HStack {
+                pickerButton
+                Spacer()
+            }
+
+//            Menu {
+//                Picker(selection: model.restingEnergyIntervalBinding, label: EmptyView()) {
+//                    ForEach(HealthPeriod.allCases, id: \.self) { interval in
+//                        Text("\(interval.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")").tag(interval)
+//                    }
+//                }
+//            } label: {
+//                BiometricPickerLabel(
+//                    "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")"
+//                )
+//                .animation(.none, value: model.restingEnergyInterval)
+//                .fixedSize(horizontal: true, vertical: false)
+//            }
+//            .contentShape(Rectangle())
+//            .simultaneousGesture(TapGesture().onEnded {
+//                Haptics.feedback(style: .soft)
+//            })
 
         }
         
-        var periodValueMenu: some View {
+        
+        var intervalValueMenu: some View {
             Menu {
                 Picker(selection: model.restingEnergyIntervalValueBinding, label: EmptyView()) {
                     ForEach(model.restingEnergyIntervalValues, id: \.self) { quantity in
@@ -385,44 +444,9 @@ struct RestingEnergySection: View {
                     }
                 }
             } label: {
-                BiometricPickerLabel(
-                    "\(model.restingEnergyInterval.value)"
-                )
-//                PickerLabel(
-//                    "\(model.restingEnergyInterval.value)",
-//                    imageColor: .green,
-//                    backgroundColor: .green,
-//                    foregroundColor: .green
-//                )
-                .animation(.none, value: model.restingEnergyInterval)
-                .fixedSize(horizontal: true, vertical: false)
-            }
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
-                Haptics.feedback(style: .soft)
-            })
-
-        }
-        
-        var periodIntervalMenu: some View {
-            Menu {
-                Picker(selection: model.restingEnergyIntervalBinding, label: EmptyView()) {
-                    ForEach(HealthPeriod.allCases, id: \.self) { interval in
-                        Text("\(interval.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")").tag(interval)
-                    }
-                }
-            } label: {
-                BiometricPickerLabel(
-                    "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")"
-                )
-//                PickerLabel(
-//                    "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")",
-//                    imageColor: .green,
-//                    backgroundColor: .green,
-//                    foregroundColor: .green
-//                )
-                .animation(.none, value: model.restingEnergyInterval)
-                .fixedSize(horizontal: true, vertical: false)
+                BiometricPickerLabel("\(model.restingEnergyInterval.value)")
+                    .animation(.none, value: model.restingEnergyInterval)
+                    .fixedSize(horizontal: true, vertical: false)
             }
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
@@ -437,7 +461,7 @@ struct RestingEnergySection: View {
                 HStack(spacing: 5) {
                     Text("previous")
                         .foregroundColor(Color(.tertiaryLabel))
-                    periodValueMenu
+                    intervalValueMenu
                     periodIntervalMenu
                 }
                 Spacer()
@@ -450,11 +474,11 @@ struct RestingEnergySection: View {
                 HStack {
                     Text("using")
                         .foregroundColor(Color(.tertiaryLabel))
-                    periodTypeMenu
+                    intervalTypeMenu
                 }
                 Spacer()
             }
-            if model.restingEnergyInterval.periodType == .average {
+            if model.restingEnergyInterval.intervalType == .average {
                 intervalRow
             }
         }
@@ -470,6 +494,83 @@ struct RestingEnergySection: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 10)
+        }
+    }
+}
+
+extension HealthPeriod {
+    static var pickerItems: [PickerItem] {
+        allCases.map { $0.pickerItem }
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id),
+              let source = HealthPeriod(rawValue: int16) else {
+            return nil
+        }
+        self = source
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(self.rawValue)",
+            title: description,
+            detail: nil,
+            secondaryDetail: pickerDetail
+        )
+    }
+    
+    var pickerDetail: String {
+        switch self {
+        case .day:
+            return "e.g. past 3 days"
+        case .week:
+            return "e.g. past 2 weeks"
+        case .month:
+            return "e.g. past month"
+        }
+    }
+}
+
+
+extension HealthIntervalType {
+    static var pickerItems: [PickerItem] {
+        allCases.map { $0.pickerItem }
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id),
+              let source = HealthIntervalType(rawValue: int16) else {
+            return nil
+        }
+        self = source
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(self.rawValue)",
+            title: pickerDescription,
+            detail: nil,
+            secondaryDetail: pickerDetail,
+            systemImage: systemImage
+        )
+    }
+    
+    var systemImage: String? {
+        switch self {
+        case .latest:
+            return "calendar.badge.clock"
+        case .average:
+            return "sum"
+        }
+    }
+    
+    var pickerDetail: String {
+        switch self {
+        case .latest:
+            return "Latest value in your Health App data."
+        case .average:
+            return "This is the average daily value for the past timeframe that you specify. It is a rolling average that will change every day."
         }
     }
 }
