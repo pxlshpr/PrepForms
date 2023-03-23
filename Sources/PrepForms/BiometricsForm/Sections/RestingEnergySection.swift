@@ -36,6 +36,8 @@ struct RestingEnergySection: View {
             intervalTypePickerSheet
         case .intervalPeriodPicker:
             intervalPeriodPickerSheet
+        case .intervalValuePicker:
+            intervalValuePickerSheet
         }
     }
     
@@ -351,6 +353,7 @@ struct RestingEnergySection: View {
         case sourcePicker
         case intervalTypePicker
         case intervalPeriodPicker
+        case intervalValuePicker
         
         var id: String { rawValue }
     }
@@ -370,7 +373,7 @@ struct RestingEnergySection: View {
 
     var intervalPeriodPickerSheet: some View {
         PickerSheet(
-            title: "Rolling Average's Period",
+            title: "Rolling Average Period",
             items: HealthPeriod.pickerItems,
             pickedItem: model.restingEnergyInterval.period.pickerItem,
             didPick: {
@@ -380,79 +383,53 @@ struct RestingEnergySection: View {
             }
         )
     }
+    
+    var intervalValuePickerSheet: some View {
+        var items: [PickerItem] {
+            model.restingEnergyIntervalValues.map { PickerItem(with: $0) }
+        }
+        
+        return PickerSheet(
+            title: "\(model.restingEnergyInterval.period.description.capitalizingFirstLetter())s to average",
+            items: items,
+            pickedItem: PickerItem(with: model.restingEnergyInterval.value),
+            didPick: {
+                Haptics.feedback(style: .soft)
+                guard let value = Int($0.id) else { return }
+                model.changeRestingEnergyIntervalValue(to: value)
+            }
+        )
+    }
 
     var healthPeriodContent: some View {
         var intervalTypeMenu: some View {
-            var pickerButton: some View {
-                Button {
-                    Haptics.feedback(style: .soft)
-                    present(.intervalTypePicker)
-                } label: {
-                    BiometricPickerLabel(model.restingEnergyInterval.intervalType.menuDescription)
-                }
-            }
-            
-            return HStack {
-                pickerButton
-                Spacer()
+            Button {
+                Haptics.feedback(style: .soft)
+                present(.intervalTypePicker)
+            } label: {
+                BiometricPickerLabel(model.restingEnergyInterval.intervalType.menuDescription)
             }
         }
         
         var periodIntervalMenu: some View {
-            var pickerButton: some View {
-                Button {
-                    Haptics.feedback(style: .soft)
-                    present(.intervalPeriodPicker)
-                } label: {
-                    BiometricPickerLabel(
-                        "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")"
-                    )
-                }
+            Button {
+                Haptics.feedback(style: .soft)
+                present(.intervalPeriodPicker)
+            } label: {
+                BiometricPickerLabel(
+                    "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")"
+                )
             }
-            
-            return HStack {
-                pickerButton
-                Spacer()
-            }
-
-//            Menu {
-//                Picker(selection: model.restingEnergyIntervalBinding, label: EmptyView()) {
-//                    ForEach(HealthPeriod.allCases, id: \.self) { interval in
-//                        Text("\(interval.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")").tag(interval)
-//                    }
-//                }
-//            } label: {
-//                BiometricPickerLabel(
-//                    "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")"
-//                )
-//                .animation(.none, value: model.restingEnergyInterval)
-//                .fixedSize(horizontal: true, vertical: false)
-//            }
-//            .contentShape(Rectangle())
-//            .simultaneousGesture(TapGesture().onEnded {
-//                Haptics.feedback(style: .soft)
-//            })
-
         }
         
         
         var intervalValueMenu: some View {
-            Menu {
-                Picker(selection: model.restingEnergyIntervalValueBinding, label: EmptyView()) {
-                    ForEach(model.restingEnergyIntervalValues, id: \.self) { quantity in
-                        Text("\(quantity)").tag(quantity)
-                    }
-                }
+            Button {
+                Haptics.feedback(style: .soft)
+                present(.intervalValuePicker)
             } label: {
                 BiometricPickerLabel("\(model.restingEnergyInterval.value)")
-                    .animation(.none, value: model.restingEnergyInterval)
-                    .fixedSize(horizontal: true, vertical: false)
             }
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
-                Haptics.feedback(style: .soft)
-            })
-
         }
         
         var intervalRow: some View {
