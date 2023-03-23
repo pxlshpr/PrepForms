@@ -581,7 +581,7 @@ extension HealthIntervalType {
         case .latest:
             return nil
         case .average:
-            return "This will a rolling average that updates every day."
+            return "This will be a rolling average that updates every day."
         }
     }
 }
