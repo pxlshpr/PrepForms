@@ -175,10 +175,20 @@ extension BiometricsModel {
         updatedTypes.contains(type)
     }
     
+    var isSyncingRestingEnergy: Bool {
+        restingEnergySource == .health
+        || restingEnergyFormulaParametersAreSynced
+    }
+    
+    var isSyncingLeanBodyMass: Bool {
+        lbmSource == .health
+        || leanBodyMassParametersAreSynced
+    }
+    
     func isSyncing(_ type: BiometricType) -> Bool {
         switch type {
         case .restingEnergy:
-            return restingEnergySource == .health
+            return isSyncingRestingEnergy
         case .activeEnergy:
             return activeEnergySource == .health
         case .sex:
@@ -188,7 +198,7 @@ extension BiometricsModel {
         case .weight:
             return weightSource == .health
         case .leanBodyMass:
-            return lbmSource == .health
+            return isSyncingLeanBodyMass
         case .height:
             return heightSource == .health
         default:

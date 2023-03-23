@@ -14,10 +14,22 @@ extension BiometricsModel {
     }
     
     var restingEnergyFormulaParametersAreSynced: Bool {
-        hasRestingEnergyFormulaParameters
-        && (weightSource == .health || heightSource == .health)
+        guard hasRestingEnergyFormulaParameters, restingEnergySource == .formula else {
+            return false
+        }
+        
+        if restingEnergyFormula.usesLeanBodyMass {
+            return isSyncingLeanBodyMass
+        } else {
+            return weightSource == .health
+        }
     }
-    
+
+    var leanBodyMassParametersAreSynced: Bool {
+        guard lbmSource == .formula || lbmSource == .fatPercentage else { return false }
+        return weightSource == .health
+    }
+
     var shouldShowSyncAllForMeasurementsForm: Bool {
         var countNotSynced = 0
         if sexSource != .health { countNotSynced += 1 }

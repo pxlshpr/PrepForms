@@ -10,6 +10,7 @@ struct ActiveEnergySection: View {
     
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
+    @State var showingSourcePicker = false
 
     var body: some View {
         VStack(spacing: 7) {
@@ -37,28 +38,37 @@ struct ActiveEnergySection: View {
             .environmentObject(model)
             .padding(.horizontal, 20)
     }
-    
+
     var sourceSection: some View {
-        var sourceMenu: some View {
-            Menu {
-                Picker(selection: model.activeEnergySourceBinding, label: EmptyView()) {
-                    ForEach(ActiveEnergySource.allCases, id: \.self) {
-                        Label($0.menuDescription, systemImage: $0.systemImage).tag($0)
-                    }
-                }
-            } label: {
-                BiometricSourcePickerLabel(source: model.activeEnergySourceBinding.wrappedValue)
-            }
-            .animation(.none, value: model.activeEnergySource)
-            .fixedSize(horizontal: true, vertical: false)
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
-                Haptics.feedback(style: .light)
-            })
+        var label: some View {
+            BiometricSourcePickerLabel(source: model.activeEnergySourceBinding.wrappedValue)
         }
         
+        var sourcePickerSheet: some View {
+            PickerSheet(
+                title: "Choose a Source",
+                items: ActiveEnergySource.pickerItems,
+                pickedItem: model.activeEnergySource?.pickerItem,
+                didPick: {
+                    Haptics.feedback(style: .soft)
+                    guard let pickedSource = ActiveEnergySource(pickerItem: $0) else { return }
+                    model.changeActiveEnergySource(to: pickedSource)
+                }
+            )
+        }
+        
+        var pickerButton: some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                showingSourcePicker = true
+            } label: {
+                label
+            }
+            .sheet(isPresented: $showingSourcePicker) { sourcePickerSheet }
+        }
+
         return HStack {
-            sourceMenu
+            pickerButton
             Spacer()
         }
         .padding(.horizontal, 17)

@@ -61,7 +61,8 @@ struct ButtonLabel: View {
             Image(systemName: leadingSystemImage)
                 .imageScale(leadingImageScale)
                 .foregroundColor(foregroundColor)
-        } else if style == .health || style == .healthPlain {
+//        } else if style == .health || style == .healthPlain {
+        } else if style == .healthPlain {
             Image(systemName: "heart.fill")
                 .symbolRenderingMode(.palette)
                 .foregroundStyle(HealthGradient)
@@ -90,7 +91,8 @@ struct ButtonLabel: View {
         case .healthAccented:
             return .white.opacity(0.9)
         case .health:
-            return HealthTopColor
+            return .green
+//            return HealthTopColor
         }
     }
     
@@ -130,7 +132,8 @@ struct ButtonLabel: View {
                 case .plain, .healthPlain:
                     return Color(.secondaryLabel)
                 case .health, .healthAccented:
-                    return HealthTopColor
+                    return .green
+//                    return HealthTopColor
                 case .accent:
                     return Color.accentColor
                 }
@@ -141,7 +144,8 @@ struct ButtonLabel: View {
                 case .plain, .healthPlain:
                     return Color(.secondaryLabel)
                 case .health, .healthAccented:
-                    return HealthBottomColor
+                    return .green
+//                    return HealthBottomColor
                 case .accent:
                     return Color.accentColor
                 }

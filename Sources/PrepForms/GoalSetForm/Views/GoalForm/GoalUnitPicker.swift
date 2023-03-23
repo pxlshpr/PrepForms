@@ -8,6 +8,7 @@ struct GoalUnitPicker: View {
     
     @Environment(\.dismiss) var dismiss
     
+    @StateObject var biometricsModel = BiometricsModel()
     @ObservedObject var model: GoalModel
     @State var presentedSheet: Sheet? = nil
     
@@ -209,9 +210,9 @@ struct GoalUnitPicker: View {
         case .tdee:
             EmptyView()
         case .weight:
-            EmptyView()
+            WeightForm()
         case .leanBodyMass:
-            EmptyView()
+            LeanBodyMassForm(biometricsModel)
             
         case .deltaPicker:
             deltaPickerSheet
@@ -725,14 +726,13 @@ extension GoalUnitPicker {
         
         var button: some View {
             Button {
-                //                Haptics.feedback(style: .soft)
-                //                shouldResignFocus.toggle()
-                //                switch pickedBodyMassType {
-                //                case .weight:
-                //                    showingWeightForm = true
-                //                case .leanMass:
-                //                    showingLeanMassForm = true
-                //                }
+                Haptics.feedback(style: .soft)
+                switch type.bodyMassType {
+                case .leanMass:
+                    present(.leanBodyMass)
+                default:
+                    present(.weight)
+                }
             } label: {
                 label
             }

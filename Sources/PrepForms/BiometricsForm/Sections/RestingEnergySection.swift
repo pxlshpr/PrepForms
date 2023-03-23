@@ -10,6 +10,7 @@ struct RestingEnergySection: View {
     
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
+    @State var presentedSheet: Sheet? = nil
     
     var body: some View {
         VStack(spacing: 7) {
@@ -19,6 +20,19 @@ struct RestingEnergySection: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 10)
+        .sheet(item: $presentedSheet) { sheet(for: $0) }
+    }
+    
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        switch sheet {
+        case .sourcePicker:
+            sourcePickerSheet
+        case .leanBodyMassForm:
+            leanBodyMassForm
+        case .profileForm:
+            profileForm
+        }
     }
     
     var header: some View {
@@ -70,31 +84,67 @@ struct RestingEnergySection: View {
         }
     }
 
+    var sourcePickerSheet: some View {
+        PickerSheet(
+            title: "Choose a Source",
+            items: RestingEnergySource.pickerItems,
+            pickedItem: model.restingEnergySource?.pickerItem,
+            didPick: {
+                Haptics.feedback(style: .soft)
+                guard let pickedSource = RestingEnergySource(pickerItem: $0) else { return }
+                model.changeRestingEnergySource(to: pickedSource)
+            }
+        )
+    }
     
     var sourceSection: some View {
-        var sourceMenu: some View {
-            Menu {
-                Picker(selection: model.restingEnergySourceBinding, label: EmptyView()) {
-                    ForEach(RestingEnergySource.allCases, id: \.self) {
-                        Label($0.menuDescription, systemImage: $0.systemImage).tag($0)
-                    }
-                }
+        var label: some View {
+            BiometricSourcePickerLabel(source: model.restingEnergySourceBinding.wrappedValue)
+        }
+
+        var pickerButton: some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                present(.sourcePicker)
             } label: {
-                BiometricSourcePickerLabel(source: model.restingEnergySourceBinding.wrappedValue)
+                label
             }
-            .animation(.none, value: model.restingEnergySource)
-            .fixedSize(horizontal: true, vertical: false)
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
-                Haptics.feedback(style: .light)
-            })
         }
         
         return HStack {
-            sourceMenu
+            pickerButton
             Spacer()
         }
         .padding(.horizontal, 17)
+    }
+
+    enum Sheet: String, Identifiable {
+        case profileForm
+        case leanBodyMassForm
+        case sourcePicker
+        
+        var id: String { rawValue }
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedSheet = sheet
+        }
+        
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+        
+        if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else {
+            present()
+        }
     }
     
     //MARK: - Formula Content
@@ -141,25 +191,38 @@ struct RestingEnergySection: View {
         .padding(.top, 8)
     }
     
+    var leanBodyMassForm: some View {
+        LeanBodyMassForm(model)
+    }
+    
+    var profileForm: some View {
+        ProfileForm()
+            .environmentObject(model)
+    }
+    
     var parametersRow: some View {
         
-        var lbmFormLink: some View {
-            NavigationLink {
-                LeanBodyMassForm()
-                    .environmentObject(model)
+        var lbmFormButton: some View {
+            let isSyncedBinding = Binding<Bool>(
+                get: { model.restingEnergyFormulaParametersAreSynced },
+                set: { _ in }
+            )
+            return Button {
+                Haptics.feedback(style: .soft)
+                present(.leanBodyMassForm)
             } label: {
                 MeasurementLabel(
                     label: model.hasLeanBodyMass ? "lean body mass" : "set lean body mass",
                     valueString: model.lbmFormattedWithUnit,
-                    useHealthAppData: model.restingEnergyFormulaUsingSyncedHealthData
+                    useHealthAppData: isSyncedBinding.wrappedValue
                 )
             }
         }
         
-        var parametersFormLink: some View {
-            NavigationLink {
-                ProfileForm()
-                    .environmentObject(model)
+        var profileFormButton: some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                present(.profileForm)
             } label: {
                 if model.hasRestingEnergyFormulaParameters,
                    let age = model.age,
@@ -199,9 +262,9 @@ struct RestingEnergySection: View {
         @ViewBuilder
         var link: some View {
             if model.restingEnergyFormula.usesLeanBodyMass {
-                lbmFormLink
+                lbmFormButton
             } else {
-                parametersFormLink
+                profileFormButton
             }
         }
 
@@ -295,12 +358,15 @@ struct RestingEnergySection: View {
                     }
                 }
             } label: {
-                PickerLabel(
-                    model.restingEnergyInterval.periodType.menuDescription,
-                    imageColor: .green,
-                    backgroundColor: .green,
-                    foregroundColor: .green
+                BiometricPickerLabel(
+                    model.restingEnergyInterval.periodType.menuDescription
                 )
+//                PickerLabel(
+//                    model.restingEnergyInterval.periodType.menuDescription,
+//                    imageColor: .green,
+//                    backgroundColor: .green,
+//                    foregroundColor: .green
+//                )
                 .animation(.none, value: model.restingEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
             }
@@ -319,12 +385,15 @@ struct RestingEnergySection: View {
                     }
                 }
             } label: {
-                PickerLabel(
-                    "\(model.restingEnergyInterval.value)",
-                    imageColor: .green,
-                    backgroundColor: .green,
-                    foregroundColor: .green
+                BiometricPickerLabel(
+                    "\(model.restingEnergyInterval.value)"
                 )
+//                PickerLabel(
+//                    "\(model.restingEnergyInterval.value)",
+//                    imageColor: .green,
+//                    backgroundColor: .green,
+//                    foregroundColor: .green
+//                )
                 .animation(.none, value: model.restingEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
             }
@@ -343,12 +412,15 @@ struct RestingEnergySection: View {
                     }
                 }
             } label: {
-                PickerLabel(
-                    "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")",
-                    imageColor: .green,
-                    backgroundColor: .green,
-                    foregroundColor: .green
+                BiometricPickerLabel(
+                    "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")"
                 )
+//                PickerLabel(
+//                    "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")",
+//                    imageColor: .green,
+//                    backgroundColor: .green,
+//                    foregroundColor: .green
+//                )
                 .animation(.none, value: model.restingEnergyInterval)
                 .fixedSize(horizontal: true, vertical: false)
             }

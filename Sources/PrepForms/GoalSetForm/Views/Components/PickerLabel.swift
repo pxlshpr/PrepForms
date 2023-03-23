@@ -219,23 +219,28 @@ struct ProfileLabel: View {
                 Text(sex.description.lowercased())
                     .fontWeight(.bold)
                     .foregroundColor(primaryColor)
+                Image(systemName: "chevron.right")
+                    .imageScale(.small)
+                    .foregroundColor(primaryColor)
             }
             .fixedSize(horizontal: true, vertical: false)
             .frame(height: 25)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 5)
+            .padding(.horizontal, 15)
+            .padding(.vertical, 12)
         }
     }
     
     var primaryColor: Color {
-//        isSynced ? .white : .primary
         isSynced
-        ? HealthTopColor
+//        ? HealthTopColor
+        ? .green
         : Color(.secondaryLabel)
     }
     
     var secondaryColor: Color {
-        isSynced ? .white.opacity(0.75) : .secondary
+        isSynced
+        ? .green.opacity(0.75)
+        : .secondary
     }
     
     func pair(_ value: Int, _ unit: String) -> some View {
@@ -243,42 +248,21 @@ struct ProfileLabel: View {
             Text("\(value)")
                 .foregroundColor(primaryColor)
                 .fontWeight(.bold)
-//                .foregroundColor(HealthTopColor)
             Text(unit)
                 .font(.footnote)
-//                .foregroundColor(secondaryColor)
                 .foregroundColor(primaryColor)
         }
     }
     
     var background: some View {
-        var color: Color {
-            colorScheme == .light ? Color(hex: "e8e9ea") : Color(hex: "434447")
+        var backgroundColor: Color {
+            isSynced ? .green : Color(.secondaryLabel)
         }
-//        return Capsule(style: .continuous)
         return RoundedRectangle(cornerRadius: 7, style: .continuous)
-            .if(isSynced, transform: { view in
-                view
-                    .foregroundStyle(
-                        .linearGradient(
-                            colors: [
-                                HealthTopColor,
-                                HealthBottomColor
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .opacity(colorScheme == .dark ? 0.1 : 0.15)
-                    )
-            })
-                .if(!isSynced, transform: { view in
-                    view
-                        .foregroundColor(
-                            Color(.secondaryLabel)
-//                            color
-                                .opacity(colorScheme == .dark ? 0.1 : 0.15)
-                        )
-                })
+            .foregroundColor(
+                backgroundColor
+                    .opacity(colorScheme == .dark ? 0.1 : 0.15)
+            )
     }
 }
 

@@ -9,6 +9,7 @@ struct AgeSection: View {
     
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
+    @State var showingSourcePicker = false
 
     var body: some View {
         FormStyledSection(header: header) {
@@ -77,26 +78,36 @@ struct AgeSection: View {
     }
     
     var sourceSection: some View {
-        var sourceMenu: some View {
-            Menu {
-                Picker(selection: model.ageSourceBinding, label: EmptyView()) {
-                    ForEach(MeasurementSource.allCases, id: \.self) {
-                        Label($0.pickerDescription, systemImage: $0.systemImage).tag($0)
-                    }
+        
+        var label: some View {
+            BiometricSourcePickerLabel(source: model.ageSourceBinding.wrappedValue)
+        }
+        
+        var sourcePickerSheet: some View {
+            PickerSheet(
+                title: "Choose a Source",
+                items: MeasurementSource.pickerItems,
+                pickedItem: model.ageSource?.pickerItem,
+                didPick: {
+                    Haptics.feedback(style: .soft)
+                    guard let pickedSource = MeasurementSource(pickerItem: $0) else { return }
+                    model.changeAgeSource(to: pickedSource)
                 }
+            )
+        }
+        
+        var pickerButton: some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                showingSourcePicker = true
             } label: {
-                BiometricSourcePickerLabel(source: model.ageSourceBinding.wrappedValue)
+                label
             }
-            .animation(.none, value: model.ageSource)
-            .fixedSize(horizontal: true, vertical: false)
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
-                Haptics.feedback(style: .light)
-            })
+            .sheet(isPresented: $showingSourcePicker) { sourcePickerSheet }
         }
         
         return HStack {
-            sourceMenu
+            pickerButton
             Spacer()
         }
     }

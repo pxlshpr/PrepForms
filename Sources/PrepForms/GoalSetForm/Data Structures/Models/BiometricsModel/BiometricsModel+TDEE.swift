@@ -28,21 +28,6 @@ extension BiometricsModel {
 
 extension BiometricsModel {
     
-    var restingEnergyFormulaUsingSyncedHealthData: Bool {
-        if restingEnergyFormula.usesLeanBodyMass {
-            switch lbmSource {
-            case .health:
-                return true
-            case .fatPercentage, .formula:
-                return weightSource == .health
-            default:
-                return false
-            }
-        } else {
-            return restingEnergyFormulaParametersAreSynced
-        }
-    }
-    
     var restingEnergyValue: Double? {
         switch restingEnergySource {
         case .formula:
@@ -114,8 +99,6 @@ extension BiometricsModel {
                 }
                 return Date(timeIntervalSince1970: timestamp).biometricEnergyFormat
             }
-//        case .formula:
-//            return restingEnergyFormulaUsingSyncedHealthData ? "currently" : nil
         default:
             return nil
         }

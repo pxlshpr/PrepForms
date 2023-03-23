@@ -11,6 +11,7 @@ struct LeanBodyMassSection: View {
     @Binding var footerString: String
     @EnvironmentObject var model: BiometricsModel
 
+    @State var showingSourcePicker = false
     @State var showFormOnAppear = false
 
     init(includeHeader: Bool = true, footerString: Binding<String> = .constant("")) {
@@ -22,6 +23,7 @@ struct LeanBodyMassSection: View {
         FormStyledSection(header: header) {
             content
         }
+        .sheet(isPresented: $showingSourcePicker) { sourcePickerSheet }
     }
     
     @ViewBuilder
@@ -199,29 +201,40 @@ struct LeanBodyMassSection: View {
         }
     }
     
-    var sourceSection: some View {
-        var sourceMenu: some View {
-            Menu {
-                Picker(selection: model.lbmSourceBinding, label: EmptyView()) {
-                    ForEach(LeanBodyMassSource.allCases, id: \.self) {
-                        Label($0.pickerDescription, systemImage: $0.systemImage).tag($0)
-                    }
+    var sourcePickerSheet: some View {
+        PickerSheet(
+            title: "Choose a Source",
+            items: LeanBodyMassSource.pickerItems,
+            pickedItem: model.lbmSource?.pickerItem,
+            didPick: {
+                Haptics.feedback(style: .soft)
+                guard let pickedSource = LeanBodyMassSource(pickerItem: $0) else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                    model.changeLBMSource(to: pickedSource)
                 }
-            } label: {
-                BiometricSourcePickerLabel(source: model.lbmSourceBinding.wrappedValue)
             }
-            .animation(.none, value: model.lbmSource)
-            .fixedSize(horizontal: true, vertical: false)
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
-                Haptics.feedback(style: .light)
-            })
+        )
+    }
+    
+
+    var sourceSection: some View {
+  
+        var label: some View {
+            BiometricSourcePickerLabel(source: model.lbmSourceBinding.wrappedValue)
         }
         
+        var pickerButton: some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                showingSourcePicker = true
+            } label: {
+                label
+            }
+        }
+
         return HStack {
-            sourceMenu
+            pickerButton
             Spacer()
         }
-//        .padding(.horizontal, 17)
     }
 }

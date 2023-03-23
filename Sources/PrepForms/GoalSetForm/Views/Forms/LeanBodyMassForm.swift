@@ -4,15 +4,35 @@ import PrepDataTypes
 import ActivityIndicatorView
 import SwiftUISugar
 
+let collapsedDetent: PresentationDetent = .height(400)
+
 struct LeanBodyMassForm: View {
     
-    @EnvironmentObject var model: BiometricsModel
+    @ObservedObject var model: BiometricsModel
+    @State var detent: PresentationDetent
+
+    init(_ model: BiometricsModel) {
+        self.model = model
+        let detent = model.lbmSource?.usesWeight == true ? .large : collapsedDetent
+        _detent = State(initialValue: detent)
+    }
     
     var body: some View {
-        FormStyledScrollView {
+        quickForm
+            .presentationDetents([collapsedDetent, .large], selection: $detent)
+            .onChange(of: model.lbmSource, perform: lbmSourceChanged)
+    }
+    
+    func lbmSourceChanged(newSource: LeanBodyMassSource?) {
+        if newSource?.usesWeight == true {
+            detent = .large
+        }
+    }
+    
+    var quickForm: some View {
+        QuickForm(title: "Lean Body Mass") {
             infoSection
-            LeanBodyMassSection(includeHeader: false, footerString: footerStringBinding)
-                .environmentObject(model)
+            leanBodyMassSection
             supplementaryContent
         }
         .scrollDismissesKeyboard(.interactively)
@@ -20,12 +40,27 @@ struct LeanBodyMassForm: View {
         .toolbar { trailingContent }
     }
     
+    var trailingContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            syncButton
+        }
+    }
+
     var infoSection: some View {
         FormStyledSection {
             Text("Lean body mass is the weight of your body minus your body fat (adipose tissue).")
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
         }
+    }
+    
+    var leanBodyMassSection: some View {
+        LeanBodyMassSection(
+            includeHeader: false,
+            footerString: footerStringBinding
+        )
+        .environmentObject(model)
     }
     
     var footerStringBinding: Binding<String> {
@@ -54,6 +89,7 @@ struct LeanBodyMassForm: View {
                 .font(.title)
                 .foregroundColor(Color(.quaternaryLabel))
             WeightSection()
+                .environmentObject(model)
         }
     }
     
@@ -63,8 +99,11 @@ struct LeanBodyMassForm: View {
                 .font(.title)
                 .foregroundColor(Color(.quaternaryLabel))
             BiologicalSexSection(includeFooter: true)
+                .environmentObject(model)
             WeightSection()
+                .environmentObject(model)
             HeightSection()
+                .environmentObject(model)
         }
     }
     
@@ -80,14 +119,13 @@ struct LeanBodyMassForm: View {
         }
     }
     
-    var trailingContent: some ToolbarContent {
-        ToolbarItemGroup(placement: .navigationBarTrailing) {
-            if model.shouldShowSyncAllForLBMForm {
-                Button {
-                    model.tappedSyncAllOnLBMForm()
-                } label: {
-                    ButtonLabel(title: "Sync All", style: .health, isCompact: true)
-                }
+    @ViewBuilder
+    var syncButton: some View {
+        if model.shouldShowSyncAllForLBMForm {
+            Button {
+                model.tappedSyncAllOnLBMForm()
+            } label: {
+                ButtonLabel(title: "Sync All", style: .health, isCompact: true)
             }
         }
     }

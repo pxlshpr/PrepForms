@@ -7,29 +7,13 @@ import SwiftUISugar
 struct ProfileForm: View {
     
     @EnvironmentObject var model: BiometricsModel
-    @Namespace var namespace
-
-    var infoSection: some View {
-        FormStyledSection {
-            Text("Please provide these details in order to calculate your resting energy using the \(model.restingEnergyFormula.menuDescription) formula.")
-                .foregroundColor(.secondary)
-        }
-    }
-    
-    var trailingContent: some ToolbarContent {
-        ToolbarItemGroup(placement: .navigationBarTrailing) {
-            if model.shouldShowSyncAllForMeasurementsForm {
-                Button {
-                    model.tappedSyncAllOnMeasurementsForm()
-                } label: {
-                    ButtonLabel(title: "Sync All", style: .health, isCompact: true)
-                }
-            }
-        }
-    }
     
     var body: some View {
-        FormStyledScrollView {
+        quickForm
+    }
+    
+    var quickForm: some View {
+        QuickForm(title: "Components") {
             infoSection
             AgeSection()
             BiologicalSexSection(includeFooter: true)
@@ -38,7 +22,32 @@ struct ProfileForm: View {
                 HeightSection()
             }
         }
-        .navigationTitle("Parameters")
         .toolbar { trailingContent }
+    }
+    
+    var infoSection: some View {
+        FormStyledSection {
+            Text("These are used to calculate your resting energy using the \(model.restingEnergyFormula.menuDescription) formula.")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .foregroundColor(.secondary)
+        }
+    }
+    
+    var trailingContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            syncButton
+        }
+    }
+    
+    @ViewBuilder
+    var syncButton: some View {
+        if model.shouldShowSyncAllForMeasurementsForm {
+            Button {
+                model.tappedSyncAllOnMeasurementsForm()
+            } label: {
+                ButtonLabel(title: "Sync All", style: .health, isCompact: true)
+            }
+        }
     }
 }
