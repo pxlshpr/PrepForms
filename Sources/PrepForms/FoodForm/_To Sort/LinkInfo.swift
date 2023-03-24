@@ -1,8 +1,16 @@
 import SwiftUI
 
-extension LinkInfo: Identifiable {
+extension LinkInfo: Identifiable, Hashable, Equatable {
     var id: String {
         url.absoluteString
+    }
+    
+    static func ==(lhs: LinkInfo, rhs: LinkInfo) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 

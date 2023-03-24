@@ -146,7 +146,7 @@ extension FoodForm.Wizard {
                     Image(systemName: "sparkles")
                         .foregroundColor(.accentColor)
                         .shimmering()
-                    Text("using our \(Text("Smart Food Label Scanner").fontWeight(.medium).foregroundColor(.primary)) to automagically fill it in.")
+                    Text("using our \(Text("AI Scanner").fontWeight(.medium).foregroundColor(.primary)) to automagically fill it in.")
                         .font(.system(.footnote, design: .rounded, weight: .regular))
                         .fixedSize(horizontal: false, vertical: true)
                         .foregroundStyle(.secondary)

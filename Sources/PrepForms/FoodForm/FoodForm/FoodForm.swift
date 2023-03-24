@@ -25,10 +25,15 @@ public struct FoodForm: View {
     @State var presentedSheet: Sheet? = nil
     @State var presentedFullScreenSheet: Sheet? = nil
 
+    @State var showingBarcodeMenu = false
+    @State var showingAddBarcodeMenu = false
+    @State var showingImageMenu = false
+    @State var showingLinkMenu = false
+    @State var showingAddSourceMenu = false
+
     @State var showingPhotosPicker = false
     @State var showingAddLinkAlert = false
     @State var showingAddBarcodeAlert = false
-    @State var showingDismissConfirmationDialog = false
     @State var showingSaveSheet = false
 
     let existingFood: Food?
@@ -68,13 +73,15 @@ public struct FoodForm: View {
         }
     }
 
-    enum Sheet: String, Identifiable {
+    enum Sheet: Hashable, Identifiable {
         case name
         case detail
         case brand
         case emojiPicker
         case barcodeScanner
-        var id: String { rawValue }
+        case link(LinkInfo)
+        
+        var id: Self { self }
     }
     
     var navigationView: some View {
@@ -94,10 +101,31 @@ public struct FoodForm: View {
                 .toolbar { navigationLeadingContent }
                 .toolbar { navigationTrailingContent }
                 .onAppear(perform: appeared)
+            
                 .onChange(of: sources.selectedPhotos, perform: selectedPhotosChanged)
                 .onChange(of: model.showingWizard, perform: showingWizardChanged)
                 .onChange(of: showingAddLinkAlert, perform: showingAddLinkAlertChanged)
                 .onChange(of: showingAddBarcodeAlert, perform: showingAddBarcodeAlertChanged)
+            
+                .confirmationDialog(
+                    "",
+                    isPresented: $showingLinkMenu,
+                    actions: { linkMenuActions },
+                    message: { linkMenuMessage }
+                )
+                .confirmationDialog(
+                    "",
+                    isPresented: $showingBarcodeMenu,
+                    actions: { barcodeMenuActions },
+                    message: { barcodeMenuMessage }
+                )
+                .confirmationDialog(
+                    "",
+                    isPresented: $showingAddBarcodeMenu,
+                    actions: { addBarcodeMenuActions },
+                    message: { addBarcodeMenuMessage }
+                )
+
                 .alert(addBarcodeTitle,
                        isPresented: $showingAddBarcodeAlert,
                        actions: { addBarcodeActions },
@@ -109,6 +137,7 @@ public struct FoodForm: View {
                     maxSelectionCount: 1,
                     matching: .images
                 )
+            
                 .fullScreenCover(item: $presentedFullScreenSheet) { sheet(for: $0) }
                 .sheet(item: $presentedSheet) { sheet(for: $0) }
         }
@@ -127,6 +156,23 @@ public struct FoodForm: View {
             emojiPicker
         case .barcodeScanner:
             barcodeScanner
+        case .link(let linkInfo):
+            webView(for: linkInfo)
+        }
+    }
+    
+    func webView(for linkInfo: LinkInfo) -> some View {
+        NavigationStack {
+            WebView(urlString: linkInfo.urlString, title: linkInfo.displayTitle)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            self.presentedSheet = nil
+                        } label: {
+                            closeButtonLabel
+                        }
+                    }
+                }
         }
     }
     

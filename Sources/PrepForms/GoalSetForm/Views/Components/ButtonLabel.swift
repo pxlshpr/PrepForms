@@ -90,7 +90,8 @@ struct ButtonLabel: View {
         case .plain:
             return .secondary
         case .healthPlain:
-            return .secondary
+            return HealthTopColor
+//            return .secondary
 //            return .green
         case .healthAccented:
             return .white.opacity(0.9)
@@ -136,7 +137,8 @@ struct ButtonLabel: View {
                 case .plain:
                     return Color(.secondaryLabel)
                 case .healthPlain:
-                    return Color(.secondaryLabel)
+                    return HealthTopColor
+//                    return Color(.secondaryLabel)
 //                    return .green
                 case .health, .healthAccented:
 //                    return .green
@@ -151,7 +153,8 @@ struct ButtonLabel: View {
                 case .plain:
                     return Color(.secondaryLabel)
                 case .healthPlain:
-                    return Color(.secondaryLabel)
+                    return HealthTopColor
+//                    return Color(.secondaryLabel)
 //                    return .green
                 case .health, .healthAccented:
 //                    return .green

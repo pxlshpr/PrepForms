@@ -17,6 +17,8 @@ extension FoodForm {
         var didAppear = false
         var startWithCamera = false
 
+        var lastTappedBarcodeValue: FieldValue? = nil
+
         public func reset(startWithCamera: Bool = false, isEditing: Bool = false) {
             didAppear = false
             

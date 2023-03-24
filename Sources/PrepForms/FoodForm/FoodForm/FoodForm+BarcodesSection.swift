@@ -41,6 +41,77 @@ extension FoodForm {
     var addBarcodeMessage: some View {
         Text("Please enter the barcode number for this food.")
     }
+
+    //MARK: - Link Menu
+    @ViewBuilder
+    var linkMenuActions: some View {
+        if let linkInfo = sources.linkInfo {
+            Button("View") {
+                Haptics.feedback(style: .soft)
+                present(.link(linkInfo))
+            }
+            Button("Remove", role: .destructive) {
+                Haptics.successFeedback()
+                withAnimation {
+                    sources.removeLink()
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    var linkMenuMessage: some View {
+        if let linkInfo = sources.linkInfo {
+            Text(linkInfo.urlDisplayString)
+        }
+    }
+    
+    //MARK: - Barcode Menu
+    @ViewBuilder
+    var barcodeMenuActions: some View {
+        if let barcodeValue = model.lastTappedBarcodeValue {
+            Button("Remove", role: .destructive) {
+                removeBarcode(barcodeValue)
+            }
+        }
+    }
+
+    @ViewBuilder
+    var barcodeMenuMessage: some View {
+        if let barcodeValue = model.lastTappedBarcodeValue {
+            Text(barcodeValue.string)
+        }
+    }
+
+    //MARK: - Add Barcode Menu
+    @ViewBuilder
+    var addBarcodeMenuActions: some View {
+        Group {
+            Button("Scan") {
+                Haptics.feedback(style: .soft)
+                presentFullScreen(.barcodeScanner)
+            }
+            Button("Type in") {
+                showAddBarcodeAlert()
+            }
+        }
+    }
+
+    @ViewBuilder
+    var addBarcodeMenuMessage: some View {
+        Text("Add Barcode")
+    }
+
+    func removeBarcode(_ barcodeValue: FieldValue) {
+        withAnimation {
+            sources.removeBarcodePayload(barcodeValue.string)
+            fields.barcodes.removeAll(where: {
+                $0.barcodeValue == barcodeValue.barcodeValue
+            })
+        }
+    }
+
+    //MARK: - BarcodesSection
     
     var barcodesSection: some View {
         var header: some View {
@@ -103,101 +174,141 @@ extension FoodForm {
             (UIScreen.main.bounds.width - (2 * 35.0) - (8.0 * 2.0)) / 3.0
         }
         
-        func removeBarcode(_ barcodeValue: FieldValue) {
-            withAnimation {
-                sources.removeBarcodePayload(barcodeValue.string)
-                fields.barcodes.removeAll(where: {
-                    $0.barcodeValue == barcodeValue.barcodeValue
-                })
-            }
-        }
-
         var axes: Axis.Set {
             let shouldScroll = barcodeValues.count > 2
             return shouldScroll ? .horizontal : []
         }
 
-        var addBarcodeSection: some View {
+        var emptyContent: some View {
+            Group {
+                foodFormButton("Scan", image: "barcode.viewfinder", isSecondary: true, colorScheme: colorScheme) {
+                    Haptics.feedback(style: .soft)
+                    presentFullScreen(.barcodeScanner)
+                }
+                foodFormButton("Type in", image: "keyboard", isSecondary: true, colorScheme: colorScheme) {
+                    showAddBarcodeAlert()
+                }
+            }
+            .frame(width: buttonWidth)
+            .transition(.asymmetric(
+                insertion: .move(edge: .trailing),
+                removal: .scale)
+            )
+        }
+        
+        var filledAddMenuButton: some View {
+            var label: some View {
+                foodFormButton("Add", image: "plus", isSecondary: true, colorScheme: colorScheme)
+                    .frame(width: buttonWidth)
+            }
+            
+            var menu: some View {
+                Menu {
+                    Button {
+                        Haptics.feedback(style: .soft)
+                        presentFullScreen(.barcodeScanner)
+                    } label: {
+                        Label("Scan", systemImage: "barcode.viewfinder")
+                    }
+                    
+                    Button {
+                        showAddBarcodeAlert()
+                    } label: {
+                        Label("Enter", systemImage: "keyboard")
+                    }
+                    
+                } label: {
+                    label
+                }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
+            }
+            
+            var button: some View {
+                Button {
+                    showingAddBarcodeMenu = true
+                } label: {
+                    label
+                }
+            }
+            
+            return menu
+//            return button
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing),
+                    removal: .scale
+                ))
+        }
+        
+        func cell(for barcodeValue: FieldValue, image: UIImage) -> some View {
+            
+            var imageView: some View {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: buttonWidth)
+            }
+            
+            var removeButton: some View {
+                Button(role: .destructive) {
+                    removeBarcode(barcodeValue)
+                } label: {
+                    Label("Remove", systemImage: "minus.circle")
+                }
+            }
+            
+            var menu: some View {
+                Menu {
+                    Text(barcodeValue.string)
+                    Divider()
+                    removeButton
+                } label: {
+                    imageView
+                }
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded {
+                    Haptics.feedback(style: .soft)
+                })
+            }
+            
+            var button: some View {
+                Button {
+                    model.lastTappedBarcodeValue = barcodeValue
+                    showingBarcodeMenu = true
+                } label: {
+                    imageView
+                }
+            }
+            
+            return menu
+//            return button
+                .transition(
+                    .asymmetric(
+                        insertion: .move(edge: .leading),
+                        removal: .scale
+                    )
+                )
+        }
+        
+        var content: some View {
             FormStyledSection(header: header, footer: footer, horizontalPadding: 0, verticalPadding: 0) {
                 ScrollView(axes, showsIndicators: false) {
                     HStack(spacing: 8.0) {
                         ForEach(barcodeValues, id: \.self) { barcodeValue in
                             if let image = barcodeValue.barcodeThumbnail(width: buttonWidth, height: 80) {
-                                Menu {
-                                    Text(barcodeValue.string)
-                                    Divider()
-                                    Button(role: .destructive) {
-                                        removeBarcode(barcodeValue)
-                                    } label: {
-                                        Label("Remove", systemImage: "minus.circle")
-                                    }
-                                } label: {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(maxWidth: buttonWidth)
-//                                        .shadow(radius: 3, x: 0, y: 3)
-                                }
-                                .contentShape(Rectangle())
-                                .simultaneousGesture(TapGesture().onEnded {
-                                    Haptics.feedback(style: .soft)
-                                })
-                                .transition(
-                                    .asymmetric(
-                                        insertion: .move(edge: .leading),
-                                        removal: .scale
-                                    )
-                                )
+                                cell(for: barcodeValue, image: image)
                             }
                         }
                         
                         if barcodeValues.isEmpty {
-                            Group {
-                                foodFormButton("Scan", image: "barcode.viewfinder", isSecondary: true, colorScheme: colorScheme) {
-                                    Haptics.feedback(style: .soft)
-                                    presentFullScreen(.barcodeScanner)
-                                }
-                                foodFormButton("Enter", image: "keyboard", isSecondary: true, colorScheme: colorScheme) {
-                                    showAddBarcodeAlert()
-                                }
-                            }
-                            .frame(width: buttonWidth)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .scale)
-                            )
+                            emptyContent
                         }
                         
                         /// Add Menu
                         if !barcodeValues.isEmpty {
-                            
-                            Menu {
-                                
-                                Button {
-                                    Haptics.feedback(style: .soft)
-                                    presentFullScreen(.barcodeScanner)
-                                } label: {
-                                    Label("Scan", systemImage: "barcode.viewfinder")
-                                }
-
-                                Button {
-                                    showAddBarcodeAlert()
-                                } label: {
-                                    Label("Enter", systemImage: "keyboard")
-                                }
-                                                                
-                            } label: {
-                                foodFormButton("Add", image: "plus", isSecondary: true, colorScheme: colorScheme)
-                                    .frame(width: buttonWidth)
-                            }
-                            .contentShape(Rectangle())
-                            .simultaneousGesture(TapGesture().onEnded {
-                                Haptics.feedback(style: .soft)
-                            })
-                            .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .scale
-                            ))
+                            filledAddMenuButton
                         }
 
                     }
@@ -208,69 +319,6 @@ extension FoodForm {
             }
         }
         
-        var addBarcodeSection_legacy: some View {
-            FormStyledSection(header: header, footer: footer, verticalPadding: 0) {
-                HStack {
-                    foodFormButton("Scan", image: "barcode.viewfinder", isSecondary: true) {
-                        Haptics.feedback(style: .soft)
-                        presentFullScreen(.barcodeScanner)
-                    }
-                    foodFormButton("Enter", image: "keyboard", isSecondary: true) {
-                        showAddBarcodeAlert()
-                    }
-                    foodFormButton("", image: "") {
-                    }
-                    .disabled(true)
-                    .opacity(0)
-                }
-                .padding(.vertical, 15)
-//                HStack {
-//                    Menu {
-//                        Button {
-//                            Haptics.feedback(style: .soft)
-//                            showingBarcodeScanner = true
-//                        } label: {
-//                            Label("Scan a Barcode", systemImage: "barcode.viewfinder")
-//                        }
-//
-//                        Button {
-//                            Haptics.feedback(style: .soft)
-//                            showingAddBarcodeAlert = true
-//                        } label: {
-//                            Label("Enter Manually", systemImage: "123.rectangle")
-//                        }
-//
-//                    } label: {
-//                        Text("Add a Barcode")
-//                            .frame(height: 50)
-//                    }
-//                    .contentShape(Rectangle())
-//                    .simultaneousGesture(TapGesture().onEnded {
-//                        Haptics.feedback(style: .soft)
-//                    })
-//                    Spacer()
-//                }
-            }
-        }
-        
-        return Group {
-            
-//            if !fields.barcodes.isEmpty {
-//                FormStyledSection(
-//                    header: header,
-//                    footer: footer,
-//                    horizontalPadding: 0,
-//                    verticalPadding: 0)
-//                {
-//                    NavigationLink {
-//                        barcodesForm
-//                    } label: {
-//                        barcodesView
-//                    }
-//                }
-//            } else {
-                addBarcodeSection
-//            }
-        }
+        return content
     }
 }

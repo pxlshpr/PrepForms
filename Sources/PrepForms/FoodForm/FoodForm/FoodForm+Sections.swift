@@ -204,10 +204,19 @@ extension FoodForm {
     }
 
     var sourcesSection: some View {
-        SourcesSummaryCell(
+        func handleAction(_ action: SourcesSummaryCell.Action) {
+            switch action {
+            case .showCamera:
+                showExtractorViewWithCamera()
+            case .showLinkMenu:
+                showingLinkMenu = true
+            }
+        }
+        
+        return SourcesSummaryCell(
             sources: sources,
             showingAddLinkAlert: $showingAddLinkAlert,
-            didTapCamera: showExtractorViewWithCamera
+            actionHandler: handleAction
         )
     }
     

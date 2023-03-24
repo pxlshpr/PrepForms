@@ -9,38 +9,37 @@ import Shimmer
 
 extension FoodForm {
     struct SourcesSummaryCell: View {
+        
         @Environment(\.colorScheme) var colorScheme
         @ObservedObject var sources: FoodForm.Sources
         @Binding var showingAddLinkAlert: Bool
-        let didTapCamera: () -> ()
+        let actionHandler: (Action) -> ()
         
         @State var showingPhotosPicker = false
         @State var showingFoodLabelCamera = false
         @State var linkIsInvalid = false
         @State var link: String = ""
         @State var linkInfoBeingPresented: LinkInfo? = nil
+        
+        enum Action {
+            case showCamera
+            case showLinkMenu
+        }
     }
 }
 
 extension FoodForm.SourcesSummaryCell {
         
     var body: some View {
-        Group {
-//            if sources.isEmpty {
-//                emptyContent
-//            } else {
-                filledContent
-//            }
-        }
-        .alert(addLinkTitle, isPresented: $showingAddLinkAlert, actions: { addLinkActions }, message: { addLinkMessage })
-        .photosPicker(
-            isPresented: $showingPhotosPicker,
-            selection: $sources.selectedPhotos,
-//            maxSelectionCount: sources.availableImagesCount,
-            maxSelectionCount: 1,
-            matching: .images
-        )
-        .sheet(item: $linkInfoBeingPresented) { webView(for: $0) }
+        content
+            .alert(addLinkTitle, isPresented: $showingAddLinkAlert, actions: { addLinkActions }, message: { addLinkMessage })
+            .photosPicker(
+                isPresented: $showingPhotosPicker,
+                selection: $sources.selectedPhotos,
+                maxSelectionCount: 1,
+                matching: .images
+            )
+            .sheet(item: $linkInfoBeingPresented) { webView(for: $0) }
     }
     
     func webView(for linkInfo: LinkInfo) -> some View {
@@ -58,11 +57,11 @@ extension FoodForm.SourcesSummaryCell {
         }
     }
     
-    var emptyContent: some View {
-        FormStyledSection(header: header, footer: emptyFooter, verticalPadding: 0) {
-            addSourceButtons
-        }
-    }
+//    var emptyContent: some View {
+//        FormStyledSection(header: header, footer: emptyFooter, verticalPadding: 0) {
+//            addSourceButtons
+//        }
+//    }
     
     
     func showAddLinkAlert() {
@@ -82,7 +81,7 @@ extension FoodForm.SourcesSummaryCell {
         HStack {
             foodFormButton("Camera", image: "camera", colorScheme: colorScheme) {
                 Haptics.feedback(style: .soft)
-                didTapCamera()
+                actionHandler(.showCamera)
             }
             foodFormButton("Photo", image: "photo.on.rectangle", colorScheme: colorScheme) {
                 Haptics.feedback(style: .soft)
@@ -117,134 +116,174 @@ extension FoodForm.SourcesSummaryCell {
         return shouldScroll ? .horizontal : []
     }
     
-    var filledContent: some View {
+    var emptyContent: some View {
+        Group {
+            foodFormButton("Camera", image: "camera", colorScheme: colorScheme) {
+                Haptics.feedback(style: .soft)
+                actionHandler(.showCamera)
+            }
+            foodFormButton("Photo", image: "photo.on.rectangle", colorScheme: colorScheme) {
+                Haptics.feedback(style: .soft)
+                showingPhotosPicker = true
+            }
+            foodFormButton("Link", image: "link", colorScheme: colorScheme) {
+                showAddLinkAlert()
+            }
+        }
+        .frame(width: buttonWidth)
+        .transition(.asymmetric(
+            insertion: .move(edge: .trailing),
+            removal: .scale)
+        )
+    }
+    
+    func imageCell(_ imageModel: ImageModel) -> some View {
+        
+        @ViewBuilder
+        var label: some View {
+            if let image = imageModel.image {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: buttonWidth, height: 80)
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 20,
+                            style: .continuous
+                        )
+                    )
+            }
+        }
+        
+        var menu: some View {
+            Menu {
+                Button(role: .destructive) {
+                    removeImageModel(imageModel)
+                } label: {
+                    Label("Remove", systemImage: "minus.circle")
+                }
+            } label: {
+                label
+            }
+            .contentShape(Rectangle())
+            .simultaneousGesture(TapGesture().onEnded {
+                Haptics.feedback(style: .soft)
+            })
+        }
+        
+        return menu
+            .transition(
+                .asymmetric(
+                    insertion: .move(edge: .leading),
+                    removal: .scale
+                )
+            )
+    }
+    
+    func linkCell(_ linkInfo: LinkInfo) -> some View {
+        
+        var label: some View {
+            LinkCell(linkInfo)
+                .frame(width: buttonWidth)
+        }
+        
+        var menu: some View {
+            Menu {
+                Button {
+                    Haptics.feedback(style: .soft)
+                    linkInfoBeingPresented = linkInfo
+                } label: {
+                    Label("View", systemImage: "safari")
+                }
+                Divider()
+                Button(role: .destructive) {
+                    Haptics.successFeedback()
+                    withAnimation {
+                        sources.removeLink()
+                    }
+                } label: {
+                    Label("Remove", systemImage: "minus.circle")
+                }
+            } label: {
+                label
+            }
+            .contentShape(Rectangle())
+            .simultaneousGesture(TapGesture().onEnded {
+                Haptics.feedback(style: .soft)
+            })
+        }
+        
+        var button: some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                actionHandler(.showLinkMenu)
+            } label: {
+                label
+            }
+        }
+        
+//        return button
+        return menu
+            .transition(.move(edge: .leading))
+    }
+    
+    var addMenu: some View {
+        Menu {
+            
+            Section("Scan a Food Label") {
+                Button {
+                    Haptics.feedback(style: .soft)
+                    actionHandler(.showCamera)
+                } label: {
+                    Label("Camera", systemImage: "camera")
+                }
+
+                Button {
+                    Haptics.feedback(style: .soft)
+                    showingPhotosPicker = true
+                } label: {
+                    Label("Choose Photo", systemImage: "photo.on.rectangle")
+                }
+            }
+            
+            Divider()
+
+            Button {
+                showAddLinkAlert()
+            } label: {
+                Label("Add a Link", systemImage: "link")
+            }
+            
+        } label: {
+            foodFormButton("Add", image: "plus", isSecondary: true, colorScheme: colorScheme)
+                .frame(width: buttonWidth)
+        }
+        .contentShape(Rectangle())
+        .simultaneousGesture(TapGesture().onEnded {
+            Haptics.feedback(style: .soft)
+        })
+        .transition(.move(edge: .trailing))
+    }
+    
+    var content: some View {
         FormStyledSection(header: header, footer: filledFooter, horizontalPadding: 0, verticalPadding: 0) {
             ScrollView(axes, showsIndicators: false) {
                 HStack(spacing: 8.0) {
-                    /// Images
+                    
                     ForEach(sources.imageModels, id: \.self.hashValue) { imageModel in
-                        if let image = imageModel.image {
-                            Menu {
-                                Button(role: .destructive) {
-                                    removeImageModel(imageModel)
-                                } label: {
-                                    Label("Remove", systemImage: "minus.circle")
-                                }
-                            } label: {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: buttonWidth, height: 80)
-                                    .clipShape(
-                                        RoundedRectangle(
-                                            cornerRadius: 20,
-                                            style: .continuous
-                                        )
-                                    )
-//                                    .shadow(radius: 3, x: 0, y: 3)
-                            }
-                            .contentShape(Rectangle())
-                            .simultaneousGesture(TapGesture().onEnded {
-                                Haptics.feedback(style: .soft)
-                            })
-                            .transition(
-                                .asymmetric(
-                                    insertion: .move(edge: .leading),
-                                    removal: .scale
-                                )
-                            )
-                        }
+                        imageCell(imageModel)
                     }
                     
-                    /// Link
                     if let linkInfo = sources.linkInfo {
-                        Menu {
-                            Button {
-                                Haptics.feedback(style: .soft)
-                                linkInfoBeingPresented = linkInfo
-                            } label: {
-                                Label("View", systemImage: "safari")
-                            }
-                            Divider()
-                            Button(role: .destructive) {
-                                Haptics.successFeedback()
-                                withAnimation {
-                                    sources.removeLink()
-                                }
-                            } label: {
-                                Label("Remove", systemImage: "minus.circle")
-                            }
-                        } label: {
-                            LinkCell(linkInfo)
-                                .frame(width: buttonWidth)
-                        }
-                        .contentShape(Rectangle())
-                        .simultaneousGesture(TapGesture().onEnded {
-                            Haptics.feedback(style: .soft)
-                        })
-                        .transition(.move(edge: .leading))
+                        linkCell(linkInfo)
                     }
                     
                     if sources.isEmpty {
-                        Group {
-                            foodFormButton("Camera", image: "camera", colorScheme: colorScheme) {
-                                Haptics.feedback(style: .soft)
-                                didTapCamera()
-                            }
-                            foodFormButton("Photo", image: "photo.on.rectangle", colorScheme: colorScheme) {
-                                Haptics.feedback(style: .soft)
-                                showingPhotosPicker = true
-                            }
-                            foodFormButton("Link", image: "link", colorScheme: colorScheme) {
-                                showAddLinkAlert()
-                            }
-                        }
-                        .frame(width: buttonWidth)
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .trailing),
-                            removal: .scale)
-                        )
+                        emptyContent
                     }
-
                     
-                    /// Add Menu
                     if !sources.isEmpty {
-                        
-                        Menu {
-                            
-                            Section("Scan a Food Label") {
-                                Button {
-                                    Haptics.feedback(style: .soft)
-                                    didTapCamera()
-                                } label: {
-                                    Label("Camera", systemImage: "camera")
-                                }
-
-                                Button {
-                                    Haptics.feedback(style: .soft)
-                                    showingPhotosPicker = true
-                                } label: {
-                                    Label("Choose Photo", systemImage: "photo.on.rectangle")
-                                }
-                            }
-                            
-                            Divider()
-
-                            Button {
-                                showAddLinkAlert()
-                            } label: {
-                                Label("Add a Link", systemImage: "link")
-                            }
-                            
-                        } label: {
-                            foodFormButton("Add", image: "plus", isSecondary: true, colorScheme: colorScheme)
-                                .frame(width: buttonWidth)
-                        }
-                        .contentShape(Rectangle())
-                        .simultaneousGesture(TapGesture().onEnded {
-                            Haptics.feedback(style: .soft)
-                        })
-                        .transition(.move(edge: .trailing))
+                        addMenu
                     }
                 }
                 .padding(.vertical, 10)
@@ -369,7 +408,7 @@ extension FoodForm.SourcesSummaryCell {
             
             Button {
                 Haptics.feedback(style: .soft)
-                didTapCamera()
+                actionHandler(.showCamera)
             } label: {
                 Label("Take Photo\(sources.pluralS)", systemImage: "camera")
             }

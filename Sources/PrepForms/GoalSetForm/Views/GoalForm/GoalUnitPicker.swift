@@ -318,23 +318,23 @@ extension GoalUnitPicker {
                 PickerLabel(description)
             } else {
                 if type.usesEnergyGoal {
-                    if model.goalSetModel.energyGoal?.isSynced == true {
+//                    if model.goalSetModel.energyGoal?.isSynced == true {
+//                        PickerLabel(
+//                            description,
+//                            systemImage: "chevron.up.chevron.down",
+//                            imageColor: Color(hex: "F3DED7"),
+//                            backgroundGradientTop: HealthTopColor,
+//                            backgroundGradientBottom: HealthBottomColor,
+//                            foregroundColor: .white,
+//                            imageScale: .small
+//                        )
+//                    } else {
                         PickerLabel(
                             description,
                             systemImage: "chevron.up.chevron.down",
-                            imageColor: Color(hex: "F3DED7"),
-                            backgroundGradientTop: HealthTopColor,
-                            backgroundGradientBottom: HealthBottomColor,
-                            foregroundColor: .white,
                             imageScale: .small
                         )
-                    } else {
-                        PickerLabel(
-                            description,
-                            systemImage: "chevron.up.chevron.down",
-                            imageScale: .small
-                        )
-                    }
+//                    }
                     
                 } else {
                     PickerLabel(description)
@@ -682,26 +682,42 @@ extension GoalUnitPicker {
         }
     }
     
-    @ViewBuilder
     var energyGoalButton: some View {
-        if type.nutrientGoalType?.isPercentageOfEnergy == true {
-            Button {
-                present(.energyGoal)
-            } label: {
-                PickerLabel(
-                    "energy goal",
-                    prefix: "of",
-                    systemImage: "chevron.right",
-//                    backgroundColor: Color(.tertiaryLabel),
-                    imageScale: .small
-                )
+        var description: String {
+            "energy goal"
+        }
+        
+        return Group {
+            if type.nutrientGoalType?.isPercentageOfEnergy == true {
+                Button {
+                    present(.energyGoal)
+                } label: {
+                    if model.goalSetModel.energyGoal?.isSynced == true {
+                        PickerLabel(
+                            description,
+                            prefix: "of",
+                            systemImage: "chevron.right",
+                            imageColor: Color(hex: "F3DED7"),
+                            backgroundGradientTop: HealthTopColor,
+                            backgroundGradientBottom: HealthBottomColor,
+                            foregroundColor: .white,
+                            imageScale: .small
+                        )
+                    } else {
+                        PickerLabel(
+                            description,
+                            prefix: "of",
+                            systemImage: "chevron.right",
+                            imageScale: .small
+                        )
+                    }
+                }
             }
         }
     }
     
-    @ViewBuilder
     var perEnergyButton: some View {
-        var string: String {
+        var description: String {
              "\(perEnergyValue.cleanAmount) \(UserManager.energyUnit.shortDescription) of energy goal"
         }
         
@@ -710,15 +726,27 @@ extension GoalUnitPicker {
                 Button {
                     present(.energyGoal)
                 } label: {
-                    PickerLabel(
-                        string,
-                        prefix: "per",
-                        systemImage: "chevron.right",
-                        //                    backgroundColor: Color(.tertiaryLabel),
-                        imageScale: .small
-                    )
+                    if model.goalSetModel.energyGoal?.isSynced == true {
+                        PickerLabel(
+                            description,
+                            prefix: "per",
+                            systemImage: "chevron.right",
+                            imageColor: Color(hex: "F3DED7"),
+                            backgroundGradientTop: HealthTopColor,
+                            backgroundGradientBottom: HealthBottomColor,
+                            foregroundColor: .white,
+                            imageScale: .small
+                        )
+                    } else {
+                        PickerLabel(
+                            description,
+                            prefix: "per",
+                            systemImage: "chevron.right",
+                            imageScale: .small
+                        )
+                    }
                 }
-                .disabled(true)
+//                .disabled(true)
             }
         }
     }
