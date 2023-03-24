@@ -72,7 +72,7 @@ struct GoalUnitPicker: View {
             case .fromMaintenance, .percentFromMaintenance:
                 return true
             default:
-                return false
+                return true
             }
         case .macro(let nutrientGoalType, _):
             return nutrientGoalTypeHasRequiredParameters(nutrientGoalType)
@@ -199,7 +199,8 @@ struct GoalUnitPicker: View {
             bodyMassUnitPicker
             bodyMassTypePicker
             workoutDurationUnitPicker
-            energyButton
+            energyGoalButton
+            perEnergyButton
             bodyMassButton
         }
     }
@@ -208,11 +209,13 @@ struct GoalUnitPicker: View {
     func sheet(for sheet: Sheet) -> some View {
         switch sheet {
         case .tdee:
-            EmptyView()
+            TDEEForm()
         case .weight:
             WeightForm()
         case .leanBodyMass:
             LeanBodyMassForm(biometricsModel)
+        case .energyGoal:
+            energyGoalSheet
             
         case .deltaPicker:
             deltaPickerSheet
@@ -230,6 +233,14 @@ struct GoalUnitPicker: View {
             bodyMassUnitPickerSheet
         case .workoutDurationUnitPicker:
             workoutDurationUnitPickerSheet
+        }
+    }
+    
+    @ViewBuilder
+    var energyGoalSheet: some View {
+        if let energyGoalModel = model.goalSetModel.energyGoal {
+            GoalForm(goalModel: energyGoalModel) { _ in
+            }
         }
     }
     
@@ -403,13 +414,15 @@ extension GoalUnitPicker {
     @ViewBuilder
     var workoutDurationUnitPicker: some View {
         if type.nutrientGoalType?.isQuantityPerWorkoutDuration == true {
-            Button {
-                present(.workoutDurationUnitPicker)
-            } label: {
-                PickerLabel(
-                    workoutDurationUnit.menuDescription,
-                    prefix: "per"
-                )
+            Group {
+                Button {
+                    present(.workoutDurationUnitPicker)
+                } label: {
+                    PickerLabel(
+                        workoutDurationUnit.menuDescriptionLong,
+                        prefix: "per"
+                    )
+                }
             }
         }
     }
@@ -670,20 +683,43 @@ extension GoalUnitPicker {
     }
     
     @ViewBuilder
-    var energyButton: some View {
-        if type.nutrientGoalType?.isQuantityPerEnergy == true {
+    var energyGoalButton: some View {
+        if type.nutrientGoalType?.isPercentageOfEnergy == true {
             Button {
-                
+                present(.energyGoal)
             } label: {
                 PickerLabel(
-                    perEnergyValue.cleanAmount + " " + UserManager.energyUnit.shortDescription,
-                    prefix: "per",
-                    systemImage: "flame.fill",
+                    "energy goal",
+                    prefix: "of",
+                    systemImage: "chevron.right",
 //                    backgroundColor: Color(.tertiaryLabel),
                     imageScale: .small
                 )
             }
-            .disabled(true)
+        }
+    }
+    
+    @ViewBuilder
+    var perEnergyButton: some View {
+        var string: String {
+             "\(perEnergyValue.cleanAmount) \(UserManager.energyUnit.shortDescription) of energy goal"
+        }
+        
+        return Group {
+            if type.nutrientGoalType?.isQuantityPerEnergy == true {
+                Button {
+                    present(.energyGoal)
+                } label: {
+                    PickerLabel(
+                        string,
+                        prefix: "per",
+                        systemImage: "chevron.right",
+                        //                    backgroundColor: Color(.tertiaryLabel),
+                        imageScale: .small
+                    )
+                }
+                .disabled(true)
+            }
         }
     }
     
@@ -790,6 +826,7 @@ extension GoalUnitPicker {
         case tdee
         case leanBodyMass
         case weight
+        case energyGoal
         
         case dayEnergyPicker
         case dayNutrientPicker
@@ -812,7 +849,8 @@ extension NutrientGoalType {
         case .quantityPerBodyMass(_, _):
             return nutrientUnit.shortDescription
         case .percentageOfEnergy:
-            return "% of energy"
+//            return "% of energy"
+            return "%"
         case .quantityPerEnergy:
             return nutrientUnit.shortDescription
         case .quantityPerWorkoutDuration(_):
@@ -915,13 +953,12 @@ enum FlattenedGoalType  {
     }
     
     var detail: String? {
-        return nil
+        func nutrient(_ nutrientType: NutrientType?, _ macro: Macro?) -> String {
+            let description = nutrientType?.description ?? macro?.description ?? ""
+            return description.lowercased()
+        }
         
-//        var energyName: String {
-//            UserManager.energyUnit == .kcal ? "caloric" : "energy"
-//        }
-//
-//        switch self {
+        switch self {
 //        case .energyFixed:
 //            return "Use this to specify the goal in exact \(energyName) values."
 //        case .energyFromMaintenance:
@@ -930,15 +967,17 @@ enum FlattenedGoalType  {
 //            return "Use this to specify the goal in percentage values relative to your maintenance."
 //        case .nutrientFixed(let unit):
 //            return "Use this to specify the goal in exact \(unit.shortDescription) values."
-//        case .nutrientPerBodyMass(let unit):
-//            return "Use this to specify the goal in \(unit.shortDescription) per \(UserManager.bodyMassUnit.shortDescription) of weight or lean body mass."
-//        case .nutrientPerWorkoutDuration(let unit):
-//            return "Use this to specify the goal in \(unit.shortDescription) per minute or hour of your workout durations."
-//        case .nutrientPerEnergy(let unit):
-//            return "Use this to specify the goal in \(unit.shortDescription) per 1000 \(UserManager.energyUnit.shortDescription) of your energy goal."
-//        case .nutrientPercentageOfEnergy:
-//            return "Use this to specify the goal in percentage values of your energy goal."
-//        }
+//        case .nutrientPerBodyMass(_, let n, let m):
+//            return "Scales this \(nutrient(n, m)) goal with your body mass."
+//        case .nutrientPerWorkoutDuration(_, let n, let m):
+//            return "Scales this \(nutrient(n, m)) goal with your workout duration."
+//        case .nutrientPerEnergy(_, let n, let m):
+//            return "Scales this \(nutrient(n, m)) goal with your energy goal."
+//        case .nutrientPercentageOfEnergy(_, let n, let m):
+//            return "Scales this \(nutrient(n, m)) goal with your energy goal."
+        default:
+            return nil
+        }
     }
     
     var secondaryDetail: String? {

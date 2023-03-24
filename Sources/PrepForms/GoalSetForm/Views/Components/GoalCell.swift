@@ -143,10 +143,12 @@ struct GoalCell: View {
             )
         }
         
-        func label(_ string: String, image: String) -> some View {
+        func label(_ string: String, image: String?) -> some View {
             HStack {
                 Text(string)
-                Image(systemName: image)
+                if let image {
+                    Image(systemName: image)
+                }
             }
             .foregroundColor(Color(.secondaryLabel))
             .font(.system(.subheadline, design: .rounded, weight: .medium))
@@ -157,8 +159,7 @@ struct GoalCell: View {
         }
         
         return Group {
-            if shouldShowType, let typeDescription, let typeImage {
-//                label_legacy(typeDescription, image: typeImage)
+            if shouldShowType, let typeDescription {
                 label(typeDescription, image: typeImage)
             }
         }
