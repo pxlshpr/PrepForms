@@ -32,20 +32,21 @@ extension GoalSetForm {
             focusOnAppear: false,
             includeCancelButton: true) { emoji in
                 Haptics.successFeedback()
-                present(.emojiPicker)
-//                showingEmojiPicker = false
+                presentedSheet = nil
                 model.emoji = emoji
             }
     }
     
-    @ViewBuilder
-    var goalForm: some View {
-        if let goalModel = model.goalModelToShowFormFor {
-            GoalForm(goalModel: goalModel, didTapDelete: didTapDeleteOnGoal)
-                .environmentObject(model)
-        } else {
-            EmptyView()
-        }
+    func goalForm(_ goalModel: GoalModel) -> some View {
+        GoalForm(
+            goalModel: goalModel,
+            didTapDelete: didTapDeleteOnGoal
+        )
+        .environmentObject(model)
+//        if let goalModel = model.goalModelToShowFormFor {
+//        } else {
+//            EmptyView()
+//        }
     }
     
     func didTapDeleteOnGoal(_ goalModel: GoalModel) {
@@ -68,7 +69,7 @@ extension GoalSetForm {
             Haptics.feedback(style: .soft)
             dismiss()
         } label: {
-            CloseButtonLabel(forNavigationBar: true)
+            CloseButtonLabel()
         }
     }
     
@@ -84,21 +85,24 @@ extension GoalSetForm {
         }
     }
     
-    @ViewBuilder
-    var addButton: some View {
-        if !model.goalModels.isEmpty {
-            Button {
-                presentNutrientsPicker()
-            } label: {
-                Image(systemName: "plus")
-            }
-        }
-    }
+//    @ViewBuilder
+//    var addButton: some View {
+//        if !model.goalModels.isEmpty {
+//            Button {
+//                presentNutrientsPicker()
+//            } label: {
+//                Image(systemName: "plus")
+//            }
+//        }
+//    }
 
     @ViewBuilder
     var addCell: some View {
         if !model.goalModels.isEmpty {
-            addGoalsButton
+            HStack {
+                addGoalsButton
+                Spacer()
+            }
         }
     }
 

@@ -354,7 +354,7 @@ extension ItemForm {
         Button {
             tappedClose()
         } label: {
-            CloseButtonLabel(forNavigationBar: true)
+            CloseButtonLabel()
         }
     }
 

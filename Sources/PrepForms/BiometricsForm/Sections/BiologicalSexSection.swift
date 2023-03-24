@@ -71,7 +71,9 @@ struct BiologicalSexSection: View {
         let valueBinding = Binding<BiometricValue?>(
             get: { model.sexBiometricValue },
             set: { newValue in
-                model.sex = newValue?.sex?.hkBiologicalSex
+                withAnimation {
+                    model.sex = newValue?.sex?.hkBiologicalSex
+                }
                 model.saveBiometrics()
             }
         )

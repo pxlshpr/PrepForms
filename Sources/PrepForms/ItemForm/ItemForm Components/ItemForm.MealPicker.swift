@@ -56,7 +56,7 @@ public extension ItemForm.MealPicker {
                 Haptics.feedback(style: .soft)
                 didTapDismiss()
             } label: {
-                closeButtonLabel
+                CloseButtonLabel()
             }
         }
     }

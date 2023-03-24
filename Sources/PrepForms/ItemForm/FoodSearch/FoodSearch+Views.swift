@@ -410,7 +410,7 @@ extension FoodSearch {
         Button {
             tappedClose()
         } label: {
-            CloseButtonLabel(forNavigationBar: true)
+            CloseButtonLabel()
         }
     }
     

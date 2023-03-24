@@ -23,12 +23,48 @@ extension BiometricsModel {
                     changeSexSource(to: .health)
                     changeWeightSource(to: .health)
                     changeHeightSource(to: .health)
+                    
+                    //TODO: Do this correctly after all values have been fetched and not with an artificial delay
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        self.saveBiometrics()
+                    }
                 }
             } catch {
                 //TODO: Handle error
             }
         }
     }
+    
+    func tappedSyncAllOnTDEEForm() {
+        
+        withAnimation {
+            activeEnergySyncStatus = .synced
+            restingEnergySyncStatus = .synced
+        }
+            
+        Task {
+            do {
+                try await HealthKitManager.shared.requestPermissions(
+                    quantityTypes: [
+                        .basalEnergyBurned,
+                        .activeEnergyBurned
+                    ]
+                )
+                await MainActor.run {
+                    changeActiveEnergySource(to: .health)
+                    changeRestingEnergySource(to: .health)
+                    
+                    //TODO: Do this correctly after all values have been fetched and not with an artificial delay
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        self.saveBiometrics()
+                    }
+                }
+            } catch {
+                //TODO: Handle error
+            }
+        }
+    }
+
 
     func tappedSyncAllOnMeasurementsForm() {
         
@@ -61,6 +97,11 @@ extension BiometricsModel {
                     changeAgeSource(to: .health)
                     if restingEnergyEquation.requiresHeight {
                         changeHeightSource(to: .health)
+                    }
+                    
+                    //TODO: Do this correctly after all values have been fetched and not with an artificial delay
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                        self.saveBiometrics()
                     }
                 }
             } catch {

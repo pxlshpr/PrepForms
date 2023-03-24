@@ -10,9 +10,10 @@ public struct GoalForm: View {
     @Environment(\.colorScheme) var colorScheme
     
     @EnvironmentObject var goalSetModel: GoalSetForm.Model
+    @StateObject var biometricsModel = BiometricsModel()
     @ObservedObject var model: GoalModel
     
-    let didTapDelete: (GoalModel) -> ()
+    let didTapDelete: ((GoalModel) -> ())?
     
     @State var leftValue: Double?
     @State var rightValue: Double?
@@ -33,7 +34,7 @@ public struct GoalForm: View {
     @State var showingDeleteConfirmationForEnergy = false
     @State var presentedSheet: Sheet? = nil
 
-    public init(goalModel: GoalModel, didTapDelete: @escaping ((GoalModel) -> ())) {
+    public init(goalModel: GoalModel, didTapDelete: ((GoalModel) -> ())? = nil) {
         self.model = goalModel
 //        _model = StateObject(wrappedValue: goalModel)
         self.didTapDelete = didTapDelete
@@ -139,8 +140,25 @@ public struct GoalForm: View {
             valueForm(for: .right)
         case .unit:
             unitPicker
+            
+        case .tdee:
+            TDEEForm()
+        case .weight:
+            WeightForm()
+        case .leanBodyMass:
+            LeanBodyMassForm(biometricsModel)
+        case .energyGoal:
+            energyGoalForm
+            
         default:
             EmptyView()
+        }
+    }
+    
+    @ViewBuilder
+    var energyGoalForm: some View {
+        if let energyGoal = goalSetModel.energyGoal {
+            GoalForm(goalModel: energyGoal)
         }
     }
     
@@ -225,7 +243,19 @@ public struct GoalForm: View {
             HStack {
                 if let missingRequirement = model.missingRequirement {
                     Button {
-                        
+                        Haptics.feedback(style: .soft)
+                        switch missingRequirement {
+                        case .maintenanceEnergy:
+                            present(.tdee)
+                        case .leanMass:
+                            present(.leanBodyMass)
+                        case .weight:
+                            present(.weight)
+                        case .energyGoal:
+                            present(.energyGoal)
+                        default:
+                            break
+                        }
                     } label: {
                         GoalRequirementLabel(requirement: missingRequirement)
                     }
@@ -388,7 +418,7 @@ public struct GoalForm: View {
             showingDeleteConfirmationForEnergy = true
             return
         }
-        didTapDelete(model)
+        didTapDelete?(model)
     }
     
     var deleteEnergyConfirmationTitle: String {
@@ -397,14 +427,15 @@ public struct GoalForm: View {
     
     func deleteEnergyConfirmationActions() -> some View {
         Button("Delete", role: .destructive) {
-            didTapDelete(model)
+            didTapDelete?(model)
         }
     }
 
     var deleteActionBinding: Binding<FormConfirmableAction?> {
         Binding<FormConfirmableAction?>(
             get: {
-                FormConfirmableAction(
+                guard didTapDelete != nil else { return nil }
+                return FormConfirmableAction(
                     buttonImage: "trash.circle.fill",
                     handler: {
                         tappedDelete()
@@ -425,7 +456,8 @@ public struct GoalForm: View {
         var label: some View {
             HStack {
 //                appleHealthBolt
-                Image(systemName: "bolt.horizontal.fill")
+//                Image(systemName: "bolt.horizontal.fill")
+                Image(systemName: "heart.fill")
                     .symbolRenderingMode(.palette)
                     .imageScale(.small)
 //                    .foregroundStyle(.green.gradient)
@@ -443,6 +475,7 @@ public struct GoalForm: View {
                 RoundedRectangle(cornerRadius: 7, style: .continuous)
                     .foregroundColor(Color(.quaternarySystemFill))
             )
+            .disabled(true)
         }
         
         var button: some View {
@@ -695,13 +728,18 @@ public struct GoalForm: View {
 //        .opacity(saveIsDisabled ? (colorScheme == .light ? 0.2 : 0.2) : 1)
     }
     
-    enum Sheet: String, Identifiable {
+    enum Sheet: Hashable, Identifiable {
         case lowerBound
         case upperBound
         case unit
         case info
         
-        var id: String { rawValue }
+        case tdee
+        case leanBodyMass
+        case weight
+        case energyGoal
+
+        var id: Self { self }
     }
     
     enum Side {

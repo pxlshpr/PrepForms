@@ -45,8 +45,10 @@ struct ProfileForm: View {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            syncButton
-            dismissButton
+            HStack(spacing: 0) {
+                syncButton
+                dismissButton
+            }
         }
     }
     
@@ -55,7 +57,7 @@ struct ProfileForm: View {
             Haptics.feedback(style: .soft)
             dismiss()
         } label: {
-            CloseButtonLabel(forNavigationBar: true)
+            CloseButtonLabel()
         }
     }
     

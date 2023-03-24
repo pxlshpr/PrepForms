@@ -138,7 +138,7 @@ public struct MealForm_Legacy2: View {
             Haptics.feedback(style: .soft)
             dismiss()
         } label: {
-            closeButtonLabel
+            CloseButtonLabel()
         }
     }
     

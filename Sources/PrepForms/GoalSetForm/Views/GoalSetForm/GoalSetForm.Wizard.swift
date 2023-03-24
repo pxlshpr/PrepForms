@@ -241,7 +241,7 @@ var TemplateDiets: [GoalSet] {
     let highProteinKeto = GoalSet(
         type: .day,
         name: "High Protein",
-        emoji: "🍗",
+        emoji: "🅿️",
         goals: [
             Goal(type: .energy(.percentFromMaintenance(.surplus)),
                  lowerBound: nil, upperBound: 10
@@ -282,7 +282,7 @@ var TemplateDiets: [GoalSet] {
     )
 
 
-    return [rda, cutting, bulking, lowCarb, cheatDay, keto, highProteinKeto]
+    return [rda, cutting, bulking, cheatDay, keto, highProteinKeto]
 }
 
 var TemplateMealTypes: [GoalSet] {

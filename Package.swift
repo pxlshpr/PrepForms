@@ -16,7 +16,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pxlshpr/PrepCoreDataStack", from: "0.0.36"),
-        .package(url: "https://github.com/pxlshpr/EmojiPicker", from: "0.0.22"),
+        .package(url: "https://github.com/pxlshpr/EmojiPicker", from: "0.0.25"),
         .package(url: "https://github.com/pxlshpr/FoodLabel", from: "0.0.62"),
         .package(url: "https://github.com/pxlshpr/FoodLabelScanner", from: "0.0.161"),
         .package(url: "https://github.com/pxlshpr/MFPScraper", from: "0.0.62"),

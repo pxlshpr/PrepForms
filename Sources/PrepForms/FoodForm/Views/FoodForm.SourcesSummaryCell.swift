@@ -46,11 +46,11 @@ extension FoodForm.SourcesSummaryCell {
         NavigationStack {
             WebView(urlString: linkInfo.urlString, title: linkInfo.displayTitle)
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
+                    ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
                             self.linkInfoBeingPresented = nil
                         } label: {
-                            closeButtonLabel
+                            CloseButtonLabel()
                         }
                     }
                 }

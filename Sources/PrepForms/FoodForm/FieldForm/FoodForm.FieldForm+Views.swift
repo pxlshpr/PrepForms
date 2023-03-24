@@ -150,7 +150,7 @@ extension FoodForm.FieldForm {
                 doNotRegisterUserInput = true
                 dismiss()
             } label: {
-                closeButtonLabel
+                CloseButtonLabel()
             }
         }
     }

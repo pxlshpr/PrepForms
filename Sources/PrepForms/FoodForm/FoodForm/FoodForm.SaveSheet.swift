@@ -192,7 +192,7 @@ extension FoodForm.SaveSheet {
                 Haptics.feedback(style: .soft)
                 tappedDismiss()
             } label: {
-                CloseButtonLabel()
+                CloseButtonLabel(forUseOutsideOfNavigationBar: true)
             }
         }
 

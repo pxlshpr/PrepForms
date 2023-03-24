@@ -165,11 +165,11 @@ public struct FoodForm: View {
         NavigationStack {
             WebView(urlString: linkInfo.urlString, title: linkInfo.displayTitle)
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
+                    ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
                             self.presentedSheet = nil
                         } label: {
-                            closeButtonLabel
+                            CloseButtonLabel()
                         }
                     }
                 }
@@ -556,7 +556,7 @@ public struct FoodForm: View {
                 dismissWithHaptics()
             }
         } label: {
-            CloseButtonLabel(forNavigationBar: true)
+            CloseButtonLabel()
         }
         .confirmationDialog(
             "",

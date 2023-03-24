@@ -36,7 +36,7 @@ struct GoalUnitPicker: View {
                 Haptics.feedback(style: .soft)
                 dismiss()
             } label: {
-                CloseButtonLabel(forNavigationBar: true)
+                CloseButtonLabel()
             }
         }
     }
@@ -239,8 +239,7 @@ struct GoalUnitPicker: View {
     @ViewBuilder
     var energyGoalSheet: some View {
         if let energyGoalModel = model.goalSetModel.energyGoal {
-            GoalForm(goalModel: energyGoalModel) { _ in
-            }
+            GoalForm(goalModel: energyGoalModel)
         }
     }
     

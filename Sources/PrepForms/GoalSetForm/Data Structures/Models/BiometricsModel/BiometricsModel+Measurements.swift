@@ -14,7 +14,8 @@ extension BiometricsModel {
     }
     
     var restingEnergyEquationVariablesAreSynced: Bool {
-        guard hasRestingEnergyEquationVariables, restingEnergySource == .equation else {
+        guard restingEnergySource == .equation else {
+//        guard hasRestingEnergyEquationVariables, restingEnergySource == .equation else {
             return false
         }
         
@@ -654,7 +655,6 @@ extension BiometricsModel {
     }
 }
 
-//MARK: - LBM Form
 extension BiometricsModel {
     
     var shouldShowSyncAllForLBMForm: Bool {
@@ -667,5 +667,9 @@ extension BiometricsModel {
         return countNotSynced >= 1
     }
 
+    var shouldShowSyncAllForTDEEForm: Bool {
+        activeEnergySource != .health
+        || restingEnergySource != nil
+    }
 
 }

@@ -49,7 +49,12 @@ struct ButtonLabel: View {
         }
         .font(font)
         .padding(.horizontal, hPadding)
-        .padding(.vertical, vPadding)
+        .if(isCompact, transform: { view in
+            view.frame(height: 32)
+        })
+        .if(!isCompact, transform: { view in
+            view.padding(.vertical, vPadding)
+        })
         .background(background)
         .fixedSize(horizontal: true, vertical: false)
         .animation(.none, value: style)
@@ -114,7 +119,8 @@ struct ButtonLabel: View {
     }
 
     var font: Font {
-        isCompact ? .footnote : .body
+        .body
+//        isCompact ? .footnote : .body
     }
 
     var titleStack: some View {

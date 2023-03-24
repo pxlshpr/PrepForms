@@ -403,7 +403,7 @@ public struct ParentFoodForm: View {
                 dismissWithHaptics()
             }
         } label: {
-            CloseButtonLabel(forNavigationBar: true)
+            CloseButtonLabel()
         }
         .confirmationDialog(
             "",

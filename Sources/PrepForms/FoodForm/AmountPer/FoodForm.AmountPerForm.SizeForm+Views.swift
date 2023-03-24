@@ -36,7 +36,7 @@ extension FoodForm.AmountPerForm.SizeForm {
             Button {
                 dismiss()
             } label: {
-                closeButtonLabel
+                CloseButtonLabel()
             }
         }
     }

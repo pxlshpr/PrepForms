@@ -68,13 +68,31 @@ public struct TDEEForm: View {
     
     
     var trailingContent: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            Button {
-                Haptics.feedback(style: .soft)
-                dismiss()
-            } label: {
-                closeButtonLabel
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            HStack(spacing: 0) {
+                syncAllButton
+                dismissButton
             }
+        }
+    }
+    
+    @ViewBuilder
+    var syncAllButton: some View {
+        if model.shouldShowSyncAllForTDEEForm {
+            Button {
+                model.tappedSyncAllOnTDEEForm()
+            } label: {
+                ButtonLabel(title: "Sync All", style: .health, isCompact: true)
+            }
+        }
+    }
+    
+    var dismissButton: some View {
+        Button {
+            Haptics.feedback(style: .soft)
+            dismiss()
+        } label: {
+            CloseButtonLabel()
         }
     }
 }

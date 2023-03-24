@@ -24,9 +24,20 @@ struct GoalCell: View {
     @State var upperBoundPrefix: String? = nil
     @State var lowerBoundSuffix: String? = nil
     @State var upperBoundSuffix: String? = nil
+    
+    let actionHandler: (Action) -> ()
 
-    init(model: GoalModel, showingEquivalentValues: Binding<Bool>) {
+    enum Action {
+        case tappedMissingRequirement(GoalRequirement)
+    }
+    
+    init(
+        model: GoalModel,
+        showingEquivalentValues: Binding<Bool>,
+        actionHandler: @escaping (Action) -> ()
+    ) {
         self.model = model
+        self.actionHandler = actionHandler
         _showingEquivalentValues = showingEquivalentValues
     }
     
@@ -69,6 +80,7 @@ struct GoalCell: View {
     func missingRequirementView(_ requirement: GoalRequirement) -> some View {
         Button {
             Haptics.feedback(style: .rigid)
+            actionHandler(.tappedMissingRequirement(requirement))
         } label: {
             GoalRequirementLabel(requirement: requirement)
         }

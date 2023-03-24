@@ -83,8 +83,10 @@ public struct BiometricsForm: View {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            syncAllButton
-            closeButton
+            HStack(spacing: 0) {
+                syncAllButton
+                closeButton
+            }
         }
     }
     
@@ -93,7 +95,7 @@ public struct BiometricsForm: View {
             Haptics.feedback(style: .soft)
             dismiss()
         } label: {
-            CloseButtonLabel(forNavigationBar: true)
+            CloseButtonLabel()
         }
     }
     

@@ -46,8 +46,10 @@ struct LeanBodyMassForm: View {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            syncButton
-            dismissButton
+            HStack(spacing: 0) {
+                syncButton
+                dismissButton
+            }
         }
     }
 
@@ -56,7 +58,7 @@ struct LeanBodyMassForm: View {
             Haptics.feedback(style: .soft)
             dismiss()
         } label: {
-            CloseButtonLabel(forNavigationBar: true)
+            CloseButtonLabel()
         }
     }
 

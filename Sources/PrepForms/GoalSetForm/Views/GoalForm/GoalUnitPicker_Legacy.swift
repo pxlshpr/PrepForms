@@ -88,7 +88,7 @@
 //                Haptics.feedback(style: .soft)
 //                dismiss()
 //            } label: {
-//                CloseButtonLabel(forNavigationBar: true)
+//                CloseButtonLabel()
 //            }
 //        }
 //    }

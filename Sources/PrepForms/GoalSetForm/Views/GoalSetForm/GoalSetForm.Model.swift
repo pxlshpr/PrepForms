@@ -17,12 +17,12 @@ extension GoalSetForm {
         let existingGoalSet: GoalSet?
         let isDuplicating: Bool
         
-        @Published var shouldShowWizard: Bool = true
-        @Published var showingWizardOverlay: Bool  = true
-        @Published var showingWizard: Bool  = true
-        @Published var formDisabled = false
+        @Published var shouldShowWizard: Bool
+        @Published var showingWizardOverlay: Bool
+        @Published var showingWizard: Bool
+        @Published var formDisabled: Bool
 
-        @Published var goalModelToShowFormFor: GoalModel? = nil
+//        @Published var goalModelToShowFormFor: GoalModel? = nil
         
         public init(
             type: GoalSetType,
@@ -38,7 +38,19 @@ extension GoalSetForm {
             
             self.isDuplicating = isDuplicating
             self.existingGoalSet = isDuplicating ? nil : existing
-            
+
+            if existing == nil {
+                self.shouldShowWizard = true
+                self.showingWizardOverlay = true
+                self.showingWizard = true
+                self.formDisabled = true
+            } else {
+                self.shouldShowWizard = false
+                self.showingWizardOverlay = false
+                self.showingWizard = false
+                self.formDisabled = false
+            }
+
             self.goalModels = existing?.goals.goalModels(goalSet: self, goalSetType: type) ?? []
             self.createImplicitGoals()
         }

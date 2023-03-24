@@ -6,18 +6,23 @@ import PrepCoreDataStack
 
 public struct GoalSetForm: View {
         
-    enum Sheet: String, Identifiable {
+    enum Sheet: Hashable, Identifiable {
+        
         case nutrientsPicker
         case emojiPicker
         case nameForm
-        case goalForm
+        case goalForm(GoalModel)
         
-        public var id: String { rawValue }
+        case tdee
+        case leanBodyMass
+        case weight
+        
+        public var id: Self { self }
     }
     
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
-    
+    @StateObject var biometricsModel = BiometricsModel()
     @StateObject var model: Model
     
     @State var presentedSheet: Sheet? = nil
@@ -94,8 +99,15 @@ public struct GoalSetForm: View {
                 nutrientsPicker
             case .nameForm:
                 nameForm
-            case .goalForm:
-                goalForm
+            case .goalForm(let goalModel):
+                goalForm(goalModel)
+
+            case .tdee:
+                TDEEForm()
+            case .weight:
+                WeightForm()
+            case .leanBodyMass:
+                LeanBodyMassForm(biometricsModel)
             }
         }
         .onWillDisappear {
@@ -162,8 +174,8 @@ public struct GoalSetForm: View {
     
     func showGoalForm(for goalModel: GoalModel) {
         Haptics.feedback(style: .soft)
-        model.goalModelToShowFormFor = goalModel
-        present(.goalForm)
+//        model.goalModelToShowFormFor = goalModel
+        present(.goalForm(goalModel))
     }
     
     func canBeSavedChanged(to newValue: Bool) {
@@ -290,6 +302,7 @@ public struct GoalSetForm: View {
                 energyCell
                 macroCells
                 microCells
+                addCell
                 footerInfoContent
             }
             .padding(.horizontal, 20)
@@ -324,53 +337,53 @@ public struct GoalSetForm: View {
         }
     }
 
-    var addHeroButton: some View {
+    func heroButtonLabel(_ systemImage: String) -> some View {
+        Image(systemName: systemImage)
+            .font(.system(size: 25))
+            .fontWeight(.medium)
+            .foregroundColor(.white)
+            .frame(width: 48, height: 48)
+            .background(
+                ZStack {
+                    Circle()
+                        .foregroundStyle(Color.accentColor.gradient)
+                }
+                .shadow(color: Color(.black).opacity(0.2), radius: 3, x: 0, y: 3)
+            )
+    }
+
+    var saveButton: some View {
+        
         var label: some View {
-            Image(systemName: "checkmark")
-//            Image(systemName: "plus")
-                .font(.system(size: 25))
-                .fontWeight(.medium)
-                .foregroundColor(.white)
-                .frame(width: 48, height: 48)
-                .background(
-                    ZStack {
-                        Circle()
-                            .foregroundStyle(Color.accentColor.gradient)
-                    }
-                    .shadow(color: Color(.black).opacity(0.2), radius: 3, x: 0, y: 3)
-                )
+            heroButtonLabel("checkmark")
         }
         
         var button: some View {
             Button {
-                Haptics.feedback(style: .soft)
-                presentNutrientsPicker()
+                tappedSave()
             } label: {
                 label
             }
+            .disabled(!canBeSaved)
         }
         
         return ZStack {
-            label
+            if canBeSaved {
+                label
+            }
             button
         }
     }
-
+    
     var buttonLayer: some View {
         VStack {
             Spacer()
             HStack {
                 Spacer()
-                if !model.goalModels.isEmpty {
-                    addHeroButton
-                        .transition(.move(edge: .trailing))
-                }
+                saveButton
+                    .transition(.move(edge: .trailing))
             }
             .padding(.horizontal, 20)
-//            if showingSaveButton {
-//                saveButton
-//                    .transition(.move(edge: .bottom))
-//            }
         }
         .padding(.bottom, 34)
         .edgesIgnoringSafeArea(.bottom)
@@ -409,24 +422,6 @@ public struct GoalSetForm: View {
         dismiss()
     }
 
-    var saveButton: some View {
-        var saveButton: some View {
-            FormPrimaryButton(title: "Save") {
-                tappedSave()
-            }
-        }
-        
-        return VStack(spacing: 0) {
-            Divider()
-            VStack {
-                saveButton
-                    .padding(.vertical)
-            }
-        }
-        .background(.thinMaterial)
-    }
-    
-    
     @ViewBuilder
     var energyCell: some View {
         if let goal = model.energyGoal {
@@ -463,12 +458,37 @@ public struct GoalSetForm: View {
 
     
     func cell(for goalModel: GoalModel, isButton: Bool = true) -> some View {
+        
+        func actionHandler(_ action: GoalCell.Action) {
+            switch action {
+            case .tappedMissingRequirement(let goalRequirement):
+                switch goalRequirement {
+                case .maintenanceEnergy:
+                    present(.tdee)
+                case .leanMass:
+                    present(.leanBodyMass)
+                case .weight:
+                    present(.weight)
+                case .energyGoal:
+                    guard let energyGoal = model.energyGoal else {
+                        return
+                    }
+//                    model.goalModelToShowFormFor = energyGoal
+                    present(.goalForm(energyGoal))
+                default:
+                    break
+                }
+            }
+        }
+        
         var label: some View {
             GoalCell(
                 model: goalModel,
-                showingEquivalentValues: $showingEquivalentValues
+                showingEquivalentValues: $showingEquivalentValues,
+                actionHandler: actionHandler
             )
         }
+        
         return Group {
             if isButton {
                 Button {
