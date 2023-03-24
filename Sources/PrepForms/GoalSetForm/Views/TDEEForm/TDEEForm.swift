@@ -22,7 +22,7 @@ public struct TDEEForm: View {
         NavigationView {
             form
                 .scrollDismissesKeyboard(.interactively)
-                .navigationTitle("Maintenance \(UserManager.energyDescription)")
+                .navigationTitle("Maintenance Energy")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { trailingContent }
                 .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)

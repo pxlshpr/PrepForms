@@ -8,29 +8,16 @@ import ActivityIndicatorView
 extension BiometricValueRow {
     
     var sexPicker: some View {
-        let sexBinding = Binding<BiometricSex>(
-            get: { value?.sex ?? .female },
-            set: { newValue in
-                value = .sex(newValue)
-            }
-        )
         
         var labelString: String {
-//            if !isUserEntered, fetchStatus == .noData {
             if !isUserEntered, syncStatus != .syncing, value == nil {
                 return "no data"
             } else {
-                return sexBinding.wrappedValue.description
+                return (value?.sex ?? .female).description
             }
         }
         
-        return Menu {
-            Picker(selection: sexBinding, label: EmptyView()) {
-                ForEach([BiometricSex.female, BiometricSex.male], id: \.self) {
-                    Text($0.description).tag($0)
-                }
-            }
-        } label: {
+        var label: some View {
             HStack {
                 Text(labelString)
                     .font(font)
@@ -47,13 +34,72 @@ extension BiometricValueRow {
             .padding(.horizontal, isUserEntered ? 15 : 0)
             .background(background)
         }
-        .animation(.none, value: value)
-        .fixedSize(horizontal: true, vertical: false)
-        .contentShape(Rectangle())
-        .simultaneousGesture(TapGesture().onEnded {
-            Haptics.feedback(style: .light)
-        })
-        .disabled(!isUserEntered)
+        
+        var menu: some View {
+            let binding = Binding<BiometricSex>(
+                get: { value?.sex ?? .female },
+                set: { newValue in
+                    value = .sex(newValue)
+                }
+            )
+            
+            return Menu {
+                Picker(selection: binding, label: EmptyView()) {
+                    ForEach([BiometricSex.female, BiometricSex.male], id: \.self) {
+                        Text($0.description).tag($0)
+                    }
+                }
+            } label: {
+                label
+            }
+            .animation(.none, value: value)
+            .fixedSize(horizontal: true, vertical: false)
+            .contentShape(Rectangle())
+            .simultaneousGesture(TapGesture().onEnded {
+                Haptics.feedback(style: .light)
+            })
+        }
+        
+        var button: some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                present(.sexPickerSheet)
+            } label: {
+                label
+            }
+        }
+        
+//        return menu
+        return button
+            .disabled(!isUserEntered)
     }
     
+}
+
+extension BiometricSex {
+    static var pickerItems: [PickerItem] {
+        [Self.female, Self.male]
+            .map { $0.pickerItem }
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id),
+              let source = BiometricSex(rawValue: int16) else {
+            return nil
+        }
+        self = source
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(self.rawValue)",
+            title: pickerTitle,
+            detail: nil,
+            secondaryDetail: nil
+        )
+    }
+    
+    var pickerTitle: String {
+        description
+    }
 }

@@ -65,6 +65,7 @@ struct ButtonLabel: View {
         } else if style == .healthPlain {
             Image(systemName: "heart.fill")
                 .symbolRenderingMode(.palette)
+//                .foregroundColor(.green)
                 .foregroundStyle(HealthGradient)
         } else if style == .healthAccented {
             Image(systemName: "heart.fill")
@@ -86,13 +87,16 @@ struct ButtonLabel: View {
         switch style {
         case .accent:
             return .accentColor
-        case .plain, .healthPlain:
+        case .plain:
             return .secondary
+        case .healthPlain:
+            return .secondary
+//            return .green
         case .healthAccented:
             return .white.opacity(0.9)
         case .health:
-            return .green
-//            return HealthTopColor
+//            return .green
+            return HealthTopColor
         }
     }
     
@@ -129,11 +133,14 @@ struct ButtonLabel: View {
             
             var topColor: Color {
                 switch style {
-                case .plain, .healthPlain:
+                case .plain:
                     return Color(.secondaryLabel)
+                case .healthPlain:
+                    return Color(.secondaryLabel)
+//                    return .green
                 case .health, .healthAccented:
-                    return .green
-//                    return HealthTopColor
+//                    return .green
+                    return HealthTopColor
                 case .accent:
                     return Color.accentColor
                 }
@@ -141,11 +148,14 @@ struct ButtonLabel: View {
             
             var bottomColor: Color {
                 switch style {
-                case .plain, .healthPlain:
+                case .plain:
                     return Color(.secondaryLabel)
+                case .healthPlain:
+                    return Color(.secondaryLabel)
+//                    return .green
                 case .health, .healthAccented:
-                    return .green
-//                    return HealthBottomColor
+//                    return .green
+                    return HealthBottomColor
                 case .accent:
                     return Color.accentColor
                 }

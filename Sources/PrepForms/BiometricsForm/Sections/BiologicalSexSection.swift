@@ -48,6 +48,7 @@ struct BiologicalSexSection: View {
     }
     
     func tappedManualEntry() {
+        model.sex = .female
         showFormOnAppear = true
         model.changeSexSource(to: .userEntered)
     }
@@ -89,13 +90,15 @@ struct BiologicalSexSection: View {
     
     var sourceSection: some View {
         var label: some View {
-            BiometricSourcePickerLabel(source: model.sexSourceBinding.wrappedValue)
+            let measurementSource = model.sexSource ?? .userEntered
+            let measurementSexSource = MeasurementSexSource(rawValue: measurementSource.rawValue) ?? .userEntered
+            return BiometricSourcePickerLabel(source: measurementSexSource)
         }
         
         var sourcePickerSheet: some View {
             PickerSheet(
                 title: "Choose a Source",
-                items: MeasurementSource.pickerItems,
+                items: MeasurementSexSource.pickerItems,
                 pickedItem: model.sexSource?.pickerItem,
                 didPick: {
                     Haptics.feedback(style: .soft)
@@ -124,5 +127,70 @@ struct BiologicalSexSection: View {
     var header: some View {
         BiometricSectionHeader(type: .sex)
             .environmentObject(model)
+    }
+}
+
+public enum MeasurementSexSource: Int16, Codable, CaseIterable {
+    case health = 1
+    case userEntered
+    
+    public var menuDescription: String {
+        switch self {
+        case .health:
+            return "Health App"
+        case .userEntered:
+            return "Choose it"
+        }
+    }
+}
+
+extension MeasurementSexSource: BiometricSource {
+    public var isHealthSynced: Bool {
+        self == .health
+    }
+    public var isUserEntered: Bool {
+        self == .userEntered
+    }
+}
+
+extension MeasurementSexSource {
+    static var pickerItems: [PickerItem] {
+        allCases.map { $0.pickerItem }
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id),
+              let source = MeasurementSexSource(rawValue: int16) else {
+            return nil
+        }
+        self = source
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(self.rawValue)",
+            title: pickerDescription,
+            detail: nil,
+            secondaryDetail: nil,
+            systemImage: systemImage
+        )
+    }
+    
+    public var pickerDescription: String {
+        switch self {
+        case .health:
+            return "Sync with Health App"
+        case .userEntered:
+            return "Choose it"
+        }
+    }
+    
+    public var systemImage: String {
+        switch self {
+        case .health:
+            return "heart.fill"
+        case .userEntered:
+            return "hand.tap"
+        }
     }
 }

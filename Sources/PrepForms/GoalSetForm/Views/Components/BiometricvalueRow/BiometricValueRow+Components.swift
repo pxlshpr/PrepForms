@@ -61,7 +61,7 @@ extension BiometricValueRow {
         if syncStatus == .lastSyncFailed || syncStatus == .nextAvailableSynced {
             Button {
                 Haptics.feedback(style: .soft)
-                showingSyncFailedInfo = true
+                present(.syncFailedInfo)
             } label: {
                 HStack {
                     Text(syncStatus == .lastSyncFailed ? "sync failed" : "no data")
@@ -139,7 +139,7 @@ extension BiometricValueRow {
     var button: some View {
         Button {
             Haptics.feedback(style: .soft)
-            showingForm = true
+            present(.form)
         } label: {
             texts
                 .padding(.vertical, isUserEntered ? 8 : 0)

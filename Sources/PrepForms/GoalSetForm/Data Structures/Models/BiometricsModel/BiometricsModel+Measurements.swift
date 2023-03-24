@@ -38,21 +38,12 @@ extension BiometricsModel {
         if restingEnergyEquation.requiresHeight {
             if heightSource != .health { countNotSynced += 1 }
         }
-        return countNotSynced > 1
+        return countNotSynced >= 1
     }
 }
 
 //MARK: - Biological Sex
 extension BiometricsModel {
-    var sexSourceBinding: Binding<MeasurementSource> {
-        Binding<MeasurementSource>(
-            get: { self.sexSource ?? .userEntered },
-            set: { newSource in
-                Haptics.feedback(style: .soft)
-                self.changeSexSource(to: newSource)
-            }
-        )
-    }
     
     var sexPickerBinding: Binding<HKBiologicalSex> {
         Binding<HKBiologicalSex>(
@@ -673,7 +664,7 @@ extension BiometricsModel {
         if weightSource != .health { countNotSynced += 1 }
         if heightSource != .health { countNotSynced += 1 }
         /// return true if the user has picked `.equation` as the source and we have at least two parameters not synced
-        return countNotSynced > 1
+        return countNotSynced >= 1
     }
 
 

@@ -13,7 +13,7 @@ struct BiometricSectionHeader: View {
             Text(title)
             updatedBadge
             Spacer()
-            syncedSymbol
+//            syncedSymbol
         }
         .textCase(.uppercase)
         .fixedSize(horizontal: false, vertical: true)
@@ -25,9 +25,9 @@ struct BiometricSectionHeader: View {
     var title: String {
         switch type {
         case .restingEnergy:
-            return "Resting \(UserManager.energyDescription)"
+            return "Resting Energy"
         case .activeEnergy:
-            return "Active \(UserManager.energyDescription)"
+            return "Active Energy"
         default:
             return type.description
         }

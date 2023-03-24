@@ -18,7 +18,8 @@ struct MeasurementLabel: View {
     }
     
     var systemImage: String? {
-        useHealthAppData ? nil : "chevron.right"
+        "chevron.right"
+//        useHealthAppData ? nil : "chevron.right"
     }
     
     var style: ButtonLabel.Style {

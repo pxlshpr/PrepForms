@@ -20,6 +20,8 @@ struct PickerLabel: View {
     let prefixColor: Color
     let foregroundColor: Color
     
+    let isLarge: Bool
+    
     init(
         _ string: String,
         prefix: String? = nil,
@@ -33,7 +35,8 @@ struct PickerLabel: View {
         foregroundColor: Color = Color(.label),
         prefixColor: Color = Color(.secondaryLabel),
         imageScale: Image.Scale = .small,
-        infiniteMaxHeight: Bool = true
+        infiniteMaxHeight: Bool = true,
+        isLarge: Bool = true
     ) {
         self.string = string
         self.prefix = prefix
@@ -48,6 +51,7 @@ struct PickerLabel: View {
         self.backgroundColor = backgroundColor
         self.foregroundColor = foregroundColor
         self.prefixColor = prefixColor
+        self.isLarge = isLarge
     }
     
     var body: some View {
@@ -118,9 +122,17 @@ struct PickerLabel: View {
                         .foregroundColor(textColor)
                 }
             }
-            .frame(height: 25)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 5)
+            .if(!isLarge, transform: { view in
+                view
+                    .frame(height: 25)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+            })
+            .if(isLarge, transform: { view in
+                view
+                    .padding(.horizontal, 15)
+                    .padding(.vertical, 12)
+            })
         }
         
         return ZStack {
@@ -232,14 +244,15 @@ struct ProfileLabel: View {
     
     var primaryColor: Color {
         isSynced
-//        ? HealthTopColor
-        ? .green
+        ? HealthTopColor
+//        ? .green
         : Color(.secondaryLabel)
     }
     
     var secondaryColor: Color {
         isSynced
-        ? .green.opacity(0.75)
+        ? HealthTopColor.opacity(0.75)
+//        ? .green.opacity(0.75)
         : .secondary
     }
     
@@ -256,7 +269,8 @@ struct ProfileLabel: View {
     
     var background: some View {
         var backgroundColor: Color {
-            isSynced ? .green : Color(.secondaryLabel)
+//            isSynced ? .green : Color(.secondaryLabel)
+            isSynced ? HealthTopColor : Color(.secondaryLabel)
         }
         return RoundedRectangle(cornerRadius: 7, style: .continuous)
             .foregroundColor(

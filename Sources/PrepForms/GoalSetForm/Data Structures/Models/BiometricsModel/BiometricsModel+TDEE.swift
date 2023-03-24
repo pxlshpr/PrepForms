@@ -149,16 +149,6 @@ extension BiometricsModel {
         }
     }
     
-    var restingEnergyEquationBinding: Binding<RestingEnergyEquation> {
-        Binding<RestingEnergyEquation>(
-            get: { self.restingEnergyEquation },
-            set: { newEquation in
-                Haptics.feedback(style: .soft)
-                self.changeRestingEnergyEquation(to: newEquation)
-            }
-        )
-    }
-    
     func changeRestingEnergyEquation(to newEquation: RestingEnergyEquation) {
         withAnimation {
             self.restingEnergyEquation = newEquation
@@ -176,18 +166,6 @@ extension BiometricsModel {
             }
         }
         syncRestingEnergy(ignoringInterval: true)
-    }
-    
-    var restingEnergyIntervalValueBinding: Binding<Int> {
-        Binding<Int>(
-            get: {
-                self.restingEnergyInterval.value
-            },
-            set: { newValue in
-                Haptics.feedback(style: .soft)
-                self.changeRestingEnergyIntervalValue(to: newValue)
-            }
-        )
     }
     
     func changeRestingEnergyIntervalValue(to newValue: Int) {

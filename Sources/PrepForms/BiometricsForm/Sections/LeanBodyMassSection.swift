@@ -10,9 +10,15 @@ struct LeanBodyMassSection: View {
     let includeHeader: Bool
     @Binding var footerString: String
     @EnvironmentObject var model: BiometricsModel
-
-    @State var showingSourcePicker = false
     @State var showFormOnAppear = false
+    @State var presentedSheet: Sheet? = nil
+    
+    enum Sheet: String, Identifiable {
+        case sourcePicker
+        case equationPicker
+        
+        var id: String { rawValue }
+    }
 
     init(includeHeader: Bool = true, footerString: Binding<String> = .constant("")) {
         self.includeHeader = includeHeader
@@ -23,9 +29,32 @@ struct LeanBodyMassSection: View {
         FormStyledSection(header: header) {
             content
         }
-        .sheet(isPresented: $showingSourcePicker) { sourcePickerSheet }
+        .sheet(item: $presentedSheet) { sheet(for: $0) }
     }
     
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        switch sheet {
+        case .sourcePicker:
+            sourcePickerSheet
+        case .equationPicker:
+            equationPickerSheet
+        }
+    }
+    
+    var equationPickerSheet: some View {
+        PickerSheet(
+            title: "Equation",
+            items: LeanBodyMassEquation.pickerItems,
+            pickedItem: model.lbmEquation.pickerItem,
+            didPick: {
+                Haptics.feedback(style: .soft)
+                guard let pickedEquation = LeanBodyMassEquation(pickerItem: $0) else { return }
+                model.changeLBMEquation(to: pickedEquation)
+            }
+        )
+    }
+
     @ViewBuilder
     var header: some View {
         if includeHeader {
@@ -68,35 +97,29 @@ struct LeanBodyMassSection: View {
     }
 
     var equationContent: some View {
+        
         var equationRow: some View {
-            var menu: some View {
-                Menu {
-                    Picker(selection: model.lbmEquationBinding, label: EmptyView()) {
-                        ForEach(LeanBodyMassEquation.allCases, id: \.self) {
-                            Text($0.pickerDescription).tag($0)
-                        }
-                    }
+            
+            var button: some View {
+                Button {
+                    Haptics.feedback(style: .soft)
+                    present(.equationPicker)
                 } label: {
                     PickerLabel(
                         model.lbmEquation.year,
                         prefix: model.lbmEquation.menuDescription,
                         foregroundColor: .secondary,
-                        prefixColor: .primary
+                        prefixColor: .primary,
+                        isLarge: true
                     )
-                    .animation(.none, value: model.lbmEquation)
-                    .fixedSize(horizontal: true, vertical: false)
                 }
-                .contentShape(Rectangle())
-                .simultaneousGesture(TapGesture().onEnded {
-                    Haptics.feedback(style: .soft)
-                })
-
             }
+
             return HStack {
                 HStack {
                     Text("using")
                         .foregroundColor(Color(.tertiaryLabel))
-                    menu
+                    button
                     Text("equation")
                         .foregroundColor(Color(.tertiaryLabel))
                 }
@@ -215,7 +238,6 @@ struct LeanBodyMassSection: View {
             }
         )
     }
-    
 
     var sourceSection: some View {
   
@@ -226,7 +248,7 @@ struct LeanBodyMassSection: View {
         var pickerButton: some View {
             Button {
                 Haptics.feedback(style: .soft)
-                showingSourcePicker = true
+                present(.sourcePicker)
             } label: {
                 label
             }
@@ -235,6 +257,79 @@ struct LeanBodyMassSection: View {
         return HStack {
             pickerButton
             Spacer()
+        }
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedSheet = sheet
+        }
+        
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+        
+        if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else {
+            present()
+        }
+    }
+}
+
+extension LeanBodyMassEquation {
+    static var pickerItems: [PickerItem] {
+        allCases
+            .sorted(by: { $0.year > $1.year })
+            .map { $0.pickerItem }
+    }
+    
+    init?(pickerItem: PickerItem) {
+        guard let int16 = Int16(pickerItem.id),
+              let source = LeanBodyMassEquation(rawValue: int16) else {
+            return nil
+        }
+        self = source
+    }
+    
+    var pickerItem: PickerItem {
+        PickerItem(
+            id: "\(self.rawValue)",
+            title: pickerTitle,
+            detail: nil,
+            secondaryDetail: pickerDetail
+        )
+    }
+    
+    var pickerTitle: String {
+        "\(pickerDescription)"
+    }
+
+    var pickerDetail: String? {
+        switch self {
+        case .boer:
+            return "Best suitable for obese individuals."
+        case .james:
+            return "The is the most widely used equation."
+        case .hume:
+            return "This is an old but dependable equation that was confirmed in a 2015 research to be reliable."
+        }
+    }
+
+    var pickerSecondaryDetail: String? {
+        return nil
+        switch self {
+        case .boer:
+            return "Uses your weight, height and biological sex."
+        case .james:
+            return "Uses your weight, height and biological sex."
+        case .hume:
+            return "Uses your weight, height and biological sex."
         }
     }
 }

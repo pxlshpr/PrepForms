@@ -59,16 +59,6 @@ class BiometricsModel: ObservableObject {
     }
 }
 
-//MARK: Helpers
-
-extension BiometricsModel {
-    
-    var tdeeDescriptionText: Text {
-        let energy = UserManager.energyUnit == .kcal ? "calories" : "kiljoules"
-        return Text("This is an estimate of how many \(energy) you would have to consume to *maintain* your current weight.")
-    }
-}
-
 extension BiometricsModel {
     
     var biometrics: Biometrics {
@@ -213,5 +203,27 @@ extension BiometricsModel {
             }
         }
         return false
+    }
+    
+    var typesBeingSynced: [BiometricType] {
+        BiometricType.allCases.filter { isSyncing($0) }
+    }
+    
+    var typesNotSynced: [BiometricType] {
+        BiometricType.allCases.filter { !isSyncing($0) }
+    }
+}
+
+//MARK: Helpers
+
+extension BiometricsModel {
+    
+    var tdeeDescriptionText: Text {
+        let energy = UserManager.energyUnit == .kcal ? "calories" : "kiljoules"
+        return Text("This is an estimate of how many \(energy) you would have to consume to *maintain* your current weight.")
+    }
+    
+    var shouldShowSyncAllButton: Bool {
+        typesNotSynced.count > 1
     }
 }

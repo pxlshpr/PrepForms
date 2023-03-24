@@ -49,6 +49,7 @@ struct BiometricButton: View {
                 if isSecondary {
                     Image(systemName: "heart.fill")
                         .symbolRenderingMode(.palette)
+//                        .foregroundColor(.green)
                         .foregroundStyle(HealthGradient)
                 } else {
                     Image(systemName: "heart.fill")
@@ -66,7 +67,10 @@ struct BiometricButton: View {
             guard isSecondary else {
                 return .white
             }
-            return style == .plain ? .accentColor : HealthTopColor
+            return style == .plain
+            ? .accentColor
+            : HealthTopColor
+//            : .green
         }
         
         var background: some View {
@@ -76,6 +80,7 @@ struct BiometricButton: View {
             }
 
             var healthColor: Color {
+//                .green
                 HealthTopColor
             }
 
@@ -102,6 +107,7 @@ struct BiometricButton: View {
                     case .health:
                         shape
                             .fill(healthGradient)
+//                            .fill(.green)
                     case .plain:
                         shape
                             .fill(Color.accentColor.gradient)

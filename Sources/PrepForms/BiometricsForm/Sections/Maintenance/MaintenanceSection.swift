@@ -1,9 +1,11 @@
 import SwiftUI
 import PrepDataTypes
 import PrepCoreDataStack
+import SwiftUISugar
 
 struct MaintenanceSection: View {
     
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: BiometricsModel
     @Namespace var namespace
     
@@ -16,7 +18,7 @@ struct MaintenanceSection: View {
                     .padding(.vertical, 15)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
-                            .foregroundColor(Color(.secondarySystemGroupedBackground))
+                            .foregroundColor(formCellBackgroundColor(colorScheme: colorScheme))
                     )
                     .padding(.bottom, 10)
             }
@@ -31,10 +33,10 @@ struct MaintenanceSection: View {
             HStack {
                 Color.clear
                     .animatedMaintenanceEnergyModifier(value: value, energyUnit: unit)
-                    .fixedSize(horizontal: true, vertical: false)
-                    .frame(maxWidth: .infinity, alignment: .center)
                 updatedBadge
             }
+            .fixedSize(horizontal: true, vertical: false)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
         
         @ViewBuilder

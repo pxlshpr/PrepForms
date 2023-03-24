@@ -8,6 +8,7 @@ import PrepCoreDataStack
 
 struct ActiveEnergySection: View {
     
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
     @State var presentedSheet: Sheet? = nil
@@ -21,7 +22,7 @@ struct ActiveEnergySection: View {
                 .padding(.vertical, 15)
                 .background(
                     RoundedRectangle(cornerRadius: 10)
-                        .foregroundColor(Color(.secondarySystemGroupedBackground))
+                        .foregroundColor(formCellBackgroundColor(colorScheme: colorScheme))
                 )
 //                .padding(.bottom, 10)
                 .if(model.activeEnergyFooterString == nil) { view in
@@ -494,7 +495,7 @@ extension ActivityLevel {
     var pickerSecondaryDetail: String? {
         switch self {
         case .notSet:
-            return "Using this will assign 0 \(UserManager.energyUnit.shortDescription) as your active \(UserManager.energyDescription.lowercased()) component."
+            return "Using this will assign 0 \(UserManager.energyUnit.shortDescription) as your active energy component."
         case .sedentary:
             return "Little or no exercise, working a desk job."
         case .lightlyActive:

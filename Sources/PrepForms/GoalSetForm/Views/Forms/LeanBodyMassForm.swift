@@ -8,6 +8,7 @@ let collapsedDetent: PresentationDetent = .height(400)
 
 struct LeanBodyMassForm: View {
     
+    @Environment(\.dismiss) var dismiss
     @ObservedObject var model: BiometricsModel
     @State var detent: PresentationDetent
 
@@ -30,19 +31,32 @@ struct LeanBodyMassForm: View {
     }
     
     var quickForm: some View {
-        QuickForm(title: "Lean Body Mass") {
-            infoSection
-            leanBodyMassSection
-            supplementaryContent
+        NavigationView {
+//        QuickForm(title: "Lean Body Mass") {
+            FormStyledScrollView {
+                infoSection
+                leanBodyMassSection
+                supplementaryContent
+            }
+            .navigationTitle("Lean Body Mass")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { trailingContent }
         }
-        .scrollDismissesKeyboard(.interactively)
-        .navigationTitle("Lean Body Mass")
-        .toolbar { trailingContent }
     }
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             syncButton
+            dismissButton
+        }
+    }
+
+    var dismissButton: some View {
+        Button {
+            Haptics.feedback(style: .soft)
+            dismiss()
+        } label: {
+            CloseButtonLabel(forNavigationBar: true)
         }
     }
 

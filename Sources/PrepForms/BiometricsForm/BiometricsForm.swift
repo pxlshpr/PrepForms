@@ -29,6 +29,25 @@ public struct BiometricsForm: View {
         }
     }
     
+    var content: some View {
+        FormStyledScrollView {
+            allSections
+        }
+    }
+    
+    var allSections: some View {
+        Group {
+            infoSection
+            energyGroup
+            profileTitle
+            weightSection
+            leanBodyMassSection
+            heightSection
+            ageSection
+            biologicalSexSection
+        }
+    }
+    
     func appeared() {
         if UserManager.previousBiometrics != nil {
             UserManager.setDidViewBiometrics()
@@ -53,7 +72,7 @@ public struct BiometricsForm: View {
     
     @ViewBuilder
     var syncAllButton: some View {
-        if model.lastUpdatedAt == nil {
+        if model.shouldShowSyncAllButton {
             Button {
                 model.tappedSyncAll()
             } label: {
@@ -87,21 +106,6 @@ public struct BiometricsForm: View {
         }
     }
 
-    
-    var content: some View {
-        FormStyledScrollView {
-            infoSection
-            energyGroup
-            profileTitle
-            weightSection
-            leanBodyMassSection
-            heightSection
-            ageSection
-            biologicalSexSection
-            footerSection
-        }
-    }
-    
     var energyGroup: some View {
         Group {
             maintenanceTitle
@@ -137,50 +141,94 @@ public struct BiometricsForm: View {
     }
 
     var maintenanceTitle: some View {
+        var isSynced: Bool {
+            model.isSyncing(.activeEnergy) || model.isSyncing(.restingEnergy)
+        }
+        
         @ViewBuilder
         var syncedSymbol: some View {
-            if model.isSyncing(.activeEnergy) || model.isSyncing(.restingEnergy) {
+            if isSynced {
                 appleHealthBolt
             }
         }
 
         return HStack {
-            Image(systemName: "flame.fill")
-                .font(.title2)
-            Text("Maintenance \(UserManager.energyDescription)")
-                .font(.system(.title2, design: .rounded, weight: .bold))
-                .foregroundColor(.primary)
-            Spacer()
             syncedSymbol
+//            Image(systemName: "flame.fill")
+//                .font(.title2)
+            Text("Maintenance Energy")
+                .font(.system(.title2, design: .rounded, weight: .bold))
+                .foregroundStyle(
+                    LinearGradient (
+                        colors: [
+                            isSynced ? HealthTopColor : .primary,
+                            isSynced ? HealthBottomColor : .primary
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+            Spacer()
         }
         .padding(.horizontal, 20 + 17)
         .padding(.top, 20)
         .padding(.bottom, 0)
     }
 
-    var infoText: some View {
-//        Text("These are used to create goals based on your **\(UserManager.tdeeDescription)**, which is an estimate of how much you would have to consume to *maintain* your current weight.")
-//        Text("Your biometric data is used to create goals based on your **Maintenance Calories**, which estimates what you need to consume to *maintain* your current weight.")
-        Text("We use your biometric data to set goals based on your **\(UserManager.tdeeDescription)** and to monitor changes in your **body mass**.")
-    }
-    
     var infoSection: some View {
-        infoText
-            .multilineTextAlignment(.leading)
-            .foregroundColor(.secondary)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 30)
-            .padding(.horizontal, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .foregroundColor(
-                        Color(.quaternarySystemFill)
-                            .opacity(colorScheme == .dark ? 0.5 : 1)
-                    )
-            )
-            .cornerRadius(10)
-            .padding(.bottom, 10)
-            .padding(.horizontal, 17)
+        
+        var content: some View {
+            var text: some View {
+                Text("Your biometric data is used to set goals based on your **Maintenance Energy**, also known as your Total Daily Energy Expenditure (TDEE).")
+            }
+            
+            @ViewBuilder
+            var syncInfo: some View {
+                if model.isSyncingAtLeastOneType {
+                    HStack(alignment: .firstTextBaseline) {
+                        appleHealthBolt
+                            .imageScale(.small)
+                            .frame(width: 25)
+                        Text("These biometrics are being kept in sync with your data from the Health App.")
+//                            .font(.caption)
+                            .foregroundColor(Color(.secondaryLabel))
+                    }
+                }
+            }
+            
+            return VStack(alignment: .leading, spacing: 5) {
+                Group {
+//                    text
+                    syncInfo
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        
+        var section: some View {
+            content
+                .multilineTextAlignment(.leading)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .padding(.horizontal, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .foregroundColor(
+                            Color(.quaternarySystemFill)
+                                .opacity(colorScheme == .dark ? 0.5 : 1)
+                        )
+                )
+                .cornerRadius(10)
+                .padding(.bottom, 10)
+                .padding(.horizontal, 17)
+        }
+        
+        return Group {
+            if model.isSyncingAtLeastOneType {
+                section
+            }
+        }
     }
     
     func updatedBinding(for type: BiometricType) -> Binding<Bool> {
@@ -222,21 +270,6 @@ public struct BiometricsForm: View {
     var leanBodyMassSection: some View {
         LeanBodyMassSection()
             .environmentObject(model)
-    }
-    
-    @ViewBuilder
-    var footerSection: some View {
-        if model.isSyncingAtLeastOneType {
-            HStack(alignment: .firstTextBaseline) {
-                appleHealthBolt
-                    .imageScale(.small)
-                    .frame(width: 25)
-                Text("These biometrics are being kept in sync with your data from the Health App.")
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal, 20)
-        }
     }
 }
 

@@ -6,23 +6,32 @@ import SwiftUISugar
 
 struct ProfileForm: View {
     
-    @EnvironmentObject var model: BiometricsModel
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var model: BiometricsModel
+    
+    init(_ model: BiometricsModel) {
+        self.model = model
+    }
     
     var body: some View {
         quickForm
     }
     
     var quickForm: some View {
-        QuickForm(title: "Components") {
-            infoSection
-            AgeSection()
-            BiologicalSexSection(includeFooter: true)
-            WeightSection()
-            if model.restingEnergyEquation.requiresHeight {
-                HeightSection()
+        NavigationView {
+            FormStyledScrollView {
+                infoSection
+                AgeSection()
+                BiologicalSexSection(includeFooter: true)
+                WeightSection()
+                if model.restingEnergyEquation.requiresHeight {
+                    HeightSection()
+                }
             }
+            .navigationTitle("Components")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { trailingContent }
         }
-        .toolbar { trailingContent }
     }
     
     var infoSection: some View {
@@ -37,6 +46,16 @@ struct ProfileForm: View {
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
             syncButton
+            dismissButton
+        }
+    }
+    
+    var dismissButton: some View {
+        Button {
+            Haptics.feedback(style: .soft)
+            dismiss()
+        } label: {
+            CloseButtonLabel(forNavigationBar: true)
         }
     }
     

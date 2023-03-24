@@ -22,7 +22,7 @@ struct GoalUnitPicker: View {
     var body: some View {
         quickForm
             .sheet(item: $presentedSheet) { sheet(for: $0) }
-            .presentationDetents([.height(300)])
+            .presentationDetents([.height(350)])
             .onChange(of: type, perform: typeChanged)
     }
     
@@ -529,11 +529,11 @@ extension EnergyGoalDelta {
     var pickerDetail: String {
         switch self {
         case .deficit:
-            return "e.g. 500 \(UserManager.energyUnit.shortDescription) deficit from your maintenance \(UserManager.energyDescription)"
+            return "e.g. 500 \(UserManager.energyUnit.shortDescription) deficit from your maintenance energy"
         case .surplus:
-            return "e.g. 500 \(UserManager.energyUnit.shortDescription) surplus from your maintenance \(UserManager.energyDescription)"
+            return "e.g. 500 \(UserManager.energyUnit.shortDescription) surplus from your maintenance energy"
         case .deviation:
-            return "e.g. within 200 \(UserManager.energyUnit.shortDescription) of your maintenance \(UserManager.energyDescription)"
+            return "e.g. within 200 \(UserManager.energyUnit.shortDescription) of your maintenance energy"
         }
     }
     
@@ -633,9 +633,13 @@ extension GoalUnitPicker {
                             prefix: "maintenance",
                             prefixImage: "flame.fill",
                             systemImage: "chevron.forward",
-                            imageColor: .green,
-                            backgroundColor: .green,
-                            foregroundColor: .green,
+//                            imageColor: .green,
+//                            backgroundColor: .green,
+//                            foregroundColor: .green,
+                            imageColor: HealthTopColor,
+                            backgroundColor: HealthTopColor,
+                            foregroundColor: HealthTopColor,
+
                             imageScale: .small
                         )
                     } else {
@@ -694,10 +698,14 @@ extension GoalUnitPicker {
                         prefix: "\(bodyMassType.description)",
                         prefixImage: "figure.arms.open",
                         systemImage: "chevron.forward",
-                        imageColor: .green,
-                        backgroundColor: .green,
-                        foregroundColor: .green,
-                        prefixColor: .green,
+//                        imageColor: .green,
+//                        backgroundColor: .green,
+//                        foregroundColor: .green,
+//                        prefixColor: .green,
+                        imageColor: HealthTopColor,
+                        backgroundColor: HealthTopColor,
+                        foregroundColor: HealthTopColor,
+                        prefixColor: HealthTopColor,
                         imageScale: .small
                     )
                 } else {

@@ -8,6 +8,7 @@ import PrepCoreDataStack
 
 struct RestingEnergySection: View {
     
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
     @State var presentedSheet: Sheet? = nil
@@ -56,7 +57,7 @@ struct RestingEnergySection: View {
         .padding(.vertical, 15)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .foregroundColor(Color(.secondarySystemGroupedBackground))
+                .foregroundColor(formCellBackgroundColor(colorScheme: colorScheme))
         )
         .if(model.restingEnergyFooterString == nil) { view in
             view.padding(.bottom, 10)
@@ -167,28 +168,6 @@ struct RestingEnergySection: View {
             }
         }
         
-        var equationMenu: some View {
-            Menu {
-                Picker(selection: model.restingEnergyEquationBinding, label: EmptyView()) {
-                    ForEach(RestingEnergyEquation.latest, id: \.self) { equation in
-                        Text(equation.pickerDescription + " • " + equation.year).tag(equation)
-                    }
-                    Divider()
-                    ForEach(RestingEnergyEquation.legacy, id: \.self) {
-                        Text($0.pickerDescription + " • " + $0.year).tag($0)
-                    }
-                }
-            } label: {
-                BiometricPickerLabel(model.restingEnergyEquation.menuDescription)
-                    .animation(.none, value: model.restingEnergyEquation)
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
-                Haptics.feedback(style: .soft)
-            })
-        }
-        
         return HStack {
             HStack {
                 Text("using")
@@ -206,8 +185,7 @@ struct RestingEnergySection: View {
     }
     
     var profileForm: some View {
-        ProfileForm()
-            .environmentObject(model)
+        ProfileForm(model)
     }
     
     var parametersRow: some View {
