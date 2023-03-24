@@ -14,7 +14,6 @@ extension GoalSetForm {
         @Published var singleGoalModelToPushTo: GoalModel? = nil
         @Published var implicitGoals: [GoalModel] = []
         
-        @Published var path: [GoalSetFormRoute] = []
         let existingGoalSet: GoalSet?
         let isDuplicating: Bool
         
@@ -47,6 +46,25 @@ extension GoalSetForm {
 }
 
 extension GoalSetForm.Model {
+    
+    func delete(_ goalModel: GoalModel) {
+        if goalModel.type.isEnergy {
+            deleteAllEnergyDependentGoals()
+        }
+        goalModels.removeAll(where: {
+            $0.type.identifyingHashValue == goalModel.type.identifyingHashValue
+        })
+    }
+    
+    var hasEnergyDependentGoals: Bool {
+        !goalModels.filter({ $0.requirement == .energyGoal}).isEmpty
+    }
+    
+    func deleteAllEnergyDependentGoals() {
+        goalModels.removeAll(where: {
+            $0.requirement == .energyGoal
+        })
+    }
     
     var isEditing: Bool {
         existingGoalSet != nil && !isDuplicating

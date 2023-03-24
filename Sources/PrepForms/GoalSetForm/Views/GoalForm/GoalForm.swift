@@ -30,6 +30,7 @@ public struct GoalForm: View {
 
     let equivalentUnitString: String?
 
+    @State var showingDeleteConfirmationForEnergy = false
     @State var presentedSheet: Sheet? = nil
 
     public init(goalModel: GoalModel, didTapDelete: @escaping ((GoalModel) -> ())) {
@@ -57,12 +58,21 @@ public struct GoalForm: View {
         quickForm
             .presentationDetents([.height(200)])
             .onDisappear(perform: disappeared)
-            .sheet(item: $presentedSheet) { sheet(for: $0) }
+        
             .onChange(of: model.type) { [oldValue = model.type] newValue in
                 typeChanged(from: oldValue, to: newValue)
             }
             .onChange(of: model.lowerBound, perform: lowerBoundChanged)
             .onChange(of: model.upperBound, perform: upperBoundChanged)
+        
+            .confirmationDialog(
+                deleteEnergyConfirmationTitle,
+                isPresented: $showingDeleteConfirmationForEnergy,
+                titleVisibility: .visible,
+                actions: deleteEnergyConfirmationActions
+            )
+
+            .sheet(item: $presentedSheet) { sheet(for: $0) }
     }
     
     func typeChanged(from oldType: GoalType, to newType: GoalType) {
@@ -372,13 +382,32 @@ public struct GoalForm: View {
         }
     }
     
+    func tappedDelete() {
+        guard !(model.type.isEnergy && goalSetModel.hasEnergyDependentGoals) else {
+            Haptics.warningFeedback()
+            showingDeleteConfirmationForEnergy = true
+            return
+        }
+        didTapDelete(model)
+    }
+    
+    var deleteEnergyConfirmationTitle: String {
+        "This will also delete any energy-dependent goals.\nAre you sure?"
+    }
+    
+    func deleteEnergyConfirmationActions() -> some View {
+        Button("Delete", role: .destructive) {
+            didTapDelete(model)
+        }
+    }
+
     var deleteActionBinding: Binding<FormConfirmableAction?> {
         Binding<FormConfirmableAction?>(
             get: {
                 FormConfirmableAction(
                     buttonImage: "trash.circle.fill",
                     handler: {
-                        didTapDelete(model)
+                        tappedDelete()
                     }
                 )
             },

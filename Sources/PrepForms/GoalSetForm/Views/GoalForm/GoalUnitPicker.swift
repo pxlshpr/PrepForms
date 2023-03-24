@@ -318,24 +318,11 @@ extension GoalUnitPicker {
                 PickerLabel(description)
             } else {
                 if type.usesEnergyGoal {
-//                    if model.goalSetModel.energyGoal?.isSynced == true {
-//                        PickerLabel(
-//                            description,
-//                            systemImage: "chevron.up.chevron.down",
-//                            imageColor: Color(hex: "F3DED7"),
-//                            backgroundGradientTop: HealthTopColor,
-//                            backgroundGradientBottom: HealthBottomColor,
-//                            foregroundColor: .white,
-//                            imageScale: .small
-//                        )
-//                    } else {
-                        PickerLabel(
-                            description,
-                            systemImage: "chevron.up.chevron.down",
-                            imageScale: .small
-                        )
-//                    }
-                    
+                    PickerLabel(
+                        description,
+                        systemImage: "chevron.up.chevron.down",
+                        imageScale: .small
+                    )
                 } else {
                     PickerLabel(description)
                 }
@@ -570,7 +557,8 @@ extension GoalUnitPicker {
             items: GoalType.dietNutrientPickerItems(
                 with: nutrientUnit,
                 nutrientType: type.nutrientType,
-                macro: type.macro
+                macro: type.macro,
+                includingEnergyDependentGoals: model.goalSetModel.energyGoal != nil
             )
         )
     }
@@ -1067,13 +1055,25 @@ enum FlattenedGoalType  {
         [.energyFixed, .energyFromMaintenance, .energyPercentFromMaintenance]
     }
     
-    static func dietNutrientTypes(with nutrientUnit: NutrientUnit, nutrientType: NutrientType? = nil, macro: Macro? = nil) -> [FlattenedGoalType] {
-        [
+    static func dietNutrientTypes(
+        with nutrientUnit: NutrientUnit,
+        nutrientType: NutrientType? = nil,
+        macro: Macro? = nil,
+        includingEnergyDependentGoals: Bool
+        
+    ) -> [FlattenedGoalType] {
+        var types: [FlattenedGoalType] = [
             .nutrientFixed(nutrientUnit, nutrientType, macro),
-            .nutrientPerBodyMass(nutrientUnit, nutrientType, macro),
-            .nutrientPerEnergy(nutrientUnit, nutrientType, macro),
-            .nutrientPercentageOfEnergy(nutrientUnit, nutrientType, macro)
+            .nutrientPerBodyMass(nutrientUnit, nutrientType, macro)
         ]
+        
+        if includingEnergyDependentGoals {
+            types.append(contentsOf: [
+                .nutrientPerEnergy(nutrientUnit, nutrientType, macro),
+                .nutrientPercentageOfEnergy(nutrientUnit, nutrientType, macro)
+            ])
+        }
+        return types
     }
 
     static var mealEnergyTypes: [FlattenedGoalType] {
@@ -1138,14 +1138,34 @@ extension GoalType {
         FlattenedGoalType.dietEnergyTypes.map { $0.pickerItem }
     }
     
-    static func dietNutrientPickerItems(with nutrientUnit: NutrientUnit, nutrientType: NutrientType? = nil, macro: Macro? = nil) -> [PickerItem] {
-        FlattenedGoalType.dietNutrientTypes(with: nutrientUnit, nutrientType: nutrientType, macro: macro)
-            .map { $0.pickerItem }
+    static func dietNutrientPickerItems(
+        with nutrientUnit: NutrientUnit,
+        nutrientType: NutrientType? = nil,
+        macro: Macro? = nil,
+        includingEnergyDependentGoals: Bool
+    ) -> [PickerItem] {
+        
+        FlattenedGoalType.dietNutrientTypes(
+            with: nutrientUnit,
+            nutrientType: nutrientType,
+            macro: macro,
+            includingEnergyDependentGoals: includingEnergyDependentGoals
+        )
+        .map { $0.pickerItem }
     }
     
-    static func mealNutrientPickerItems(with nutrientUnit: NutrientUnit, nutrientType: NutrientType? = nil, macro: Macro? = nil) -> [PickerItem] {
-        FlattenedGoalType.mealNutrientTypes(with: nutrientUnit, nutrientType: nutrientType, macro: macro)
-            .map { $0.pickerItem }
+    static func mealNutrientPickerItems(
+        with nutrientUnit: NutrientUnit,
+        nutrientType: NutrientType? = nil,
+        macro: Macro? = nil
+    ) -> [PickerItem] {
+        
+        FlattenedGoalType.mealNutrientTypes(
+            with: nutrientUnit,
+            nutrientType: nutrientType,
+            macro: macro
+        )
+        .map { $0.pickerItem }
     }
 
 }

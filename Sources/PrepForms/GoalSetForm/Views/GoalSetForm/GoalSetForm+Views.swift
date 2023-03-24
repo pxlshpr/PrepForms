@@ -48,10 +48,11 @@ extension GoalSetForm {
         }
     }
     
-    func didTapDeleteOnGoal(_ goal: GoalModel) {
-        model.path = []
+    func didTapDeleteOnGoal(_ goalModel: GoalModel) {
+        Haptics.feedback(style: .soft)
+        presentedSheet = nil
         withAnimation {
-            model.goalModels.removeAll(where: { $0.type.identifyingHashValue == goal.type.identifyingHashValue })
+            model.delete(goalModel)
         }
     }
     

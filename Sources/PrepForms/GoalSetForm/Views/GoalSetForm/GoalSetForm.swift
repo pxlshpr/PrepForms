@@ -55,7 +55,7 @@ public struct GoalSetForm: View {
     }
     
     public var body: some View {
-        NavigationStack(path: $model.path) {
+        NavigationStack {
             ZStack {
                 content
                 TapTargetResetLayer()
@@ -64,12 +64,15 @@ public struct GoalSetForm: View {
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.large)
             .toolbar { trailingContent }
-            .navigationDestination(for: GoalSetFormRoute.self, destination: navigationDestination)
             .scrollDismissesKeyboard(.interactively)
             .onAppear(perform: appeared)
+            
             .onChange(of: model.containsGoalWithEquivalentValues, perform: containsGoalWithEquivalentValuesChanged)
             .onChange(of: canBeSaved, perform: canBeSavedChanged)
             .onChange(of: model.singleGoalModelToPushTo, perform: singleGoalModelToPushTo)
+            .onChange(of: presentedSheet, perform: presentedSheetChanged)
+            .onChange(of: presentedSheet, perform: presentedSheetChanged)
+            
             .confirmationDialog(
                 editConfirmationTitle,
                 isPresented: $showingEditConfirmation,
@@ -77,9 +80,8 @@ public struct GoalSetForm: View {
                 actions: editConfirmationActions
             )
             .alert(isPresented: $showingDuplicateAlert) { duplicateAlert }
-            .onChange(of: presentedSheet, perform: presentedSheetChanged)
+            
             .sheet(item: $presentedSheet) { sheet(for: $0) }
-            .onChange(of: presentedSheet, perform: presentedSheetChanged)
         }
     }
     
@@ -141,14 +143,10 @@ public struct GoalSetForm: View {
         "This \(model.type.description) has been used \(numberOfPreviousUses) times. Are you sure you want to modify all of them?"
     }
     
-    @ViewBuilder
     func editConfirmationActions() -> some View {
         Button("Save") {
             saveAndDismiss()
         }
-//        Button("Past and Future Uses") {
-//            saveAndDismiss(overwritingPreviousUses: true)
-//        }
     }
 
     var nameForm: some View {
