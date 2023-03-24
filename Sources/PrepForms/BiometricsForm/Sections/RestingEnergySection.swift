@@ -232,7 +232,7 @@ struct RestingEnergySection: View {
                     .fixedSize(horizontal: true, vertical: false)
                 } else {
                     MeasurementLabel(
-                        label: "set parameters",
+                        label: "set components",
                         valueString: "",
                         useHealthAppData: false
                     )
