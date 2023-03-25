@@ -37,6 +37,8 @@ public struct GoalForm: View {
 
     @State var buttonsHeight: CGFloat = 0
     
+    let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
+    
     public init(
         goalModel initialModel: GoalModel,
         didTapDelete: ((GoalModel) -> ())? = nil
@@ -62,6 +64,8 @@ public struct GoalForm: View {
         self.equivalentUnitString = goalModel.equivalentUnitString
     }
     
+    @State var isDirtyOverride = false
+    
     public var body: some View {
         quickForm
             .presentationDetents([.height(GoalFormHeight)])
@@ -72,6 +76,7 @@ public struct GoalForm: View {
             }
             .onChange(of: model.lowerBound, perform: lowerBoundChanged)
             .onChange(of: model.upperBound, perform: upperBoundChanged)
+            .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
         
             .confirmationDialog(
                 deleteEnergyConfirmationTitle,
@@ -81,6 +86,11 @@ public struct GoalForm: View {
             )
 
             .sheet(item: $presentedSheet) { sheet(for: $0) }
+    }
+    
+    func didUpdateBiometrics(_ notification: Notification) {
+        isDirtyOverride = true
+        updateWithAnimation()
     }
     
     var quickForm: some View {
@@ -308,6 +318,10 @@ public struct GoalForm: View {
     }
     
     var shouldDisableSaveButton: Bool {
+        guard !isDirtyOverride else {
+            return true
+        }
+        
         var isValid: Bool {
             model.isValid
         }
