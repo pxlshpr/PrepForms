@@ -577,29 +577,39 @@ public struct GoalSetForm: View {
         var containsFooterContent: Bool {
             model.containsSyncedGoal || model.containsImplicitGoal
         }
+        
+        @ViewBuilder
+        var syncedInfo: some View {
+            if model.containsSyncedGoal {
+                HStack(alignment: .firstTextBaseline) {
+                    appleHealthBolt
+                        .imageScale(.small)
+                        .frame(width: 25)
+                    Text(syncedGoalsString)
+                }
+            }
+        }
+        
+        @ViewBuilder
+        var implicitInfo: some View {
+            if let implicitGoalName = model.implicitGoalName {
+                HStack(alignment: .firstTextBaseline) {
+                    Image(systemName: "sparkles")
+                        .imageScale(.medium)
+                        .frame(width: 25)
+//                            Text("Your \(implicitGoalName.lowercased()) goal has been automatically generated based on your other goals. You can still create a different goal to use instead of this.")
+//                            Text("Your \(implicitGoalName.lowercased()) goal has been auto-generated based on your other goals. Feel free to create a custom goal if you prefer.")
+//                            Text("Your \(implicitGoalName.lowercased()) goal has been auto-generated based on your other goals. Feel free to create a custom goal if you prefer.")
+                    Text("Your \(implicitGoalName.lowercased()) goal has been set automatically based on your other macro goals. If you prefer, you can create a custom goal instead.")
+                }
+            }
+        }
 
         return Group {
             if containsFooterContent {
                 VStack(alignment: .leading, spacing: 10) {
-                    if model.containsSyncedGoal {
-                        HStack(alignment: .firstTextBaseline) {
-                            appleHealthBolt
-                                .imageScale(.small)
-                                .frame(width: 25)
-                            Text(syncedGoalsString)
-                        }
-                    }
-                    if let implicitGoalName = model.implicitGoalName {
-                        HStack(alignment: .firstTextBaseline) {
-                            Image(systemName: "sparkles")
-                                .imageScale(.medium)
-                                .frame(width: 25)
-//                            Text("Your \(implicitGoalName.lowercased()) goal has been automatically generated based on your other goals. You can still create a different goal to use instead of this.")
-//                            Text("Your \(implicitGoalName.lowercased()) goal has been auto-generated based on your other goals. Feel free to create a custom goal if you prefer.")
-//                            Text("Your \(implicitGoalName.lowercased()) goal has been auto-generated based on your other goals. Feel free to create a custom goal if you prefer.")
-                            Text("Your \(implicitGoalName.lowercased()) goal has been set automatically based on your other macro goals. If you prefer, you can create a custom goal instead.")
-                        }
-                    }
+                    syncedInfo
+                    implicitInfo
                 }
                 .font(.footnote)
                 .foregroundColor(Color(.secondaryLabel))

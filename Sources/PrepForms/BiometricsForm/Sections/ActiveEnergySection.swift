@@ -405,6 +405,7 @@ struct ActiveEnergySection: View {
 
     func tappedActivityLevel() {
         model.changeActiveEnergySource(to: .activityLevel)
+        model.saveBiometrics()
     }
 
     func tappedManualEntry() {

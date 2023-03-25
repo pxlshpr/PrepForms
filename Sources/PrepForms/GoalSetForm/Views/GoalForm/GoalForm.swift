@@ -4,12 +4,6 @@ import SwiftHaptics
 import PrepDataTypes
 import PrepCoreDataStack
 
-var GoalFormHeight: CGFloat {
-//    380
-    UIScreen.main.bounds.height < 850 ? 400 : 380
-//    UIScreen.main.bounds.height < 850 ? 446 : 475
-}
-
 public struct GoalForm: View {
     
     @Environment(\.dismiss) var dismiss
@@ -221,14 +215,14 @@ public struct GoalForm: View {
         var content: some View {
             
             var message: String {
-                !model.isSynced
+                model.isSynced
                 ? "This goal is synced with your biometrics and will update automatically."
                 : "This goal is not synced with your biometrics."
             }
             
             var syncInfo: some View {
                 HStack {
-                    if !model.isSynced {
+                    if model.isSynced {
                         appleHealthBolt
                             .imageScale(.small)
                             .frame(width: 25)
@@ -259,7 +253,7 @@ public struct GoalForm: View {
                                 .opacity(colorScheme == .dark ? 0.5 : 1)
                         )
                 )
-                .padding(.horizontal, 17)
+                .padding(.horizontal, 20)
                 .padding(.top, shouldShowEquivalentSection ? 0 : 10)
         }
         
@@ -314,7 +308,12 @@ public struct GoalForm: View {
     }
     
     var shouldDisableSaveButton: Bool {
-        self.model.hasSameContentsAs(initialModel)
+        var isValid: Bool {
+            model.isValid
+        }
+        
+        guard isValid else { return false }
+        return model.hasSameContentsAs(initialModel)
     }
     
     func didTapSave() {
@@ -333,7 +332,7 @@ public struct GoalForm: View {
             get: {
                 FormConfirmableAction(
                     position: .bottomFilled,
-                    confirmationButtonTitle: "Done",
+                    confirmationButtonTitle: "Save",
                     isDisabled: shouldDisableSaveButton,
                     handler: didTapSave
                 )
@@ -828,39 +827,6 @@ public struct GoalForm: View {
         }
     }
     
-    var saveButton: some View {
-        var buttonWidth: CGFloat { UIScreen.main.bounds.width - (20 * 2.0) }
-        var xPosition: CGFloat { UIScreen.main.bounds.width / 2.0 }
-        var yPosition: CGFloat { (52.0/2.0) + 16.0 }
-        var shadowOpacity: CGFloat { 0 }
-        var buttonHeight: CGFloat { 52 }
-        var buttonCornerRadius: CGFloat { 10 }
-        var shadowSize: CGFloat { 2 }
-        var foregroundColor: Color {
-//            (colorScheme == .light && saveIsDisabled) ? .black : .white
-            .white
-        }
-        
-        return Button {
-//            tappedSave()
-        } label: {
-//            Text(existingMeal == nil ? "Add" : "Save")
-            Text("Save")
-                .bold()
-                .foregroundColor(foregroundColor)
-                .frame(width: buttonWidth, height: buttonHeight)
-                .background(
-                    RoundedRectangle(cornerRadius: buttonCornerRadius)
-                        .foregroundStyle(Color.accentColor.gradient)
-                        .shadow(color: Color(.black).opacity(shadowOpacity), radius: shadowSize, x: 0, y: shadowSize)
-                )
-        }
-        .buttonStyle(.borderless)
-        .position(x: xPosition, y: yPosition)
-//        .disabled(saveIsDisabled)
-//        .opacity(saveIsDisabled ? (colorScheme == .light ? 0.2 : 0.2) : 1)
-    }
-    
     enum Sheet: Hashable, Identifiable {
         case lowerBound
         case upperBound
@@ -879,4 +845,10 @@ public struct GoalForm: View {
         case left
         case right
     }
+}
+
+var GoalFormHeight: CGFloat {
+//    380
+    UIScreen.main.bounds.height < 850 ? 400 : 380
+//    UIScreen.main.bounds.height < 850 ? 446 : 475
 }

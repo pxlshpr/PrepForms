@@ -66,6 +66,7 @@ extension GoalSetForm.Model {
         goalModels.removeAll(where: {
             $0.type.identifyingHashValue == goalModel.type.identifyingHashValue
         })
+         createImplicitGoals()
     }
     
     var hasEnergyDependentGoals: Bool {
