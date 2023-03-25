@@ -53,11 +53,17 @@ extension GoalSetForm {
 
             self.goalModels = existing?.goals.goalModels(goalSet: self, goalSetType: type) ?? []
             self.createImplicitGoals()
+            
+            NotificationCenter.default.addObserver(self, selector: #selector(didSetBiometrics), name: .didSetBiometrics, object: nil)
         }
     }
 }
 
 extension GoalSetForm.Model {
+    
+    @objc func didSetBiometrics(_ notification: Notification) {
+        createImplicitGoals()
+    }
     
     func delete(_ goalModel: GoalModel) {
         if goalModel.type.isEnergy {
@@ -66,7 +72,7 @@ extension GoalSetForm.Model {
         goalModels.removeAll(where: {
             $0.type.identifyingHashValue == goalModel.type.identifyingHashValue
         })
-         createImplicitGoals()
+        createImplicitGoals()
     }
     
     var hasEnergyDependentGoals: Bool {

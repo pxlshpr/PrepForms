@@ -31,6 +31,7 @@ struct GoalCell: View {
         case tappedMissingRequirement(GoalRequirement)
     }
     
+    let didSetBiometrics = NotificationCenter.default.publisher(for: .didSetBiometrics)
     init(
         model: GoalModel,
         showingEquivalentValues: Binding<Bool>,
@@ -47,9 +48,14 @@ struct GoalCell: View {
             .onChange(of: model.upperBound, perform: upperBoundChanged)
             .onChange(of: model.type, perform: typeChanged)
             .onChange(of: showingEquivalentValues, perform: showingEquivalentValuesChanged)
+            .onReceive(didSetBiometrics, perform: didSetBiometrics)
             .onAppear {
                 updateWithAnimation()
             }
+    }
+    
+    func didSetBiometrics(_ notification: Notification) {
+        updateWithAnimation()
     }
 
     var content: some View {

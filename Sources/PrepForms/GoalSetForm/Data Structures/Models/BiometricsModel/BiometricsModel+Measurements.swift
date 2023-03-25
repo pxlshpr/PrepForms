@@ -669,7 +669,7 @@ extension BiometricsModel {
 
     var shouldShowSyncAllForTDEEForm: Bool {
         activeEnergySource != .health
-        || restingEnergySource != nil
+        || restingEnergySource != .health
     }
 
 }

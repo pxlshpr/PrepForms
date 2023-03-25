@@ -47,7 +47,7 @@ public struct GoalForm: View {
     ) {
         let goalModel = initialModel.copy
         _model = StateObject(wrappedValue: goalModel)
-        self.initialModel = goalModel
+        self.initialModel = goalModel.copy
         self.didTapDelete = didTapDelete
         
         _leftValue = State(initialValue: goalModel.lowerBound)
@@ -198,14 +198,22 @@ public struct GoalForm: View {
             .fixedSize(horizontal: false, vertical: true)
         }
         
+        
+        var emptyString: String {
+            "N – self: \(self.hasEquivalentValues), model: \(model.hasEquivalentValues)"
+        }
+        
         var section: some View {
             FormStyledSection {
                 HStack {
                     if let requirement = model.missingRequirement {
                         Spacer()
                         missingRequirementButton(requirement)
-                    } else if hasEquivalentValues {
+//                    } else if hasEquivalentValues {
+                    } else if model.hasEquivalentValues {
                         equivalentTexts
+                    } else {
+                        Text(emptyString)
                     }
                     Spacer()
                 }
@@ -296,11 +304,15 @@ public struct GoalForm: View {
             equivalentLeftValue = model.equivalentLowerBound
             equivalentRightValue = model.equivalentUpperBound
             usesSingleValue = model.usesSingleValue
-            hasEquivalentValues = model.hasEquivalentValues
             showSyncedIndicator = model.showsSyncedIndicator
             hasValidLowerBound = model.hasValidLowerBound
             hasValidUpperBound = model.hasValidUpperBound
+            
+            print("💎 Setting: hasEquivalentValues: \(model.hasEquivalentValues), shouldShowEquivalentSection: \(model.shouldShowEquivalentSection)")
+            
+            hasEquivalentValues = model.hasEquivalentValues
             shouldShowEquivalentSection = model.shouldShowEquivalentSection
+            print("💎 Retrieving: hasEquivalentValues: \(hasEquivalentValues), model.shouldShowEquivalentSection: \(shouldShowEquivalentSection)")
 
             lowerBoundPrefix = model.lowerBoundPrefix(equivalent: true)
             upperBoundPrefix = model.upperBoundPrefix(equivalent: true)
@@ -319,7 +331,7 @@ public struct GoalForm: View {
     
     var shouldDisableSaveButton: Bool {
         guard !isDirtyOverride else {
-            return true
+            return false
         }
         
         var isValid: Bool {
@@ -379,9 +391,7 @@ public struct GoalForm: View {
             }
         }
         .onDisappear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                updateWithAnimation()
-            }
+            updateWithAnimation()
         }
     }
     

@@ -118,6 +118,9 @@ public struct GoalSetForm: View {
                 blurRadiusOverride = nil
             }
         }
+        .onDisappear {
+            model.createImplicitGoals()
+        }
     }
     
     func present(_ sheet: Sheet) {

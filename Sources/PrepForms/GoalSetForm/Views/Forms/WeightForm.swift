@@ -9,21 +9,56 @@ struct WeightForm: View {
     @StateObject var model: BiometricsModel = BiometricsModel()
     
     var body: some View {
-        quickForm
-            .presentationDetents([.height(300)])
-            .onChange(of: model.weight, perform: weightChanged)
+        NavigationView {
+            FormStyledScrollView {
+                WeightSection(includeHeader: false)
+                    .environmentObject(model)
+                    .toolbar { trailingContent }
+            }
+            .navigationTitle("Weight")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+        .presentationDetents([.height(300)])
     }
     
-    func weightChanged(_ newValue: Double?) {
-        guard newValue != nil else { return }
-        Haptics.successFeedback()
-        dismiss()
+    var trailingContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
+            if isValid {
+                doneButton
+            } else {
+                dismissButton
+            }
+        }
     }
     
-    var quickForm: some View {
-        QuickForm(title: "Weight") {
-            WeightSection(includeHeader: false)
-                .environmentObject(model)
+    var isValid: Bool {
+        model.weight != nil
+    }
+
+    @ViewBuilder
+    var doneButton: some View {
+        Button {
+            Haptics.successFeedback()
+            dismiss()
+        } label: {
+            Text("Done")
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .frame(height: 32)
+                .padding(.horizontal, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(Color.accentColor.gradient)
+                )
+        }
+    }
+    
+    var dismissButton: some View {
+        Button {
+            Haptics.feedback(style: .soft)
+            dismiss()
+        } label: {
+            CloseButtonLabel()
         }
     }
 }

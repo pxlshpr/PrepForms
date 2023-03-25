@@ -24,25 +24,10 @@ public struct TDEEForm: View {
                 .scrollDismissesKeyboard(.interactively)
                 .navigationTitle("Maintenance Energy")
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbar { leadingContent }
                 .toolbar { trailingContent }
                 .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
-                .onChange(of: model.restingEnergy, perform: restingEnergyChanged)
-                .onChange(of: model.activeEnergy, perform: activeEnergyChanged)
         }
-    }
-    
-    func restingEnergyChanged(_ newValue: Double?) {
-        dismissIfValid()
-    }
-    
-    func activeEnergyChanged(_ newValue: Double?) {
-        dismissIfValid()
-    }
-    
-    func dismissIfValid() {
-        guard model.maintenanceEnergy != nil else { return }
-        Haptics.successFeedback()
-        dismiss()
     }
     
     func didUpdateBiometrics(notification: Notification) {
@@ -85,13 +70,20 @@ public struct TDEEForm: View {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            HStack(spacing: 0) {
-                syncAllButton
+            if isValid {
+                doneButton
+            } else {
                 dismissButton
             }
         }
     }
     
+    var leadingContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarLeading) {
+            syncAllButton
+        }
+    }
+
     @ViewBuilder
     var syncAllButton: some View {
         if model.shouldShowSyncAllForTDEEForm {
@@ -100,6 +92,28 @@ public struct TDEEForm: View {
             } label: {
                 ButtonLabel(title: "Sync All", style: .health, isCompact: true)
             }
+        }
+    }
+    
+    var isValid: Bool {
+        model.maintenanceEnergy != nil
+    }
+
+    @ViewBuilder
+    var doneButton: some View {
+        Button {
+            Haptics.successFeedback()
+            dismiss()
+        } label: {
+            Text("Done")
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .frame(height: 32)
+                .padding(.horizontal, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(Color.accentColor.gradient)
+                )
         }
     }
     
