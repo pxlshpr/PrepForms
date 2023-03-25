@@ -56,7 +56,7 @@ public struct GoalSetForm: View {
         _showingEquivalentValuesToggle = State(initialValue: model.containsGoalWithEquivalentValues)
         self.didTapSave = didTapSave
         
-        _showingSaveButton = State(initialValue: isDuplicating)
+        _showingSaveButton = State(initialValue: existingGoalSet != nil)
     }
     
     public var body: some View {
@@ -73,7 +73,7 @@ public struct GoalSetForm: View {
             .onAppear(perform: appeared)
             
             .onChange(of: model.containsGoalWithEquivalentValues, perform: containsGoalWithEquivalentValuesChanged)
-            .onChange(of: canBeSaved, perform: canBeSavedChanged)
+//            .onChange(of: canBeSaved, perform: canBeSavedChanged)
             .onChange(of: model.singleGoalModelToPushTo, perform: singleGoalModelToPushTo)
             .onChange(of: presentedSheet, perform: presentedSheetChanged)
             .onChange(of: presentedSheet, perform: presentedSheetChanged)
@@ -178,11 +178,11 @@ public struct GoalSetForm: View {
         present(.goalForm(goalModel))
     }
     
-    func canBeSavedChanged(to newValue: Bool) {
-        withAnimation {
-            showingSaveButton = newValue
-        }
-    }
+//    func canBeSavedChanged(to newValue: Bool) {
+//        withAnimation {
+//            showingSaveButton = newValue
+//        }
+//    }
 
     func containsGoalWithEquivalentValuesChanged(to newValue: Bool) {
         withAnimation {
@@ -331,10 +331,10 @@ public struct GoalSetForm: View {
     
     @ViewBuilder
     var safeAreaInset: some View {
-        if showingSaveButton {
+//        if showingSaveButton {
             Spacer()
                 .frame(height: 60.0)
-        }
+//        }
     }
 
     func heroButtonLabel(_ systemImage: String) -> some View {
@@ -367,11 +367,15 @@ public struct GoalSetForm: View {
             .disabled(!canBeSaved)
         }
         
-        return ZStack {
-            if canBeSaved {
-                label
+        return Group {
+            if !model.showingWizard {
+                ZStack {
+                    if canBeSaved {
+                        label
+                    }
+                    button
+                }
             }
-            button
         }
     }
     

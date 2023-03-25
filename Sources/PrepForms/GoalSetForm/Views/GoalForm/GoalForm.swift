@@ -4,6 +4,10 @@ import SwiftHaptics
 import PrepDataTypes
 import PrepCoreDataStack
 
+var GoalFormHeight: CGFloat {
+    UIScreen.main.bounds.height < 850 ? 446 : 475
+}
+
 public struct GoalForm: View {
     
     @Environment(\.dismiss) var dismiss
@@ -11,7 +15,8 @@ public struct GoalForm: View {
     
     @EnvironmentObject var goalSetModel: GoalSetForm.Model
     @StateObject var biometricsModel = BiometricsModel()
-    @ObservedObject var model: GoalModel
+    @StateObject var model: GoalModel
+    let initialModel: GoalModel
     
     let didTapDelete: ((GoalModel) -> ())?
     
@@ -34,9 +39,15 @@ public struct GoalForm: View {
     @State var showingDeleteConfirmationForEnergy = false
     @State var presentedSheet: Sheet? = nil
 
-    public init(goalModel: GoalModel, didTapDelete: ((GoalModel) -> ())? = nil) {
-        self.model = goalModel
-//        _model = StateObject(wrappedValue: goalModel)
+    @State var buttonsHeight: CGFloat = 0
+    
+    public init(
+        goalModel initialModel: GoalModel,
+        didTapDelete: ((GoalModel) -> ())? = nil
+    ) {
+        let goalModel = initialModel.copy
+        _model = StateObject(wrappedValue: goalModel)
+        self.initialModel = goalModel
         self.didTapDelete = didTapDelete
         
         _leftValue = State(initialValue: goalModel.lowerBound)
@@ -57,7 +68,7 @@ public struct GoalForm: View {
     
     public var body: some View {
         quickForm
-            .presentationDetents([.height(200)])
+            .presentationDetents([.height(GoalFormHeight)])
             .onDisappear(perform: disappeared)
         
             .onChange(of: model.type) { [oldValue = model.type] newValue in
@@ -76,13 +87,192 @@ public struct GoalForm: View {
             .sheet(item: $presentedSheet) { sheet(for: $0) }
     }
     
+    var quickForm: some View {
+        QuickForm(
+            title: model.description,
+            lighterBackground: false,
+            saveAction: saveAction,
+            deleteAction: deleteActionBinding
+        ) {
+            content
+        }
+    }
+    
+    var content: some View {
+        
+        var vstack: some View {
+            VStack(spacing: 0) {
+                sections
+                Spacer() /// so that contents sticks to top when dragging form upwards
+            }
+//            .padding(.horizontal, 20)
+        }
+        
+        var formStyledScrollView: some View {
+            FormStyledScrollView {
+                sections
+            }
+        }
+        
+        var sections: some View {
+            Group {
+                valuesSection
+                    .padding(.horizontal, 20)
+                equivalentValuesSection
+//                    .padding(.bottom, 10)
+                syncStatusSection
+            }
+        }
+        
+        return vstack
+    }
+    
+    var valuesSection: some View {
+        var valuesButtons: some View {
+            var buttonsLayer: some View {
+                HStack {
+                    buttonForSide(.left)
+                    if !usesSingleValue {
+                        buttonForSide(.right)
+                    }
+                }
+            }
+            
+            @ViewBuilder
+            var swapValuesButtonLayer: some View {
+                if !usesSingleValue {
+                    VStack {
+                        swapValuesButton
+                            .padding(.top, 2)
+                        Color.clear
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: buttonsHeight, alignment: .top)
+                }
+            }
+            
+            return ZStack {
+                buttonsLayer
+                    .readSize { size in
+                        self.buttonsHeight = size.height
+                    }
+                swapValuesButtonLayer
+            }
+        }
+        
+        return HStack {
+            valuesButtons
+            unitButton
+        }
+    }
+    
+    var equivalentValuesSection: some View {
+        func missingRequirementButton(_ requirement: GoalRequirement) -> some View {
+            Button {
+                Haptics.feedback(style: .soft)
+                switch requirement {
+                case .maintenanceEnergy:
+                    present(.tdee)
+                case .leanMass:
+                    present(.leanBodyMass)
+                case .weight:
+                    present(.weight)
+                case .energyGoal:
+                    present(.energyGoal)
+                default:
+                    break
+                }
+            } label: {
+                GoalRequirementLabel(requirement: requirement)
+            }
+            .disabled(!requirement.isBiometric)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        
+        var section: some View {
+            FormStyledSection {
+                HStack {
+                    Spacer()
+                    if let requirement = model.missingRequirement {
+                        missingRequirementButton(requirement)
+                    } else if hasEquivalentValues {
+                        equivalentTexts
+                    }
+                    Spacer()
+                }
+            }
+        }
+        
+        return Group {
+            if shouldShowEquivalentSection {
+                section
+            }
+        }
+    }
+    
+    var shouldShowEquivalentSection: Bool {
+        model.missingRequirement != nil || hasEquivalentValues == true
+    }
+    
+    var syncStatusSection: some View {
+        
+        var content: some View {
+            
+            var message: String {
+                model.isSynced
+                ? "This goal is synced with your biometrics and will update automatically."
+                : "This goal is not synced with your biometrics."
+            }
+            
+            var syncInfo: some View {
+                HStack {
+                    if model.isSynced {
+                        appleHealthBolt
+                            .imageScale(.small)
+                            .frame(width: 25)
+                    }
+                    Text(message)
+//                        .font(.footnote)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .foregroundColor(Color(.tertiaryLabel))
+                }
+            }
+            
+            return syncInfo
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        
+        var section: some View {
+            content
+                .multilineTextAlignment(.leading)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .padding(.horizontal, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .foregroundColor(
+                            Color(.quaternarySystemFill)
+                                .opacity(colorScheme == .dark ? 0.5 : 1)
+                        )
+                )
+                .padding(.horizontal, 17)
+                .padding(.top, shouldShowEquivalentSection ? 0 : 10)
+        }
+        
+        return section
+    }
+    
     func typeChanged(from oldType: GoalType, to newType: GoalType) {
-        if oldType.isDualBounded, newType.isSingleBounded,
-           leftValue == nil, rightValue != nil
-        {
-            model.lowerBound = model.upperBound
+        if newType.isSingleBounded, oldType.isDualBounded {
+            if leftValue == nil, rightValue != nil {
+                model.lowerBound = model.upperBound
+            }
             model.upperBound = nil
         }
+        model.validateEnergy()
+        model.validateNutrient()
         updateWithAnimation()
     }
 
@@ -120,17 +310,36 @@ public struct GoalForm: View {
             updates()
         }
     }
-
-    var quickForm: some View {
-        QuickForm(
-            title: model.description,
-            lighterBackground: false,
-            deleteAction: deleteActionBinding
-        ) {
-            valuesContent
-        }
+    
+    var shouldDisableSaveButton: Bool {
+        self.model.hasSameContentsAs(initialModel)
     }
     
+    func didTapSave() {
+        Haptics.successFeedback()
+        withAnimation {
+//            model.validateEnergy()
+//            model.validateNutrient()
+            goalSetModel.saveUpdatedGoal(model: model)
+            goalSetModel.createImplicitGoals()
+        }
+        dismiss()
+    }
+
+    var saveAction: Binding<FormConfirmableAction?> {
+        Binding<FormConfirmableAction?>(
+            get: {
+                FormConfirmableAction(
+                    position: .bottomFilled,
+                    confirmationButtonTitle: "Done",
+                    isDisabled: shouldDisableSaveButton,
+                    handler: didTapSave
+                )
+            },
+            set: { _ in }
+        )
+    }
+
     @ViewBuilder
     func sheet(for sheet: Sheet) -> some View {
         switch sheet {
@@ -181,6 +390,9 @@ public struct GoalForm: View {
                 self.equivalentRightValue = model.equivalentUpperBound
             }
         }
+        
+        model.validateEnergy()
+        model.validateNutrient()
         model.goalSetModel.createImplicitGoals()
     }
 
@@ -195,87 +407,6 @@ public struct GoalForm: View {
             value: valueForSide(side),
             handleNewValue: handleNewValue
         )
-    }
-    
-    @State var buttonsHeight: CGFloat = 0
-    
-    var valuesContent: some View {
-        var topRow: some View {
-            var valuesButtons: some View {
-                var buttonsLayer: some View {
-                    HStack {
-                        buttonForSide(.left)
-                        if !usesSingleValue {
-                            buttonForSide(.right)
-                        }
-                    }
-                }
-                
-                @ViewBuilder
-                var swapValuesButtonLayer: some View {
-                    if !usesSingleValue {
-                        VStack {
-                            swapValuesButton
-                                .padding(.top, 2)
-                            Color.clear
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: buttonsHeight, alignment: .top)
-                    }
-                }
-                
-                return ZStack {
-                    buttonsLayer
-                        .readSize { size in
-                            self.buttonsHeight = size.height
-                        }
-                    swapValuesButtonLayer
-                }
-            }
-            
-            return HStack {
-                valuesButtons
-                unitButton
-            }
-        }
-        
-        var bottomRow: some View {
-            HStack {
-                if let missingRequirement = model.missingRequirement {
-                    Button {
-                        Haptics.feedback(style: .soft)
-                        switch missingRequirement {
-                        case .maintenanceEnergy:
-                            present(.tdee)
-                        case .leanMass:
-                            present(.leanBodyMass)
-                        case .weight:
-                            present(.weight)
-                        case .energyGoal:
-                            present(.energyGoal)
-                        default:
-                            break
-                        }
-                    } label: {
-                        GoalRequirementLabel(requirement: missingRequirement)
-                    }
-                    .disabled(!missingRequirement.isBiometric)
-                    .fixedSize(horizontal: false, vertical: true)
-                } else if hasEquivalentValues {
-//                    equivalentLabel
-                    equivalentTexts
-                }
-                Spacer()
-                syncedButton
-            }
-        }
-        
-        return VStack(spacing: 10) {
-            topRow
-            bottomRow
-            Spacer() /// so that contents sticks to top when dragging form upwards
-        }
-        .padding(.horizontal, 20)
     }
     
     func valueForSide(_ side: Side) -> Double? {
@@ -447,9 +578,9 @@ public struct GoalForm: View {
     }
     
     func disappeared() {
-        model.validateEnergy()
-        model.validateNutrient()
-        goalSetModel.createImplicitGoals()
+//        model.validateEnergy()
+//        model.validateNutrient()
+//        goalSetModel.createImplicitGoals()
     }
     
     var syncedButton: some View {

@@ -22,7 +22,7 @@ struct GoalUnitPicker: View {
     var body: some View {
         quickForm
             .sheet(item: $presentedSheet) { sheet(for: $0) }
-            .presentationDetents([.height(350)])
+            .presentationDetents([.height(GoalFormHeight)])
             .onChange(of: type, perform: typeChanged)
     }
     
@@ -82,7 +82,7 @@ struct GoalUnitPicker: View {
     }
     
     var isDirty: Bool {
-        true
+        model.type != type
     }
     
     var shouldDisableSaveButton: Bool {
@@ -96,7 +96,7 @@ struct GoalUnitPicker: View {
                 FormConfirmableAction(
                     position: .bottomFilled,
                     confirmationButtonTitle: "Done",
-                    isDisabled: !hasRequiredParameters,
+                    isDisabled: shouldDisableSaveButton,
                     handler: didTapSave
                 )
             },

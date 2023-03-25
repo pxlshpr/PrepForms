@@ -337,3 +337,20 @@ func randomEmoji(forGoalSetType type: GoalSetType) -> String {
     }
     return String(character)
 }
+
+extension GoalSetForm.Model {
+    func saveUpdatedGoal(model: GoalModel) {
+        guard let index = goalModels.firstIndex(where: { $0.id == model.id }) else {
+            return
+        }
+        goalModels[index].update(with: model)
+    }
+}
+
+extension GoalModel {
+    func update(with goalModel: GoalModel) {
+        self.type = goalModel.type
+        self.lowerBound = goalModel.lowerBound
+        self.upperBound = goalModel.upperBound
+    }
+}
