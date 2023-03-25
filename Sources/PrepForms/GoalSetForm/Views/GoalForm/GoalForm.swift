@@ -5,7 +5,9 @@ import PrepDataTypes
 import PrepCoreDataStack
 
 var GoalFormHeight: CGFloat {
-    UIScreen.main.bounds.height < 850 ? 446 : 475
+//    380
+    UIScreen.main.bounds.height < 850 ? 400 : 380
+//    UIScreen.main.bounds.height < 850 ? 446 : 475
 }
 
 public struct GoalForm: View {
@@ -192,8 +194,8 @@ public struct GoalForm: View {
         var section: some View {
             FormStyledSection {
                 HStack {
-                    Spacer()
                     if let requirement = model.missingRequirement {
+                        Spacer()
                         missingRequirementButton(requirement)
                     } else if hasEquivalentValues {
                         equivalentTexts
@@ -219,14 +221,14 @@ public struct GoalForm: View {
         var content: some View {
             
             var message: String {
-                model.isSynced
+                !model.isSynced
                 ? "This goal is synced with your biometrics and will update automatically."
                 : "This goal is not synced with your biometrics."
             }
             
             var syncInfo: some View {
                 HStack {
-                    if model.isSynced {
+                    if !model.isSynced {
                         appleHealthBolt
                             .imageScale(.small)
                             .frame(width: 25)
