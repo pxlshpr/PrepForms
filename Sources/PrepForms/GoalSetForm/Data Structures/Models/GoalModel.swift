@@ -663,6 +663,11 @@ extension GoalModel {
     var equivalentUpperBound: Double? {
         goal.calculateUpperBound(with: goalCalcParams)
     }
+    
+    var shouldShowEquivalentSection: Bool {
+        missingRequirement != nil
+        || hasEquivalentValues == true
+    }
 }
 
 extension GoalModel: Hashable {

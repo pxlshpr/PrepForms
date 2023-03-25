@@ -30,6 +30,8 @@ public struct GoalForm: View {
     @State var lowerBoundSuffix: String?
     @State var upperBoundSuffix: String?
 
+    @State var shouldShowEquivalentSection: Bool
+    
     let equivalentUnitString: String?
 
     @State var showingDeleteConfirmationForEnergy = false
@@ -61,6 +63,7 @@ public struct GoalForm: View {
         _upperBoundPrefix = State(initialValue: goalModel.upperBoundPrefix(equivalent: true))
         _lowerBoundSuffix = State(initialValue: goalModel.lowerBoundSuffix(equivalent: true))
         _upperBoundSuffix = State(initialValue: goalModel.upperBoundSuffix(equivalent: true))
+        _shouldShowEquivalentSection = State(initialValue: goalModel.shouldShowEquivalentSection)
         self.equivalentUnitString = goalModel.equivalentUnitString
     }
     
@@ -216,10 +219,6 @@ public struct GoalForm: View {
         }
     }
     
-    var shouldShowEquivalentSection: Bool {
-        model.missingRequirement != nil || hasEquivalentValues == true
-    }
-    
     var syncStatusSection: some View {
         
         var content: some View {
@@ -301,6 +300,7 @@ public struct GoalForm: View {
             showSyncedIndicator = model.showsSyncedIndicator
             hasValidLowerBound = model.hasValidLowerBound
             hasValidUpperBound = model.hasValidUpperBound
+            shouldShowEquivalentSection = model.shouldShowEquivalentSection
 
             lowerBoundPrefix = model.lowerBoundPrefix(equivalent: true)
             upperBoundPrefix = model.upperBoundPrefix(equivalent: true)
@@ -355,27 +355,33 @@ public struct GoalForm: View {
         )
     }
 
-    @ViewBuilder
     func sheet(for sheet: Sheet) -> some View {
-        switch sheet {
-        case .lowerBound:
-            valueForm(for: .left)
-        case .upperBound:
-            valueForm(for: .right)
-        case .unit:
-            unitPicker
-            
-        case .tdee:
-            TDEEForm()
-        case .weight:
-            WeightForm()
-        case .leanBodyMass:
-            LeanBodyMassForm(biometricsModel)
-        case .energyGoal:
-            energyGoalForm
-            
-        default:
-            EmptyView()
+        Group {
+            switch sheet {
+            case .lowerBound:
+                valueForm(for: .left)
+            case .upperBound:
+                valueForm(for: .right)
+            case .unit:
+                unitPicker
+                
+            case .tdee:
+                TDEEForm()
+            case .weight:
+                WeightForm()
+            case .leanBodyMass:
+                LeanBodyMassForm(biometricsModel)
+            case .energyGoal:
+                energyGoalForm
+                
+            default:
+                EmptyView()
+            }
+        }
+        .onDisappear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                updateWithAnimation()
+            }
         }
     }
     

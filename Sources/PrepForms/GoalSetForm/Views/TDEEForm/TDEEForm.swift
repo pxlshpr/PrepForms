@@ -26,7 +26,23 @@ public struct TDEEForm: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar { trailingContent }
                 .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
+                .onChange(of: model.restingEnergy, perform: restingEnergyChanged)
+                .onChange(of: model.activeEnergy, perform: activeEnergyChanged)
         }
+    }
+    
+    func restingEnergyChanged(_ newValue: Double?) {
+        dismissIfValid()
+    }
+    
+    func activeEnergyChanged(_ newValue: Double?) {
+        dismissIfValid()
+    }
+    
+    func dismissIfValid() {
+        guard model.maintenanceEnergy != nil else { return }
+        Haptics.successFeedback()
+        dismiss()
     }
     
     func didUpdateBiometrics(notification: Notification) {
