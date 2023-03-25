@@ -37,7 +37,7 @@ public struct GoalForm: View {
 
     @State var buttonsHeight: CGFloat = 0
     
-    let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
+    let didSetBiometrics = NotificationCenter.default.publisher(for: .didSetBiometrics)
     
     public init(
         goalModel initialModel: GoalModel,
@@ -76,7 +76,7 @@ public struct GoalForm: View {
             }
             .onChange(of: model.lowerBound, perform: lowerBoundChanged)
             .onChange(of: model.upperBound, perform: upperBoundChanged)
-            .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
+            .onReceive(didSetBiometrics, perform: didSetBiometrics)
         
             .confirmationDialog(
                 deleteEnergyConfirmationTitle,
@@ -88,7 +88,7 @@ public struct GoalForm: View {
             .sheet(item: $presentedSheet) { sheet(for: $0) }
     }
     
-    func didUpdateBiometrics(_ notification: Notification) {
+    func didSetBiometrics(_ notification: Notification) {
         isDirtyOverride = true
         updateWithAnimation()
     }

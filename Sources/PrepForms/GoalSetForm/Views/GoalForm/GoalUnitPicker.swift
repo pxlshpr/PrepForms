@@ -15,7 +15,7 @@ struct GoalUnitPicker: View {
     @State var type: GoalType
     @State var isDirtyOverride = false
     
-    let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
+    let didSetBiometrics = NotificationCenter.default.publisher(for: .didSetBiometrics)
     
     init(model: GoalModel) {
         self.model = model
@@ -26,11 +26,11 @@ struct GoalUnitPicker: View {
         quickForm
             .sheet(item: $presentedSheet) { sheet(for: $0) }
             .presentationDetents([.height(GoalFormHeight)])
-            .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
+            .onReceive(didSetBiometrics, perform: didSetBiometrics)
             .onChange(of: type, perform: typeChanged)
     }
     
-    func didUpdateBiometrics(_ notification: Notification) {
+    func didSetBiometrics(_ notification: Notification) {
         isDirtyOverride = true
     }
     
