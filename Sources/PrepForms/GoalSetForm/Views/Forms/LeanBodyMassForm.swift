@@ -19,7 +19,7 @@ struct LeanBodyMassForm: View {
     }
     
     var body: some View {
-        quickForm
+        content
             .presentationDetents([collapsedDetent, .large], selection: $detent)
             .onChange(of: model.lbmSource, perform: lbmSourceChanged)
     }
@@ -30,9 +30,8 @@ struct LeanBodyMassForm: View {
         }
     }
     
-    var quickForm: some View {
+    var content: some View {
         NavigationView {
-//        QuickForm(title: "Lean Body Mass") {
             FormStyledScrollView {
                 infoSection
                 leanBodyMassSection
@@ -40,19 +39,49 @@ struct LeanBodyMassForm: View {
             }
             .navigationTitle("Lean Body Mass")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar { leadingContent }
             .toolbar { trailingContent }
+        }
+    }
+    
+    var leadingContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarLeading) {
+            syncButton
         }
     }
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            HStack(spacing: 0) {
-                syncButton
-                dismissButton
-            }
+//            if isValid {
+                doneButton
+//            } else {
+//                dismissButton
+//            }
         }
     }
+    
+    var isValid: Bool {
+        model.lbm != nil
+    }
 
+    @ViewBuilder
+    var doneButton: some View {
+        Button {
+            Haptics.successFeedback()
+            dismiss()
+        } label: {
+            Text("Done")
+//                .fontWeight(.bold)
+//                .foregroundColor(.white)
+//                .frame(height: 32)
+//                .padding(.horizontal, 8)
+//                .background(
+//                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+//                        .fill(Color.accentColor.gradient)
+//                )
+        }
+    }
+    
     var dismissButton: some View {
         Button {
             Haptics.feedback(style: .soft)

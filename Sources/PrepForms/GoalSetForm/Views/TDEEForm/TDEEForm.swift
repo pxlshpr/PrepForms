@@ -12,9 +12,9 @@ public struct TDEEForm: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     @StateObject var model: BiometricsModel = BiometricsModel()
-    
     @State var showingSaveButton: Bool = false
-    
+    @State var presentedSheet: Sheet? = nil
+
     let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
     
     @ViewBuilder
@@ -27,6 +27,7 @@ public struct TDEEForm: View {
                 .toolbar { leadingContent }
                 .toolbar { trailingContent }
                 .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
+                .sheet(item: $presentedSheet) { sheet(for: $0) }
         }
     }
     
@@ -35,7 +36,7 @@ public struct TDEEForm: View {
             self.model.load(UserManager.biometrics)
         }
     }
-
+    
     var form: some View {
         FormStyledScrollView {
             maintenanceSection
@@ -53,12 +54,19 @@ public struct TDEEForm: View {
     }
     
     var restingEnergySection: some View {
-        RestingEnergySection()
+        func presentSheet(_ sheet: RestingEnergySheet) {
+            present(.resting(sheet))
+        }
+        
+        return RestingEnergySection(sheetPresenter: presentSheet)
             .environmentObject(model)
     }
     
     var activeEnergySection: some View {
-        ActiveEnergySection()
+        func presentSheet(_ sheet: ActiveEnergySheet) {
+            present(.active(sheet))
+        }
+        return ActiveEnergySection(sheetPresenter: presentSheet)
             .environmentObject(model)
     }
     
@@ -70,11 +78,7 @@ public struct TDEEForm: View {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            if isValid {
-                doneButton
-            } else {
-                dismissButton
-            }
+            doneButton
         }
     }
     
@@ -83,7 +87,7 @@ public struct TDEEForm: View {
             syncAllButton
         }
     }
-
+    
     @ViewBuilder
     var syncAllButton: some View {
         if model.shouldShowSyncAllForTDEEForm {
@@ -98,7 +102,7 @@ public struct TDEEForm: View {
     var isValid: Bool {
         model.maintenanceEnergy != nil
     }
-
+    
     @ViewBuilder
     var doneButton: some View {
         Button {
@@ -106,14 +110,6 @@ public struct TDEEForm: View {
             dismiss()
         } label: {
             Text("Done")
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-                .frame(height: 32)
-                .padding(.horizontal, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(Color.accentColor.gradient)
-                )
         }
     }
     
@@ -123,6 +119,70 @@ public struct TDEEForm: View {
             dismiss()
         } label: {
             CloseButtonLabel()
+        }
+    }
+}
+
+extension TDEEForm {
+    
+    enum Sheet: Hashable, Identifiable {
+        case resting(RestingEnergySheet)
+        case active(ActiveEnergySheet)
+        
+        var id: Self { self }
+    }
+}
+
+enum LeanBodyMassSheet: Hashable, Identifiable {
+    case source
+    case equation
+    
+    var id: Self { self }
+}
+
+enum ActiveEnergySheet: Hashable, Identifiable {
+    case source
+    case intervalType
+    case intervalPeriod
+    case intervalValue
+    case activityLevel
+
+    var id: Self { self }
+}
+
+extension TDEEForm {
+    
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        
+        switch sheet {
+            
+        case .resting(let restingEnergySheet):
+            model.restingEnergySheet(for: restingEnergySheet)
+            
+        case .active(let activeEnergySheet):
+            model.activeEnergySheet(for: activeEnergySheet)
+        }
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedSheet = sheet
+        }
+        
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+        
+        if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else {
+            present()
         }
     }
 }

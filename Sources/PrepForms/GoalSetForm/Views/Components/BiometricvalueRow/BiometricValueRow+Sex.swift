@@ -75,31 +75,3 @@ extension BiometricValueRow {
     }
     
 }
-
-extension BiometricSex {
-    static var pickerItems: [PickerItem] {
-        [Self.female, Self.male]
-            .map { $0.pickerItem }
-    }
-    
-    init?(pickerItem: PickerItem) {
-        guard let int16 = Int16(pickerItem.id),
-              let source = BiometricSex(rawValue: int16) else {
-            return nil
-        }
-        self = source
-    }
-    
-    var pickerItem: PickerItem {
-        PickerItem(
-            id: "\(self.rawValue)",
-            title: pickerTitle,
-            detail: nil,
-            secondaryDetail: nil
-        )
-    }
-    
-    var pickerTitle: String {
-        description
-    }
-}

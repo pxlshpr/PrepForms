@@ -10,12 +10,13 @@ struct WeightForm: View {
     
     var body: some View {
         NavigationView {
-            FormStyledScrollView {
+            VStack {
                 WeightSection(includeHeader: false)
                     .environmentObject(model)
-                    .toolbar { trailingContent }
+                Spacer()
             }
             .navigationTitle("Weight")
+            .toolbar { trailingContent }
             .navigationBarTitleDisplayMode(.inline)
         }
         .presentationDetents([.height(300)])
@@ -23,11 +24,11 @@ struct WeightForm: View {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            if isValid {
+//            if isValid {
                 doneButton
-            } else {
-                dismissButton
-            }
+//            } else {
+//                dismissButton
+//            }
         }
     }
     
@@ -42,14 +43,14 @@ struct WeightForm: View {
             dismiss()
         } label: {
             Text("Done")
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-                .frame(height: 32)
-                .padding(.horizontal, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(Color.accentColor.gradient)
-                )
+//                .fontWeight(.bold)
+//                .foregroundColor(.white)
+//                .frame(height: 32)
+//                .padding(.horizontal, 8)
+//                .background(
+//                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+//                        .fill(Color.accentColor.gradient)
+//                )
         }
     }
     

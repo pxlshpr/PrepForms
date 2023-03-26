@@ -307,13 +307,18 @@ public struct GoalSetForm: View {
                 microCells
                 addCell
                 footerInfoContent
+                safeAreaInset
             }
             .padding(.horizontal, 20)
         }
-        .safeAreaInset(edge: .bottom) { safeAreaInset }
         .overlay(overlay)
         .blur(radius: computedBlurRadius)
         .disabled(model.formDisabled)
+    }
+    
+    var safeAreaInset: some View {
+        Spacer()
+            .frame(height: 60.0)
     }
     
     var computedBlurRadius: CGFloat {
@@ -332,14 +337,6 @@ public struct GoalSetForm: View {
         return blurringForWizardAndPresentingSheets
     }
     
-    @ViewBuilder
-    var safeAreaInset: some View {
-//        if showingSaveButton {
-            Spacer()
-                .frame(height: 60.0)
-//        }
-    }
-
     func heroButtonLabel(_ systemImage: String) -> some View {
         Image(systemName: systemImage)
             .font(.system(size: 25))

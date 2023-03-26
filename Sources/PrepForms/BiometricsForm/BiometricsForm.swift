@@ -6,15 +6,15 @@ import SwiftHaptics
 
 public struct BiometricsForm: View {
     
-    @StateObject var model: BiometricsModel = BiometricsModel()
-    
     @Namespace var namespace
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
+    
+    @StateObject var model: BiometricsModel = BiometricsModel()
+    @State var presentedSheet: Sheet? = nil
+    @State var changedTypes: [BiometricType] = []
 
     let didUpdateBiometrics = NotificationCenter.default.publisher(for: .didUpdateBiometrics)
-    
-    @State var changedTypes: [BiometricType] = []
     
     public init() { }
     
@@ -26,6 +26,7 @@ public struct BiometricsForm: View {
                 .toolbar { leadingContent }
                 .onAppear(perform: appeared)
                 .onReceive(didUpdateBiometrics, perform: didUpdateBiometrics)
+                .sheet(item: $presentedSheet) { sheet(for: $0) }
         }
     }
     
@@ -107,7 +108,7 @@ public struct BiometricsForm: View {
                 .font(.footnote)
         }
     }
-
+    
     var energyGroup: some View {
         Group {
             maintenanceTitle
@@ -141,7 +142,7 @@ public struct BiometricsForm: View {
         .padding(.top, 20)
         .padding(.bottom, 0)
     }
-
+    
     var maintenanceTitle: some View {
         var isSynced: Bool {
             model.isSyncing(.activeEnergy) || model.isSyncing(.restingEnergy)
@@ -153,11 +154,11 @@ public struct BiometricsForm: View {
                 appleHealthBolt
             }
         }
-
+        
         return HStack {
             syncedSymbol
-//            Image(systemName: "flame.fill")
-//                .font(.title2)
+            //            Image(systemName: "flame.fill")
+            //                .font(.title2)
             Text("Maintenance Energy")
                 .font(.system(.title2, design: .rounded, weight: .bold))
                 .foregroundStyle(
@@ -176,7 +177,7 @@ public struct BiometricsForm: View {
         .padding(.top, 20)
         .padding(.bottom, 0)
     }
-
+    
     var infoSection: some View {
         
         var content: some View {
@@ -192,7 +193,7 @@ public struct BiometricsForm: View {
                             .imageScale(.small)
                             .frame(width: 25)
                         Text("These biometrics are being kept in sync with your data from the Health App.")
-//                            .font(.caption)
+                        //                            .font(.caption)
                             .foregroundColor(Color(.secondaryLabel))
                     }
                 }
@@ -200,7 +201,7 @@ public struct BiometricsForm: View {
             
             return VStack(alignment: .leading, spacing: 5) {
                 Group {
-//                    text
+                    //                    text
                     syncInfo
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -239,13 +240,23 @@ public struct BiometricsForm: View {
             set: { _ in }
         )
     }
+}
+
+extension BiometricsForm {
+    
     var restingEnergySection: some View {
-        RestingEnergySection()
+        func presentSheet(_ sheet: RestingEnergySheet) {
+            present(.resting(sheet))
+        }
+        return RestingEnergySection(sheetPresenter: presentSheet)
             .environmentObject(model)
     }
 
     var activeEnergySection: some View {
-        ActiveEnergySection()
+        func presentSheet(_ sheet: ActiveEnergySheet) {
+            present(.active(sheet))
+        }
+        return ActiveEnergySection(sheetPresenter: presentSheet)
             .environmentObject(model)
     }
 
@@ -275,3 +286,76 @@ public struct BiometricsForm: View {
     }
 }
 
+
+extension BiometricsForm {
+    
+    enum Sheet: Hashable, Identifiable {
+        case resting(RestingEnergySheet)
+        case active(ActiveEnergySheet)
+        case leanBodyMass(LeanBodyMassSheet)
+        case weightSource
+        case heightSource
+        case ageSource
+        case sexSource
+        
+        var id: Self { self }
+    }
+}
+
+extension BiometricsForm {
+    
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        
+        switch sheet {
+            
+        case .resting(let restingEnergySheet):
+            model.restingEnergySheet(for: restingEnergySheet)
+            
+        case .active(let activeEnergySheet):
+            model.activeEnergySheet(for: activeEnergySheet)
+            
+        case .leanBodyMass(let leanBodyMassSheet):
+            switch leanBodyMassSheet {
+            case .source:
+                EmptyView()
+            case .equation:
+                EmptyView()
+            }
+            
+        case .weightSource:
+            EmptyView()
+            
+        case .heightSource:
+            EmptyView()
+            
+        case .ageSource:
+            EmptyView()
+            
+        case .sexSource:
+            EmptyView()
+            
+        }
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedSheet = sheet
+        }
+        
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+        
+        if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else {
+            present()
+        }
+    }
+}

@@ -11,7 +11,7 @@ struct RestingEnergySection: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
-    @State var presentedSheet: Sheet? = nil
+    let sheetPresenter: (RestingEnergySheet) -> ()
     
     var body: some View {
         VStack(spacing: 7) {
@@ -21,27 +21,6 @@ struct RestingEnergySection: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 10)
-        .sheet(item: $presentedSheet) { sheet(for: $0) }
-    }
-    
-    @ViewBuilder
-    func sheet(for sheet: Sheet) -> some View {
-        switch sheet {
-        case .sourcePicker:
-            sourcePickerSheet
-        case .leanBodyMassForm:
-            leanBodyMassForm
-        case .profileForm:
-            profileForm
-        case .intervalTypePicker:
-            intervalTypePickerSheet
-        case .intervalPeriodPicker:
-            intervalPeriodPickerSheet
-        case .intervalValuePicker:
-            intervalValuePickerSheet
-        case .equationPicker:
-            equationPickerSheet
-        }
     }
     
     var header: some View {
@@ -92,19 +71,6 @@ struct RestingEnergySection: View {
             bottomRow
         }
     }
-
-    var sourcePickerSheet: some View {
-        PickerSheet(
-            title: "Choose a Source",
-            items: RestingEnergySource.pickerItems,
-            pickedItem: model.restingEnergySource?.pickerItem,
-            didPick: {
-                Haptics.feedback(style: .soft)
-                guard let pickedSource = RestingEnergySource(pickerItem: $0) else { return }
-                model.changeRestingEnergySource(to: pickedSource)
-            }
-        )
-    }
     
     var sourceSection: some View {
         var label: some View {
@@ -114,7 +80,7 @@ struct RestingEnergySection: View {
         var pickerButton: some View {
             Button {
                 Haptics.feedback(style: .soft)
-                present(.sourcePicker)
+                present(.source)
             } label: {
                 label
             }
@@ -127,25 +93,8 @@ struct RestingEnergySection: View {
         .padding(.horizontal, 17)
     }
 
-    func present(_ sheet: Sheet) {
-        
-        func present() {
-            Haptics.feedback(style: .soft)
-            presentedSheet = sheet
-        }
-        
-        func delayedPresent() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                present()
-            }
-        }
-        
-        if presentedSheet != nil {
-            presentedSheet = nil
-            delayedPresent()
-        } else {
-            present()
-        }
+    func present(_ sheet: RestingEnergySheet) {
+        sheetPresenter(sheet)
     }
     
     //MARK: - Equation Content
@@ -162,7 +111,7 @@ struct RestingEnergySection: View {
         var equationButton: some View {
             Button {
                 Haptics.feedback(style: .soft)
-                present(.equationPicker)
+                present(.equation)
             } label: {
                 BiometricPickerLabel(model.restingEnergyEquation.menuDescription)
             }
@@ -180,14 +129,6 @@ struct RestingEnergySection: View {
         .padding(.top, 8)
     }
     
-    var leanBodyMassForm: some View {
-        LeanBodyMassForm(model)
-    }
-    
-    var profileForm: some View {
-        ProfileForm(model)
-    }
-    
     var parametersRow: some View {
         
         var lbmFormButton: some View {
@@ -197,7 +138,7 @@ struct RestingEnergySection: View {
             )
             return Button {
                 Haptics.feedback(style: .soft)
-                present(.leanBodyMassForm)
+                present(.leanBodyMass)
             } label: {
                 MeasurementLabel(
                     label: model.hasLeanBodyMass ? "lean body mass" : "set lean body mass",
@@ -241,7 +182,7 @@ struct RestingEnergySection: View {
             
             return Button {
                 Haptics.feedback(style: .soft)
-                present(.profileForm)
+                present(.components)
             } label: {
                 label
             }
@@ -347,79 +288,11 @@ struct RestingEnergySection: View {
         .padding(.horizontal)
     }
     
-    enum Sheet: String, Identifiable {
-        case profileForm
-        case leanBodyMassForm
-        case sourcePicker
-        case intervalTypePicker
-        case intervalPeriodPicker
-        case intervalValuePicker
-        case equationPicker
-        
-        var id: String { rawValue }
-    }
-    
-    var intervalTypePickerSheet: some View {
-        PickerSheet(
-            title: "Choose a value",
-            items: HealthIntervalType.pickerItems,
-            pickedItem: model.restingEnergyInterval.intervalType.pickerItem,
-            didPick: {
-                Haptics.feedback(style: .soft)
-                guard let pickedType = HealthIntervalType(pickerItem: $0) else { return }
-                model.changeRestingEnergyIntervalType(to: pickedType)
-            }
-        )
-    }
-
-    var intervalPeriodPickerSheet: some View {
-        PickerSheet(
-            title: "Duration to average",
-            items: HealthPeriod.pickerItems,
-            pickedItem: model.restingEnergyInterval.period.pickerItem,
-            didPick: {
-                Haptics.feedback(style: .soft)
-                guard let pickedPeriod = HealthPeriod(pickerItem: $0) else { return }
-                model.changeRestingEnergyIntervalPeriod(to: pickedPeriod)
-            }
-        )
-    }
-    
-    var equationPickerSheet: some View {
-        PickerSheet(
-            title: "Equation",
-            items: RestingEnergyEquation.pickerItems,
-            pickedItem: model.restingEnergyEquation.pickerItem,
-            didPick: {
-                Haptics.feedback(style: .soft)
-                guard let pickedEquation = RestingEnergyEquation(pickerItem: $0) else { return }
-                model.changeRestingEnergyEquation(to: pickedEquation)
-            }
-        )
-    }
-    
-    var intervalValuePickerSheet: some View {
-        var items: [PickerItem] {
-            model.restingEnergyIntervalValues.map { PickerItem(with: $0) }
-        }
-        
-        return PickerSheet(
-            title: "\(model.restingEnergyInterval.period.description.capitalizingFirstLetter())s to average",
-            items: items,
-            pickedItem: PickerItem(with: model.restingEnergyInterval.value),
-            didPick: {
-                Haptics.feedback(style: .soft)
-                guard let value = Int($0.id) else { return }
-                model.changeRestingEnergyIntervalValue(to: value)
-            }
-        )
-    }
-
     var healthPeriodContent: some View {
         var intervalTypeMenu: some View {
             Button {
                 Haptics.feedback(style: .soft)
-                present(.intervalTypePicker)
+                present(.intervalType)
             } label: {
                 BiometricPickerLabel(model.restingEnergyInterval.intervalType.menuDescription)
             }
@@ -428,7 +301,7 @@ struct RestingEnergySection: View {
         var periodIntervalMenu: some View {
             Button {
                 Haptics.feedback(style: .soft)
-                present(.intervalPeriodPicker)
+                present(.intervalPeriod)
             } label: {
                 BiometricPickerLabel(
                     "\(model.restingEnergyInterval.period.description)\(model.restingEnergyInterval.value > 1 ? "s" : "")"
@@ -440,7 +313,7 @@ struct RestingEnergySection: View {
         var intervalValueMenu: some View {
             Button {
                 Haptics.feedback(style: .soft)
-                present(.intervalValuePicker)
+                present(.intervalValue)
             } label: {
                 BiometricPickerLabel("\(model.restingEnergyInterval.value)")
             }
@@ -485,132 +358,6 @@ struct RestingEnergySection: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 10)
-        }
-    }
-}
-
-extension HealthPeriod {
-    static var pickerItems: [PickerItem] {
-        allCases.map { $0.pickerItem }
-    }
-    
-    init?(pickerItem: PickerItem) {
-        guard let int16 = Int16(pickerItem.id),
-              let source = HealthPeriod(rawValue: int16) else {
-            return nil
-        }
-        self = source
-    }
-    
-    var pickerItem: PickerItem {
-        PickerItem(
-            id: "\(self.rawValue)",
-            title: description,
-            detail: nil,
-            secondaryDetail: nil
-        )
-    }
-}
-
-
-extension HealthIntervalType {
-    static var pickerItems: [PickerItem] {
-        allCases.map { $0.pickerItem }
-    }
-    
-    init?(pickerItem: PickerItem) {
-        guard let int16 = Int16(pickerItem.id),
-              let source = HealthIntervalType(rawValue: int16) else {
-            return nil
-        }
-        self = source
-    }
-    
-    var pickerItem: PickerItem {
-        PickerItem(
-            id: "\(self.rawValue)",
-            title: pickerDescription,
-            detail: pickerDetail,
-            secondaryDetail: pickerSecondaryDetail,
-            systemImage: systemImage
-        )
-    }
-    
-    var systemImage: String? {
-        switch self {
-        case .latest:
-            return "calendar.badge.clock"
-        case .average:
-            return "sum"
-        }
-    }
-
-    var pickerDetail: String? {
-        switch self {
-        case .latest:
-            return "Use the latest available value."
-        case .average:
-            return "Use the average daily value of the past x days/weeks/months. "
-        }
-    }
-
-    var pickerSecondaryDetail: String? {
-        switch self {
-        case .latest:
-            return nil
-        case .average:
-            return "This will be a rolling average that updates every day."
-        }
-    }
-}
-
-extension RestingEnergyEquation {
-    static var pickerItems: [PickerItem] {
-        allCases
-            .sorted(by: { $0.year > $1.year })
-            .map { $0.pickerItem }
-    }
-    
-    init?(pickerItem: PickerItem) {
-        guard let int16 = Int16(pickerItem.id),
-              let source = RestingEnergyEquation(rawValue: int16) else {
-            return nil
-        }
-        self = source
-    }
-    
-    var pickerItem: PickerItem {
-        PickerItem(
-            id: "\(self.rawValue)",
-            title: pickerTitle,
-            detail: pickerDetail,
-            secondaryDetail: pickerSecondaryDetail
-        )
-    }
-    
-    var pickerTitle: String {
-        "\(pickerDescription) • \(year)"
-    }
-
-    var pickerDetail: String? {
-        switch self {
-        case .rozaShizgal:
-            return "This is the revised Harris-Benedict equation."
-        case .schofield:
-            return "This is the equation used by the WHO."
-        default:
-            return nil
-        }
-    }
-
-    var pickerSecondaryDetail: String? {
-        switch self {
-        case .katchMcardle, .cunningham:
-            return "Uses your lean body mass."
-        case .henryOxford, .schofield:
-            return "Uses your age, weight and biological sex."
-        case .mifflinStJeor, .rozaShizgal, .harrisBenedict:
-            return "Uses your age, weight, height and biological sex."
         }
     }
 }

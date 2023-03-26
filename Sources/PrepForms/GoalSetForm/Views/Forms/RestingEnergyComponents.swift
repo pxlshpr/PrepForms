@@ -4,7 +4,7 @@ import PrepDataTypes
 import ActivityIndicatorView
 import SwiftUISugar
 
-struct ProfileForm: View {
+struct RestingEnergyComponents: View {
     
     @Environment(\.dismiss) var dismiss
     @ObservedObject var model: BiometricsModel
@@ -30,25 +30,47 @@ struct ProfileForm: View {
             }
             .navigationTitle("Components")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar { leadingContent }
             .toolbar { trailingContent }
         }
     }
     
     var infoSection: some View {
         FormStyledSection {
-            Text("These are used to calculate your resting energy using the \(model.restingEnergyEquation.menuDescription) equation.")
+            Text("These are used to calculate your resting energy using the *\(model.restingEnergyEquation.menuDescription)* equation.")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
                 .foregroundColor(.secondary)
         }
     }
     
+    var leadingContent: some ToolbarContent {
+        ToolbarItemGroup(placement: .navigationBarLeading) {
+            syncButton
+        }
+    }
+    
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-            HStack(spacing: 0) {
-                syncButton
-                dismissButton
-            }
+//            if isValid {
+                doneButton
+//            } else {
+//                dismissButton
+//            }
+        }
+    }
+    
+    var isValid: Bool {
+        model.calculatedRestingEnergy != nil
+    }
+
+    @ViewBuilder
+    var doneButton: some View {
+        Button {
+            Haptics.feedback(style: .soft)
+            dismiss()
+        } label: {
+            Text("Done")
         }
     }
     
