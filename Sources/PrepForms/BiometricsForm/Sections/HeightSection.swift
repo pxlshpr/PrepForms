@@ -9,7 +9,8 @@ struct HeightSection: View {
     
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
-
+    let showSourcePicker: () -> ()
+    
     var body: some View {
         FormStyledSection(header: header) {
             content
@@ -84,34 +85,18 @@ struct HeightSection: View {
         }
     }
     
-    @State var showingSourcePicker = false
-    
     var sourceSection: some View {
         var label: some View {
             BiometricSourcePickerLabel(source: model.heightSourceBinding.wrappedValue)
         }
         
-        var sourcePickerSheet: some View {
-            PickerSheet(
-                title: "Choose a Source",
-                items: MeasurementSource.pickerItems,
-                pickedItem: model.heightSource?.pickerItem,
-                didPick: {
-                    Haptics.feedback(style: .soft)
-                    guard let pickedSource = MeasurementSource(pickerItem: $0) else { return }
-                    model.changeHeightSource(to: pickedSource)
-                }
-            )
-        }
-        
         var pickerButton: some View {
             Button {
                 Haptics.feedback(style: .soft)
-                showingSourcePicker = true
+                showSourcePicker()
             } label: {
                 label
             }
-            .sheet(isPresented: $showingSourcePicker) { sourcePickerSheet }
         }
 
         return HStack {

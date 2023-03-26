@@ -10,10 +10,11 @@ struct BiologicalSexSection: View {
     let includeFooter: Bool
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
-    @State var showingSourcePicker = false
+    let showSourcePicker: () -> ()
 
-    init(includeFooter: Bool = false) {
+    init(includeFooter: Bool = false, showSourcePicker: @escaping () -> ()) {
         self.includeFooter = includeFooter
+        self.showSourcePicker = showSourcePicker
     }
     
     var body: some View {
@@ -96,28 +97,14 @@ struct BiologicalSexSection: View {
             let measurementSexSource = MeasurementSexSource(rawValue: measurementSource.rawValue) ?? .userEntered
             return BiometricSourcePickerLabel(source: measurementSexSource)
         }
-        
-        var sourcePickerSheet: some View {
-            PickerSheet(
-                title: "Choose a Source",
-                items: MeasurementSexSource.pickerItems,
-                pickedItem: model.sexSource?.pickerItem,
-                didPick: {
-                    Haptics.feedback(style: .soft)
-                    guard let pickedSource = MeasurementSource(pickerItem: $0) else { return }
-                    model.changeSexSource(to: pickedSource)
-                }
-            )
-        }
-        
+
         var pickerButton: some View {
             Button {
                 Haptics.feedback(style: .soft)
-                showingSourcePicker = true
+                showSourcePicker()
             } label: {
                 label
             }
-            .sheet(isPresented: $showingSourcePicker) { sourcePickerSheet }
         }
 
         return HStack {

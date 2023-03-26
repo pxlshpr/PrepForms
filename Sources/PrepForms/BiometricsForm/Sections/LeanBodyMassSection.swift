@@ -11,50 +11,24 @@ struct LeanBodyMassSection: View {
     @Binding var footerString: String
     @EnvironmentObject var model: BiometricsModel
     @State var showFormOnAppear = false
-    @State var presentedSheet: Sheet? = nil
-    
-    enum Sheet: String, Identifiable {
-        case sourcePicker
-        case equationPicker
-        
-        var id: String { rawValue }
-    }
+    let sheetPresenter: (LeanBodyMassSheet) -> ()
 
-    init(includeHeader: Bool = true, footerString: Binding<String> = .constant("")) {
+    init(
+        includeHeader: Bool = true,
+        footerString: Binding<String> = .constant(""),
+        sheetPresenter: @escaping (LeanBodyMassSheet) -> ()
+    ) {
         self.includeHeader = includeHeader
         _footerString = footerString
+        self.sheetPresenter = sheetPresenter
     }
     
     var body: some View {
         FormStyledSection(header: header) {
             content
         }
-        .sheet(item: $presentedSheet) { sheet(for: $0) }
     }
     
-    @ViewBuilder
-    func sheet(for sheet: Sheet) -> some View {
-        switch sheet {
-        case .sourcePicker:
-            sourcePickerSheet
-        case .equationPicker:
-            equationPickerSheet
-        }
-    }
-    
-    var equationPickerSheet: some View {
-        PickerSheet(
-            title: "Equation",
-            items: LeanBodyMassEquation.pickerItems,
-            pickedItem: model.lbmEquation.pickerItem,
-            didPick: {
-                Haptics.feedback(style: .soft)
-                guard let pickedEquation = LeanBodyMassEquation(pickerItem: $0) else { return }
-                model.changeLBMEquation(to: pickedEquation)
-            }
-        )
-    }
-
     @ViewBuilder
     var header: some View {
         if includeHeader {
@@ -103,7 +77,7 @@ struct LeanBodyMassSection: View {
             var button: some View {
                 Button {
                     Haptics.feedback(style: .soft)
-                    present(.equationPicker)
+                    present(.equation)
                 } label: {
                     PickerLabel(
                         model.lbmEquation.year,
@@ -223,21 +197,6 @@ struct LeanBodyMassSection: View {
             )
         }
     }
-    
-    var sourcePickerSheet: some View {
-        PickerSheet(
-            title: "Choose a Source",
-            items: LeanBodyMassSource.pickerItems,
-            pickedItem: model.lbmSource?.pickerItem,
-            didPick: {
-                Haptics.feedback(style: .soft)
-                guard let pickedSource = LeanBodyMassSource(pickerItem: $0) else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                    model.changeLBMSource(to: pickedSource)
-                }
-            }
-        )
-    }
 
     var sourceSection: some View {
   
@@ -248,7 +207,7 @@ struct LeanBodyMassSection: View {
         var pickerButton: some View {
             Button {
                 Haptics.feedback(style: .soft)
-                present(.sourcePicker)
+                present(.source)
             } label: {
                 label
             }
@@ -260,24 +219,7 @@ struct LeanBodyMassSection: View {
         }
     }
     
-    func present(_ sheet: Sheet) {
-        
-        func present() {
-            Haptics.feedback(style: .soft)
-            presentedSheet = sheet
-        }
-        
-        func delayedPresent() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                present()
-            }
-        }
-        
-        if presentedSheet != nil {
-            presentedSheet = nil
-            delayedPresent()
-        } else {
-            present()
-        }
+    func present(_ sheet: LeanBodyMassSheet) {
+        sheetPresenter(sheet)
     }
 }

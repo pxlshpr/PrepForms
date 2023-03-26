@@ -44,7 +44,7 @@ extension BiometricsModel {
                 }
             )
         }
-
+        
         var intervalPeriod: some View {
             PickerSheet(
                 title: "Duration to average",
@@ -74,7 +74,7 @@ extension BiometricsModel {
                 }
             )
         }
-
+        
         var equation: some View {
             PickerSheet(
                 title: "Equation",
@@ -101,7 +101,6 @@ extension BiometricsModel {
         }
     }
     
- 
     func activeEnergySheet(for sheet: ActiveEnergySheet) -> some View {
         
         var intervalType: some View {
@@ -116,7 +115,7 @@ extension BiometricsModel {
                 }
             )
         }
-
+        
         var intervalPeriod: some View {
             PickerSheet(
                 title: "Duration to average",
@@ -159,7 +158,7 @@ extension BiometricsModel {
                 }
             )
         }
-
+        
         var source: some View {
             PickerSheet(
                 title: "Choose a Source",
@@ -188,6 +187,86 @@ extension BiometricsModel {
             }
         }
         
+    }
+    
+    func leanBodyMassSheet(for sheet: LeanBodyMassSheet) -> some View {
+        
+        var equation: some View {
+            PickerSheet(
+                title: "Equation",
+                items: LeanBodyMassEquation.pickerItems,
+                pickedItem: lbmEquation.pickerItem,
+                didPick: {
+                    Haptics.feedback(style: .soft)
+                    guard let pickedEquation = LeanBodyMassEquation(pickerItem: $0) else { return }
+                    self.changeLBMEquation(to: pickedEquation)
+                }
+            )
+        }
+        
+        var source: some View {
+            PickerSheet(
+                title: "Choose a Source",
+                items: LeanBodyMassSource.pickerItems,
+                pickedItem: lbmSource?.pickerItem,
+                didPick: {
+                    Haptics.feedback(style: .soft)
+                    guard let pickedSource = LeanBodyMassSource(pickerItem: $0) else { return }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                        self.changeLBMSource(to: pickedSource)
+                    }
+                }
+            )
+        }
+        
+        return Group {
+            switch sheet {
+            case .source:
+                source
+            case .equation:
+                equation
+            }
+        }
+    }
+
+    func measurementSourcePickerSheet(for biometricType: BiometricType) -> some View {
+        
+        var measurementSource: MeasurementSource? {
+            switch biometricType {
+            case .sex:      return sexSource
+            case .age:      return ageSource
+            case .weight:   return weightSource
+            case .height:   return heightSource
+            default:        return nil
+            }
+        }
+        
+        func handlePickedItem(_ pickerItem: PickerItem) {
+            Haptics.feedback(style: .soft)
+            guard let pickedSource = MeasurementSource(pickerItem: pickerItem) else {
+                return
+            }
+            
+            switch biometricType {
+            case .sex:
+                changeSexSource(to: pickedSource)
+            case .age:
+                changeAgeSource(to: pickedSource)
+            case .weight:
+                changeWeightSource(to: pickedSource)
+            case .height:
+                changeHeightSource(to: pickedSource)
+            default:
+                break
+            }
+        }
+        
+        return PickerSheet(
+            title: "Choose a Source",
+            items: MeasurementSource.pickerItems,
+            pickedItem: measurementSource?.pickerItem,
+            didPick: handlePickedItem
+        )
     }
     
 }

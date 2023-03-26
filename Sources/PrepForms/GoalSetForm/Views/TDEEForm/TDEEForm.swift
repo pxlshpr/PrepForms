@@ -131,26 +131,6 @@ extension TDEEForm {
         
         var id: Self { self }
     }
-}
-
-enum LeanBodyMassSheet: Hashable, Identifiable {
-    case source
-    case equation
-    
-    var id: Self { self }
-}
-
-enum ActiveEnergySheet: Hashable, Identifiable {
-    case source
-    case intervalType
-    case intervalPeriod
-    case intervalValue
-    case activityLevel
-
-    var id: Self { self }
-}
-
-extension TDEEForm {
     
     @ViewBuilder
     func sheet(for sheet: Sheet) -> some View {
@@ -185,4 +165,21 @@ extension TDEEForm {
             present()
         }
     }
+}
+
+enum LeanBodyMassSheet: Hashable, Identifiable {
+    case source
+    case equation
+    
+    var id: Self { self }
+}
+
+enum ActiveEnergySheet: Hashable, Identifiable {
+    case source
+    case intervalType
+    case intervalPeriod
+    case intervalValue
+    case activityLevel
+
+    var id: Self { self }
 }

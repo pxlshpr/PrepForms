@@ -11,7 +11,8 @@ struct LeanBodyMassForm: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var model: BiometricsModel
     @State var detent: PresentationDetent
-
+    @State var presentedSheet: Sheet? = nil
+    
     init(_ model: BiometricsModel) {
         self.model = model
         let detent = model.lbmSource?.usesWeight == true ? .large : collapsedDetent
@@ -22,6 +23,7 @@ struct LeanBodyMassForm: View {
         content
             .presentationDetents([collapsedDetent, .large], selection: $detent)
             .onChange(of: model.lbmSource, perform: lbmSourceChanged)
+            .sheet(item: $presentedSheet) { sheet(for: $0) }
     }
     
     func lbmSourceChanged(newSource: LeanBodyMassSource?) {
@@ -52,18 +54,14 @@ struct LeanBodyMassForm: View {
     
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-//            if isValid {
-                doneButton
-//            } else {
-//                dismissButton
-//            }
+            doneButton
         }
     }
     
     var isValid: Bool {
         model.lbm != nil
     }
-
+    
     @ViewBuilder
     var doneButton: some View {
         Button {
@@ -71,14 +69,6 @@ struct LeanBodyMassForm: View {
             dismiss()
         } label: {
             Text("Done")
-//                .fontWeight(.bold)
-//                .foregroundColor(.white)
-//                .frame(height: 32)
-//                .padding(.horizontal, 8)
-//                .background(
-//                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-//                        .fill(Color.accentColor.gradient)
-//                )
         }
     }
     
@@ -90,7 +80,7 @@ struct LeanBodyMassForm: View {
             CloseButtonLabel()
         }
     }
-
+    
     var infoSection: some View {
         FormStyledSection {
             Text("Lean body mass is the weight of your body minus your body fat (adipose tissue).")
@@ -101,9 +91,13 @@ struct LeanBodyMassForm: View {
     }
     
     var leanBodyMassSection: some View {
-        LeanBodyMassSection(
+        func presentSheet(_ sheet: LeanBodyMassSheet) {
+            present(.leanBodyMass(sheet))
+        }
+        return LeanBodyMassSection(
             includeHeader: false,
-            footerString: footerStringBinding
+            footerString: footerStringBinding,
+            sheetPresenter: presentSheet
         )
         .environmentObject(model)
     }
@@ -133,8 +127,7 @@ struct LeanBodyMassForm: View {
             Text("of")
                 .font(.title)
                 .foregroundColor(Color(.quaternaryLabel))
-            WeightSection()
-                .environmentObject(model)
+            weightSection
         }
     }
     
@@ -143,13 +136,31 @@ struct LeanBodyMassForm: View {
             Text("with")
                 .font(.title)
                 .foregroundColor(Color(.quaternaryLabel))
-            BiologicalSexSection(includeFooter: true)
-                .environmentObject(model)
-            WeightSection()
-                .environmentObject(model)
-            HeightSection()
-                .environmentObject(model)
+            sexSection
+            weightSection
+            heightSection
         }
+    }
+    
+    var sexSection: some View {
+        BiologicalSexSection(includeFooter: true) {
+            present(.sexSource)
+        }
+        .environmentObject(model)
+    }
+    
+    var heightSection: some View {
+        HeightSection {
+            present(.heightSource)
+        }
+        .environmentObject(model)
+    }
+    
+    var weightSection: some View {
+        WeightSection {
+            present(.weightSource)
+        }
+        .environmentObject(model)
     }
     
     @ViewBuilder
@@ -172,6 +183,54 @@ struct LeanBodyMassForm: View {
             } label: {
                 ButtonLabel(title: "Sync All", style: .health, isCompact: true)
             }
+        }
+    }
+}
+
+extension LeanBodyMassForm {
+    
+    enum Sheet: Hashable, Identifiable {
+        case leanBodyMass(LeanBodyMassSheet)
+        case weightSource
+        case heightSource
+        case sexSource
+        
+        var id: Self { self }
+    }
+    
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        
+        switch sheet {
+        case .leanBodyMass(let leanBodyMassSheet):
+            model.leanBodyMassSheet(for: leanBodyMassSheet)
+        case .weightSource:
+            model.measurementSourcePickerSheet(for: .weight)
+        case .heightSource:
+            model.measurementSourcePickerSheet(for: .height)
+        case .sexSource:
+            model.measurementSourcePickerSheet(for: .sex)
+        }
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedSheet = sheet
+        }
+        
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+        
+        if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else {
+            present()
         }
     }
 }

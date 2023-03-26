@@ -8,7 +8,8 @@ struct RestingEnergyComponents: View {
     
     @Environment(\.dismiss) var dismiss
     @ObservedObject var model: BiometricsModel
-    
+    @State var presentedSheet: Sheet? = nil
+
     init(_ model: BiometricsModel) {
         self.model = model
     }
@@ -21,17 +22,42 @@ struct RestingEnergyComponents: View {
         NavigationView {
             FormStyledScrollView {
                 infoSection
-                AgeSection()
-                BiologicalSexSection(includeFooter: true)
-                WeightSection()
+                ageSection
+                sexSection
+                weightSection
                 if model.restingEnergyEquation.requiresHeight {
-                    HeightSection()
+                    heightSection
                 }
             }
             .navigationTitle("Components")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { leadingContent }
             .toolbar { trailingContent }
+            .sheet(item: $presentedSheet) { sheet(for: $0) }
+        }
+    }
+    
+    var ageSection: some View {
+        AgeSection {
+            present(.ageSource)
+        }
+    }
+    
+    var sexSection: some View {
+        BiologicalSexSection(includeFooter: true) {
+            present(.sexSource)
+        }
+    }
+    
+    var weightSection: some View {
+        WeightSection {
+            present(.weightSource)
+        }
+    }
+    
+    var heightSection: some View {
+        HeightSection {
+            present(.heightSource)
         }
     }
     
@@ -91,6 +117,53 @@ struct RestingEnergyComponents: View {
             } label: {
                 ButtonLabel(title: "Sync All", style: .health, isCompact: true)
             }
+        }
+    }
+}
+
+extension RestingEnergyComponents {
+    
+    enum Sheet: Hashable, Identifiable {
+        case weightSource
+        case heightSource
+        case ageSource
+        case sexSource
+
+        var id: Self { self }
+    }
+    
+    @ViewBuilder
+    func sheet(for sheet: Sheet) -> some View {
+        switch sheet {
+        case .weightSource:
+            model.measurementSourcePickerSheet(for: .weight)
+        case .heightSource:
+            model.measurementSourcePickerSheet(for: .height)
+        case .ageSource:
+            model.measurementSourcePickerSheet(for: .age)
+        case .sexSource:
+            model.measurementSourcePickerSheet(for: .sex)
+        }
+    }
+    
+    func present(_ sheet: Sheet) {
+        
+        func present() {
+            Haptics.feedback(style: .soft)
+            presentedSheet = sheet
+        }
+        
+        func delayedPresent() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                present()
+            }
+        }
+        
+        if presentedSheet != nil {
+            presentedSheet = nil
+            delayedPresent()
+        } else {
+            present()
         }
     }
 }

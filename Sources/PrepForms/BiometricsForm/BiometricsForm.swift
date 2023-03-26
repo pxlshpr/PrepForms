@@ -261,27 +261,38 @@ extension BiometricsForm {
     }
 
     var weightSection: some View {
-        WeightSection()
-            .environmentObject(model)
+        WeightSection {
+            present(.weightSource)
+        }
+        .environmentObject(model)
     }
-
+    
     var heightSection: some View {
-        HeightSection()
-            .environmentObject(model)
+        HeightSection {
+            present(.heightSource)
+        }
+        .environmentObject(model)
     }
 
     var biologicalSexSection: some View {
-        BiologicalSexSection()
-            .environmentObject(model)
+        BiologicalSexSection {
+            present(.sexSource)
+        }
+        .environmentObject(model)
     }
     
     var ageSection: some View {
-        AgeSection()
-            .environmentObject(model)
+        AgeSection {
+            present(.ageSource)
+        }
+        .environmentObject(model)
     }
     
     var leanBodyMassSection: some View {
-        LeanBodyMassSection()
+        func presentSheet(_ sheet: LeanBodyMassSheet) {
+            present(.leanBodyMass(sheet))
+        }
+        return LeanBodyMassSection(sheetPresenter: presentSheet)
             .environmentObject(model)
     }
 }
@@ -316,25 +327,16 @@ extension BiometricsForm {
             model.activeEnergySheet(for: activeEnergySheet)
             
         case .leanBodyMass(let leanBodyMassSheet):
-            switch leanBodyMassSheet {
-            case .source:
-                EmptyView()
-            case .equation:
-                EmptyView()
-            }
+            model.leanBodyMassSheet(for: leanBodyMassSheet)
             
         case .weightSource:
-            EmptyView()
-            
+            model.measurementSourcePickerSheet(for: .weight)
         case .heightSource:
-            EmptyView()
-            
+            model.measurementSourcePickerSheet(for: .height)
         case .ageSource:
-            EmptyView()
-            
+            model.measurementSourcePickerSheet(for: .age)
         case .sexSource:
-            EmptyView()
-            
+            model.measurementSourcePickerSheet(for: .sex)
         }
     }
     

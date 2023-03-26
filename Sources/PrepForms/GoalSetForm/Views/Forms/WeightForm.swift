@@ -6,29 +6,43 @@ import SwiftHaptics
 struct WeightForm: View {
 
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @StateObject var model: BiometricsModel = BiometricsModel()
+    @State var showingSourcePicker: Bool = false
     
     var body: some View {
         NavigationView {
             VStack {
-                WeightSection(includeHeader: false)
-                    .environmentObject(model)
+                WeightSection(
+                    includeHeader: false,
+                    showSourcePicker: showSourcePicker
+                )
+                .environmentObject(model)
                 Spacer()
             }
             .navigationTitle("Weight")
             .toolbar { trailingContent }
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showingSourcePicker) { sourcePicker }
+            .background(
+                formBackgroundColor(colorScheme: colorScheme)
+                    .edgesIgnoringSafeArea(.all)
+            )
         }
         .presentationDetents([.height(300)])
     }
     
+    var sourcePicker: some View {
+        model.measurementSourcePickerSheet(for: .weight)
+    }
+    
+    func showSourcePicker() {
+        showingSourcePicker = true
+    }
+    
     var trailingContent: some ToolbarContent {
         ToolbarItemGroup(placement: .navigationBarTrailing) {
-//            if isValid {
-                doneButton
-//            } else {
-//                dismissButton
-//            }
+            doneButton
         }
     }
     
@@ -43,14 +57,6 @@ struct WeightForm: View {
             dismiss()
         } label: {
             Text("Done")
-//                .fontWeight(.bold)
-//                .foregroundColor(.white)
-//                .frame(height: 32)
-//                .padding(.horizontal, 8)
-//                .background(
-//                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-//                        .fill(Color.accentColor.gradient)
-//                )
         }
     }
     
