@@ -3,6 +3,41 @@ import SwiftUISugar
 import PrepDataTypes
 import SwiftHaptics
 
+extension Double {
+    var isGreaterThan0: Bool {
+        self > 0
+    }
+}
+
+extension Optional where Wrapped == Double {
+    var isGreaterThan0: Bool {
+        return self?.isGreaterThan0 ?? true
+    }
+}
+
+extension GoalModel {
+    func cellLowerBound(_ showingEquivalentValues: Bool) -> Double? {
+        if showingEquivalentValues, let equivalentLowerBound {
+            return equivalentLowerBound
+        } else {
+            return lowerBound
+        }
+    }
+    
+    func cellUpperBound(_ showingEquivalentValues: Bool) -> Double? {
+        if showingEquivalentValues, let equivalentUpperBound {
+            return equivalentUpperBound
+        } else {
+            return upperBound ?? 0
+        }
+    }
+
+    func shouldShowType(_ showingEquivalentValues: Bool) -> Bool {
+        guard hasOneBound else { return false }
+        guard !showingEquivalentValues else { return false }
+        return type.showsEquivalentValues
+    }
+}
 struct GoalCell: View {
     
     @Environment(\.colorScheme) var colorScheme
@@ -10,21 +45,18 @@ struct GoalCell: View {
     @ObservedObject var model: GoalModel
     @Binding var showingEquivalentValues: Bool
 
-    @State var lowerBound: Double? = nil
-    @State var upperBound: Double? = nil
+    @State var lowerBound: Double?
+    @State var upperBound: Double?
+    @State var hasValidUpperBound: Bool
+    @State var hasValidLowerBound: Bool
+    @State var lowerBoundPrefix: String?
+    @State var upperBoundPrefix: String?
+    @State var lowerBoundSuffix: String?
+    @State var upperBoundSuffix: String?
+    @State var typeDescription: String?
+    @State var typeImage: String?
+    @State var shouldShowType: Bool
 
-    @State var shouldShowType: Bool = false
-    @State var typeDescription: String? = nil
-    @State var typeImage: String? = nil
-
-    @State var hasValidUpperBound: Bool = true
-    @State var hasValidLowerBound: Bool = true
-
-    @State var lowerBoundPrefix: String? = nil
-    @State var upperBoundPrefix: String? = nil
-    @State var lowerBoundSuffix: String? = nil
-    @State var upperBoundSuffix: String? = nil
-    
     let actionHandler: (Action) -> ()
 
     enum Action {
@@ -39,6 +71,22 @@ struct GoalCell: View {
     ) {
         self.model = model
         self.actionHandler = actionHandler
+        
+        let isEquivalent = showingEquivalentValues.wrappedValue
+        let lowerBound = model.cellLowerBound(isEquivalent)
+        let upperBound = model.cellUpperBound(isEquivalent)
+        _lowerBound = State(initialValue: lowerBound)
+        _upperBound = State(initialValue: upperBound)
+        _hasValidLowerBound = State(initialValue: lowerBound.isGreaterThan0)
+        _hasValidUpperBound = State(initialValue: upperBound.isGreaterThan0)
+        _lowerBoundPrefix = State(initialValue: model.lowerBoundPrefix(equivalent: isEquivalent))
+        _upperBoundPrefix = State(initialValue: model.upperBoundPrefix(equivalent: isEquivalent))
+        _lowerBoundSuffix = State(initialValue: model.lowerBoundSuffix(equivalent: isEquivalent))
+        _upperBoundSuffix = State(initialValue: model.upperBoundSuffix(equivalent: isEquivalent))
+        _typeDescription = State(initialValue: model.type.accessoryDescription)
+        _typeImage = State(initialValue: model.type.accessorySystemImage)
+        _shouldShowType = State(initialValue: model.shouldShowType(isEquivalent))
+
         _showingEquivalentValues = showingEquivalentValues
     }
     
@@ -49,9 +97,6 @@ struct GoalCell: View {
             .onChange(of: model.type, perform: typeChanged)
             .onChange(of: showingEquivalentValues, perform: showingEquivalentValuesChanged)
             .onReceive(didSetBiometrics, perform: didSetBiometrics)
-            .onAppear {
-                updateWithAnimation()
-            }
     }
     
     func didSetBiometrics(_ notification: Notification) {
@@ -297,35 +342,40 @@ struct GoalCell: View {
     //MARK: - Computed
     
     var computedShouldShowType: Bool {
-        guard model.hasOneBound else { return false }
-        guard !showingEquivalentValues else { return false }
-        return model.type.showsEquivalentValues
+        model.shouldShowType(showingEquivalentValues)
+//        guard model.hasOneBound else { return false }
+//        guard !showingEquivalentValues else { return false }
+//        return model.type.showsEquivalentValues
     }
     
     var computedUpperBound: Double? {
-        if showingEquivalentValues, let upperBound = model.equivalentUpperBound {
-            return upperBound
-        } else {
-            return model.upperBound ?? 0
-        }
+        model.cellUpperBound(showingEquivalentValues)
+//        if showingEquivalentValues, let upperBound = model.equivalentUpperBound {
+//            return upperBound
+//        } else {
+//            return model.upperBound ?? 0
+//        }
     }
     
     var computedLowerBound: Double? {
-        if showingEquivalentValues, let lowerBound = model.equivalentLowerBound {
-            return lowerBound
-        } else {
-            return model.lowerBound
-        }
+        model.cellLowerBound(showingEquivalentValues)
+//        if showingEquivalentValues, let lowerBound = model.equivalentLowerBound {
+//            return lowerBound
+//        } else {
+//            return model.lowerBound
+//        }
     }
 
     var computedHasValidLowerBound: Bool {
-        guard let lowerBound else { return false }
-        return lowerBound > 0
+        lowerBound.isGreaterThan0
+//        guard let lowerBound else { return false }
+//        return lowerBound > 0
     }
     
     var computedHasValidUpperBound: Bool {
-        guard let upperBound else { return false }
-        return upperBound > 0
+        upperBound.isGreaterThan0
+//        guard let upperBound else { return false }
+//        return upperBound > 0
     }
 
     //MARK: - Actions
@@ -344,9 +394,9 @@ struct GoalCell: View {
             self.lowerBoundSuffix = model.lowerBoundSuffix(equivalent: showingEquivalentValues)
             self.upperBoundSuffix = model.upperBoundSuffix(equivalent: showingEquivalentValues)
 
-            self.shouldShowType = computedShouldShowType
             self.typeDescription = model.type.accessoryDescription
             self.typeImage = model.type.accessorySystemImage
+            self.shouldShowType = computedShouldShowType
         }
         
         if animated {
