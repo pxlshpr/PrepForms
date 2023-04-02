@@ -369,7 +369,7 @@ extension FieldValue {
             if weightFirst {
                 return "\(weight.description) ↔ \(volume.description)"
             } else {
-                return " \(volume.description) ↔ \(weight.description)"
+                return "\(volume.description) ↔ \(weight.description)"
             }
         }
         

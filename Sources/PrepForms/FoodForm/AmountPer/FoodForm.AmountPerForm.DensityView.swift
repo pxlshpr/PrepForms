@@ -14,9 +14,9 @@ extension FoodForm.AmountPerForm.DensityView {
             Image(systemName: "arrow.triangle.swap")
                 .foregroundColor(Color(.tertiaryLabel))
             if let densityValue = field.value.densityValue,
-               densityValue.isValid,
-               let description = densityValue.description(weightFirst: isWeightBased)
+               densityValue.isValid
             {
+                let description = densityValue.description(weightFirst: isWeightBased)
                 Text(description)
                     .foregroundColor(Color(.secondaryLabel))
             } else {
