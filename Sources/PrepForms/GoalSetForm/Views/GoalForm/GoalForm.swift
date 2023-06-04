@@ -99,7 +99,8 @@ public struct GoalForm: View {
     var quickForm: some View {
         QuickForm(
             title: model.description,
-            lighterBackground: false,
+            backgroundStyle: .standard,
+//            lighterBackground: false,
             saveAction: saveAction,
             deleteAction: deleteActionBinding
         ) {
